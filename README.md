@@ -4,6 +4,7 @@ colorpicker addon for codemirror
 # How to use 
 
 ```
+<link rel="stylesheet" href="addon/colorpicker/colorpicker" />
 <script src="addon/colorpicker/colorpicker.js"></script>
 ```
 
