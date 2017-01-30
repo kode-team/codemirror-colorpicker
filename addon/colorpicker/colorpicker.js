@@ -13,6 +13,10 @@
 
          var color = {
 
+             trim : function (str) {
+                return str.replace(/^\s+|\s+$/g, '');
+             },
+
             /**
              * @method format
              *
@@ -49,6 +53,12 @@
                     } else {
                         return "rgba(" + [obj.r, obj.g, obj.b, obj.a].join(",") + ")";
                     }
+                } else if (type == 'hsl') {
+                    if (typeof obj.a == 'undefined') {
+                        return "hsl(" + [obj.h, obj.s, obj.l].join(",") + ")";
+                    } else {
+                        return "hsla(" + [obj.h, obj.s, obj.l, obj.a].join(",") + ")";
+                    }
                 }
 
                 return obj;
@@ -73,7 +83,7 @@
                         var arr = str.replace("rgb(", "").replace(")","").split(",");
 
                         for(var i = 0, len = arr.length; i < len; i++) {
-                            arr[i] = parseInt(_.trim(arr[i]), 10);
+                            arr[i] = parseInt(color.trim(arr[i]), 10);
                         }
 
                         return { type : 'rgb', r : arr[0], g : arr[1], b : arr[2], a : 1	};
@@ -83,9 +93,9 @@
                         for(var i = 0, len = arr.length; i < len; i++) {
 
                             if (len - 1 == i) {
-                                arr[i] = parseFloat(_.trim(arr[i]));
+                                arr[i] = parseFloat(color.trim(arr[i]));
                             } else {
-                                arr[i] = parseInt(_.trim(arr[i]), 10);
+                                arr[i] = parseInt(color.trim(arr[i]), 10);
                             }
                         }
 

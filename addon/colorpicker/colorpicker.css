@@ -73,7 +73,7 @@
 }
 .codemirror-colorpicker > .control > .hue {
   position: relative;
-  padding: 8px 12px;
+  padding: 6px 12px;
   margin: 0px 0px 0px 45px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -83,29 +83,29 @@
 .codemirror-colorpicker > .control > .hue > .hue-container {
   position: relative;
   width: 157px;
-  height: 6px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  height: 10px;
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  border-radius: 1px;
 }
 .codemirror-colorpicker > .control > .opacity {
   position: relative;
   width: 143px;
-  padding: 8px 12px;
+  padding: 3px 12px;
   margin: 0px 0px 0px 45px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: pointer;
 }
-.codemirror-colorpicker > .control > .opacity > .container {
+.codemirror-colorpicker > .control > .opacity > .opacity-container {
   position: relative;
   width: 100%;
-  height: 3px;
+  height: 10px;
   z-index: 2;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  border-radius: 1px;
 }
 .codemirror-colorpicker > .control > .input {
   position: absolute;
@@ -188,20 +188,9 @@
 .codemirror-colorpicker {
   border: 1px solid #ececec;
   background-color: #fff;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
   -webkit-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
   -moz-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
   box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
-}
-.codemirror-colorpicker > .color {
-  -webkit-border-top-right-radius: 5px;
-  -moz-border-radius-topright: 5px;
-  border-top-right-radius: 5px;
-  -webkit-border-top-left-radius: 5px;
-  -moz-border-radius-topleft: 5px;
-  border-top-left-radius: 5px;
 }
 .codemirror-colorpicker > .color > .saturation {
   background-color: rgba(204, 154, 129, 0);
