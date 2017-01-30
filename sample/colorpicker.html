@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css" />
+
+    <script type="text/javascript" src="../node_modules/codemirror/lib/codemirror.js" ></script>
+    <script type="text/javascript" src="../node_modules/codemirror/mode/css/css.js" ></script>
+    <link rel="stylesheet" href="../addon/colorpicker/colorpicker.css" />    
+    <script type="text/javascript" src="../addon/colorpicker/colorview.js" ></script>
+    <script type="text/javascript" src="../addon/colorpicker/colorpicker.js" ></script>
+
+</head>
+<body>
+
+
+<script type="text/javascript">
+    CodeMirror(document.body, {
+        lineNumbers: true, 
+        mode : "css",
+        colorpicker : {
+            mode : 'edit'
+        }
+    })
+</script>
+</body>
+
+</html>
