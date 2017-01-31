@@ -279,6 +279,7 @@
              HSLtoRGB : function (h, s, l) {
                  var r, g, b;
 
+                 h /= 360;
                  s /= 100;
                  l /= 100;
 
@@ -831,6 +832,8 @@
             var c = newColor || "#FF0000",
                 rgb = color.parse(c);
 
+            console.log(rgb);
+
             $information.data('format', rgb.type);
 
             initFormat();
@@ -1185,21 +1188,21 @@
         }
 
 
-        function show (line, ch, color,  callback) {
+        function show (pos, color,  callback) {
             destroy();
             initEvent();
             $root.appendTo(document.body);
-            $root.show();
-            isColorPickerShow = true;
-
-            initColor(color);
-            var pos = cm.charCoords({line : line, ch : ch });       
 
             $root.css({
                 position: 'absolute',
                 left : pos.left + 'px',
-                top : (pos.bottom) + 'px'
+                top : pos.top + 'px'
             });
+
+            $root.show();
+            isColorPickerShow = true;
+
+            initColor(color);
 
             // define colorpicker callback
             colorpickerCallback = function (colorString) {

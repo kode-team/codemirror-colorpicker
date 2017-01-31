@@ -115,7 +115,8 @@
 		if (this.colorpicker) {
 			var self = this; 
 			var prevColor = color;
-			this.colorpicker.show(lineNo, ch, color, function (newColor) {
+            var pos = this.cm.charCoords({line : lineNo, ch : ch });
+            this.colorpicker.show({ left : pos.left, top : pos.bottom }, color, function (newColor) {
 				self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, prevColor);
 				prevColor = newColor; 
 			});
