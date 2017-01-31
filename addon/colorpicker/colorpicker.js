@@ -46,7 +46,7 @@
                     var b = obj.b.toString(16);
                     if (obj.b < 16) b = "0" + b;
 
-                    return "#" + [r,g,b].join("").toUpperCase();
+                    return "#" + [r, g, b].join("");
                 } else if (type == 'rgb') {
                     if (typeof obj.a == 'undefined') {
                         return "rgb(" + [obj.r, obj.g, obj.b].join(",") + ")";
@@ -55,9 +55,9 @@
                     }
                 } else if (type == 'hsl') {
                     if (typeof obj.a == 'undefined') {
-                        return "hsl(" + [obj.h, obj.s, obj.l].join(",") + ")";
+                        return "hsl(" + [obj.h, obj.s + '%', obj.l + '%'].join(",") + ")";
                     } else {
-                        return "hsla(" + [obj.h, obj.s, obj.l, obj.a].join(",") + ")";
+                        return "hsla(" + [obj.h, obj.s + '%', obj.l + '%', obj.a].join(",") + ")";
                     }
                 }
 
@@ -87,9 +87,9 @@
 
                         return { type : 'rgb', r : arr[0], g : arr[1], b : arr[2], a : 1	};
                     } else if (str.indexOf("rgba(") > -1) {
-                        var arr = str.replace("rgba(", "").replace(")","").split(",");
+                        var arr = str.replace("rgba(", "").replace(")", "").split(",");
 
-                        for(var i = 0, len = arr.length; i < len; i++) {
+                        for (var i = 0, len = arr.length; i < len; i++) {
 
                             if (len - 1 == i) {
                                 arr[i] = parseFloat(color.trim(arr[i]));
@@ -98,7 +98,44 @@
                             }
                         }
 
-                        return { type : 'rgba',  r : arr[0], g : arr[1], b : arr[2], a : arr[3]};
+                        return {type: 'rgba', r: arr[0], g: arr[1], b: arr[2], a: arr[3]};
+                    } else if (str.indexOf("hsl(") > -1) {
+                        var arr = str.replace("hsl(", "").replace(")","").split(",");
+
+                        for(var i = 0, len = arr.length; i < len; i++) {
+                            arr[i] = parseInt(color.trim(arr[i]), 10);
+                        }
+
+                        var obj = { type : 'hsl', h : arr[0], s : arr[1], l : arr[2], a : 1	};
+
+                        var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
+
+                        obj.r = temp.r;
+                        obj.g = temp.g;
+                        obj.b = temp.b;
+
+                        return obj;
+                    } else if (str.indexOf("hsla(") > -1) {
+                        var arr = str.replace("hsla(", "").replace(")", "").split(",");
+
+                        for (var i = 0, len = arr.length; i < len; i++) {
+
+                            if (len - 1 == i) {
+                                arr[i] = parseFloat(color.trim(arr[i]));
+                            } else {
+                                arr[i] = parseInt(color.trim(arr[i]), 10);
+                            }
+                        }
+
+                        var obj = {type: 'hsla', h: arr[0], s: arr[1], l: arr[2], a: arr[3]};
+
+                        var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
+
+                        obj.r = temp.r;
+                        obj.g = temp.g;
+                        obj.b = temp.b;
+
+                        return obj;
                     } else if (str.indexOf("#") == 0) {
 
                         str = str.replace("#", "");
@@ -207,7 +244,66 @@
                 var V = MaxC;
 
                 return { h : H, s : S, v :  V };
-            }
+            },
+
+             RGBtoHSL : function (r, g, b) {
+                 r /= 255, g /= 255, b /= 255;
+                 var max = Math.max(r, g, b), min = Math.min(r, g, b);
+                 var h, s, l = (max + min) / 2;
+
+                 if(max == min){
+                     h = s = 0; // achromatic
+                 }else{
+                     var d = max - min;
+                     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                     switch(max){
+                         case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                         case g: h = (b - r) / d + 2; break;
+                         case b: h = (r - g) / d + 4; break;
+                     }
+                     h /= 6;
+                 }
+
+                 return { h : Math.round(h * 360) , s : Math.round(s * 100), l : Math.round(l * 100)};
+             },
+
+             HUEtoRGB : function (p, q, t) {
+                 if(t < 0) t += 1;
+                 if(t > 1) t -= 1;
+                 if(t < 1/6) return p + (q - p) * 6 * t;
+                 if(t < 1/2) return q;
+                 if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                 return p;
+             },
+
+             HSLtoRGB : function (h, s, l) {
+                 var r, g, b;
+
+                 s /= 100;
+                 l /= 100;
+
+                 if(s == 0){
+                     r = g = b = l; // achromatic
+                 }else{
+                     var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                     var p = 2 * l - q;
+                     r = this.HUEtoRGB(p, q, h + 1/3);
+                     g = this.HUEtoRGB(p, q, h);
+                     b = this.HUEtoRGB(p, q, h - 1/3);
+                 }
+
+                 return { r : r * 255, g : g * 255, b : b * 255 };
+             },
+
+             HSVtoHSL : function (H, S, V) {
+
+                return { h : h , s : s, l : l }
+             },
+
+             HSLtoHSV : function (H, S, L) {
+
+                return { h: h, s : s, v : v};
+             }
         };
 
         var hue_color = [
@@ -221,12 +317,14 @@
         ];
 
         var $root, $hue, $color, $value, $saturation, $drag_pointer, $drag_bar,
-            $control, $controlPattern, $controlColor, $hueContainer, $opacity, $opacityContainer,
-            $opacity_drag_bar, $information;
+            $control, $controlPattern, $controlColor, $hueContainer, $opacity, $opacityContainer, $opacityColorBar, $formatChangeButton,
+            $opacity_drag_bar, $information, $informationChange;
 
+        var currentA, currentH, currentS, currentV;
         var $hexCode;
         var $rgb_r, $rgb_g, $rgb_b, $rgb_a;
         var $hsl_h, $hsl_s, $hsl_l, $hsl_a;
+        var cssPrefix = getCssValuePrefix();
 
         var colorpickerCallback = function () {};
         var counter = 0; 
@@ -249,6 +347,26 @@
             this.el = el;  
         }
 
+        dom.prototype.removeClass = function (cls) {
+            this.el.className = color.trim((" " + this.el.className + " ").replace(' ' + cls + ' ', ' '));
+        }
+
+        dom.prototype.hasClass = function (cls) {
+            if (!this.el.className)
+            {
+                return false;
+            } else {
+                var newClass = ' ' + this.el.className + ' ';
+                return newClass.indexOf(' ' + cls + ' ') > -1;
+            }
+        }
+
+        dom.prototype.addClass = function (cls) {
+            if (!this.hasClass(cls)) {
+                this.el.className = this.el.className + " " + cls;
+            }
+
+        }
 
         dom.prototype.html = function (html) {
             this.el.innerHTML = html;
@@ -376,18 +494,21 @@
             return this.css('display', 'none');
         }
 
-        function setRGBInput(r, g, b, a) {
+        function setRGBInput(r, g, b) {
             $rgb_r.val(r);
             $rgb_g.val(g);
             $rgb_b.val(b);
-            $rgb_a.val(a);
+            $rgb_a.val(currentA);
+
+            var hsl = color.RGBtoHSL(r, g, b);
+            setHSLInput(hsl.h, hsl.s, hsl.l);
         }
 
-        function setHSLInput(h, s, l, a) {
+        function setHSLInput(h, s, l) {
             $hsl_h.val(h);
-            $hsl_s.val(s);
-            $hsl_l.val(l);
-            $hsl_a.val(a);
+            $hsl_s.val(s + '%');
+            $hsl_l.val(l + '%');
+            $hsl_a.val(currentA);
         }
 
         function getHexFormat() {
@@ -398,39 +519,62 @@
             }, 'hex');
         }
 
-        function setInputColor(evtType) {
+        function convertRGB() {
+            return color.HSVtoRGB(currentH, currentS, currentV);
+        }
+
+        function convertHEX() {
+            return color.format(convertRGB(), 'hex');
+        }
+
+        function convertHSL() {
+            var rgb = color.HSVtoRGB(currentH, currentS, currentV);
+            return color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
+        }
+
+        function getFormattedColor (format) {
+            format = format || 'hex';
+
+            if (format == 'rgb') {
+                var rgb = convertRGB();
+                rgb.a = currentA == 1 ? undefined : currentA;
+                return color.format(rgb, 'rgb');
+            } else if (format == 'hsl') {
+                var hsl = convertHSL();
+                hsl.a = currentA == 1 ? undefined : currentA;
+                return color.format(hsl, 'hsl');
+            } else {
+                var rgb = convertRGB();
+                return color.format(rgb, 'hex');
+            }
+        }
+
+        function setInputColor() {
+
+            var format = $information.data('format') || 'hex';
 
             var rgb = null;
-            var alpha = caculateOpacity();
-            if (evtType == 'hex') {
-                rgb = color.parse($hexCode.val());
-
-                setRGBInput(rgb.r, rgb.g, rgb.b, alpha);
-
-            } else if (evtType == 'rgb') {
-                $hexCode.val(getHexFormat());
-                rgb = color.parse($hexCode.val());
-
-            } else {
-                var str = getColor('hex');
-                $hexCode.val( str);
-
-                rgb = color.parse($hexCode.val());
-
-                setRGBInput(rgb.r, rgb.g, rgb.b, alpha);
+            if (format == 'hex') {
+                $hexCode.val(convertHEX());
+            } else if (format == 'rgb') {
+                var rgb = convertRGB();
+                setRGBInput(rgb.r, rgb.g, rgb.b);
+            } else if (format == 'hsl') {
+                var hsl = convertHSL();
+                setHSLInput(hsl.h, hsl.s, hsl.l);
             }
 
-            // set alpha
-            rgb.a = alpha;
-
             // set background
+            var rgb = convertRGB();
             var colorString = color.format(rgb, 'rgb');
-            $controlColor.css('background-color', colorString);
+            $controlColor.css('background-color', getFormattedColor('rgb'));
+
+            setOpacityColorBar(colorString);
 
             if (typeof colorpickerCallback == 'function') {
 
-                if (!isNaN(rgb.a)) {
-                    colorpickerCallback(color.format(rgb, 'hex' ), rgb);
+                if (!isNaN(currentA)) {
+                    colorpickerCallback(getFormattedColor(format));
                 }
    
             }
@@ -456,6 +600,8 @@
             });
             
             $drag_pointer.data('pos', { x: x, y : y});
+
+            calculateHSV()
 
             setInputColor();
         }
@@ -515,7 +661,48 @@
 
             $color.css("background-color", hueColor);
 
+            currentH = (dist/100) * 360;
+
             setInputColor();
+        }
+
+        function getCssValuePrefix()
+        {
+            var rtrnVal = '';//default to standard syntax
+            var prefixes = ['', '-o-', '-ms-', '-moz-', '-webkit-'];
+
+            // Create a temporary DOM object for testing
+            var dom = document.createElement('div');
+
+            for (var i = 0; i < prefixes.length; i++)
+            {
+                // Attempt to set the style
+                dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
+
+                // Detect if the style was successfully set
+                if (dom.style.background)
+                {
+                    rtrnVal = prefixes[i];
+                }
+            }
+
+            dom = null;
+            delete dom;
+
+            return rtrnVal;
+        }
+
+        function setOpacityColorBar(hueColor) {
+            var rgb = color.parse(hueColor);
+
+            rgb.a = 0;
+            var start = color.format(rgb, 'rgb');
+
+            rgb.a = 1;
+            var end = color.format(rgb, 'rgb');
+
+            var prefix = cssPrefix;
+            $opacityColorBar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
         }
 
         function setOpacity(e) {
@@ -540,6 +727,10 @@
             
             $opacity_drag_bar.data('pos', { x : x });
 
+            caculateOpacity();
+
+            currentFormat();
+
             setInputColor();
         }
 
@@ -547,10 +738,10 @@
             var opacityPos = $opacity_drag_bar.data('pos') || { x : 0 };
             var a = Math.round((opacityPos.x / $opacityContainer.width()) * 100) / 100;
 
-            return isNaN(a) ? 1 : a;
+            currentA = isNaN(a) ? 1 : a;
         }
 
-        function calculateColor() {
+        function calculateHSV() {
             var pos = $drag_pointer.data('pos') || { x : 0, y : 0 };
             var huePos = $drag_bar.data('pos') || { x : 0 };
 
@@ -567,10 +758,9 @@
                 v = 0;
             }
 
-            var rgb = color.HSVtoRGB(h, s, v);
-            rgb.a = caculateOpacity();
-
-            return rgb;
+            currentH = h;
+            currentS = s;
+            currentV = v;
         }
 
         function pos(e) {
@@ -610,44 +800,52 @@
             if(parseInt(b) > 255) $rgb_b.val(255);
             else $rgb_b.val(parseInt(b));
 
-            initColor(getHexFormat(), "rgb");
+            initColor(getHexFormat());
         }
 
-        function initColor(newColor, evtType, callback) {
-            var c = newColor || "#FF0000",
-                rgb = color.parse(c);
-
-            $color.css("background-color", c);
-
-            var hsv = color.RGBtoHSV(rgb.r, rgb.g, rgb.b),
-                x = $color.width() * hsv.s,
-                y = $color.height() * ( 1 - hsv.v);
+        function setColorUI() {
+            var     x = $color.width() * currentH, y = $color.height() * ( 1 - currentV);
 
             $drag_pointer.css({
                 left : (x - 5) + "px",
                 top : (y - 5) + "px"
             });
-            
+
             $drag_pointer.data('pos', { x  : x, y : y });
 
-            var hueX = $hueContainer.width() * (hsv.h / 360);
+            var hueX = $hueContainer.width() * (currentH / 360);
 
             $drag_bar.css({
                 left : (hueX - 7.5) + 'px'
             });
-            
+
             $drag_bar.data('pos', { x : hueX });
 
-            var opacityX = $opacityContainer.width() * (rgb.a || 0);
+            var opacityX = $opacityContainer.width() * (currentA || 0);
 
             $opacity_drag_bar.css({
                 left : (opacityX - 7.5) + 'px'
             });
-            
-            $opacity_drag_bar.data('pos', { x : opacityX });
 
+            $opacity_drag_bar.data('pos', { x : opacityX });
+        }
+
+        function initColor(newColor, callback) {
+            var c = newColor || "#FF0000",
+                rgb = color.parse(c);
+
+            $color.css("background-color", c);
+
+            var hsv = color.RGBtoHSV(rgb.r, rgb.g, rgb.b);
+
+            currentA = rgb.a;
+            currentH = hsv.h;
+            currentS = hsv.s;
+            currentV = hsv.v;
+
+            setColorUI();
             setHueColor();
-            setInputColor(evtType);
+            setInputColor();
 
             if (callback) {
                 colorpickerCallback = callback; 
@@ -702,7 +900,7 @@
                 var code = $hexCode.val();
 
                 if(code.charAt(0) == '#' && code.length == 7) {
-                    initColor(code, 'hex');
+                    initColor(code);
                 }
             });
 
@@ -732,10 +930,48 @@
                     setOpacity(e);
                 }
             });
+
+            addEvent($formatChangeButton.el, 'click', function (e) {
+                nextFormat();
+            })
+        }
+
+        function currentFormat () {
+            var current_format = $information.data('format') || 'hex';
+            if (currentA < 1 && current_format == 'hex' ) {
+                var next_format = 'rgb';
+                $information.removeClass(current_format);
+                $information.addClass(next_format);
+                $information.data('format', next_format);
+
+                setInputColor();
+            }
+        }
+
+        function nextFormat() {
+            var current_format = $information.data('format') || 'hex';
+            var next_format = 'hex';
+            if (current_format == 'hex') {
+                next_format = 'rgb';
+            } else if (current_format == 'rgb') {
+                next_format = 'hsl';
+            } else if (current_format == 'hsl') {
+                if (currentA == 1) {
+                    next_format = 'hex';
+                } else {
+                    next_format = 'rgb';
+                }
+            }
+
+            $information.removeClass(current_format);
+            $information.addClass(next_format);
+            $information.data('format', next_format);
+
+            setInputColor();
         }
 
         function makeInputField(type) {
-            var item = new dom('div', 'information-item');
+            var item = new dom('div', 'information-item '+ type);
 
             if (type == 'hex') {
                 var field = new dom('div', 'input-field hex');
@@ -836,14 +1072,22 @@
             $drag_bar = new dom('div', 'drag-bar' );
             $opacity = new dom('div', 'opacity' );
             $opacityContainer = new dom('div', 'opacity-container' );
+            $opacityColorBar = new dom('div', 'color-bar' );
+
             $opacity_drag_bar = new dom('div', 'drag-bar2' );
 
-            $information = new dom('div', 'information' );
+            $information = new dom('div', 'information hex' );
+
+            $informationChange = new dom('div', 'information-change');
+
+            $formatChangeButton = new dom('button', 'format-change-button', { type : 'button'}).html('↔');
+            $informationChange.append($formatChangeButton);
 
 
             $information.append(makeInputField('hex'));
             $information.append(makeInputField('rgb'));
             $information.append(makeInputField('hsl'));
+            $information.append($informationChange);
 
 
             $value.append($drag_pointer);
@@ -853,6 +1097,7 @@
             $hueContainer.append($drag_bar);
             $hue.append($hueContainer);
 
+            $opacityContainer.append($opacityColorBar);
             $opacityContainer.append($opacity_drag_bar);
             $opacity.append($opacityContainer);
 
@@ -900,7 +1145,8 @@
         }
 
         function getColor(type) {
-            var rgb = calculateColor();
+            calculateHSV();
+            var rgb = convertRGB();
 
             if (type) {
                 return color.format(rgb, type);
@@ -913,8 +1159,9 @@
         function show (line, ch, color,  callback) {
             $root.appendTo(document.body);
             $root.show();
-            isColorPickerShow = true; 
-            initColor(color, 'hex', function (colorString, rgb) {
+            isColorPickerShow = true;
+
+            initColor(color, function (colorString) {
                 callback(colorString);
             });     
             var pos = cm.charCoords({line : line, ch : ch });       

@@ -50,7 +50,7 @@
 }
 .codemirror-colorpicker > .control {
   position: relative;
-  padding: 18px 0px 20px 0px;
+  padding: 18px 0px 14px 0px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -84,9 +84,9 @@
   position: relative;
   width: 157px;
   height: 10px;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 .codemirror-colorpicker > .control > .opacity {
   position: relative;
@@ -102,9 +102,9 @@
   width: 100%;
   height: 8px;
   z-index: 2;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 
 .codemirror-colorpicker > .control .drag-bar,
@@ -127,10 +127,44 @@
   box-sizing: padding-box;
 }
 
+.codemirror-colorpicker > .information.hex > .information-item.hex {
+  display: flex;
+}
+
+.codemirror-colorpicker > .information.rgb > .information-item.rgb {
+  display: flex;
+}
+
+.codemirror-colorpicker > .information.hsl > .information-item.hsl {
+  display: flex;
+}
+
 .codemirror-colorpicker > .information > .information-item {
-  display:flex;
+  display:none;
   position: relative;
   padding: 0px 5px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-right:40px;
+}
+
+.codemirror-colorpicker > .information > .information-change {
+  position:absolute;
+  display:block;
+  width:40px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+}
+
+.codemirror-colorpicker > .information > .information-change > .format-change-button {
+  width:100%;
+  height:100%;
+  background:transparent;
+  border:0px;
+  cursor:pointer;
+  outline:none;
 }
 
 .codemirror-colorpicker > .information > .information-item > .input-field {
@@ -145,12 +179,9 @@
 .codemirror-colorpicker > .information > .information-item > .input-field > .input {
   text-align: center;
   width:100%;
-  box-sizing:border-box;
-}
-
-.codemirror-colorpicker > .information > .information-item > .input-field > .input input[type=text] {
-  width: 100%;
-  font-size:12px;
+  padding:3px 5px;
+  font-size:11px;
+  color: #333;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -159,7 +190,7 @@
   -ms-user-select: text;
   -o-user-select: text;
   user-select: text;
-  border-color: #a9a9a9;
+  border: 1px solid #cbcbcb;
 }
 
 .codemirror-colorpicker > .information > .information-item > .input-field > .title {
@@ -183,39 +214,7 @@
   -o-user-select: text;
   user-select: text;
 }
-.codemirror-colorpicker > .information > .input:nth-child(1) {
-  width: 93px;
-  left: 10px;
-}
-.codemirror-colorpicker > .information > .input:nth-child(2) {
-  width: 30px;
-  right: 74px;
-}
-.codemirror-colorpicker > .information > .input:nth-child(3) {
-  width: 30px;
-  right: 42px;
-}
-.codemirror-colorpicker > .information > .input:nth-child(4) {
-  width: 30px;
-  right: 10px;
-}
-.codemirror-colorpicker > .information > .title {
-  position: absolute;
-  font-size: 11px;
-  top: 15px;
-}
-.codemirror-colorpicker > .information > .title:nth-child(5) {
-  left: 10px;
-}
-.codemirror-colorpicker > .information > .title:nth-child(6) {
-  left: 123px;
-}
-.codemirror-colorpicker > .information > .title:nth-child(7) {
-  left: 155px;
-}
-.codemirror-colorpicker > .information > .title:nth-child(8) {
-  left: 187px;
-}
+
 
 .codemirror-colorpicker {
   border: 1px solid #ececec;
@@ -256,7 +255,7 @@
   background: -webkit-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
   background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
 }
-.codemirror-colorpicker > .control > .opacity > .opacity-container:before {
+.codemirror-colorpicker > .control > .opacity > .opacity-container > .color-bar {
   position:absolute;
   display:block;
   content:"";
@@ -288,7 +287,7 @@
   background-color: #FFFFFF;
 }
 .codemirror-colorpicker > .information {
-  border-top: 1px solid #e8e8e8;
+  /*border-top: 1px solid #e8e8e8;*/
 }
 .codemirror-colorpicker > .information > .title {
   color: #a3a3a3;
