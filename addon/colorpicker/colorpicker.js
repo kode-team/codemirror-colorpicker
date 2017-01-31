@@ -98,7 +98,7 @@
                             }
                         }
 
-                        return {type: 'rgba', r: arr[0], g: arr[1], b: arr[2], a: arr[3]};
+                        return {type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3]};
                     } else if (str.indexOf("hsl(") > -1) {
                         var arr = str.replace("hsl(", "").replace(")","").split(",");
 
@@ -127,7 +127,7 @@
                             }
                         }
 
-                        var obj = {type: 'hsla', h: arr[0], s: arr[1], l: arr[2], a: arr[3]};
+                        var obj = {type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3]};
 
                         var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
 
@@ -499,9 +499,6 @@
             $rgb_g.val(g);
             $rgb_b.val(b);
             $rgb_a.val(currentA);
-
-            var hsl = color.RGBtoHSL(r, g, b);
-            setHSLInput(hsl.h, hsl.s, hsl.l);
         }
 
         function setHSLInput(h, s, l) {
@@ -601,7 +598,7 @@
             
             $drag_pointer.data('pos', { x: x, y : y});
 
-            calculateHSV()
+            caculateHSV()
 
             setInputColor();
         }
@@ -638,7 +635,7 @@
         function setHueColor(e) {
             var min = $hueContainer.offset().left;
             var max = min + $hueContainer.width();
-            var current = e ? pos(e).clientX : 0;
+            var current = e ? pos(e).clientX : min + (max - min) * (currentH / 360);
 
             var dist;
             if (current < min) {
@@ -741,7 +738,7 @@
             currentA = isNaN(a) ? 1 : a;
         }
 
-        function calculateHSV() {
+        function caculateHSV() {
             var pos = $drag_pointer.data('pos') || { x : 0, y : 0 };
             var huePos = $drag_bar.data('pos') || { x : 0 };
 
@@ -804,7 +801,7 @@
         }
 
         function setColorUI() {
-            var     x = $color.width() * currentH, y = $color.height() * ( 1 - currentV);
+            var  x = $color.width() * currentS, y = $color.height() * ( 1 - currentV );
 
             $drag_pointer.css({
                 left : (x - 5) + "px",
@@ -830,9 +827,13 @@
             $opacity_drag_bar.data('pos', { x : opacityX });
         }
 
-        function initColor(newColor, callback) {
+        function initColor(newColor) {
             var c = newColor || "#FF0000",
                 rgb = color.parse(c);
+
+            $information.data('format', rgb.type);
+
+            initFormat();
 
             $color.css("background-color", c);
 
@@ -846,11 +847,6 @@
             setColorUI();
             setHueColor();
             setInputColor();
-
-            if (callback) {
-                colorpickerCallback = callback; 
-            }
-
         }
 
         function addEvent (dom, eventName, callback) {
@@ -911,29 +907,55 @@
             addEvent($rgb_b.el, 'keydown', checkNumberKey);
             addEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
 
-            addEvent(document, 'mouseup', function (e) {
-                $color.data('isDown', false);
-                $hue.data('isDown', false);
-                $opacity.data('isDown', false);
-            });
-
-            addEvent(document, 'mousemove', function (e) {
-                if ($color.data('isDown')) {
-                    setMainColor(e);
-                }
-
-                if ($hue.data('isDown')) {
-                    setHueColor(e);
-                }
-
-                if ($opacity.data('isDown')) {
-                    setOpacity(e);
-                }
-            });
+            addEvent(document, 'mouseup', EventDocumentMouseUp);
+            addEvent(document, 'mousemove', EventDocumentMouseMove);
 
             addEvent($formatChangeButton.el, 'click', function (e) {
                 nextFormat();
             })
+        }
+
+        function EventDocumentMouseUp (e) {
+            $color.data('isDown', false);
+            $hue.data('isDown', false);
+            $opacity.data('isDown', false);
+        }
+
+        function EventDocumentMouseMove(e) {
+            if ($color.data('isDown')) {
+                setMainColor(e);
+            }
+
+            if ($hue.data('isDown')) {
+                setHueColor(e);
+            }
+
+            if ($opacity.data('isDown')) {
+                setOpacity(e);
+            }
+        }
+
+        function destroy() {
+            removeEvent($color.el, 'mousedown');
+            removeEvent($color.el, 'mouseup');
+            removeEvent($drag_bar.el);
+            removeEvent($opacity_drag_bar.el);
+            removeEvent($hueContainer.el);
+            removeEvent($opacityContainer.el);
+            removeEvent($hexCode.el, 'keydown');
+            removeEvent($hexCode.el, 'keyup');
+            removeEvent($rgb_r.el, 'keydown', checkNumberKey);
+            removeEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
+            removeEvent($rgb_g.el, 'keydown', checkNumberKey);
+            removeEvent($rgb_g.el, 'keyup', setRGBtoHexColor);
+            removeEvent($rgb_b.el, 'keydown', checkNumberKey);
+            removeEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
+            removeEvent(document, 'mouseup', EventDocumentMouseUp);
+            removeEvent(document, 'mousemove', EventDocumentMouseMove);
+            removeEvent($formatChangeButton.el, 'click')
+
+            // remove color picker callback
+            colorpickerCallback = undefined;
         }
 
         function currentFormat () {
@@ -946,6 +968,15 @@
 
                 setInputColor();
             }
+        }
+
+        function initFormat () {
+            var current_format = $information.data('format') || 'hex';
+
+            $information.removeClass('hex');
+            $information.removeClass('rgb');
+            $information.removeClass('hsl');
+            $information.addClass(current_format);
         }
 
         function nextFormat() {
@@ -1056,8 +1087,6 @@
         }
 
         function init() {
-            self = this, opts = this.options;
-
             $root = new dom('div', 'codemirror-colorpicker');
             $color = new dom('div', 'color');
             $drag_pointer = new dom('div', 'drag-pointer' );
@@ -1111,7 +1140,7 @@
             $root.append($information);
 
             initHueColors();
-            initEvent();
+            //initEvent();
             initColor();
         };
 
@@ -1145,7 +1174,7 @@
         }
 
         function getColor(type) {
-            calculateHSV();
+            caculateHSV();
             var rgb = convertRGB();
 
             if (type) {
@@ -1157,13 +1186,13 @@
 
 
         function show (line, ch, color,  callback) {
+            destroy();
+            initEvent();
             $root.appendTo(document.body);
             $root.show();
             isColorPickerShow = true;
 
-            initColor(color, function (colorString) {
-                callback(colorString);
-            });     
+            initColor(color);
             var pos = cm.charCoords({line : line, ch : ch });       
 
             $root.css({
@@ -1172,10 +1201,16 @@
                 top : (pos.bottom) + 'px'
             });
 
+            // define colorpicker callback
+            colorpickerCallback = function (colorString) {
+                callback(colorString);
+            }
+
         }
 
         function hide () {
             if (isColorPickerShow) {
+                destroy();
                 $root.hide();
                 $root.remove();
                 isColorPickerShow = false; 

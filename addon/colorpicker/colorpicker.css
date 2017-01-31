@@ -21,6 +21,7 @@
 .codemirror-colorpicker {
   position: relative;
   width: 226px;
+  z-index: 1000;
 }
 .codemirror-colorpicker > .color {
   position: relative;
