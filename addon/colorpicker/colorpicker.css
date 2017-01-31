@@ -24,7 +24,7 @@
 }
 .codemirror-colorpicker > .color {
   position: relative;
-  height: 145px;
+  height: 120px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -90,7 +90,6 @@
 }
 .codemirror-colorpicker > .control > .opacity {
   position: relative;
-  width: 143px;
   padding: 3px 12px;
   margin: 0px 0px 0px 45px;
   -webkit-box-sizing: border-box;
@@ -101,21 +100,13 @@
 .codemirror-colorpicker > .control > .opacity > .opacity-container {
   position: relative;
   width: 100%;
-  height: 10px;
+  height: 8px;
   z-index: 2;
   -webkit-border-radius: 1px;
   -moz-border-radius: 1px;
   border-radius: 1px;
 }
-.codemirror-colorpicker > .control > .input {
-  position: absolute;
-  font-size: 10px;
-  right: 10px;
-  bottom: 20px;
-  width: 30px;
-  height: 20px;
-  padding: 0 0 0 2px;
-}
+
 .codemirror-colorpicker > .control .drag-bar,
 .codemirror-colorpicker > .control .drag-bar2 {
   position: absolute;
@@ -131,11 +122,52 @@
 }
 .codemirror-colorpicker > .information {
   position: relative;
-  height: 73px;
   -webkit-box-sizing: padding-box;
   -moz-box-sizing: padding-box;
   box-sizing: padding-box;
 }
+
+.codemirror-colorpicker > .information > .information-item {
+  display:flex;
+  position: relative;
+  padding: 0px 5px;
+}
+
+.codemirror-colorpicker > .information > .information-item > .input-field {
+  display:block;
+  flex:1;
+  padding: 5px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.codemirror-colorpicker > .information > .information-item > .input-field > .input {
+  text-align: center;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.codemirror-colorpicker > .information > .information-item > .input-field > .input input[type=text] {
+  width: 100%;
+  font-size:12px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+  border-color: #a9a9a9;
+}
+
+.codemirror-colorpicker > .information > .information-item > .input-field > .title {
+  text-align:center;
+  font-size:12px;
+  color:#a9a9a9;
+}
+
 .codemirror-colorpicker > .information > .input {
   position: absolute;
   font-size: 10px;
@@ -224,21 +256,35 @@
   background: -webkit-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
   background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
 }
+.codemirror-colorpicker > .control > .opacity > .opacity-container:before {
+  position:absolute;
+  display:block;
+  content:"";
+  left:0px;
+  right:0px;
+  bottom:0px;
+  top:0px;
+  background: -moz-linear-gradient(left, rgba(232, 232, 232, 0), rgba(232, 232, 232, 1));
+  background: -ms-linear-gradient(left, rgba(232, 232, 232, 0), rgba(232, 232, 232, 1));
+  background: -o-linear-gradient(left, rgba(232, 232, 232, 0), rgba(232, 232, 232, 1));
+  background: -webkit-gradient(linear, left top, right top, from(rgba(232, 232, 232, 0)), to(rgba(232, 232, 232, 1)));
+  background: -webkit-linear-gradient(left, rgba(232, 232, 232, 0), rgba(232, 232, 232, 1));
+  background: linear-gradient(to right, rgba(232, 232, 232, 0) , rgba(232, 232, 232, 1) );
+}
 .codemirror-colorpicker > .control > .opacity > .opacity-container {
-  background: #bababa;
+  background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
+  background-repeat: repeat;
 }
-.codemirror-colorpicker > .control > .input {
-  color: #333;
-}
+
 .codemirror-colorpicker > .control > .empty {
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
 }
 .codemirror-colorpicker > .control .drag-bar,
 .codemirror-colorpicker > .control .drag-bar2 {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
-  -moz-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
 }
 .codemirror-colorpicker > .information {

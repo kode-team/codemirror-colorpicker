@@ -77,7 +77,6 @@
              * @returns {Object}  rgb object
              */
             parse : function (str) {
-
                 if (typeof str == 'string') {
                     if (str.indexOf("rgb(") > -1) {
                         var arr = str.replace("rgb(", "").replace(")","").split(",");
@@ -223,19 +222,16 @@
 
         var $root, $hue, $color, $value, $saturation, $drag_pointer, $drag_bar,
             $control, $controlPattern, $controlColor, $hueContainer, $opacity, $opacityContainer,
-            $opacityInput, $opacity_drag_bar, $information, $informationTitle1, $informationTitle2,
-            $informationTitle3, $informationTitle4, $informationInput1, $informationInput2,
-            $informationInput3, $informationInput4;
+            $opacity_drag_bar, $information;
+
+        var $hexCode;
+        var $rgb_r, $rgb_g, $rgb_b, $rgb_a;
+        var $hsl_h, $hsl_s, $hsl_l, $hsl_a;
 
         var colorpickerCallback = function () {};
         var counter = 0; 
         var cached = {};
         var isColorPickerShow = false;
-
-
-        function createDom(tag, className, attr) {
-            return new dom(tag, className, attr);
-        }
 
         function dom(tag, className, attr) {
             var el  = document.createElement(tag);
@@ -380,42 +376,56 @@
             return this.css('display', 'none');
         }
 
+        function setRGBInput(r, g, b, a) {
+            $rgb_r.val(r);
+            $rgb_g.val(g);
+            $rgb_b.val(b);
+            $rgb_a.val(a);
+        }
+
+        function setHSLInput(h, s, l, a) {
+            $hsl_h.val(h);
+            $hsl_s.val(s);
+            $hsl_l.val(l);
+            $hsl_a.val(a);
+        }
+
+        function getHexFormat() {
+            return color.format({
+                r : $rgb_r.int(),
+                g : $rgb_g.int(),
+                b : $rgb_b.int()
+            }, 'hex');
+        }
+
         function setInputColor(evtType) {
+
             var rgb = null;
-
+            var alpha = caculateOpacity();
             if (evtType == 'hex') {
-                rgb = color.parse($informationInput1.val());
+                rgb = color.parse($hexCode.val());
 
-                $informationInput2.val(rgb.r);
-                $informationInput3.val(rgb.g);
-                $informationInput4.val(rgb.b);
+                setRGBInput(rgb.r, rgb.g, rgb.b, alpha);
 
             } else if (evtType == 'rgb') {
-                $informationInput1.val(color.format({
-                    r : $informationInput2.int(),
-                    g : $informationInput3.int(),
-                    b : $informationInput4.int()
-                }, 'hex'));
-
-                rgb = color.parse($informationInput1.val());
+                $hexCode.val(getHexFormat());
+                rgb = color.parse($hexCode.val());
 
             } else {
                 var str = getColor('hex');
+                $hexCode.val( str);
 
-                $informationInput1.val( str);
+                rgb = color.parse($hexCode.val());
 
-                rgb = color.parse($informationInput1.val());
-                $informationInput2.val( rgb.r);
-                $informationInput3.val( rgb.g);
-                $informationInput4.val( rgb.b);
+                setRGBInput(rgb.r, rgb.g, rgb.b, alpha);
             }
 
             // set alpha
-            rgb.a = caculateOpacity();
+            rgb.a = alpha;
 
             // set background
-            $controlColor.css('background-color', color.format(rgb, 'hex'));
-            $opacityInput.val(Math.floor(rgb.a * 100) + "%");
+            var colorString = color.format(rgb, 'rgb');
+            $controlColor.css('background-color', colorString);
 
             if (typeof colorpickerCallback == 'function') {
 
@@ -476,14 +486,15 @@
                 return scale(startColor, endColor, (p - startColor.start)/(endColor.start - startColor.start));
             }
 
-            return hue_color[0];
+            return hue_color[0].rgb;
         }
 
         function setHueColor(e) {
             var min = $hueContainer.offset().left;
             var max = min + $hueContainer.width();
-            var current = pos(e).clientX;
+            var current = e ? pos(e).clientX : 0;
 
+            var dist;
             if (current < min) {
                 dist = 0;
             } else if (current > max) {
@@ -492,7 +503,7 @@
                 dist = (current - min) / (max - min) * 100;
             }
 
-            var x = ($hue.width() * (dist/100));
+            var x = ($hueContainer.width() * (dist/100));
 
             $drag_bar.css({
                 left: (x -Math.ceil($drag_bar.width()/2)) + 'px'
@@ -508,9 +519,10 @@
         }
 
         function setOpacity(e) {
-            var min = $opacity.offset().left;
-            var max = min + $opacity.width();
+            var min = $opacityContainer.offset().left;
+            var max = min + $opacityContainer.width();
             var current = pos(e).clientX;
+            var dist;
 
             if (current < min) {
                 dist = 0;
@@ -520,7 +532,7 @@
                 dist = (current - min) / (max - min) * 100;
             }
 
-            var x = ($opacity.width() * (dist/100));
+            var x = ($opacityContainer.width() * (dist/100));
 
             $opacity_drag_bar.css({
                 left: (x -Math.ceil($opacity_drag_bar.width()/2)) + 'px'
@@ -533,9 +545,9 @@
 
         function caculateOpacity() {
             var opacityPos = $opacity_drag_bar.data('pos') || { x : 0 };
-            var a = Math.round((opacityPos.x / $opacity.width()) * 100) / 100;
+            var a = Math.round((opacityPos.x / $opacityContainer.width()) * 100) / 100;
 
-            return a;
+            return isNaN(a) ? 1 : a;
         }
 
         function calculateColor() {
@@ -545,7 +557,7 @@
             var width = $color.width();
             var height = $color.height();
 
-            var h = (huePos.x / $hue.width()) * 360;
+            var h = (huePos.x / $hueContainer.width()) * 360;
             var s = (pos.x / width);
             var v = ((height - pos.y) / height);
 
@@ -583,26 +595,22 @@
         }
 
         function setRGBtoHexColor(e) {
-            var r = $informationInput2.val(),
-                g = $informationInput3.val(),
-                b = $informationInput4.val();
+            var r = $rgb_r.val(),
+                g = $rgb_g.val(),
+                b = $rgb_b.val();
 
             if(r == "" || g == "" || b == "") return;
 
-            if(parseInt(r) > 255) $informationInput2.val(255);
-            else $informationInput2.val(parseInt(r));
+            if(parseInt(r) > 255) $rgb_r.val(255);
+            else $rgb_r.val(parseInt(r));
 
-            if(parseInt(g) > 255) $informationInput3.val(255);
-            else $informationInput3.val(parseInt(g));
+            if(parseInt(g) > 255) $rgb_g.val(255);
+            else $rgb_g.val(parseInt(g));
 
-            if(parseInt(b) > 255) $informationInput4.val(255);
-            else $informationInput4.val(parseInt(b));
+            if(parseInt(b) > 255) $rgb_b.val(255);
+            else $rgb_b.val(parseInt(b));
 
-            initColor(color.format({
-                r: $informationInput2.int(),
-                g: $informationInput3.int(),
-                b: $informationInput4.int()
-            }, "hex"), "rgb");
+            initColor(getHexFormat(), "rgb");
         }
 
         function initColor(newColor, evtType, callback) {
@@ -622,7 +630,7 @@
             
             $drag_pointer.data('pos', { x  : x, y : y });
 
-            var hueX = $hue.width() * (hsv.h / 360);
+            var hueX = $hueContainer.width() * (hsv.h / 360);
 
             $drag_bar.css({
                 left : (hueX - 7.5) + 'px'
@@ -630,7 +638,7 @@
             
             $drag_bar.data('pos', { x : hueX });
 
-            var opacityX = $opacity.width() * (rgb.a || 0);
+            var opacityX = $opacityContainer.width() * (rgb.a || 0);
 
             $opacity_drag_bar.css({
                 left : (opacityX - 7.5) + 'px'
@@ -638,6 +646,7 @@
             
             $opacity_drag_bar.data('pos', { x : opacityX });
 
+            setHueColor();
             setInputColor(evtType);
 
             if (callback) {
@@ -684,25 +693,25 @@
                 setOpacity(e);
             });
 
-            addEvent($informationInput1.el, 'keydown', function(e) {
+            addEvent($hexCode.el, 'keydown', function(e) {
                 if(e.which < 65 || e.which > 70) {
                     return checkNumberKey(e);
                 }
             });
-            addEvent($informationInput1.el, 'keyup', function(e) {
-                var code = $informationInput1.val();
+            addEvent($hexCode.el, 'keyup', function(e) {
+                var code = $hexCode.val();
 
                 if(code.charAt(0) == '#' && code.length == 7) {
                     initColor(code, 'hex');
                 }
             });
 
-            addEvent($informationInput2.el, 'keydown', checkNumberKey);
-            addEvent($informationInput2.el, 'keyup', setRGBtoHexColor);
-            addEvent($informationInput3.el, 'keydown', checkNumberKey);
-            addEvent($informationInput3.el, 'keyup', setRGBtoHexColor);
-            addEvent($informationInput4.el, 'keydown', checkNumberKey);
-            addEvent($informationInput4.el, 'keyup', setRGBtoHexColor);
+            addEvent($rgb_r.el, 'keydown', checkNumberKey);
+            addEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
+            addEvent($rgb_g.el, 'keydown', checkNumberKey);
+            addEvent($rgb_g.el, 'keyup', setRGBtoHexColor);
+            addEvent($rgb_b.el, 'keydown', checkNumberKey);
+            addEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
 
             addEvent(document, 'mouseup', function (e) {
                 $color.data('isDown', false);
@@ -725,6 +734,91 @@
             });
         }
 
+        function makeInputField(type) {
+            var item = new dom('div', 'information-item');
+
+            if (type == 'hex') {
+                var field = new dom('div', 'input-field hex');
+
+                $hexCode = new dom('input', 'input', { type : 'text' });
+
+                field.append($hexCode);
+                field.append(new dom('div', 'title').html('HEX'));
+
+                item.append(field);
+
+            } else if (type == 'rgb') {
+                var field = new dom('div', 'input-field rgb-r');
+                $rgb_r = new dom('input', 'input', { type : 'text' });
+
+                field.append($rgb_r);
+                field.append(new dom('div', 'title').html('R'));
+
+                item.append(field);
+
+                field = new dom('div', 'input-field rgb-g');
+                $rgb_g = new dom('input', 'input', { type : 'text' });
+
+                field.append($rgb_g);
+                field.append(new dom('div', 'title').html('G'));
+
+                item.append(field);
+
+                field = new dom('div', 'input-field rgb-b');
+                $rgb_b = new dom('input', 'input', { type : 'text' });
+
+                field.append($rgb_b);
+                field.append(new dom('div', 'title').html('B'));
+
+                item.append(field);
+
+                // rgba
+                field = new dom('div', 'input-field rgb-a');
+                $rgb_a = new dom('input', 'input', { type : 'text' });
+
+                field.append($rgb_a);
+                field.append(new dom('div', 'title').html('A'));
+
+                item.append(field);
+
+            } else if (type == 'hsl') {
+                var field = new dom('div', 'input-field hsl-h');
+                $hsl_h = new dom('input', 'input', { type : 'text' });
+
+                field.append($hsl_h);
+                field.append(new dom('div', 'title').html('H'));
+
+                item.append(field);
+
+                field = new dom('div', 'input-field hsl-s');
+                $hsl_s = new dom('input', 'input', { type : 'text' });
+
+                field.append($hsl_s);
+                field.append(new dom('div', 'title').html('S'));
+
+                item.append(field);
+
+                field = new dom('div', 'input-field hsl-l');
+                $hsl_l = new dom('input', 'input', { type : 'text' });
+
+                field.append($hsl_l);
+                field.append(new dom('div', 'title').html('L'));
+
+                item.append(field);
+
+                // rgba
+                field = new dom('div', 'input-field hsl-a');
+                $hsl_a = new dom('input', 'input', { type : 'text' });
+
+                field.append($hsl_a);
+                field.append(new dom('div', 'title').html('A'));
+
+                item.append(field);
+            }
+
+            return item;
+        }
+
         function init() {
             self = this, opts = this.options;
 
@@ -742,18 +836,15 @@
             $drag_bar = new dom('div', 'drag-bar' );
             $opacity = new dom('div', 'opacity' );
             $opacityContainer = new dom('div', 'opacity-container' );
-            $opacityInput = new dom('input', 'input', {'type': 'text', 'disabled': true });
             $opacity_drag_bar = new dom('div', 'drag-bar2' );
 
             $information = new dom('div', 'information' );
-            $informationTitle1 = new dom('div', 'title' ).html("HEX");
-            $informationTitle2 = new dom('div', 'title' ).html("R");
-            $informationTitle3 = new dom('div', 'title' ).html("G");
-            $informationTitle4 = new dom('div', 'title' ).html("B");
-            $informationInput1 = new dom('input', 'input', {'type': 'text', 'maxlength': 7 });
-            $informationInput2 = new dom('input', 'input', {'type': 'text', 'maxlength': 3  });
-            $informationInput3 = new dom('input', 'input', {'type': 'text', 'maxlength': 3  });
-            $informationInput4 = new dom('input', 'input', {'type': 'text', 'maxlength': 3  });
+
+
+            $information.append(makeInputField('hex'));
+            $information.append(makeInputField('rgb'));
+            $information.append(makeInputField('hsl'));
+
 
             $value.append($drag_pointer);
             $saturation.append($value);
@@ -767,18 +858,8 @@
 
             $control.append($hue);
             $control.append($opacity);
-            $control.append($opacityInput);
             $control.append($controlPattern);
             $control.append($controlColor);
-
-            $information.append($informationInput1);
-            $information.append($informationInput2);
-            $information.append($informationInput3);
-            $information.append($informationInput4);
-            $information.append($informationTitle1);
-            $information.append($informationTitle2);
-            $information.append($informationTitle3);
-            $information.append($informationTitle4);
 
             $root.append($color);
             $root.append($control);
@@ -822,11 +903,6 @@
             var rgb = calculateColor();
 
             if (type) {
-                if (type == 'hex') {
-                    if (rgb.a < 1) {
-                        type = 'rgb';
-                    }
-                }
                 return color.format(rgb, type);
             }
 
