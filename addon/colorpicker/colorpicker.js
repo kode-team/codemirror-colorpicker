@@ -294,16 +294,6 @@
                  }
 
                  return { r : r * 255, g : g * 255, b : b * 255 };
-             },
-
-             HSVtoHSL : function (H, S, V) {
-
-                return { h : h , s : s, l : l }
-             },
-
-             HSLtoHSV : function (H, S, L) {
-
-                return { h: h, s : s, v : v};
              }
         };
 
@@ -458,7 +448,7 @@
             } else {
                 var keys = Object.keys(cached);
                 
-                var id = this.uniqId + ".";
+                var uniqId = this.uniqId + ".";
                 return keys.filter(function (key) {
                     if (key.indexOf(uniqId) == 0) {
                        return true;      
@@ -547,6 +537,10 @@
             }
         }
 
+        function setControlColor (color) {
+            $controlColor.css('background-color', color);
+        }
+
         function setInputColor() {
 
             var format = $information.data('format') || 'hex';
@@ -563,10 +557,10 @@
             }
 
             // set background
+            setControlColor(getFormattedColor('rgb'));
+
             var rgb = convertRGB();
             var colorString = color.format(rgb, 'rgb');
-            $controlColor.css('background-color', getFormattedColor('rgb'));
-
             setOpacityColorBar(colorString);
 
             if (typeof colorpickerCallback == 'function') {
@@ -600,7 +594,6 @@
             $drag_pointer.data('pos', { x: x, y : y});
 
             caculateHSV()
-
             setInputColor();
         }
 
@@ -633,6 +626,14 @@
             return hue_color[0].rgb;
         }
 
+        function setBackgroundColor (color) {
+            $color.css("background-color", color);
+        }
+
+        function setCurrentH (h) {
+            currentH = h;
+        }
+
         function setHueColor(e) {
             var min = $hueContainer.offset().left;
             var max = min + $hueContainer.width();
@@ -657,10 +658,8 @@
 
             var hueColor = checkHueColor(dist/100);
 
-            $color.css("background-color", hueColor);
-
-            currentH = (dist/100) * 360;
-
+            setBackgroundColor(hueColor);
+            setCurrentH((dist/100) * 360);
             setInputColor();
         }
 
@@ -726,9 +725,7 @@
             $opacity_drag_bar.data('pos', { x : x });
 
             caculateOpacity();
-
             currentFormat();
-
             setInputColor();
         }
 
@@ -828,25 +825,29 @@
             $opacity_drag_bar.data('pos', { x : opacityX });
         }
 
-        function initColor(newColor) {
-            var c = newColor || "#FF0000",
-                rgb = color.parse(c);
+        function setCurrentHSV (h, s, v, a) {
+            currentA = a;
+            currentH = h;
+            currentS = s;
+            currentV = v;
+        }
 
-            console.log(rgb);
-
-            $information.data('format', rgb.type);
-
+        function setCurrentFormat (format) {
+            $information.data('format', format);
             initFormat();
+        }
 
-            $color.css("background-color", c);
 
-            var hsv = color.RGBtoHSV(rgb.r, rgb.g, rgb.b);
 
-            currentA = rgb.a;
-            currentH = hsv.h;
-            currentS = hsv.s;
-            currentV = hsv.v;
+        function initColor(newColor) {
+            var c = newColor || "#FF0000", colorObj = color.parse(c);
 
+            setCurrentFormat(colorObj.type);
+            setBackgroundColor(c);
+
+            var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+
+            setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
             setColorUI();
             setHueColor();
             setInputColor();
