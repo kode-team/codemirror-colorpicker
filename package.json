@@ -6,9 +6,6 @@
   "dependencies": {
     "codemirror": "^5.23.0"
   },
-  "devDependencies": {
-    "codemirror": "^5.23.0"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
