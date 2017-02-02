@@ -81,22 +81,24 @@
         this.cm = cm;
         this.markers = {};
 
+        if (this.cm.colorpicker) {
+            this.colorpicker = this.cm.colorpicker(this.opt);
+        } else if (this.opt.colorpicker) {
+            this.colorpicker = this.opt.colorpicker;
+        }
+
+
         this.cm.on('mousedown', onMousedown);
         this.cm.on('keyup', onKeyup);
         this.cm.on('change', onChange)
+
+        this.cm.getWrapperElement().addEventListener('paste', onPaste);
 
         if (this.is_edit_mode())
         {
             this.cm.on('scroll', debounce(onScroll, 50));
         }
 
-        this.cm.getWrapperElement().addEventListener('paste', onPaste);
-
-        if (this.cm.colorpicker) {
-            this.colorpicker = this.cm.colorpicker();
-        } else if (this.opt.colorpicker) {
-            this.colorpicker = this.opt.colorpicker;
-        }
 
     }
 

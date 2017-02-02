@@ -15,13 +15,15 @@
 
 
 <script type="text/javascript">
-    CodeMirror(document.body, {
+    var cm = CodeMirror(document.body, {
         lineNumbers: true, 
         mode : "css",
         colorpicker : {
             mode : 'edit'
         }
-    })
+    });
+
+    cm.setValue('#aaa');
 </script>
 </body>
 

@@ -83,7 +83,7 @@
 }
 .codemirror-colorpicker > .control > .hue > .hue-container {
   position: relative;
-  width: 157px;
+  width: 100%;
   height: 10px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -101,7 +101,7 @@
 .codemirror-colorpicker > .control > .opacity > .opacity-container {
   position: relative;
   width: 100%;
-  height: 8px;
+  height: 10px;
   z-index: 2;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
