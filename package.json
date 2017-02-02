@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "colorpicker for codemirror",
   "main": "index.js",
-  "dependencies": {
-    "codemirror": "^5.23.0"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

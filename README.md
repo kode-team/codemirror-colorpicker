@@ -6,6 +6,7 @@ CodeMirror ColorPicker Addon like Chrome devtool style
 
 ```
 <link rel="stylesheet" href="addon/colorpicker/colorpicker" />
+<script src="addon/colorpicker/colorview.js"></script>
 <script src="addon/colorpicker/colorpicker.js"></script>
 ```
 
@@ -38,5 +39,18 @@ colorpicker {
 
 https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
 
+# Install 
+
+## npm 
+
+```npm
+npm install codemirror-colorpicker
+```
+
+## bower 
+
+```
+bower install codemirror-colorpicker 
+```
 
 # License : MIT 
