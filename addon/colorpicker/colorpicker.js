@@ -1,21 +1,21 @@
 (function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../lib/codemirror"), require("./foldcode"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../lib/codemirror", "./foldcode"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
+    if (typeof exports == "object" && typeof module == "object") // CommonJS
+        mod(require("../../lib/codemirror"), require("./foldcode"));
+    else if (typeof define == "function" && define.amd) // AMD
+        define(["../../lib/codemirror", "./foldcode"], mod);
+    else // Plain browser env
+        mod(CodeMirror);
 })(function(CodeMirror) {
 
     CodeMirror.defineExtension("colorpicker", function () {
 
-        var cm  = this; 
+        var cm  = this;
 
-         var color = {
+        var color = {
 
-             trim : function (str) {
+            trim : function (str) {
                 return str.replace(/^\s+|\s+$/g, '');
-             },
+            },
 
             /**
              * @method format
@@ -246,55 +246,55 @@
                 return { h : H, s : S, v :  V };
             },
 
-             RGBtoHSL : function (r, g, b) {
-                 r /= 255, g /= 255, b /= 255;
-                 var max = Math.max(r, g, b), min = Math.min(r, g, b);
-                 var h, s, l = (max + min) / 2;
+            RGBtoHSL : function (r, g, b) {
+                r /= 255, g /= 255, b /= 255;
+                var max = Math.max(r, g, b), min = Math.min(r, g, b);
+                var h, s, l = (max + min) / 2;
 
-                 if(max == min){
-                     h = s = 0; // achromatic
-                 }else{
-                     var d = max - min;
-                     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                     switch(max){
-                         case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                         case g: h = (b - r) / d + 2; break;
-                         case b: h = (r - g) / d + 4; break;
-                     }
-                     h /= 6;
-                 }
+                if(max == min){
+                    h = s = 0; // achromatic
+                }else{
+                    var d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch(max){
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
 
-                 return { h : Math.round(h * 360) , s : Math.round(s * 100), l : Math.round(l * 100)};
-             },
+                return { h : Math.round(h * 360) , s : Math.round(s * 100), l : Math.round(l * 100)};
+            },
 
-             HUEtoRGB : function (p, q, t) {
-                 if(t < 0) t += 1;
-                 if(t > 1) t -= 1;
-                 if(t < 1/6) return p + (q - p) * 6 * t;
-                 if(t < 1/2) return q;
-                 if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                 return p;
-             },
+            HUEtoRGB : function (p, q, t) {
+                if(t < 0) t += 1;
+                if(t > 1) t -= 1;
+                if(t < 1/6) return p + (q - p) * 6 * t;
+                if(t < 1/2) return q;
+                if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            },
 
-             HSLtoRGB : function (h, s, l) {
-                 var r, g, b;
+            HSLtoRGB : function (h, s, l) {
+                var r, g, b;
 
-                 h /= 360;
-                 s /= 100;
-                 l /= 100;
+                h /= 360;
+                s /= 100;
+                l /= 100;
 
-                 if(s == 0){
-                     r = g = b = l; // achromatic
-                 }else{
-                     var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                     var p = 2 * l - q;
-                     r = this.HUEtoRGB(p, q, h + 1/3);
-                     g = this.HUEtoRGB(p, q, h);
-                     b = this.HUEtoRGB(p, q, h - 1/3);
-                 }
+                if(s == 0){
+                    r = g = b = l; // achromatic
+                }else{
+                    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    var p = 2 * l - q;
+                    r = this.HUEtoRGB(p, q, h + 1/3);
+                    g = this.HUEtoRGB(p, q, h);
+                    b = this.HUEtoRGB(p, q, h - 1/3);
+                }
 
-                 return { r : r * 255, g : g * 255, b : b * 255 };
-             }
+                return { r : r * 255, g : g * 255, b : b * 255 };
+            }
         };
 
         var hue_color = [
@@ -318,7 +318,7 @@
         var cssPrefix = getCssValuePrefix();
 
         var colorpickerCallback = function () {};
-        var counter = 0; 
+        var counter = 0;
         var cached = {};
         var isColorPickerShow = false;
 
@@ -335,7 +335,7 @@
                 el.setAttribute(k, attr[k]);
             }
 
-            this.el = el;  
+            this.el = el;
         }
 
         dom.prototype.removeClass = function (cls) {
@@ -362,8 +362,8 @@
         dom.prototype.html = function (html) {
             this.el.innerHTML = html;
 
-            return this;  
-        }        
+            return this;
+        }
 
         dom.prototype.empty = function () {
             return this.html('');
@@ -377,15 +377,15 @@
                 this.el.appendChild(el.el || el);
             }
 
-            return this; 
+            return this;
         }
 
         dom.prototype.appendTo = function (target) {
-            var t = target.el ? target.el : target; 
+            var t = target.el ? target.el : target;
 
             t.appendChild(this.el);
 
-            return this; 
+            return this;
         }
 
         dom.prototype.remove = function () {
@@ -393,7 +393,7 @@
                 this.el.parentNode.removeChild(this.el);
             }
 
-            return this; 
+            return this;
         }
 
         dom.prototype.text = function () {
@@ -402,7 +402,7 @@
 
         dom.prototype.css = function (key, value) {
             if (arguments.length == 2) {
-                this.el.style[key] = value; 
+                this.el.style[key] = value;
             } else if (arguments.length == 1) {
 
                 if (typeof key == 'string') {
@@ -413,10 +413,10 @@
                         this.el.style[k] = keys[k];
                     }
                 }
-                
+
             }
 
-            return this; 
+            return this;
         }
 
         dom.prototype.offset = function () {
@@ -426,51 +426,51 @@
                 top: rect.top + document.body.scrollTop,
                 left: rect.left + document.body.scrollLeft
             };
-        }   
+        }
 
         dom.prototype.width = function () {
-            return this.el.offsetWidth; 
+            return this.el.offsetWidth;
         }
 
         dom.prototype.height = function () {
-            return this.el.offsetHeight; 
+            return this.el.offsetHeight;
         }
 
         dom.prototype.dataKey = function (key) {
-            return this.uniqId + '.' + key; 
+            return this.uniqId + '.' + key;
         }
 
         dom.prototype.data = function (key, value) {
             if (arguments.length == 2) {
-                cached[this.dataKey(key)] = value; 
+                cached[this.dataKey(key)] = value;
             } else if (arguments.length == 1) {
                 return cached[this.dataKey(key)];
             } else {
                 var keys = Object.keys(cached);
-                
+
                 var uniqId = this.uniqId + ".";
                 return keys.filter(function (key) {
                     if (key.indexOf(uniqId) == 0) {
-                       return true;      
+                        return true;
                     }
 
-                    return false; 
+                    return false;
                 }).map(function (value) {
                     return cached[value];
                 })
             }
 
-            return this; 
+            return this;
         }
 
         dom.prototype.val = function (value) {
             if (arguments.length == 0) {
-                return this.el.value; 
+                return this.el.value;
             } else if (arguments.length == 1) {
-                this.el.value = value; 
+                this.el.value = value;
             }
 
-            return this; 
+            return this;
         }
 
         dom.prototype.int = function () {
@@ -568,7 +568,7 @@
                 if (!isNaN(currentA)) {
                     colorpickerCallback(getFormattedColor(format));
                 }
-   
+
             }
         }
 
@@ -590,7 +590,7 @@
                 left: (x - 5) + 'px',
                 top: (y - 5) + 'px'
             });
-            
+
             $drag_pointer.data('pos', { x: x, y : y});
 
             caculateHSV()
@@ -653,7 +653,7 @@
             $drag_bar.css({
                 left: (x -Math.ceil($drag_bar.width()/2)) + 'px'
             });
-            
+
             $drag_bar.data('pos', { x : x});
 
             var hueColor = checkHueColor(dist/100);
@@ -721,7 +721,7 @@
             $opacity_drag_bar.css({
                 left: (x -Math.ceil($opacity_drag_bar.width()/2)) + 'px'
             });
-            
+
             $opacity_drag_bar.data('pos', { x : x });
 
             caculateOpacity();
@@ -861,48 +861,62 @@
             dom.removeEventListener(eventName, callback);
         }
 
+        function EventColorMouseDown(e) {
+            $color.data('isDown', true);
+            setMainColor(e);
+        }
+
+        function EventColorMouseUp(e) {
+            $color.data('isDown', false);
+        }
+
+        function EventDragBarMouseDown (e) {
+            e.preventDefault();
+            $hue.data('isDown', true);
+        }
+
+        function EventOpacityDragBarMouseDown(e) {
+            e.preventDefault();
+            $opacity.data('isDown', true);
+        }
+
+        function EventHueMouseDown (e) {
+            $hue.data('isDown', true);
+            setHueColor(e);
+        }
+
+        function EventOpacityMouseDown (e) {
+            $opacity.data('isDown', true);
+            setOpacity(e);
+        }
+
+        function EventHexCodeKeyDown(e) {
+            if(e.which < 65 || e.which > 70) {
+                return checkNumberKey(e);
+            }
+        }
+
+        function EventHexCodeKeyUp (e) {
+            var code = $hexCode.val();
+
+            if(code.charAt(0) == '#' && code.length == 7) {
+                initColor(code);
+            }
+        }
+
+        function EventFormatChangeClick(e) {
+            nextFormat();
+        }
+
         function initEvent() {
-            addEvent($color.el, 'mousedown', function(e) {
-                $color.data('isDown', true);
-                setMainColor(e);
-            });
-
-            addEvent($color.el, 'mouseup', function(e) {
-                $color.data('isDown', false);
-            });
-
-            addEvent($drag_bar.el, 'mousedown', function(e) {
-                e.preventDefault();
-                $hue.data('isDown', true);
-            });
-
-            addEvent($opacity_drag_bar.el, 'mousedown', function(e) {
-                e.preventDefault();
-                $opacity.data('isDown', true);
-            });
-
-            addEvent($hueContainer.el, 'mousedown', function(e) {
-                $hue.data('isDown', true);
-                setHueColor(e);
-            });
-
-            addEvent($opacityContainer.el, 'mousedown', function(e) {
-                $opacity.data('isDown', true);
-                setOpacity(e);
-            });
-
-            addEvent($hexCode.el, 'keydown', function(e) {
-                if(e.which < 65 || e.which > 70) {
-                    return checkNumberKey(e);
-                }
-            });
-            addEvent($hexCode.el, 'keyup', function(e) {
-                var code = $hexCode.val();
-
-                if(code.charAt(0) == '#' && code.length == 7) {
-                    initColor(code);
-                }
-            });
+            addEvent($color.el, 'mousedown', EventColorMouseDown);
+            addEvent($color.el, 'mouseup', EventColorMouseUp);
+            addEvent($drag_bar.el, 'mousedown', EventDragBarMouseDown);
+            addEvent($opacity_drag_bar.el, 'mousedown', EventOpacityDragBarMouseDown);
+            addEvent($hueContainer.el, 'mousedown', EventHueMouseDown);
+            addEvent($opacityContainer.el, 'mousedown', EventOpacityMouseDown);
+            addEvent($hexCode.el, 'keydown', EventHexCodeKeyDown);
+            addEvent($hexCode.el, 'keyup', EventHexCodeKeyUp);
 
             addEvent($rgb_r.el, 'keydown', checkNumberKey);
             addEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
@@ -914,9 +928,7 @@
             addEvent(document, 'mouseup', EventDocumentMouseUp);
             addEvent(document, 'mousemove', EventDocumentMouseMove);
 
-            addEvent($formatChangeButton.el, 'click', function (e) {
-                nextFormat();
-            })
+            addEvent($formatChangeButton.el, 'click', EventFormatChangeClick)
         }
 
         function EventDocumentMouseUp (e) {
@@ -940,14 +952,14 @@
         }
 
         function destroy() {
-            removeEvent($color.el, 'mousedown');
-            removeEvent($color.el, 'mouseup');
-            removeEvent($drag_bar.el);
-            removeEvent($opacity_drag_bar.el);
-            removeEvent($hueContainer.el);
-            removeEvent($opacityContainer.el);
-            removeEvent($hexCode.el, 'keydown');
-            removeEvent($hexCode.el, 'keyup');
+            removeEvent($color.el, 'mousedown', EventColorMouseDown);
+            removeEvent($color.el, 'mouseup', EventColorMouseUp);
+            removeEvent($drag_bar.el, 'mousedown', EventDragBarMouseDown);
+            removeEvent($opacity_drag_bar.el, 'mousedown', EventOpacityDragBarMouseDown);
+            removeEvent($hueContainer.el, 'mousedown', EventHueMouseDown);
+            removeEvent($opacityContainer.el, 'mousedown', EventOpacityMouseDown);
+            removeEvent($hexCode.el, 'keydown', EventHexCodeKeyDown);
+            removeEvent($hexCode.el, 'keyup', EventHexCodeKeyUp);
             removeEvent($rgb_r.el, 'keydown', checkNumberKey);
             removeEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
             removeEvent($rgb_g.el, 'keydown', checkNumberKey);
@@ -956,7 +968,7 @@
             removeEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
             removeEvent(document, 'mouseup', EventDocumentMouseUp);
             removeEvent(document, 'mousemove', EventDocumentMouseMove);
-            removeEvent($formatChangeButton.el, 'click')
+            removeEvent($formatChangeButton.el, 'click', EventFormatChangeClick);
 
             // remove color picker callback
             colorpickerCallback = undefined;
@@ -985,6 +997,7 @@
 
         function nextFormat() {
             var current_format = $information.data('format') || 'hex';
+
             var next_format = 'hex';
             if (current_format == 'hex') {
                 next_format = 'rgb';
@@ -1156,12 +1169,12 @@
 
                 hue.r = obj.r;
                 hue.g = obj.g;
-                hue.b = obj.b; 
+                hue.b = obj.b;
             }
         }
 
         /**
-         * public methods 
+         * public methods
          */
         function setColor(value) {
             if(typeof(value) == "object") {
@@ -1217,7 +1230,7 @@
                 destroy();
                 $root.hide();
                 $root.remove();
-                isColorPickerShow = false; 
+                isColorPickerShow = false;
             }
 
         }
@@ -1228,7 +1241,7 @@
             show: show,
             hide: hide,
             setColor: setColor,
-            getColor: getColor 
+            getColor: getColor
         }
     })
 
