@@ -1,5 +1,6 @@
-# codemirror-colorpicker
-colorpicker addon for codemirror 
+# CodeMirror Colorpicker Addon 
+
+CodeMirror ColorPicker Addon like Chrome devtool style  
 
 # How to use 
 
