@@ -5,7 +5,7 @@ CodeMirror ColorPicker Addon like Chrome devtool style
 # How to use 
 
 ```
-<link rel="stylesheet" href="addon/colorpicker/colorpicker" />
+<link rel="stylesheet" href="addon/colorpicker/colorpicker.css/>
 <script src="addon/colorpicker/colorview.js"></script>
 <script src="addon/colorpicker/colorpicker.js"></script>
 ```
