@@ -33,4 +33,10 @@ colorpicker {
 
 <img src="http://i.giphy.com/26xBI1fdHFsAjCwqQ.gif" />
 
+
+# Sample Page 
+
+https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
+
+
 # License : MIT 
