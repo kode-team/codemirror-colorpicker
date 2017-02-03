@@ -28,13 +28,15 @@
         }
     });
 
-    function onChange(cm) {
-        cm.state.colorpicker.style_color_update(cm.getCursor().line);
-    }
+    function onChange(cm, evt) {
+        if (evt.origin == 'setValue') {  // if content is changed by setValue method, it initialize markers
+            cm.state.colorpicker.close_color_picker();
+            cm.state.colorpicker.init_color_update();
+            cm.state.colorpicker.style_color_update();
+        } else {
+            cm.state.colorpicker.style_color_update(cm.getCursor().line);
+        }
 
-    function onUpdate(cm) {
-        cm.state.colorpicker.init_color_update();
-        cm.state.colorpicker.close_color_picker();
     }
 
     function onKeyup(cm) {
@@ -101,7 +103,6 @@
         this.cm.on('mousedown', onMousedown);
         this.cm.on('keyup', onKeyup);
         this.cm.on('change', onChange);
-        this.cm.on('update', onUpdate);
 
         this.cm.getWrapperElement().addEventListener('paste', onPaste);
 
@@ -153,11 +154,10 @@
 
         if (this.colorpicker) {
             var self = this;
-            var firstColor, prevColor;
-            firstColor = prevColor = color;
+            var prevColor = color;
             var pos = this.cm.charCoords({line : lineNo, ch : ch });
             this.colorpicker.show({ left : pos.left, top : pos.bottom }, color, function (newColor) {
-                self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*' + firstColor);
+                self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
                 prevColor = newColor;
             });
 
