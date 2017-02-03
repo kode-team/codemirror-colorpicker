@@ -32,6 +32,11 @@
         cm.state.colorpicker.style_color_update(cm.getCursor().line);
     }
 
+    function onUpdate(cm) {
+        cm.state.colorpicker.init_color_update();
+        cm.state.colorpicker.close_color_picker();
+    }
+
     function onKeyup(cm) {
         cm.state.colorpicker.keyup();
     }
@@ -82,15 +87,21 @@
         this.markers = {};
 
         if (this.cm.colorpicker) {
-            this.colorpicker = this.cm.colorpicker(this.opt);
+            this.colorpicker = this.cm.colorpicker();
         } else if (this.opt.colorpicker) {
             this.colorpicker = this.opt.colorpicker;
         }
 
+        this.init_event();
+
+    }
+
+    codemirror_colorpicker.prototype.init_event = function () {
 
         this.cm.on('mousedown', onMousedown);
         this.cm.on('keyup', onKeyup);
-        this.cm.on('change', onChange)
+        this.cm.on('change', onChange);
+        this.cm.on('update', onUpdate);
 
         this.cm.getWrapperElement().addEventListener('paste', onPaste);
 
@@ -98,7 +109,6 @@
         {
             this.cm.on('scroll', debounce(onScroll, 50));
         }
-
 
     }
 
@@ -174,6 +184,10 @@
         }
     }
 
+    codemirror_colorpicker.prototype.init_color_update = function () {
+        this.markers = {};  // initialize marker list
+    }
+
     codemirror_colorpicker.prototype.style_color_update = function (lineHandle) {
 
         if (lineHandle) {
@@ -210,7 +224,6 @@
         this.empty_marker(lineNo, lineHandle);
 
         var result = this.match_result(lineHandle);
-
         if (result)
         {
             var obj = { next : 0 };
@@ -266,7 +279,7 @@
     }
 
     codemirror_colorpicker.prototype.update_element = function (el, color) {
-        el.style.background = color;
+        el.style.backgroundColor = color;
     }
 
     codemirror_colorpicker.prototype.set_mark = function (line, ch, el) {
