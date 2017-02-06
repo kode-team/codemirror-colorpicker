@@ -189,7 +189,7 @@
   box-sizing: border-box;
 }
 
-.codemirror-colorpicker > .information > .information-item > .input-field > .input {
+.codemirror-colorpicker > .information > .information-item > .input-field > input {
   text-align: center;
   width:100%;
   padding:3px 5px;
@@ -212,7 +212,7 @@
   color:#a9a9a9;
 }
 
-.codemirror-colorpicker > .information > .input {
+.codemirror-colorpicker > .information > input {
   position: absolute;
   font-size: 10px;
   height: 20px;
