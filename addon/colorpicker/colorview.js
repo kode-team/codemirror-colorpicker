@@ -9,6 +9,7 @@
     "use strict";
 
     var colorpicker_class = 'codemirror-colorview';
+    var colorpicker_background_class = 'codemirror-colorview-background';
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
         if (old && old != CodeMirror.Init) {
@@ -138,9 +139,9 @@
     }
 
     codemirror_colorpicker.prototype.check_mousedown = function (evt) {
-        if (this.hasClass(evt.target, colorpicker_class))
+        if (this.hasClass(evt.target, colorpicker_background_class) )
         {
-            this.open_color_picker(evt.target);
+            this.open_color_picker(evt.target.parentNode);
         } else {
             this.close_color_picker();
         }
@@ -245,6 +246,16 @@
             el.title ="";
         }
 
+        el.back_element = this.make_background_element();
+        el.appendChild(el.back_element);
+
+        return el;
+    }
+
+    codemirror_colorpicker.prototype.make_background_element = function () {
+        var el = document.createElement('div');
+
+        el.className = colorpicker_background_class;
 
         return el;
     }
@@ -279,7 +290,7 @@
     }
 
     codemirror_colorpicker.prototype.update_element = function (el, color) {
-        el.style.backgroundColor = color;
+        el.back_element.style.backgroundColor = color;
     }
 
     codemirror_colorpicker.prototype.set_mark = function (line, ch, el) {

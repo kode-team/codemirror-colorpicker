@@ -3,12 +3,24 @@
 
 .codemirror-colorview {
 	border : 1px solid #8e8e8e;
+    position: relative;
 	display : inline-block;
 	box-sizing : border-box;
 	margin : 0px 2px;
 	width : 10px;
 	height : 10px;
 	cursor: pointer;
+    background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
+    background-repeat: repeat;
+}
+
+.codemirror-colorview .codemirror-colorview-background {
+  content: "";
+  position: absolute;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  top:0px;
 }
 
 .codemirror-colorview:hover {
