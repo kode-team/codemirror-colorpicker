@@ -51,9 +51,8 @@
         }
     }
 
-    function onPaste () {
-        // TODO: cm  객체를 어디서 얻어오나?
-        //self.style_color_update();
+    function onPaste (cm, evt) {
+        onChange(cm, { origin : 'setValue'});
     }
 
     function onScroll (cm) {
@@ -105,7 +104,14 @@
         this.cm.on('keyup', onKeyup);
         this.cm.on('change', onChange);
 
-        this.cm.getWrapperElement().addEventListener('paste', onPaste);
+        // create paste callback
+        this.onPasteCallback = (function (cm, callback) {
+            return  function (evt) {
+                callback.call(this, cm, evt);
+            }
+        })(this.cm, onPaste);
+
+        this.cm.getWrapperElement().addEventListener('paste', this.onPasteCallback);
 
         if (this.is_edit_mode())
         {
@@ -124,8 +130,14 @@
 
     codemirror_colorpicker.prototype.destroy = function () {
         this.cm.off('mousedown', onMousedown);
+        this.cm.off('keyup', onKeyup);
         this.cm.off('change', onChange)
-        this.cm.getWrapperElement().removeEventListener('paste', onPaste);
+        this.cm.getWrapperElement().removeEventListener('paste', this.onPasteCallback);
+
+        if (this.is_edit_mode())
+        {
+            this.cm.off('scroll');
+        }
     }
 
     codemirror_colorpicker.prototype.hasClass = function (el, className) {
