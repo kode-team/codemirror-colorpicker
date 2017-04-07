@@ -50,7 +50,10 @@
             cm.state.colorpicker.init_color_update();
             cm.state.colorpicker.style_color_update();
         }
+    }
 
+    function onRefresh(cm, evt) {
+        onChange(cm, { origin : 'setValue'});
     }
 
     function onKeyup(cm) {
@@ -117,6 +120,7 @@
         this.cm.on('keyup', onKeyup);
         this.cm.on('change', onChange);
         this.cm.on('update', onUpdate);
+        this.cm.on('refresh', onRefresh);
 
         // create paste callback
         this.onPasteCallback = (function (cm, callback) {
