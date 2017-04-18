@@ -386,7 +386,6 @@
     }
 
     codemirror_colorpicker.prototype.render = function (cursor, lineNo, lineHandle, color, nameColor) {
-        console.log(color, nameColor);
         var start = lineHandle.text.indexOf(color, cursor.next);
 
         cursor.next = start + color.length;
