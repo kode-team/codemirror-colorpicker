@@ -1,8 +1,8 @@
 (function(mod) {
     if (typeof exports == "object" && typeof module == "object") // CommonJS
-        mod(require("../../lib/codemirror"), require("./foldcode"));
+        mod(require("codemirror"));
     else if (typeof define == "function" && define.amd) // AMD
-        define(["../../lib/codemirror", "./foldcode"], mod);
+        define(["codemirror" ], mod);
     else // Plain browser env
         mod(CodeMirror);
 })(function(CodeMirror) {
@@ -321,6 +321,7 @@
         var counter = 0;
         var cached = {};
         var isColorPickerShow = false;
+        var isShortCut = false;
 
         function dom(tag, className, attr) {
             var el  = document.createElement(tag);
@@ -1216,6 +1217,8 @@
             $root.show();
             isColorPickerShow = true;
 
+            isShortCut = pos.isShortCut || false;
+
             initColor(color);
 
             // define colorpicker callback
@@ -1238,6 +1241,9 @@
         init();
 
         return {
+            isShortCut : function () {
+                return isShortCut;
+            },
             show: show,
             hide: hide,
             setColor: setColor,

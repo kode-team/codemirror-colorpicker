@@ -1,8 +1,8 @@
 (function(mod) {
     if (typeof exports == "object" && typeof module == "object") // CommonJS
-        mod(require("../../lib/codemirror"), require("./foldcode"));
+        mod(require("codemirror"));
     else if (typeof define == "function" && define.amd) // AMD
-        define(["../../lib/codemirror", "./foldcode"], mod);
+        define(["codemirror"], mod);
     else // Plain browser env
         mod(CodeMirror);
 })(function(CodeMirror) {
@@ -15,6 +15,7 @@
     var colorpicker_background_class = 'codemirror-colorview-background';
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
+
         if (old && old != CodeMirror.Init) {
 
             if (cm.state.colorpicker)
@@ -56,8 +57,8 @@
         onChange(cm, { origin : 'setValue'});
     }
 
-    function onKeyup(cm) {
-        cm.state.colorpicker.keyup();
+    function onKeyup(cm, evt) {
+        cm.state.colorpicker.keyup(evt);
     }
 
     function onMousedown(cm, evt) {
@@ -87,6 +88,16 @@
             t = setTimeout(function () {
                 callback(cm, e);
             }, delay || 300);
+        }
+    }
+
+    function has_class(el, cls) {
+        if (!el.className)
+        {
+            return false;
+        } else {
+            var newClass = ' ' + el.className + ' ';
+            return newClass.indexOf(' ' + cls + ' ') > -1;
         }
     }
 
@@ -177,6 +188,34 @@
         }
     }
 
+    codemirror_colorpicker.prototype.popup_color_picker = function (defalutColor) {
+        var cursor = this.cm.getCursor();
+        var self = this;
+        var colorMarker = {
+            lineNo : cursor.line,
+            ch : cursor.ch,
+            color: defalutColor || '#FFFFFF',
+            isShortCut : true
+        };
+
+        Object.keys(this.markers).forEach(function(key) {
+            var searchKey = "#" + key;
+            if (searchKey.indexOf( "#" + colorMarker.lineNo + ":") > -1) {
+                var marker = self.markers[key];
+
+                if (marker.ch <= colorMarker.ch && colorMarker.ch <= marker.ch + marker.color.length) {
+                    // when cursor has marker
+                    colorMarker.ch = marker.ch;
+                    colorMarker.color = marker.color;
+                    colorMarker.nameColor = marker.nameColor;
+                }
+
+            }
+        });
+
+        this.open_color_picker(colorMarker);
+    }
+
     codemirror_colorpicker.prototype.open_color_picker = function (el) {
         var lineNo = el.lineNo;
         var ch = el.ch;
@@ -188,7 +227,7 @@
             var self = this;
             var prevColor = color;
             var pos = this.cm.charCoords({line : lineNo, ch : ch });
-            this.colorpicker.show({ left : pos.left, top : pos.bottom }, nameColor || color, function (newColor) {
+            this.colorpicker.show({ left : pos.left, top : pos.bottom, isShortCut : el.isShortCut || false }, nameColor || color, function (newColor) {
                 self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
                 prevColor = newColor;
             });
@@ -209,10 +248,14 @@
     }
 
 
-    codemirror_colorpicker.prototype.keyup = function () {
+    codemirror_colorpicker.prototype.keyup = function (evt) {
 
-        if (this.colorpicker) {
-            this.colorpicker.hide();
+        if (this.colorpicker ) {
+            if (evt.key == 'Escape') {
+                this.colorpicker.hide();
+            } else if (this.colorpicker.isShortCut() == false) {
+                this.colorpicker.hide();
+            }
         }
     }
 
@@ -239,8 +282,12 @@
 
         for(var i = 0, len = list.length; i < len; i++) {
             var key = this.key(lineNo, list[i].from);
-            delete this.markers[key];
-            list[i].marker.clear();
+
+            if (key && has_class(list[i].marker.replacedWith, colorpicker_class)) {
+                delete this.markers[key];
+                list[i].marker.clear();
+            }
+
         }
     }
 
@@ -339,7 +386,7 @@
     }
 
     codemirror_colorpicker.prototype.render = function (cursor, lineNo, lineHandle, color, nameColor) {
-
+        console.log(color, nameColor);
         var start = lineHandle.text.indexOf(color, cursor.next);
 
         cursor.next = start + color.length;
@@ -354,7 +401,7 @@
         var el  = this.create_marker(lineNo, start);
 
         this.update_element(el, nameColor || color);
-        this.set_state(lineNo, start, color, nameColor);
+        this.set_state(lineNo, start, color, nameColor || color);
         this.set_mark(lineNo, start, el);
     }
 });
