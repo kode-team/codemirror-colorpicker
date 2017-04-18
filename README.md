@@ -26,6 +26,20 @@ colorpicker {
 }
 ```
 
+## Support short cut (for popup color picker) 
+
+```javascript
+colorpicker {
+    mode : 'edit'
+},
+extraKeys : {
+      // when ctrl+k  keys pressed, color picker is able to open. 
+      'Ctrl-K' : function (cm, event) {
+          cm.state.colorpicker.popup_color_picker();
+     }
+}
+```
+
 # Sample demo - View mode 
 
 <img src="http://i.giphy.com/l3q2SDCDRUCaTiEKs.gif" />
