@@ -1244,6 +1244,7 @@
             isShortCut : function () {
                 return isShortCut;
             },
+            $root: $root,
             show: show,
             hide: hide,
             setColor: setColor,
