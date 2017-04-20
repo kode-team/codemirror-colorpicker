@@ -999,40 +999,44 @@
 
         }
 
+        function isControlKey (e) {
+            return e.metaKey || e.ctrlKey;
+        }
+
         function moveColorCode (e) {
             e.preventDefault();
             switch (e.key) {
                 case "ArrowDown":
 
-                    if (e.shiftKey || e.ctrlKey) {
+                    if (e.shiftKey || isControlKey(e)) {
                         if (e.shiftKey) moveHueColor(-1);
-                        if (e.ctrlKey) moveTransparent(-1);
+                        if (isControlKey(e)) moveTransparent(-1);
                     } else {
                         moveMainColor(0, COLOR_MOVE_DIST);
                     }
 
                     break;
                 case "ArrowUp":
-                    if (e.shiftKey || e.ctrlKey) {
+                    if (e.shiftKey || isControlKey(e)) {
                         if (e.shiftKey) moveHueColor(1);
-                        if (e.ctrlKey) moveTransparent(1);
+                        if (isControlKey(e)) moveTransparent(1);
                     } else {
                         moveMainColor(0, -COLOR_MOVE_DIST);
                     }
                     break;
                 case "ArrowLeft":
-                    if (e.shiftKey || e.ctrlKey) {
+                    if (e.shiftKey || isControlKey(e)) {
                         if (e.shiftKey) moveHueColor(-1);
-                        if (e.ctrlKey) moveTransparent(-1);
+                        if (isControlKey(e)) moveTransparent(-1);
                     } else {
                         moveMainColor(-COLOR_MOVE_DIST, 0);
                     }
 
                     break;
                 case "ArrowRight":
-                    if (e.shiftKey || e.ctrlKey) {
+                    if (e.shiftKey || isControlKey(e)) {
                         if (e.shiftKey) moveHueColor(1);
-                        if (e.ctrlKey) moveTransparent(1);
+                        if (isControlKey(e)) moveTransparent(1);
                     } else {
                         moveMainColor(COLOR_MOVE_DIST, 0);
                     }
