@@ -1,6 +1,6 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "colorpicker for codemirror",
   "main": "index.js",
   "scripts": {
