@@ -14,6 +14,11 @@
     background-repeat: repeat;
 }
 
+.codemirror-colorpicker.colorpicker-focus-status {
+    border:  0.5px solid #cacaca;
+    outline:none;
+}
+
 .codemirror-colorview .codemirror-colorview-background {
   content: "";
   position: absolute;

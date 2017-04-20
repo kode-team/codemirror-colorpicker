@@ -232,9 +232,11 @@
                 top : pos.bottom,
                 isShortCut : el.isShortCut || false,
                 hideDelay : self.opt.hideDelay || 2000
-            }, nameColor || color, function (newColor) {
+            }, (nameColor || color ), function /* return color */(newColor) {
                 self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
                 prevColor = newColor;
+            }, function /* hide callback */() {
+                self.cm.focus();
             });
 
         }
