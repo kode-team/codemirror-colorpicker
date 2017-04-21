@@ -14,9 +14,8 @@
     background-repeat: repeat;
 }
 
-.codemirror-colorpicker.colorpicker-focus-status {
-    border:  0.5px solid #cacaca;
-    outline:none;
+.codemirror-colorpicker .has-focus {
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .codemirror-colorview .codemirror-colorview-background {

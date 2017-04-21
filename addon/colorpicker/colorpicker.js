@@ -325,6 +325,9 @@
         var isShortCut = false;
         var hideDelay = 2000;
         var COLOR_MOVE_DIST = 4;
+        var focusClass = 'has-focus';
+        var colorPickerFocusClass = 'colorpicker-focus-status';
+        var percentChar = '%';
 
         function dom(tag, className, attr) {
 
@@ -549,8 +552,8 @@
 
         function setHSLInput(h, s, l) {
             $hsl_h.val(h);
-            $hsl_s.val(s + '%');
-            $hsl_l.val(l + '%');
+            $hsl_s.val(s + percentChar);
+            $hsl_l.val(l + percentChar);
             $hsl_a.val(currentA);
         }
 
@@ -616,8 +619,7 @@
         }
 
         function setInputColor() {
-
-            var format = $information.data('format') || 'hex';
+            var format = getCurrentFormat();
 
             var rgb = null;
             if (format == 'hex') {
@@ -696,7 +698,7 @@
             currentH = h;
         }
 
-        function setHueColor(e, direction) {
+        function setHueColor(e, direction, isNotChangeInput) {
             var min = $hueContainer.offset().left;
             var max = min + $hueContainer.width();
 
@@ -724,7 +726,11 @@
 
             setBackgroundColor(hueColor);
             setCurrentH((dist/100) * 360);
-            setInputColor();
+
+            if (!isNotChangeInput) {
+                setInputColor();
+            }
+
         }
 
         function getCssValuePrefix()
@@ -766,7 +772,7 @@
             $opacityColorBar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
         }
 
-        function setOpacity(e, direction) {
+        function setOpacity(e, direction, isNotChangeInput) {
             var min = $opacityContainer.offset().left;
             var max = min + $opacityContainer.width();
             var current = e ? pos(e).clientX : min + (max - min) * (currentA + direction/100);
@@ -789,8 +795,11 @@
             $opacity_drag_bar.data('pos', { x : x });
 
             caculateOpacity();
-            currentFormat();
-            setInputColor();
+            currentFormat(isNotChangeInput);
+            if (!isNotChangeInput) {
+                setInputColor();
+            }
+
         }
 
         function caculateOpacity() {
@@ -901,9 +910,6 @@
         function initColor(newColor, isNotChangeINput) {
             var c = newColor || "#FF0000", colorObj = color.parse(c);
 
-            console.log(newColor);
-            console.dir(colorObj);
-
             setCurrentFormat(colorObj.type);
             setBackgroundColor(c);
 
@@ -928,18 +934,22 @@
         }
 
         function EventColorPickerRootFocus (e) {
-            $root.addClass('colorpicker-focus-status');
+            $root.addClass(colorPickerFocusClass);
         }
 
+        var timerForBlur = null;
         function EventColorPickerRootBlur(e) {
-            var isColorPicker = new dom(document.activeElement).closest('codemirror-colorpicker');
-            var isColorView = new dom(document.activeElement).closest('codemirror-colorview');
-            //var isCodeMirror = new dom(document.activeElement).closest('CodeMirror');
+            clearTimeout(timerForBlur);
 
-            // when it has not a active element in color picker, remove 'colorpicker-focus-status' class for hiding colorpicker
-            if (!isColorPicker  && !isColorView) {
-                //$root.removeClass('colorpicker-focus-status');
-            }
+            timerForBlur = setTimeout(function() {
+                var isColorPicker = new dom(document.activeElement).closest('codemirror-colorpicker');
+                var isColorView = new dom(document.activeElement).closest('codemirror-colorview');
+
+                // when it has not a active element in color picker, remove 'colorpicker-focus-status' class for hiding colorpicker
+                if (!isColorPicker  && !isColorView) {
+                    $root.removeClass(colorPickerFocusClass);
+                }
+            }, 1000);
 
         }
 
@@ -981,13 +991,20 @@
             setOpacity(null, direction);
         }
 
-        function moveInputColor(e) {
+        function moveInputColor(e, isLastInput, isModeChange) {
+            e.preventDefault();
 
-            //change mode
-            nextFormat();
-
-            setTimeout(function() {
-                var current_format = $information.data('format') || 'hex';
+            if ($color.hasClass(focusClass)) {
+                $hueContainer.addClass(focusClass);
+                $color.removeClass(focusClass);
+            } else if ($hueContainer.hasClass(focusClass)) {
+                $opacityContainer.addClass(focusClass);
+                $hueContainer.removeClass(focusClass);
+            } else if ($opacityContainer.hasClass(focusClass)) {
+                $information.addClass(focusClass);
+                $opacityContainer.removeClass(focusClass);
+            } else if ($information.hasClass(focusClass)) {
+                var current_format = getCurrentFormat();
                 if (current_format == 'hex') {
                     $hexCode.select();
                 } else if (current_format == 'rgb') {
@@ -995,55 +1012,223 @@
                 } else if (current_format == 'hsl') {
                     $hsl_h.select();
                 }
-            }, 100);
 
+                if (isLastInput) {
+                    nextFormat();
+
+                    if (isModeChange) {
+                        $color.addClass(focusClass);
+                        $information.removeClass(focusClass);
+                    }
+
+                    setTimeout(function() {
+                        var current_format = getCurrentFormat();
+                        if (current_format == 'hex') {
+                            $hexCode.select();
+
+                            if (isModeChange) {
+                                $root.focus();
+                            }
+
+                        } else if (current_format == 'rgb') {
+                            $rgb_r.select();
+
+                            if (isModeChange) {
+                                $root.focus();
+                            }
+                        } else if (current_format == 'hsl') {
+                            $hsl_h.select();
+                        }
+                    }, 200);
+                }
+
+
+            } else {
+                $color.addClass(focusClass);
+            }
         }
 
         function isControlKey (e) {
             return e.metaKey || e.ctrlKey;
         }
 
-        function moveColorCode (e) {
+        function checkRGBMaxValue(value) {
+            if (value < 0) return 0;
+            if (value > 255) return 255;
+
+            return value;
+        }
+
+        function checkAlphaMaxValue(value) {
+            if (value < 0) return 0;
+            if (value > 1) return 1;
+
+            return value;
+        }
+
+
+        function changeInputColorByKeyboard(e, direction) {
+            var $input = new dom(e.target);
+            var $parent = new dom($input.el.parentNode);
+            direction = direction || 1;
+
+            var dist = 1 * direction;
+
+            var current_format = getCurrentFormat();
+
+            if (current_format == 'hex') {
+                var c = color.parse($hexCode.val());
+
+                if (e.shiftKey) {
+                    c.r += dist;
+                    c.r = checkRGBMaxValue(c.r);
+                } else if (isControlKey(e)) {
+                    c.g += dist;
+                    c.g = checkRGBMaxValue(c.g);
+                } else  {
+                    c.b += dist;
+                    c.b = checkRGBMaxValue(c.b);
+                }
+
+                $hexCode.val(color.format(c, 'hex'));
+
+            } else if (current_format == 'rgb') {
+                if ($parent.hasClass('rgb-r') ||
+                    $parent.hasClass('rgb-g') ||
+                    $parent.hasClass('rgb-b')
+                ) {
+                    $input.val(checkRGBMaxValue(parseInt($input.val(), 10) + dist));
+                }  else if ($parent.hasClass('rgb-a')) {
+
+                    var i = Math.round(parseFloat($input.val()) * 100) ;
+                    var value = (i + dist)/100;
+                    $input.val(checkAlphaMaxValue(value));
+                }
+
+            } else if (current_format == 'hsl') {
+                if ($parent.hasClass('hsl-h') ) {
+                    $input.val(parseInt($input.val(), 10) + dist);
+                } else if ($parent.hasClass('hsl-s') ) {
+                    var num = parseInt($input.val().replace(percentChar, ''), 10) + dist;
+                    $input.val(num + percentChar);
+                } else if ($parent.hasClass('hsl-l') ) {
+                    var num = parseInt($input.val().replace(percentChar, ''), 10) + dist;
+                    $input.val(num + percentChar);
+                }  else if ($parent.hasClass('hsl-a')) {
+                    var i = Math.round(parseFloat($input.val()) * 100) ;
+                    var value = (i + dist)/100;
+                    $input.val(checkAlphaMaxValue(value));
+                }
+            }
+
+            $input.select();
+
+            // update main color, hue color, opacity, color panel
+            updateColorCode();
+        }
+
+        // update color ui from input color
+        function updateColorCode () {
+
+            // do not update input values
+            var colorString = "";
+            var current_format = getCurrentFormat();
+
+            if (current_format == 'hex') {
+                colorString = $hexCode.val();
+            } else if (current_format == 'rgb') {
+                colorString = getRGBFormat();
+            } else if (current_format == 'hsl') {
+                colorString = getHSLFormat();
+            }
+
+            // create color object
+            var colorObj = color.parse(colorString);
+
+            // set color area
+            setCurrentFormat(colorObj.type);
+            setBackgroundColor(colorString);
+
+            // convert rgb to hsv
+            var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+
+            // set hsv area
+            setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+            setColorUI();
+            setHueColor(null, 0, true);
+
+            // set background
+            setControlColor(getFormattedColor('rgb'));
+
+            // set opacity
+            setOpacityColorBar(color.format(convertRGB(), 'rgb'));
+
+            if (typeof colorpickerCallback == 'function') {
+                if (!isNaN(currentA)) {
+                    // callback colorstring
+                    colorpickerCallback(colorString);
+                }
+            }
+
+        }
+
+        function moveColorCode (e, isInput) {
             e.preventDefault();
             switch (e.key) {
                 case "ArrowDown":
 
-                    if (e.shiftKey || isControlKey(e)) {
-                        if (e.shiftKey) moveHueColor(-1);
-                        if (isControlKey(e)) moveTransparent(-1);
-                    } else {
+                    if ($color.hasClass(focusClass)) {
                         moveMainColor(0, COLOR_MOVE_DIST);
+                    } else if ($hueContainer.hasClass(focusClass)) {
+                        moveHueColor(-1);
+                    } else if ($opacityContainer.hasClass(focusClass)) {
+                        moveTransparent(-1);
+                    } else if (isInput) {
+                        changeInputColorByKeyboard(e, -1);
                     }
 
                     break;
                 case "ArrowUp":
-                    if (e.shiftKey || isControlKey(e)) {
-                        if (e.shiftKey) moveHueColor(1);
-                        if (isControlKey(e)) moveTransparent(1);
-                    } else {
+
+                    if ($color.hasClass(focusClass)) {
                         moveMainColor(0, -COLOR_MOVE_DIST);
+                    } else if ($hueContainer.hasClass(focusClass)) {
+                        moveHueColor(1);
+                    } else if ($opacityContainer.hasClass(focusClass)) {
+                        moveTransparent(1);
+                    } else if (isInput) {
+                        changeInputColorByKeyboard(e);
                     }
+
                     break;
                 case "ArrowLeft":
-                    if (e.shiftKey || isControlKey(e)) {
-                        if (e.shiftKey) moveHueColor(-1);
-                        if (isControlKey(e)) moveTransparent(-1);
-                    } else {
+
+                    if ($color.hasClass(focusClass)) {
                         moveMainColor(-COLOR_MOVE_DIST, 0);
+                    } else if ($hueContainer.hasClass(focusClass)) {
+                        moveHueColor(-1);
+                    } else if ($opacityContainer.hasClass(focusClass)) {
+                        moveTransparent(-1);
+                    } else if (isInput) {
+
                     }
 
                     break;
                 case "ArrowRight":
-                    if (e.shiftKey || isControlKey(e)) {
-                        if (e.shiftKey) moveHueColor(1);
-                        if (isControlKey(e)) moveTransparent(1);
-                    } else {
+
+                    if ($color.hasClass(focusClass)) {
                         moveMainColor(COLOR_MOVE_DIST, 0);
+                    } else if ($hueContainer.hasClass(focusClass)) {
+                        moveHueColor(1);
+                    } else if ($opacityContainer.hasClass(focusClass)) {
+                        moveTransparent(1);
+                    } else if (isInput) {
+
                     }
+
                     break;
                 case "Escape":
                 case "Enter":
-                    $root.blur();
                     setTimeout(function() {
                         hide();
                         colorpickerHideCallback();  // close by key event
@@ -1052,44 +1237,19 @@
             }
         }
 
-        function EventColorPickerRootKeyUp(e) {
-            var $target = new dom(e.target);
-            if ($target.hasClass('input')) {
-
-                switch(e.key) {
-                    case "0":
-                    case "1":
-                    case "2":
-                    case "3":
-                    case "4":
-                    case "5":
-                    case "6":
-                    case "7":
-                    case "8":
-                    case "9":
-                    case ".":
-                    case "%":
-                    case "#":
-                        e.preventDefault();
-                        var current_format = $information.data('format') || 'hex';
-                        if (current_format == 'hex') {
-                            initColor($hexCode.val(), true);
-                        } else if (current_format == 'rgb') {
-                            initColor(getRGBFormat(), true);
-                        } else if (current_format == 'hsl') {
-                            initColor(getHSLFormat(), true);
-                        }
-                        break;
-                }
-
-            }
-        }
-
         function EventColorPickerRootKeyDown(e) {
             var $target = new dom(e.target);
             if ($target.hasClass('input')) {
-                if (e.key == 'Tab' && ($target.hasClass('last-input') || e.shiftKey)) {         // wheather last-input or shiftkey pressed
-                    moveInputColor(e);
+                if (e.key == 'Tab' && $target.hasClass('last-input')) {         // wheather last-input or shiftkey pressed
+                    moveInputColor(e, true, $target.hasClass('mode-change'));
+                } else {
+                    switch (e.key) {
+                        case "ArrowDown":
+                        case "ArrowUp":
+                        case "ArrowLeft":
+                        case "ArrowRight":
+                            moveColorCode(e, true);
+                    }
                 }
             } else {
                 switch (e.key) {
@@ -1140,23 +1300,6 @@
             setOpacity(e);
         }
 
-        function EventHexCodeKeyDown(e) {
-            console.log('hex code key down', e);
-            if(e.which < 65 || e.which > 70) {
-                console.log(e);
-                return checkNumberKey(e);
-            }
-        }
-
-        function EventHexCodeKeyUp (e) {
-            console.log('hex code key up', e);
-            var code = $hexCode.val();
-
-            if(code.charAt(0) == '#' && code.length == 7) {
-                initColor(code);
-            }
-        }
-
         function EventFormatChangeClick(e) {
             nextFormat();
         }
@@ -1166,7 +1309,6 @@
             addEvent($root.el, 'focus', EventColorPickerRootFocus);
             addEvent($root.el, 'blur', EventColorPickerRootBlur);
             addEvent($root.el, 'keydown', EventColorPickerRootKeyDown);
-            addEvent($root.el, 'keyup', EventColorPickerRootKeyUp);
 
             addEvent($color.el, 'mousedown', EventColorMouseDown);
             addEvent($color.el, 'mouseup', EventColorMouseUp);
@@ -1174,15 +1316,6 @@
             addEvent($opacity_drag_bar.el, 'mousedown', EventOpacityDragBarMouseDown);
             addEvent($hueContainer.el, 'mousedown', EventHueMouseDown);
             addEvent($opacityContainer.el, 'mousedown', EventOpacityMouseDown);
-            //addEvent($hexCode.el, 'keydown', EventHexCodeKeyDown);
-            //addEvent($hexCode.el, 'keyup', EventHexCodeKeyUp);
-
-            //addEvent($rgb_r.el, 'keydown', checkNumberKey);
-            //addEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
-            //addEvent($rgb_g.el, 'keydown', checkNumberKey);
-            //addEvent($rgb_g.el, 'keyup', setRGBtoHexColor);
-            //addEvent($rgb_b.el, 'keydown', checkNumberKey);
-            //addEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
 
             addEvent(document, 'mouseup', EventDocumentMouseUp);
             addEvent(document, 'mousemove', EventDocumentMouseMove);
@@ -1211,9 +1344,7 @@
             $opacity.data('isDown', false);
 
             // when color picker clicked in outside
-            if (checkInHtml(e.target)) {
-                //setHideDelay(hideDelay);
-            } else if (checkColorPickerClass(e.target) == false ) {
+            if (checkColorPickerClass(e.target) == false ) {
                 hide();
             }
 
@@ -1237,7 +1368,6 @@
             removeEvent($root.el, 'focus', EventColorPickerRootFocus);
             removeEvent($root.el, 'blur', EventColorPickerRootBlur);
             removeEvent($root.el, 'keydown', EventColorPickerRootKeyDown);
-            removeEvent($root.el, 'keyup', EventColorPickerRootKeyUp);
 
             removeEvent($color.el, 'mousedown', EventColorMouseDown);
             removeEvent($color.el, 'mouseup', EventColorMouseUp);
@@ -1245,14 +1375,7 @@
             removeEvent($opacity_drag_bar.el, 'mousedown', EventOpacityDragBarMouseDown);
             removeEvent($hueContainer.el, 'mousedown', EventHueMouseDown);
             removeEvent($opacityContainer.el, 'mousedown', EventOpacityMouseDown);
-            //removeEvent($hexCode.el, 'keydown', EventHexCodeKeyDown);
-            //removeEvent($hexCode.el, 'keyup', EventHexCodeKeyUp);
-            //removeEvent($rgb_r.el, 'keydown', checkNumberKey);
-            //removeEvent($rgb_r.el, 'keyup', setRGBtoHexColor);
-            //removeEvent($rgb_g.el, 'keydown', checkNumberKey);
-            //removeEvent($rgb_g.el, 'keyup', setRGBtoHexColor);
-            //removeEvent($rgb_b.el, 'keydown', checkNumberKey);
-            //removeEvent($rgb_b.el, 'keyup', setRGBtoHexColor);
+
             removeEvent(document, 'mouseup', EventDocumentMouseUp);
             removeEvent(document, 'mousemove', EventDocumentMouseMove);
             removeEvent($formatChangeButton.el, 'click', EventFormatChangeClick);
@@ -1261,20 +1384,23 @@
             colorpickerCallback = undefined;
         }
 
-        function currentFormat () {
-            var current_format = $information.data('format') || 'hex';
+        function currentFormat (isNotChangeInput) {
+            var current_format = getCurrentFormat();
             if (currentA < 1 && current_format == 'hex' ) {
                 var next_format = 'rgb';
                 $information.removeClass(current_format);
                 $information.addClass(next_format);
                 $information.data('format', next_format);
 
-                setInputColor();
+                if (!isNotChangeInput) {
+                    setInputColor();
+                }
+
             }
         }
 
         function initFormat () {
-            var current_format = $information.data('format') || 'hex';
+            var current_format = getCurrentFormat();
 
             $information.removeClass('hex');
             $information.removeClass('rgb');
@@ -1283,7 +1409,7 @@
         }
 
         function nextFormat() {
-            var current_format = $information.data('format') || 'hex';
+            var current_format = getCurrentFormat();
 
             var next_format = 'hex';
             if (current_format == 'hex') {
@@ -1382,7 +1508,7 @@
                 // rgba
                 field = new dom('div', 'input-field hsl-a');
                 $hsl_a = new dom('input', 'input', { type : 'text' });
-                $hsl_a.addClass('last-input');
+                $hsl_a.addClass('last-input mode-change');
 
                 field.append($hsl_a);
                 field.append(new dom('div', 'title').html('A'));
@@ -1494,6 +1620,10 @@
 
             return rgb;
         }
+        
+        function getCurrentFormat() {
+            return $information.data('format') || 'hex';
+        }
 
         function definePostion (opt) {
 
@@ -1577,7 +1707,7 @@
         }
 
         function hide () {
-            if (isColorPickerShow) {
+            if (isColorPickerShow && $root.hasClass(colorPickerFocusClass) == false) {
                 destroy();
                 $root.hide();
                 $root.remove();
