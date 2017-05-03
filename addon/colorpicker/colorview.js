@@ -144,7 +144,8 @@
 
         if (this.is_edit_mode())
         {
-            this.cm.on('scroll', debounce(onScroll, 50));
+            this.onScrollCallback = debounce(onScroll, 50);
+            this.cm.on('scroll', this.onScrollCallback);
         }
 
     }
@@ -160,12 +161,14 @@
     codemirror_colorpicker.prototype.destroy = function () {
         this.cm.off('mousedown', onMousedown);
         this.cm.off('keyup', onKeyup);
-        this.cm.off('change', onChange)
+        this.cm.off('change', onChange);
+        this.cm.off('update', onUpdate);
+        this.cm.off('refresh', onRefresh);
         this.cm.getWrapperElement().removeEventListener('paste', this.onPasteCallback);
 
         if (this.is_edit_mode())
         {
-            this.cm.off('scroll');
+            this.cm.on('scroll', this.onScrollCallback);
         }
     }
 
