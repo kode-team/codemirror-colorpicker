@@ -92,8 +92,7 @@
     }
 
     function has_class(el, cls) {
-        if (!el.className)
-        {
+        if (!el || !el.className) {
             return false;
         } else {
             var newClass = ' ' + el.className + ' ';
