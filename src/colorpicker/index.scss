@@ -1,0 +1,20 @@
+
+/* codemirror-colorpicker */
+
+.codemirror-colorpicker {
+  position: relative;
+  width: 224px;
+  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
+
+  @import './scss/pallet';
+  @import './scss/control';
+  @import './scss/information';
+  @import './scss/colorsets'; 
+  @import './scss/color-chooser';
+}
