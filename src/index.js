@@ -1,5 +1,4 @@
 import ColorView from './colorview/index'
-import ColorPicker from './colorpicker/index'
 
 CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
 
@@ -19,8 +18,3 @@ CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
         cm.state.colorpicker = new ColorView(cm, val);
     }
 });
-
-
-CodeMirror.defineExtension("colorpicker", function () {
-    return new ColorPicker();
-})

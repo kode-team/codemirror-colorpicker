@@ -1,4 +1,5 @@
 import './index.scss'
+import ColorPicker from '../colorpicker/index'
 import { color_names } from '../util/ColorNames'
 
 const colorpicker_class = 'codemirror-colorview';
@@ -94,10 +95,10 @@ export default class ColorView {
         // set excluded token 
         this.excluded_token = this.opt.excluded_token || excluded_token;
 
-        if (this.cm.colorpicker) {
-            this.colorpicker = this.cm.colorpicker();
-        } else if (this.opt.colorpicker) {
+        if (this.opt.colorpicker) {
             this.colorpicker = this.opt.colorpicker;
+        } else {
+            this.colorpicker = new ColorPicker();
         }
 
         this.init_event();

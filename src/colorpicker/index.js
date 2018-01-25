@@ -45,6 +45,10 @@ export default class ColorPicker {
         this.$body = new Dom(document.body);
         this.$root = new Dom('div', 'codemirror-colorpicker');
 
+        this.$arrow = new Dom('div', 'arrow');
+
+
+        this.$root.append(this.$arrow);
         this.$root.append(this.pallet.$el);
         this.$root.append(this.control.$el);
         this.$root.append(this.information.$el);
@@ -106,8 +110,8 @@ export default class ColorPicker {
 
         // set position
         this.$root.css({
-            left : elementScreenLeft + 'px',
-            top : elementScreenTop + 'px'
+            left : (elementScreenLeft - 25) + 'px',
+            top : (elementScreenTop + 9) + 'px'
         });
     }
 
