@@ -12,7 +12,6 @@ export default class ColorSetsChooser {
 
         this.colorpicker = colorpicker; 
 
-
         this.$EventToggle = this.EventToggle.bind(this);
         this.$EventClickColorSetsItem = this.EventClickColorSetsItem.bind(this);        
 
@@ -37,8 +36,14 @@ export default class ColorSetsChooser {
                 
 
         this.$colorsetsList = new Dom('div', 'colorsets-list' );
-        this.$colorsetsList.append(this.makeColorSetsList());
         $container.append(this.$colorsetsList);
+
+        this.refresh();
+    }
+
+    refresh () {
+        this.$colorsetsList.empty();
+        this.$colorsetsList.append(this.makeColorSetsList());
     }
 
     makeColorItemList (colors, maxCount = 5) {

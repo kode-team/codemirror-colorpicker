@@ -8,6 +8,7 @@ import ColorPallet from './ColorPallet'
 import ColorSetsChooser from './ColorSetsChooser'
 import ColorSetsList from './ColorSetsList'
 import CurrentColorSets from './CurrentColorSets'
+import CurrentColorSetsContextMenu from './CurrentColorSetsContextMenu'
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
@@ -36,6 +37,7 @@ export default class ColorPicker {
         this.colorSetsList = new ColorSetsList(this);  
         this.colorSetsChooser = new ColorSetsChooser(this);
         this.currentColorSets = new CurrentColorSets(this);
+        this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
 
         this.initialize();
     }
@@ -57,6 +59,7 @@ export default class ColorPicker {
         this.$root.append(this.information.$el);
         this.$root.append(this.currentColorSets.$el);
         this.$root.append(this.colorSetsChooser.$el);
+        this.$root.append(this.contextMenu.$el);
 
         this.$EventDocumentMouseUp = this.EventDocumentMouseUp.bind(this);
         this.$EventDocumentMouseMove = this.EventDocumentMouseMove.bind(this);
@@ -65,6 +68,10 @@ export default class ColorPicker {
         this.initializeEvent()
 
         this.initColor();        
+    }
+
+    showContextMenu (e, index) {
+        this.contextMenu.show(e, index);
     }
 
     setColor(value) {
@@ -187,6 +194,10 @@ export default class ColorPicker {
         return color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     }
 
+    getCurrentColor () {
+        return this.getFormattedColor(this.information.getFormat());
+    }
+
     getFormattedColor (format) {
         format = format || 'hex';
     
@@ -216,7 +227,7 @@ export default class ColorPicker {
         if (typeof this.colorpickerCallback == 'function') {
     
             if (!isNaN(this.currentA)) {
-                this.colorpickerCallback(this.getFormattedColor(this.information.getFormat()))
+                this.colorpickerCallback(this.getCurrentColor());
             }
     
         }
@@ -327,6 +338,7 @@ export default class ColorPicker {
         this.information.initializeEvent()
         this.currentColorSets.initializeEvent() 
         this.colorSetsChooser.initializeEvent();
+        this.contextMenu.initializeEvent();
     
     }
 
@@ -336,6 +348,10 @@ export default class ColorPicker {
 
     toggleColorChooser () {
         this.colorSetsChooser.toggle();
+    }
+
+    refreshColorSetsChooser() {
+        this.colorSetsChooser.refresh();
     }
 
     getColorSetsList () {
@@ -362,6 +378,7 @@ export default class ColorPicker {
         this.colorSetsChooser.destroy();
         this.colorSetsList.destroy();
         this.currentColorSets.destroy();
+        this.contextMenu.destroy();
 
         // remove color picker callback
         this.colorpickerCallback = undefined;

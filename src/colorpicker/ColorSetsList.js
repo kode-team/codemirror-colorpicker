@@ -60,6 +60,30 @@ export default class ColorSetsList {
         return this.currentColorSets;
     }
 
+    addCurrentColor ( color) {
+        if (Array.isArray(this.currentColorSets.colors)) {
+            this.currentColorSets.colors.push(color);
+        } 
+    }
+
+    removeCurrentColor (index) {
+        if (this.currentColorSets.colors[index]) {
+            this.currentColorSets.colors.splice(index, 1);
+        }
+    }
+
+    removeCurrentColorToTheRight (index) {
+        if (this.currentColorSets.colors[index]) {
+            this.currentColorSets.colors.splice(index, Number.MAX_VALUE);
+        }
+    }    
+
+    clearPalette () {
+        if (this.currentColorSets.colors) {
+            this.currentColorSets.colors = [];
+        }
+    }
+
     getCurrentColors ( ) {
         return this.getColors(this.currentColorSets);
     }

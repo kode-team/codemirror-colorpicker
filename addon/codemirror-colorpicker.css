@@ -54,7 +54,9 @@
     position: relative;
     width: 10px;
     height: 12px;
-    padding: 0px; }
+    padding: 3px 5px; }
+    .codemirror-colorpicker .arrow-button:hover {
+      background-color: #ececec; }
     .codemirror-colorpicker .arrow-button:before {
       content: "";
       display: inline-block;
@@ -268,7 +270,7 @@
       text-align: center;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      padding-top: 10px; }
+      padding-top: 5px; }
       .codemirror-colorpicker > .information > .information-change > .format-change-button {
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
@@ -325,12 +327,14 @@
           margin: 0px;
           pointer-events: none; }
       .codemirror-colorpicker > .colorsets > .color-list .add-color-item {
+        width: 13px;
+        height: 13px;
         display: inline-block;
+        margin-right: 12px;
         margin-bottom: 12px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
         cursor: pointer;
-        line-height: 0;
+        line-height: 1;
+        text-align: center;
         font-size: 16px;
         font-weight: 400;
         font-family: serif,sans-serif;
@@ -459,3 +463,26 @@
                 padding: 0px;
                 margin: 0px;
                 pointer-events: none; }
+
+.colorsets-contextmenu {
+  position: fixed;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 6px;
+  background-color: #ececec;
+  border: 1px solid #cccccc;
+  display: none;
+  list-style: none;
+  font-size: 13px;
+  padding-left: 0px;
+  padding-right: 0px; }
+  .colorsets-contextmenu.show {
+    display: inline-block; }
+  .colorsets-contextmenu .menu-item {
+    padding: 2px 20px;
+    cursor: default; }
+    .colorsets-contextmenu .menu-item:hover {
+      background-color: #5ea3fb;
+      color: white; }
+  .colorsets-contextmenu.small .menu-item.small-hide {
+    display: none; }

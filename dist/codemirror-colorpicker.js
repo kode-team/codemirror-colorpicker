@@ -1895,8 +1895,15 @@ var ColorSetsChooser = function () {
             $container.append($header);
 
             this.$colorsetsList = new Dom('div', 'colorsets-list');
-            this.$colorsetsList.append(this.makeColorSetsList());
             $container.append(this.$colorsetsList);
+
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.$colorsetsList.empty();
+            this.$colorsetsList.append(this.makeColorSetsList());
         }
     }, {
         key: 'makeColorItemList',
@@ -2056,6 +2063,34 @@ var ColorSetsList = function () {
             return this.currentColorSets;
         }
     }, {
+        key: 'addCurrentColor',
+        value: function addCurrentColor(color) {
+            if (Array.isArray(this.currentColorSets.colors)) {
+                this.currentColorSets.colors.push(color);
+            }
+        }
+    }, {
+        key: 'removeCurrentColor',
+        value: function removeCurrentColor(index) {
+            if (this.currentColorSets.colors[index]) {
+                this.currentColorSets.colors.splice(index, 1);
+            }
+        }
+    }, {
+        key: 'removeCurrentColorToTheRight',
+        value: function removeCurrentColorToTheRight(index) {
+            if (this.currentColorSets.colors[index]) {
+                this.currentColorSets.colors.splice(index, Number.MAX_VALUE);
+            }
+        }
+    }, {
+        key: 'clearPalette',
+        value: function clearPalette() {
+            if (this.currentColorSets.colors) {
+                this.currentColorSets.colors = [];
+            }
+        }
+    }, {
         key: 'getCurrentColors',
         value: function getCurrentColors() {
             return this.getColors(this.currentColorSets);
@@ -2099,6 +2134,7 @@ var CurrentColorSets = function () {
 
         this.$EventToggleColorChooser = this.EventToggleColorChooser.bind(this);
         this.$EventSelectColor = this.EventSelectColor.bind(this);
+        this.$EventContextMenu = this.EventContextMenu.bind(this);
 
         this.initialize();
     }
@@ -2114,6 +2150,7 @@ var CurrentColorSets = function () {
                 var color = colors[i];
                 var item = new Dom('div', 'color-item', {
                     'title': color,
+                    'data-index': i,
                     'data-color': color
                 });
                 var colorView = new Dom('div', 'color-view');
@@ -2126,7 +2163,6 @@ var CurrentColorSets = function () {
 
             if (currentColorSets.edit) {
                 var item = new Dom('div', 'add-color-item').html('+');
-
                 list.append(item);
             }
 
@@ -2161,19 +2197,79 @@ var CurrentColorSets = function () {
             this.$colorSetsColorList.append(this.makeCurrentColorSets());
         }
     }, {
+        key: 'refreshAll',
+        value: function refreshAll() {
+            this.refresh();
+            this.colorpicker.refreshColorSetsChooser();
+        }
+    }, {
+        key: 'addColor',
+        value: function addColor(color) {
+            this.colorSetsList.addCurrentColor(color);
+            this.refreshAll();
+        }
+    }, {
+        key: 'removeColor',
+        value: function removeColor(index) {
+            this.colorSetsList.removeCurrentColor(index);
+            this.refreshAll();
+        }
+    }, {
+        key: 'removeAllToTheRight',
+        value: function removeAllToTheRight(index) {
+            this.colorSetsList.removeCurrentColorToTheRight(index);
+            this.refreshAll();
+        }
+    }, {
+        key: 'clearPalette',
+        value: function clearPalette() {
+            this.colorSetsList.clearPalette();
+            this.refreshAll();
+        }
+    }, {
         key: 'EventToggleColorChooser',
         value: function EventToggleColorChooser(e) {
             this.colorpicker.toggleColorChooser();
         }
     }, {
+        key: 'EventContextMenu',
+        value: function EventContextMenu(e) {
+            e.preventDefault();
+            var currentColorSets = this.colorSetsList.getCurrentColorSets();
+
+            if (!currentColorSets.edit) {
+                return;
+            }
+
+            var $target = new Dom(e.target);
+
+            var $item = $target.closest('color-item');
+
+            if ($item) {
+                var index = parseInt($item.attr('data-index'));
+
+                this.colorpicker.showContextMenu(e, index);
+            } else {
+                this.colorpicker.showContextMenu(e);
+            }
+        }
+    }, {
         key: 'EventSelectColor',
         value: function EventSelectColor(e) {
             e.preventDefault();
-            var $item = new Dom(e.target).closest('color-item');
+            var $target = new Dom(e.target);
+
+            var $item = $target.closest('color-item');
 
             if ($item) {
                 var _color = $item.attr('data-color');
                 this.colorpicker.setColor(_color);
+            } else {
+                var $addColorItem = $target.closest('add-color-item');
+
+                if ($addColorItem) {
+                    this.addColor(this.colorpicker.getCurrentColor());
+                }
             }
         }
     }, {
@@ -2181,15 +2277,112 @@ var CurrentColorSets = function () {
         value: function initializeEvent() {
             Event.addEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);
             Event.addEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);
+            Event.addEvent(this.$colorSetsColorList.el, 'contextmenu', this.$EventContextMenu);
         }
     }, {
         key: 'destroy',
         value: function destroy() {
             Event.removeEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);
             Event.removeEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);
+            Event.removeEvent(this.$colorSetsColorList.el, 'contextmenu', this.$EventContextMenu);
         }
     }]);
     return CurrentColorSets;
+}();
+
+var CurrentColorSetsContextMenu = function () {
+    function CurrentColorSetsContextMenu(colorpicker) {
+        classCallCheck(this, CurrentColorSetsContextMenu);
+
+
+        this.colorpicker = colorpicker;
+        this.currentColorSets = colorpicker.currentColorSets;
+
+        this.$EventClickMenuItem = this.EventClickMenuItem.bind(this);
+
+        this.initialize();
+    }
+
+    createClass(CurrentColorSetsContextMenu, [{
+        key: 'initialize',
+        value: function initialize() {
+            // make colorsets view 
+            this.$el = new Dom('ul', 'colorsets-contextmenu');
+
+            this.$el.append(new Dom('li', 'menu-item small-hide', {
+                'data-type': 'remove-color'
+            }).html('Remove color'));
+
+            this.$el.append(new Dom('li', 'menu-item small-hide', {
+                'data-type': 'remove-all-to-the-right'
+            }).html('Remove all to the right'));
+
+            this.$el.append(new Dom('li', 'menu-item', {
+                'data-type': 'clear-palette'
+            }).html('Clear palette'));
+        }
+    }, {
+        key: 'show',
+        value: function show(e, index) {
+            var $event = Event.pos(e);
+
+            this.$el.css({
+                top: $event.clientY - 10 + 'px',
+                left: $event.clientX + 'px'
+            });
+            this.$el.addClass('show');
+            this.selectedColorIndex = index;
+
+            if (typeof this.selectedColorIndex == 'undefined') {
+                this.$el.addClass('small');
+            } else {
+                this.$el.removeClass('small');
+            }
+        }
+    }, {
+        key: 'hide',
+        value: function hide() {
+            this.$el.removeClass('show');
+        }
+    }, {
+        key: 'runCommand',
+        value: function runCommand(command) {
+            switch (command) {
+                case 'remove-color':
+                    this.currentColorSets.removeColor(this.selectedColorIndex);
+                    break;
+                case 'remove-all-to-the-right':
+                    this.currentColorSets.removeAllToTheRight(this.selectedColorIndex);
+                    break;
+                case 'clear-palette':
+                    this.currentColorSets.clearPalette();
+                    break;
+            }
+        }
+    }, {
+        key: 'EventClickMenuItem',
+        value: function EventClickMenuItem(e) {
+            e.preventDefault();
+            var $target = new Dom(e.target);
+
+            var $item = $target.closest('menu-item');
+            if ($item) {
+                this.runCommand($item.attr('data-type'));
+            }
+            this.hide();
+        }
+    }, {
+        key: 'initializeEvent',
+        value: function initializeEvent() {
+            Event.addEvent(this.$el.el, 'click', this.$EventClickMenuItem);
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            Event.removeEvent(this.$el.el, 'click', this.$EventSelectColor);
+        }
+    }]);
+    return CurrentColorSetsContextMenu;
 }();
 
 var color = ColorUtil.color;
@@ -2218,6 +2411,7 @@ var ColorPicker = function () {
         this.colorSetsList = new ColorSetsList(this);
         this.colorSetsChooser = new ColorSetsChooser(this);
         this.currentColorSets = new CurrentColorSets(this);
+        this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
 
         this.initialize();
     }
@@ -2241,6 +2435,7 @@ var ColorPicker = function () {
             this.$root.append(this.information.$el);
             this.$root.append(this.currentColorSets.$el);
             this.$root.append(this.colorSetsChooser.$el);
+            this.$root.append(this.contextMenu.$el);
 
             this.$EventDocumentMouseUp = this.EventDocumentMouseUp.bind(this);
             this.$EventDocumentMouseMove = this.EventDocumentMouseMove.bind(this);
@@ -2249,6 +2444,11 @@ var ColorPicker = function () {
             this.initializeEvent();
 
             this.initColor();
+        }
+    }, {
+        key: 'showContextMenu',
+        value: function showContextMenu(e, index) {
+            this.contextMenu.show(e, index);
         }
     }, {
         key: 'setColor',
@@ -2384,6 +2584,11 @@ var ColorPicker = function () {
             return color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
         }
     }, {
+        key: 'getCurrentColor',
+        value: function getCurrentColor() {
+            return this.getFormattedColor(this.information.getFormat());
+        }
+    }, {
         key: 'getFormattedColor',
         value: function getFormattedColor(format) {
             format = format || 'hex';
@@ -2411,7 +2616,7 @@ var ColorPicker = function () {
             if (typeof this.colorpickerCallback == 'function') {
 
                 if (!isNaN(this.currentA)) {
-                    this.colorpickerCallback(this.getFormattedColor(this.information.getFormat()));
+                    this.colorpickerCallback(this.getCurrentColor());
                 }
             }
         }
@@ -2528,6 +2733,7 @@ var ColorPicker = function () {
             this.information.initializeEvent();
             this.currentColorSets.initializeEvent();
             this.colorSetsChooser.initializeEvent();
+            this.contextMenu.initializeEvent();
         }
     }, {
         key: 'currentFormat',
@@ -2538,6 +2744,11 @@ var ColorPicker = function () {
         key: 'toggleColorChooser',
         value: function toggleColorChooser() {
             this.colorSetsChooser.toggle();
+        }
+    }, {
+        key: 'refreshColorSetsChooser',
+        value: function refreshColorSetsChooser() {
+            this.colorSetsChooser.refresh();
         }
     }, {
         key: 'getColorSetsList',
@@ -2568,6 +2779,7 @@ var ColorPicker = function () {
             this.colorSetsChooser.destroy();
             this.colorSetsList.destroy();
             this.currentColorSets.destroy();
+            this.contextMenu.destroy();
 
             // remove color picker callback
             this.colorpickerCallback = undefined;
