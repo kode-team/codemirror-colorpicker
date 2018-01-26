@@ -35,9 +35,9 @@
     }   
   }
 
-  @import './scss/pallet';
-  @import './scss/control';
-  @import './scss/information';
-  @import './scss/colorsets'; 
-  @import './scss/color-chooser'; 
+  @import './component/pallet';
+  @import './component/control';
+  @import './component/information';
+  @import './component/colorsets'; 
+  @import './component/colorchooser'; 
 }   

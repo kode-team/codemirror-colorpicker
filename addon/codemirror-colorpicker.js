@@ -12,6 +12,11 @@ function getColorByName(name) {
     return color_names[name];
 }
 
+var ColorNames = {
+    isColorName: isColorName,
+    getColorByName: getColorByName
+};
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -360,7 +365,7 @@ var ColorView = function () {
                         this.render(obj, lineNo, lineHandle, result[i]);
                     } else {
 
-                        var nameColor = color_names[result[i]];
+                        var nameColor = ColorNames.getColorByName(result[i]);
 
                         if (nameColor) {
                             this.render(obj, lineNo, lineHandle, result[i], nameColor);
@@ -556,8 +561,8 @@ var color$1 = {
     parse: function parse(str) {
         if (typeof str == 'string') {
 
-            if (isColorName(str)) {
-                str = getColorByName(str);
+            if (ColorNames.isColorName(str)) {
+                str = CodeNames.getColorByName(str);
             }
 
             if (str.indexOf("rgb(") > -1) {
@@ -1880,7 +1885,7 @@ var ColorSetsChooser = function () {
 
             var $header = new Dom('div', 'colorsets-item colorsets-item-header');
 
-            this.$toggleButton = new Dom('span', 'items').html('&times');
+            this.$toggleButton = new Dom('span', 'items').html('&times;');
 
             $header.append(new Dom('h1', 'title').html('Color Pallets'));
             $header.append(this.$toggleButton);
@@ -1890,8 +1895,6 @@ var ColorSetsChooser = function () {
             this.$colorsetsList = new Dom('div', 'colorsets-list');
             this.$colorsetsList.append(this.makeColorSetsList());
             $container.append(this.$colorsetsList);
-
-            this.show();
         }
     }, {
         key: 'makeColorItemList',

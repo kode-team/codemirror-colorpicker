@@ -1,4 +1,4 @@
-import { isColorName, getColorByName } from './ColorNames'
+import ColorNames from './ColorNames'
 
 
 const color = {
@@ -69,8 +69,8 @@ const color = {
     parse : function (str) {
         if (typeof str == 'string') {
 
-            if (isColorName(str)) {
-                str = getColorByName(str);
+            if (ColorNames.isColorName(str)) {
+                str = CodeNames.getColorByName(str);
             }
 
             if (str.indexOf("rgb(") > -1) {

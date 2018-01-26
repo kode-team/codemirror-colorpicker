@@ -1,5 +1,4 @@
-import './index.scss'
-import { color_names } from '../util/ColorNames'
+import ColorNames from '../util/ColorNames'
 
 const colorpicker_class = 'codemirror-colorview';
 const colorpicker_background_class = 'codemirror-colorview-background';
@@ -295,7 +294,7 @@ export default class ColorView {
                     this.render(obj, lineNo, lineHandle, result[i]);
                 } else {
                     
-                    var nameColor = color_names[result[i]];
+                    var nameColor = ColorNames.getColorByName(result[i]);
 
                     if (nameColor) {
                         this.render(obj, lineNo, lineHandle, result[i], nameColor);

@@ -1,4 +1,3 @@
-import './index.scss'
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'

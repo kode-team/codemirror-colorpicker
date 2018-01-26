@@ -69,8 +69,7 @@
     }
 
     > .opacity > .opacity-container {
-        background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
-        background-repeat: repeat;
+        @include transparent-background();
     
         > .color-bar {
             position:absolute;
@@ -85,7 +84,7 @@
     }
 
     > .empty {
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+      @include transparent-background();
     }
 
     .drag-bar,

@@ -28,7 +28,7 @@ export default class ColorSetsChooser {
 
         const $header = new Dom('div', 'colorsets-item colorsets-item-header');
         
-        this.$toggleButton = new Dom('span', 'items').html('&times');
+        this.$toggleButton = new Dom('span', 'items').html('&times;');
 
         $header.append(new Dom('h1', 'title').html('Color Pallets'))
         $header.append(this.$toggleButton)
@@ -39,9 +39,6 @@ export default class ColorSetsChooser {
         this.$colorsetsList = new Dom('div', 'colorsets-list' );
         this.$colorsetsList.append(this.makeColorSetsList());
         $container.append(this.$colorsetsList);
-
-
-        this.show();
     }
 
     makeColorItemList (colors, maxCount = 5) {

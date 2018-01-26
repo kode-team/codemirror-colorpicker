@@ -31,7 +31,7 @@
             display:inline-block;
             margin-right:12px;
             margin-bottom:12px;
-            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat;
+            @include transparent-background();
             background-size: contain;
             border: 1px solid rgba(221, 221, 221, 0.5);
             overflow:hidden;

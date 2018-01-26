@@ -1,6 +1,3 @@
-
-
-
 /* codemirror colorview */
 
 .codemirror-colorview {
@@ -11,9 +8,8 @@
 	margin : 0px 2px;
 	width : 10px;
 	height : 10px;
-	cursor: pointer;
-    background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
-    background-repeat: repeat;
+    cursor: pointer;
+    @include transparent-background();
 
     .codemirror-colorview-background {
         content: "";

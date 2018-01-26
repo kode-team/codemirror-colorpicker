@@ -8,8 +8,7 @@
   width: 10px;
   height: 10px;
   cursor: pointer;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
-  background-repeat: repeat; }
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat; }
   .codemirror-colorview .codemirror-colorview-background {
     content: "";
     position: absolute;
@@ -130,8 +129,7 @@
     .codemirror-colorpicker > .control > .hue > .hue-container {
       background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }
     .codemirror-colorpicker > .control > .opacity > .opacity-container {
-      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC");
-      background-repeat: repeat; }
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat; }
       .codemirror-colorpicker > .control > .opacity > .opacity-container > .color-bar {
         position: absolute;
         display: block;
@@ -142,7 +140,7 @@
         top: 0px;
         background: linear-gradient(to right, rgba(232, 232, 232, 0), #e8e8e8); }
     .codemirror-colorpicker > .control > .empty {
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat; }
     .codemirror-colorpicker > .control .drag-bar,
     .codemirror-colorpicker > .control .drag-bar2 {
       border: 1px solid rgba(0, 0, 0, 0.05);

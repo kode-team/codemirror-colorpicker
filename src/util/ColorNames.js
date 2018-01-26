@@ -5,3 +5,8 @@ export function isColorName (name) {
 export function getColorByName (name) {
     return color_names[name];
 }
+
+export default {
+    isColorName,
+    getColorByName 
+}
