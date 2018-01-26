@@ -2404,7 +2404,7 @@ var ColorPicker = function () {
         this.timerCloseColorPicker;
 
         this.control = new ColorControl(this);
-        this.pallet = new ColorPallet(this);
+        this.palette = new ColorPallet(this);
         this.information = new ColorInformation(this);
         this.colorSetsList = new ColorSetsList(this);
         this.colorSetsChooser = new ColorSetsChooser(this);
@@ -2428,7 +2428,7 @@ var ColorPicker = function () {
             this.$arrow = new Dom('div', 'arrow');
 
             this.$root.append(this.$arrow);
-            this.$root.append(this.pallet.$el);
+            this.$root.append(this.palette.$el);
             this.$root.append(this.control.$el);
             this.$root.append(this.information.$el);
             this.$root.append(this.currentColorSets.$el);
@@ -2622,7 +2622,7 @@ var ColorPicker = function () {
         key: 'caculateHSV',
         value: function caculateHSV() {
 
-            var obj = this.pallet.caculateSV();
+            var obj = this.palette.caculateSV();
             var control = this.control.caculateH();
 
             var s = obj.s;
@@ -2643,7 +2643,7 @@ var ColorPicker = function () {
         key: 'setColorUI',
         value: function setColorUI() {
             this.control.setColorUI();
-            this.pallet.setColorUI();
+            this.palette.setColorUI();
         }
     }, {
         key: 'setCurrentHSV',
@@ -2666,7 +2666,7 @@ var ColorPicker = function () {
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor(color) {
-            this.pallet.setBackgroundColor(color);
+            this.palette.setBackgroundColor(color);
         }
     }, {
         key: 'initColor',
@@ -2675,7 +2675,7 @@ var ColorPicker = function () {
                 colorObj = color.parse(c);
 
             this.information.setCurrentFormat(colorObj.type);
-            this.pallet.setBackgroundColor(c);
+            this.palette.setBackgroundColor(c);
 
             var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
 
@@ -2704,7 +2704,7 @@ var ColorPicker = function () {
     }, {
         key: 'EventDocumentMouseUp',
         value: function EventDocumentMouseUp(e) {
-            this.pallet.EventDocumentMouseUp(e);
+            this.palette.EventDocumentMouseUp(e);
             this.control.EventDocumentMouseUp(e);
 
             // when color picker clicked in outside
@@ -2717,7 +2717,7 @@ var ColorPicker = function () {
     }, {
         key: 'EventDocumentMouseMove',
         value: function EventDocumentMouseMove(e) {
-            this.pallet.EventDocumentMouseMove(e);
+            this.palette.EventDocumentMouseMove(e);
             this.control.EventDocumentMouseMove(e);
         }
     }, {
@@ -2726,7 +2726,7 @@ var ColorPicker = function () {
             Event.addEvent(document, 'mouseup', this.$EventDocumentMouseUp);
             Event.addEvent(document, 'mousemove', this.$EventDocumentMouseMove);
 
-            this.pallet.initializeEvent();
+            this.palette.initializeEvent();
             this.control.initializeEvent();
             this.information.initializeEvent();
             this.currentColorSets.initializeEvent();
@@ -2772,7 +2772,7 @@ var ColorPicker = function () {
             Event.removeEvent(document, 'mousemove', this.$EventDocumentMouseMove);
 
             this.control.destroy();
-            this.pallet.destroy();
+            this.palette.destroy();
             this.information.destroy();
             this.colorSetsChooser.destroy();
             this.colorSetsList.destroy();

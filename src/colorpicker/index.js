@@ -4,7 +4,7 @@ import Event from '../util/Event'
 
 import ColorControl from './ColorControl'
 import ColorInformation from './ColorInformation'
-import ColorPallet from './ColorPallet'
+import ColorPalette from './ColorPalette'
 import ColorSetsChooser from './ColorSetsChooser'
 import ColorSetsList from './ColorSetsList'
 import CurrentColorSets from './CurrentColorSets'
@@ -32,7 +32,7 @@ export default class ColorPicker {
         this.timerCloseColorPicker;
 
         this.control = new ColorControl(this);
-        this.pallet = new ColorPallet(this);
+        this.palette = new ColorPalette(this);
         this.information = new ColorInformation(this);
         this.colorSetsList = new ColorSetsList(this);  
         this.colorSetsChooser = new ColorSetsChooser(this);
@@ -54,7 +54,7 @@ export default class ColorPicker {
 
 
         this.$root.append(this.$arrow);
-        this.$root.append(this.pallet.$el);
+        this.$root.append(this.palette.$el);
         this.$root.append(this.control.$el);
         this.$root.append(this.information.$el);
         this.$root.append(this.currentColorSets.$el);
@@ -236,7 +236,7 @@ export default class ColorPicker {
     
     caculateHSV() {
 
-        var obj = this.pallet.caculateSV();
+        var obj = this.palette.caculateSV();
         var control = this.control.caculateH();
 
         var s = obj.s;
@@ -258,7 +258,7 @@ export default class ColorPicker {
 
     setColorUI() {        
         this.control.setColorUI()
-        this.pallet.setColorUI()
+        this.palette.setColorUI()
     }
 
     setCurrentHSV (h, s, v, a) {
@@ -278,14 +278,14 @@ export default class ColorPicker {
     }
 
     setBackgroundColor (color) {
-        this.pallet.setBackgroundColor(color);
+        this.palette.setBackgroundColor(color);
     }
 
     initColor(newColor) {
         var c = newColor || "#FF0000", colorObj = color.parse(c);
     
         this.information.setCurrentFormat(colorObj.type);
-        this.pallet.setBackgroundColor(c);
+        this.palette.setBackgroundColor(c);
     
         var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
     
@@ -312,7 +312,7 @@ export default class ColorPicker {
 
 
     EventDocumentMouseUp (e) {
-        this.pallet.EventDocumentMouseUp(e);
+        this.palette.EventDocumentMouseUp(e);
         this.control.EventDocumentMouseUp(e);
     
         // when color picker clicked in outside
@@ -325,7 +325,7 @@ export default class ColorPicker {
     }
     
     EventDocumentMouseMove(e) {
-        this.pallet.EventDocumentMouseMove(e);
+        this.palette.EventDocumentMouseMove(e);
         this.control.EventDocumentMouseMove(e);
     }    
 
@@ -333,7 +333,7 @@ export default class ColorPicker {
         Event.addEvent(document, 'mouseup', this.$EventDocumentMouseUp);
         Event.addEvent(document, 'mousemove', this.$EventDocumentMouseMove);
 
-        this.pallet.initializeEvent();
+        this.palette.initializeEvent();
         this.control.initializeEvent();
         this.information.initializeEvent()
         this.currentColorSets.initializeEvent() 
@@ -373,7 +373,7 @@ export default class ColorPicker {
         Event.removeEvent(document, 'mousemove', this.$EventDocumentMouseMove);
 
         this.control.destroy();
-        this.pallet.destroy();
+        this.palette.destroy();
         this.information.destroy();
         this.colorSetsChooser.destroy();
         this.colorSetsList.destroy();
