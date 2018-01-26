@@ -1,3 +1,21 @@
 @mixin transparent-background () {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat;    
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;    
+}
+
+@mixin arrow_top ($pixel, $color) {
+    width: 0; 
+    height: 0; 
+    border-left: $pixel solid transparent;
+    border-right: $pixel solid transparent;    
+    border-bottom: $pixel solid $color;
+    pointer-events: none;
+}
+
+@mixin arrow_bottom ($pixel, $color) {
+    width: 0; 
+    height: 0; 
+    border-left: $pixel solid transparent;
+    border-right: $pixel solid transparent;    
+    border-top: $pixel solid $color;
+    pointer-events: none;
 }

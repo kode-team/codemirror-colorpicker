@@ -4,23 +4,23 @@
 
     > .menu {
         float: right;
-        padding: 4px 6px;
+        padding: 10px 5px;
+        padding-right: 15px;
 
         button {
-        border:0px;
-        font-size: 14px;
-        font-weight: 300;
-        font-family: serif, sans-serif;
-        outline:none;
-        cursor: pointer;
+            border:0px;
+            font-size: 14px;
+            font-weight: 300;
+            font-family: serif, sans-serif;
+            outline:none;
+            cursor: pointer;
         }
     }
 
     > .color-list {
-        margin-right: 20px;
-        display:block;
-        padding: 12px;
-        padding-bottom:0px;
+        margin-right: 30px;
+        display: block;
+        padding: 12px 8px 0px 8px;
         box-sizing:border-box;
         line-height: 0;
 
@@ -33,7 +33,7 @@
             margin-bottom:12px;
             @include transparent-background();
             background-size: contain;
-            border: 1px solid rgba(221, 221, 221, 0.5);
+            border: 1px solid rgba(221, 221, 221, 1);
             overflow:hidden;
             box-sizing:border-box;
             cursor: pointer;

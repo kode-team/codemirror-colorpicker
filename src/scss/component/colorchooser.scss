@@ -108,7 +108,7 @@
                         margin-right:10px;
                         @include transparent-background();
                         background-size: contain;
-                        border: 1px solid rgba(221, 221, 221, 0.5);
+                        border: 1px solid rgba(221, 221, 221, 1);
                         overflow:hidden;
                         box-sizing:border-box;
                         cursor: pointer;

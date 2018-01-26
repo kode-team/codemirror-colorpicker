@@ -53,10 +53,14 @@ export default class CurrentColorSets {
         this.$el = new Dom('div', 'colorsets' );
 
         this.$colorSets = this.$el; 
-        this.$colorSetsMenu = new Dom('div', 'menu' );
+        this.$colorSetsMenu = new Dom('div', 'menu', {
+            title: 'Open Color Pallets'
+        });
         this.$colorSetsColorList = new Dom('div', 'color-list' );
 
-        this.$colorSetsChooseButton = new Dom('button', 'color-sets-choose-btn').html('+');
+        this.$colorSetsChooseButton = new Dom('button', 'color-sets-choose-btn arrow-button', {
+            type : 'button'
+        });
         this.$colorSetsMenu.append(this.$colorSetsChooseButton)
 
         this.$el.append(this.$colorSetsMenu);

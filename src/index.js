@@ -9,7 +9,7 @@ CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
 
         if (cm.state.colorpicker)
         { 
-            cm.state.colorpicker.destroy();
+            cm.state.colorpicker.destroy(); 
             cm.state.colorpicker = null;  
 
         } 

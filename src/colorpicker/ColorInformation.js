@@ -17,9 +17,9 @@ export default class ColorInformation {
 
         this.$informationChange = new Dom('div', 'information-change');
 
-        this.$formatChangeButton = new Dom('button', 'format-change-button', { type : 'button'}).html('↔');
+        this.$formatChangeButton = new Dom('button', 'format-change-button arrow-button', { type : 'button'});
         this.$informationChange.append(this.$formatChangeButton);
-
+ 
         this.$el.append(this.makeInputFieldHex());
         this.$el.append(this.makeInputFieldRgb());
         this.$el.append(this.makeInputFieldHsl());
