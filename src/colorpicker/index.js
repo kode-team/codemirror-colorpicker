@@ -15,7 +15,8 @@ const hue_color = ColorUtil.hue_color;
 
 
 export default class ColorPicker {
-    constructor () {
+    constructor (opt) {
+        this.opt = opt || {}; 
         this.$body = null;
         this.$root = null;
         this.currentA = 0;
@@ -30,18 +31,21 @@ export default class ColorPicker {
         this.hideDelay = 2000;
         this.timerCloseColorPicker;
 
-        this.initialize();
-    }
-
-    initialize () {
         this.control = new ColorControl(this);
         this.pallet = new ColorPallet(this);
         this.information = new ColorInformation(this);
+        this.colorSetsList = new ColorSetsList(this);  
         this.colorSetsChooser = new ColorSetsChooser(this);
-        this.colorSetsList = new ColorSetsList(this);
         this.currentColorSets = new CurrentColorSets(this);
 
+        this.initialize();
+    }
 
+    getOption (key) {
+        return this.opt[key];
+    }
+
+    initialize () {
         this.$body = new Dom(document.body);
         this.$root = new Dom('div', 'codemirror-colorpicker');
 
@@ -71,10 +75,7 @@ export default class ColorPicker {
 
             this.initColor(color.format(value, "hex"));
         } else if(typeof(value) == "string") {
-            if(value.charAt(0) != "#")
-                return;
-
-            this.initColor(value);
+            this.initColor(value); 
         }
     }
 
@@ -325,7 +326,7 @@ export default class ColorPicker {
         this.pallet.initializeEvent();
         this.control.initializeEvent();
         this.information.initializeEvent()
-        this.currentColorSets.initializeEvent()
+        this.currentColorSets.initializeEvent() 
         this.colorSetsChooser.initializeEvent();
     
     }
@@ -333,6 +334,23 @@ export default class ColorPicker {
     currentFormat () {
         this.information.currentFormat();
     }
+
+    toggleColorChooser () {
+        this.colorSetsChooser.toggle();
+    }
+
+    getColorSetsList () {
+        return this.colorSetsList.getColorSetsList();
+    }
+
+    setCurrentColorSets (nameOrIndex) {
+        this.colorSetsList.setCurrentColorSets(nameOrIndex);
+        this.currentColorSets.refresh();
+    }
+
+    setColorSets (list) {
+        this.colorSetsList.setUserList(list);
+    } 
 
     destroy() {
 

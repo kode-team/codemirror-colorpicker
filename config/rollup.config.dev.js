@@ -1,8 +1,10 @@
 import packageJSON from '../package.json'
 import scss from 'rollup-plugin-scss'
+import postcss from 'rollup-plugin-postcss'
 import babel from 'rollup-plugin-babel';
 import serve from 'rollup-plugin-serve'
 import livereload from 'rollup-plugin-livereload'
+import autoprefixer from 'autoprefixer'
 
 
 // rollup.config.js
@@ -13,12 +15,21 @@ export default {
     format: 'iife',
     globals: {
       "codemirror" : "CodeMirror"
-    }
+    },
+    external: ['codemirror'],
   },
+  name: 'CodemirrorColorpicker',  
   plugins : [
     serve(),
     livereload({watch: 'addon'}),
-    scss({output : 'addon/' + packageJSON.name + '.css'}),
+    //scss({output : 'addon/' + packageJSON.name + '.css'}),
+    postcss({
+      extract: 'addon/' + packageJSON.name + '.css',
+      plugins: [
+        autoprefixer()
+      ],
+      extensions: ['.scss']
+    }), 
     babel({
       exclude: 'node_modules/**',
       presets: [

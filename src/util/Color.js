@@ -1,3 +1,5 @@
+import { isColorName, getColorByName } from './ColorNames'
+
 
 const color = {
 
@@ -66,6 +68,11 @@ const color = {
      */
     parse : function (str) {
         if (typeof str == 'string') {
+
+            if (isColorName(str)) {
+                str = getColorByName(str);
+            }
+
             if (str.indexOf("rgb(") > -1) {
                 var arr = str.replace("rgb(", "").replace(")","").split(",");
 

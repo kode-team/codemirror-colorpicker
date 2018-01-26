@@ -2,29 +2,33 @@
 
 CodeMirror ColorPicker Addon like Chrome devtool style  
    
-# How to use (for  html) 
+# How to use (for  browser) 
 
 ```
-<link rel="stylesheet" href="/codemirror-colorpicker/addon/colorpicker/colorpicker.css/>
-<script src="/codemirror-colorpicker/addon/colorpicker/colorview.js"></script>
-<script src="/codemirror-colorpicker/addon/colorpicker/colorpicker.js"></script>
+<link rel="stylesheet" href="/codemirror-colorpicker/dist/codemirror-colorpciker.css/>
+<script src="/codemirror-colorpicker/dist/codemirror-colorpicker.min.js"></script>
 ```
 
-# How to use (for require, browserify, nodejs) 
+# How to use (for require, nodejs) 
 
 after npm install 
 
 ## script 
 
 ```
-require( 'codemirror-colorpicker/addon/colorpicker/colorpicker' );
-require( 'codemirror-colorpicker/addon/colorpicker/colorview' );
+require( 'codemirror-colorpicker' );
+
+or 
+
+// es6
+import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
+import 'codemirror-colorpicker' 
 ```
 
 ## style 
 
 ```
-<link rel="stylesheet" href="/node_modules/codemirror-colorpicker/addon/colorpicker/colorpicker.css">
+<link rel="stylesheet" href="/node_modules/codemirror-colorpicker/dist/codemirror-colorpicker.css">
 ```
 
 # ColorPicker Options for CodeMirror
@@ -64,6 +68,24 @@ It can open color picker on current cursor.
   }
 }
 ```
+
+## Support custom color sets (since v1.5)
+
+You can set custom color sets (ex : material, ...).
+
+```javascript
+{
+  colorpicker : {
+      mode : 'edit',
+      colorSets: [
+        { name : 'Material', colors : [ '#ffff', 'rgba(255, 255, 0, 0.5)' ] },
+        { name : 'My Colors', colors : [ 'red', 'blue', 'white' ] },
+        { name : 'Input Colors', edit: true  },
+      ]
+  }
+}
+```
+
 
 # Samples
 

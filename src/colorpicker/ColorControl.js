@@ -131,7 +131,7 @@ export default class ColorControl {
         this.colorpicker.currentFormat();
         this.colorpicker.setInputColor();
     }
-
+ 
     setInputColor () {
         this.setBackgroundColor(this.colorpicker.getFormattedColor('rgb'));
         

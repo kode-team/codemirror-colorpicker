@@ -5,7 +5,6 @@
     overflow: hidden;
     cursor: pointer;
 
-
     > .saturation {
       position: relative;
       width: 100%;
@@ -20,8 +19,6 @@
           position: absolute;
           width: 10px;
           height: 10px;
-          -webkit-border-radius: 50%;
-          -moz-border-radius: 50%;
           border-radius: 50%;
           left: -5px;
           top: -5px;
@@ -32,26 +29,14 @@
 
     > .saturation {
         background-color: rgba(204, 154, 129, 0);
-        background-image: -moz-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));
-        background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#FFF), to(rgba(204, 154, 129, 0)));
-        background-image: -webkit-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));
-        background-image: -o-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));
         background-image: linear-gradient(to right, #FFF, rgba(204, 154, 129, 0));
-        background-repeat: repeat-x;
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#00cc9a81', GradientType=1);
+        background-repeat: repeat-x; 
     
         > .value {
-            background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#000000), to(rgba(204, 154, 129, 0)));
-            background-image: -webkit-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));
-            background-image: -moz-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));
-            background-image: -o-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));
-            background-image: -ms-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));
             background-image: linear-gradient(to top, #000000, rgba(204, 154, 129, 0));
     
             > .drag-pointer {
                 border: 1px solid #fff;
-                -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
-                -moz-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
                 box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
             }
         }

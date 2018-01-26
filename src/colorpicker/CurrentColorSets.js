@@ -11,7 +11,10 @@ export default class CurrentColorSets {
 
         this.colorpicker = colorpicker; 
 
-        this.colorSetsList = new ColorSetsList(this.colorpicker);
+        this.colorSetsList = this.colorpicker.colorSetsList;
+
+        this.$EventToggleColorChooser = this.EventToggleColorChooser.bind(this);
+        this.$EventSelectColor = this.EventSelectColor.bind(this);
 
         this.initialize();
     } 
@@ -19,10 +22,15 @@ export default class CurrentColorSets {
     makeCurrentColorSets () {
         var list = new Dom('div', 'current-color-sets');
         const currentColorSets  = this.colorSetsList.getCurrentColorSets()
+        const colors  = this.colorSetsList.getCurrentColors()
+        
     
-        for(var i = 0, len = currentColorSets.colors.length; i < len; i++) {
-            var color = currentColorSets.colors[i];
-            var item = new Dom('div', 'color-item', { 'data-color' : color});
+        for(var i = 0, len = colors.length; i < len; i++) {
+            var color = colors[i];
+            var item = new Dom('div', 'color-item', { 
+                'title' : color,  
+                'data-color' : color
+            });
             var colorView = new Dom('div', 'color-view');
             colorView.css({ 'background-color': color })
     
@@ -62,11 +70,27 @@ export default class CurrentColorSets {
         this.$colorSetsColorList.append(this.makeCurrentColorSets())    
     }
 
-    initializeEvent () {
+    EventToggleColorChooser (e) {
+        this.colorpicker.toggleColorChooser();
+    }
 
+    EventSelectColor (e) {
+        e.preventDefault();
+        const $item = new Dom(e.target).closest('color-item');
+
+        if ($item) {
+            const color = $item.attr('data-color');
+            this.colorpicker.setColor(color);
+        }
+    }
+
+    initializeEvent () {
+        Event.addEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);        
+        Event.addEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);
     }
 
     destroy() {
-
+        Event.removeEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);
+        Event.removeEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);        
     }
 }

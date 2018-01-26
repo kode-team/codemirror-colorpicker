@@ -15,8 +15,11 @@ export default class Dom {
     
             var el  = document.createElement(tag);
             this.uniqId = counter++;
-    
-            el.className = className;
+
+            if (className) {
+                el.className = className;
+            }
+
             attr = attr || {};
     
             for(var k in attr) {
@@ -27,6 +30,16 @@ export default class Dom {
         }
     }
 
+
+    attr (key, value) {
+        if (arguments.length == 1) {
+            return this.el.getAttribute(key);
+        }
+
+        this.el.setAttribute(key, value);
+
+        return this; 
+    }
 
     closest (cls) {
         
@@ -67,6 +80,14 @@ export default class Dom {
             this.el.className = `${this.el.className} ${cls}`;
         }
     
+    }
+
+    toggleClass (cls) {
+        if (this.hasClass(cls)) {
+            this.removeClass(cls);
+        } else {
+            this.addClass(cls);
+        }
     }
     
     html (html) {
@@ -199,6 +220,26 @@ export default class Dom {
     
     hide () {
         return this.css('display', 'none');
+    }
+
+    toggle () {
+        if (this.css('display') == 'none') {
+            return this.show();
+        } else {
+            return this.hide();
+        }
+    }
+
+    on (eventName, callback, opt1, opt2) {
+        this.el.addEventListener(eventName, callback, opt1, opt2);
+
+        return this; 
+    }
+
+    off (eventName, callback ) {
+        this.el.removeEventListener(eventName, callback);
+
+        return this; 
     }
 }
 

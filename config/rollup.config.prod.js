@@ -5,18 +5,34 @@ import uglify from 'rollup-plugin-uglify';
 import minify from 'rollup-plugin-minify'
 
 // rollup.config.js
-export default {
+export default [{
   input: 'src/index.js',
   output: {
-    file: 'addon/' + packageJSON.name + '.js',
-    format: 'umd'
+    file: 'dist/' + packageJSON.name + '.min.js',
+    format: 'iife',
+    globals: {
+      "codemirror" : "CodeMirror"
+    }
   },
+  name: 'CodemirrorColorpicker',  
   plugins : [
-    scss({output : 'addon/' + packageJSON.name + '.css'}),
+    scss({output : 'dist/' + packageJSON.name + '.css'}),
     babel({
       exclude: 'node_modules/**'
     }),
-    uglify(),
-    minify({ iife : 'addon/' + packageJSON.name + '.min.js'})
+    uglify()
   ]
-};
+}, {
+  input: 'src/index.js',
+  output: {
+    file: 'dist/' + packageJSON.name + '.js',
+    format: 'umd'
+  },
+  name: 'codemirror-colorpicker',
+  plugins : [
+    scss({output : 'dist/' + packageJSON.name + '.css'}),
+    babel({
+      exclude: 'node_modules/**'
+    })
+  ]
+}];
