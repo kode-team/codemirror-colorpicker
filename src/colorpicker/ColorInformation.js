@@ -1,12 +1,15 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 
 const color = ColorUtil.color;
 
-export default class ColorInformation {
+export default class ColorInformation extends EventMachin {
 
     constructor(colorpicker) {
+        super();
+        
         this.colorpicker = colorpicker;
         this.initialize()
 
@@ -23,13 +26,7 @@ export default class ColorInformation {
         this.$el.append(this.makeInputFieldHex());
         this.$el.append(this.makeInputFieldRgb());
         this.$el.append(this.makeInputFieldHsl());
-        this.$el.append(this.$informationChange);
-
-        this.$EventHexCodeKeyDown = this.EventHexCodeKeyDown.bind(this);
-        this.$EventHexCodeKeyUp = this.EventHexCodeKeyUp.bind(this);
-        this.$checkNumberKey = this.checkNumberKey.bind(this);
-        this.$setRGBtoHexColor = this.setRGBtoHexColor.bind(this);
-        this.$EventFormatChangeClick = this.EventFormatChangeClick.bind(this);        
+        this.$el.append(this.$informationChange);     
     }
 
 
@@ -252,28 +249,36 @@ export default class ColorInformation {
     checkNumberKey(e) {
         return Event.checkNumberKey(e);
     }    
+
+    'keydown $rgb_r' (e) { return this.checkNumberKey(e) }
+    'keydown $rgb_g' (e) { return this.checkNumberKey(e) }
+    'keydown $rgb_b' (e) { return this.checkNumberKey(e) }
+
+    'keyup $rgb_r' (e) { return this.setRGBtoHexColor(e) }
+    'keyup $rgb_g' (e) { return this.setRGBtoHexColor(e) }
+    'keyup $rgb_b' (e) { return this.setRGBtoHexColor(e) }
     
-    EventHexCodeKeyDown(e) {
+    'keydown $hexCode' (e) {
         if(e.which < 65 || e.which > 70) {
             return this.checkNumberKey(e);
         }
     }
     
-    EventHexCodeKeyUp (e) {
+    'keyup $hexCode' (e) {
         var code = this.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
             this.colorpicker.initColor(code);
         }
     }
+
     
-    EventFormatChangeClick(e) {
+    'click $formatChangeButton' (e) {
         this.nextFormat();
     }
 
-
     initializeEvent() {
-        
+        this.initializeEventMachin();
 
 
         Event.addEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
@@ -290,6 +295,8 @@ export default class ColorInformation {
     }
 
     destroy () {
+        this.destroyEventMachin();
+
         Event.removeEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
         Event.removeEvent(this.$hexCode.el, 'keyup', this.$EventHexCodeKeyUp);
         Event.removeEvent(this.$rgb_r.el, 'keydown', this.$checkNumberKey);

@@ -1,12 +1,14 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
-export default class ColorPallet {
+export default class ColorPallet extends EventMachin {
     constructor (colorpicker) {
+        super();
 
         this.colorpicker = colorpicker; 
         this.initialize();
@@ -20,10 +22,7 @@ export default class ColorPallet {
     
         this.$value.append(this.$drag_pointer);
         this.$saturation.append(this.$value);
-        this.$el.append(this.$saturation);
-
-        this.$EventColorMouseDown = this.EventColorMouseDown.bind(this);
-        this.$EventColorMouseUp = this.EventColorMouseUp.bind(this);        
+        this.$el.append(this.$saturation);  
     }
 
     setBackgroundColor (color) {
@@ -89,32 +88,29 @@ export default class ColorPallet {
         this.$el.data('isDown', false);    
     }
 
-
-    EventColorMouseDown(e) {
-        this.$el.data('isDown', true);
-        this.setMainColor(e);
-    }
-    
-    EventColorMouseUp(e) {
-        this.$el.data('isDown', false);
-    }
-
-
     EventDocumentMouseMove(e) {
         if (this.$el.data('isDown')) {
             this.setMainColor(e);
         }
     } 
 
+
+    mousedown (e) {
+        this.$el.data('isDown', true);
+        this.setMainColor(e);
+    }
+    
+    mouseup (e) {
+        this.$el.data('isDown', false);
+    }
+
+
     initializeEvent () {
+        this.initializeEventMachin();
 
-
-        Event.addEvent(this.$el.el, 'mousedown', this.$EventColorMouseDown);
-        Event.addEvent(this.$el.el, 'mouseup', this.$EventColorMouseUp);
     }
 
     destroy() {
-        Event.removeEvent(this.$el.el, 'mousedown', this.$EventColorMouseDown);
-        Event.removeEvent(this.$el.el, 'mouseup', this.$EventColorMouseUp);
+        this.destroyEventMachin();
     }
 }

@@ -241,5 +241,9 @@ export default class Dom {
 
         return this; 
     }
+
+    getElement ( ) {
+        return this.el;
+    }
 }
 

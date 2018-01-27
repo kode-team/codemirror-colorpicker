@@ -1,18 +1,18 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 import ColorSetsList from './ColorSetsList'
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
-export default class CurrentColorSetsContextMenu {
+export default class CurrentColorSetsContextMenu extends EventMachin {
     constructor (colorpicker) {
+        super();
 
         this.colorpicker = colorpicker; 
         this.currentColorSets = colorpicker.currentColorSets;
-
-        this.$EventClickMenuItem = this.EventClickMenuItem.bind(this);
 
         this.initialize();
     } 
@@ -71,22 +71,19 @@ export default class CurrentColorSetsContextMenu {
         }
     }
 
-    EventClickMenuItem (e) {
+    'click $el .menu-item' (e) {
         e.preventDefault();
-        const $target = new Dom(e.target);
-        
-        const $item = $target.closest('menu-item');
-        if ($item) {
-            this.runCommand($item.attr('data-type'));
-        }
+
+        const $item = new Dom(e.delegateTarget);
+        this.runCommand($item.attr('data-type'));
         this.hide();        
     }
 
     initializeEvent () {
-        Event.addEvent(this.$el.el, 'click', this.$EventClickMenuItem);
+        this.initializeEventMachin();
     }
 
     destroy() {
-        Event.removeEvent(this.$el.el, 'click', this.$EventSelectColor);        
+        this.destroyEventMachin();
     }
 }

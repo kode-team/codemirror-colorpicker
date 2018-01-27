@@ -1,6 +1,7 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 
 import ColorControl from './ColorControl'
 import ColorInformation from './ColorInformation'
@@ -14,8 +15,10 @@ const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
 
-export default class ColorPicker {
+export default class ColorPicker extends EventMachin {
     constructor (opt) {
+        super();
+
         this.opt = opt || {}; 
         this.$body = null;
         this.$root = null;
@@ -23,7 +26,7 @@ export default class ColorPicker {
         this.currentH = 0;
         this.currentS = 0;
         this.currentV = 0;
-
+        this.colorSetsList = new ColorSetsList(this);  
         this.colorpickerCallback = function () {};
 
         this.isColorPickerShow = false;
@@ -34,7 +37,6 @@ export default class ColorPicker {
         this.control = new ColorControl(this);
         this.palette = new ColorPalette(this);
         this.information = new ColorInformation(this);
-        this.colorSetsList = new ColorSetsList(this);  
         this.colorSetsChooser = new ColorSetsChooser(this);
         this.currentColorSets = new CurrentColorSets(this);
         this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
@@ -60,12 +62,8 @@ export default class ColorPicker {
         this.$root.append(this.currentColorSets.$el);
         this.$root.append(this.colorSetsChooser.$el);
         this.$root.append(this.contextMenu.$el);
-
-        this.$EventDocumentMouseUp = this.EventDocumentMouseUp.bind(this);
-        this.$EventDocumentMouseMove = this.EventDocumentMouseMove.bind(this);
+                
         this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);        
-
-        this.initializeEvent()
 
         this.initColor();        
     }
@@ -310,8 +308,8 @@ export default class ColorPicker {
         return IsInHtml;
     }    
 
-
-    EventDocumentMouseUp (e) {
+    // Event Bindings 
+    'mouseup document' (e) {
         this.palette.EventDocumentMouseUp(e);
         this.control.EventDocumentMouseUp(e);
     
@@ -321,17 +319,16 @@ export default class ColorPicker {
         } else if (this.checkColorPickerClass(e.target) == false ) {
             this.hide();
         }
-    
     }
-    
-    EventDocumentMouseMove(e) {
+
+    'mousemove document' (e) {
         this.palette.EventDocumentMouseMove(e);
         this.control.EventDocumentMouseMove(e);
     }    
 
     initializeEvent () {
-        Event.addEvent(document, 'mouseup', this.$EventDocumentMouseUp);
-        Event.addEvent(document, 'mousemove', this.$EventDocumentMouseMove);
+
+        this.initializeEventMachin();
 
         this.palette.initializeEvent();
         this.control.initializeEvent();
@@ -368,9 +365,7 @@ export default class ColorPicker {
     } 
 
     destroy() {
-
-        Event.removeEvent(document, 'mouseup', this.$EventDocumentMouseUp);
-        Event.removeEvent(document, 'mousemove', this.$EventDocumentMouseMove);
+        this.destroyEventMachin();
 
         this.control.destroy();
         this.palette.destroy();

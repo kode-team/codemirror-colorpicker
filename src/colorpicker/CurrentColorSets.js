@@ -1,21 +1,19 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 import ColorSetsList from './ColorSetsList'
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
-export default class CurrentColorSets {
+export default class CurrentColorSets extends EventMachin {
     constructor (colorpicker) {
+        super();
 
         this.colorpicker = colorpicker; 
 
         this.colorSetsList = this.colorpicker.colorSetsList;
-
-        this.$EventToggleColorChooser = this.EventToggleColorChooser.bind(this);
-        this.$EventSelectColor = this.EventSelectColor.bind(this);
-        this.$EventContextMenu = this.EventContextMenu.bind(this);
 
         this.initialize();
     } 
@@ -101,11 +99,11 @@ export default class CurrentColorSets {
         this.refreshAll();
     }
 
-    EventToggleColorChooser (e) {
+    'click $colorSetsChooseButton' (e) {
         this.colorpicker.toggleColorChooser();
     }
 
-    EventContextMenu (e) {
+    'contextmenu $colorSetsColorList' (e) {
         e.preventDefault();
         const currentColorSets  = this.colorSetsList.getCurrentColorSets()
 
@@ -126,7 +124,7 @@ export default class CurrentColorSets {
         }
     }
 
-    EventSelectColor (e) {
+    'click $colorSetsColorList'  (e) {
         e.preventDefault();
         const $target = new Dom(e.target);
         
@@ -145,14 +143,12 @@ export default class CurrentColorSets {
     }
 
     initializeEvent () {
-        Event.addEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);        
-        Event.addEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);
-        Event.addEvent(this.$colorSetsColorList.el, 'contextmenu', this.$EventContextMenu);
+        this.initializeEventMachin();
+
+        
     }
 
     destroy() {
-        Event.removeEvent(this.$colorSetsChooseButton.el, 'click', this.$EventToggleColorChooser);
-        Event.removeEvent(this.$colorSetsColorList.el, 'click', this.$EventSelectColor);   
-        Event.removeEvent(this.$colorSetsColorList.el, 'contextmenu', this.$EventContextMenu);        
+        this.destroyEventMachin();       
     }
 }

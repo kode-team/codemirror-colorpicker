@@ -1,19 +1,18 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
-export default class ColorSetsChooser {
+export default class ColorSetsChooser extends EventMachin {
     constructor (colorpicker) {
+        super();
 
-        this.colorpicker = colorpicker; 
-
-        this.$EventToggle = this.EventToggle.bind(this);
-        this.$EventClickColorSetsItem = this.EventClickColorSetsItem.bind(this);        
+        this.colorpicker = colorpicker;       
 
         this.initialize();
     } 
@@ -99,11 +98,12 @@ export default class ColorSetsChooser {
         this.$el.toggleClass('open');
     }
 
-    EventToggle (e) {
+
+    'click $toggleButton' (e) {
         this.toggle();
     }
 
-    EventClickColorSetsItem (e) {
+    'click $colorsetsList' (e) {
         e.preventDefault();
         const $item = new Dom(e.target).closest('colorsets-item');
 
@@ -116,12 +116,11 @@ export default class ColorSetsChooser {
     }
 
     initializeEvent() {
-        Event.addEvent(this.$toggleButton.el, 'click', this.$EventToggle);
-        Event.addEvent(this.$colorsetsList.el, 'click', this.$EventClickColorSetsItem);
+        this.initializeEventMachin();
+
     }
 
     destroy () {
-        Event.removeEvent(this.$toggleButton.el, 'click', this.$EventToggle);
-        Event.removeEvent(this.$colorsetsList.el, 'click', this.$EventClickColorSetsItem);
+        this.destroyEventMachin();
     }
 }

@@ -2,13 +2,15 @@
 import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
+import EventMachin from '../util/EventMachin'
+
 
 const color = ColorUtil.color;
 const hue_color = ColorUtil.hue_color;
 
-export default class ColorControl {
+export default class ColorControl extends EventMachin {
     constructor (colorpicker) {
-
+        super();
         this.colorpicker = colorpicker; 
         this.initialize();
     } 
@@ -37,11 +39,6 @@ export default class ColorControl {
         this.$el.append(this.$opacity);
         this.$el.append(this.$controlPattern);
         this.$el.append(this.$controlColor);
-
-        this.$EventDragBarMouseDown = this.EventDragBarMouseDown.bind(this);
-        this.$EventOpacityDragBarMouseDown = this.EventOpacityDragBarMouseDown.bind(this);
-        this.$EventHueMouseDown = this.EventHueMouseDown.bind(this);
-        this.$EventOpacityMouseDown = this.EventOpacityMouseDown.bind(this);        
         
     }
 
@@ -191,25 +188,6 @@ export default class ColorControl {
         this.$opacity.data('isDown', false);
     }
 
-    EventDragBarMouseDown (e) {
-        e.preventDefault();
-        this.$hue.data('isDown', true);
-    }
-    
-    EventOpacityDragBarMouseDown(e) {
-        e.preventDefault();
-        this.$opacity.data('isDown', true);
-    }
-    
-    EventHueMouseDown (e) {
-        this.$hue.data('isDown', true);
-        this.setHueColor(e);
-    }
-    
-    EventOpacityMouseDown (e) {
-        this.$opacity.data('isDown', true);
-        this.setOpacity(e);
-    }
 
 
     setControlColor (color) {
@@ -245,21 +223,33 @@ export default class ColorControl {
         this.colorpicker.setCurrentH((dist/100) * 360);
         this.colorpicker.setInputColor();
     }    
+
+    'mousedown $drag_bar' (e) {
+        e.preventDefault();
+        this.$hue.data('isDown', true);
+    }
+    
+    'mousedown $opacity_drag_bar' (e) {
+        e.preventDefault();
+        this.$opacity.data('isDown', true);
+    }
+    
+    'mousedown $hueContainer' (e) {
+        this.$hue.data('isDown', true);
+        this.setHueColor(e);
+    }
+    
+    'mousedown $opacityContainer' (e) {
+        this.$opacity.data('isDown', true);
+        this.setOpacity(e);
+    }    
     
 
     initializeEvent () {
-
-
-        Event.addEvent(this.$drag_bar.el, 'mousedown', this.$EventDragBarMouseDown);
-        Event.addEvent(this.$opacity_drag_bar.el, 'mousedown', this.$EventOpacityDragBarMouseDown);
-        Event.addEvent(this.$hueContainer.el, 'mousedown', this.$EventHueMouseDown);
-        Event.addEvent(this.$opacityContainer.el, 'mousedown', this.$EventOpacityMouseDown);
+        this.initializeEventMachin();
     }
 
     destroy() {
-        Event.removeEvent(this.$drag_bar.el, 'mousedown', this.$EventDragBarMouseDown);
-        Event.removeEvent(this.$opacity_drag_bar.el, 'mousedown', this.$EventOpacityDragBarMouseDown);
-        Event.removeEvent(this.$hueContainer.el, 'mousedown', this.$EventHueMouseDown);
-        Event.removeEvent(this.$opacityContainer.el, 'mousedown', this.$EventOpacityMouseDown);
+        this.destroyEventMachin();
     }
 }
