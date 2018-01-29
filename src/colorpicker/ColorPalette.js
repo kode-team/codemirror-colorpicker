@@ -16,13 +16,9 @@ export default class ColorPallet extends EventMachin {
     
     initialize () {
         this.$el = new Dom('div', 'color');
-        this.$drag_pointer = new Dom('div', 'drag-pointer' );
-        this.$value = new Dom( 'div', 'value' );
-        this.$saturation = new Dom('div', 'saturation' );
-    
-        this.$value.append(this.$drag_pointer);
-        this.$saturation.append(this.$value);
-        this.$el.append(this.$saturation);  
+        this.$saturation = this.$el.createChild('div', 'saturation' );    
+        this.$value = this.$saturation.createChild('div', 'value' );
+        this.$drag_pointer = this.$value.createChild('div', 'drag-pointer' );
     }
 
     setBackgroundColor (color) {

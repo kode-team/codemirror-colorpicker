@@ -17,29 +17,19 @@ export default class ColorControl extends EventMachin {
     
     initialize () {
         this.$el = new Dom('div', 'control' );
-        this.$controlPattern = new Dom('div', 'empty' );
-        this.$controlColor = new Dom('div', 'color' );
-        this.$hue = new Dom('div', 'hue' );
-        this.$hueContainer = new Dom('div', 'hue-container' );
-        this.$drag_bar = new Dom('div', 'drag-bar' );
-        this.$opacity = new Dom('div', 'opacity' );
-        this.$opacityContainer = new Dom('div', 'opacity-container' );
-        this.$opacityColorBar = new Dom('div', 'color-bar' );
+        this.$hue = this.$el.createChild('div', 'hue' );        
+        this.$opacity = this.$el.createChild('div', 'opacity' );        
+        this.$controlPattern = this.$el.createChild('div', 'empty' );
+        this.$controlColor = this.$el.createChild('div', 'color' );
+
+        this.$hueContainer = this.$hue.createChild('div', 'hue-container' );
+        this.$drag_bar = this.$hueContainer.createChild('div', 'drag-bar');
+
+
+        this.$opacityContainer = this.$opacity.createChild('div', 'opacity-container' );
+        this.$opacityColorBar = this.$opacityContainer.createChild('div', 'color-bar' );
     
-        this.$opacity_drag_bar = new Dom('div', 'drag-bar2' );
-    
-        this.$hueContainer.append(this.$drag_bar);
-        this.$hue.append(this.$hueContainer);
-    
-        this.$opacityContainer.append(this.$opacityColorBar);
-        this.$opacityContainer.append(this.$opacity_drag_bar);
-        this.$opacity.append(this.$opacityContainer);
-    
-        this.$el.append(this.$hue);
-        this.$el.append(this.$opacity);
-        this.$el.append(this.$controlPattern);
-        this.$el.append(this.$controlColor);
-        
+        this.$opacity_drag_bar = this.$opacityContainer.createChild('div', 'drag-bar2' );        
     }
 
     setBackgroundColor (color) {

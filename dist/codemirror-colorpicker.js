@@ -1383,28 +1383,18 @@ var ColorControl = function (_EventMachin) {
         key: 'initialize',
         value: function initialize() {
             this.$el = new Dom('div', 'control');
-            this.$controlPattern = new Dom('div', 'empty');
-            this.$controlColor = new Dom('div', 'color');
-            this.$hue = new Dom('div', 'hue');
-            this.$hueContainer = new Dom('div', 'hue-container');
-            this.$drag_bar = new Dom('div', 'drag-bar');
-            this.$opacity = new Dom('div', 'opacity');
-            this.$opacityContainer = new Dom('div', 'opacity-container');
-            this.$opacityColorBar = new Dom('div', 'color-bar');
+            this.$hue = this.$el.createChild('div', 'hue');
+            this.$opacity = this.$el.createChild('div', 'opacity');
+            this.$controlPattern = this.$el.createChild('div', 'empty');
+            this.$controlColor = this.$el.createChild('div', 'color');
 
-            this.$opacity_drag_bar = new Dom('div', 'drag-bar2');
+            this.$hueContainer = this.$hue.createChild('div', 'hue-container');
+            this.$drag_bar = this.$hueContainer.createChild('div', 'drag-bar');
 
-            this.$hueContainer.append(this.$drag_bar);
-            this.$hue.append(this.$hueContainer);
+            this.$opacityContainer = this.$opacity.createChild('div', 'opacity-container');
+            this.$opacityColorBar = this.$opacityContainer.createChild('div', 'color-bar');
 
-            this.$opacityContainer.append(this.$opacityColorBar);
-            this.$opacityContainer.append(this.$opacity_drag_bar);
-            this.$opacity.append(this.$opacityContainer);
-
-            this.$el.append(this.$hue);
-            this.$el.append(this.$opacity);
-            this.$el.append(this.$controlPattern);
-            this.$el.append(this.$controlColor);
+            this.$opacity_drag_bar = this.$opacityContainer.createChild('div', 'drag-bar2');
         }
     }, {
         key: 'setBackgroundColor',
@@ -1653,28 +1643,23 @@ var ColorInformation = function (_EventMachin) {
         value: function initialize() {
             this.$el = new Dom('div', 'information hex');
 
-            this.$informationChange = new Dom('div', 'information-change');
+            this.$informationChange = this.$el.createChild('div', 'information-change');
 
-            this.$formatChangeButton = new Dom('button', 'format-change-button arrow-button', { type: 'button' });
-            this.$informationChange.append(this.$formatChangeButton);
+            this.$formatChangeButton = this.$informationChange.createChild('button', 'format-change-button arrow-button', { type: 'button' });
 
             this.$el.append(this.makeInputFieldHex());
             this.$el.append(this.makeInputFieldRgb());
             this.$el.append(this.makeInputFieldHsl());
-            this.$el.append(this.$informationChange);
         }
     }, {
         key: 'makeInputFieldHex',
         value: function makeInputFieldHex() {
             var item = new Dom('div', 'information-item hex');
-            var field = new Dom('div', 'input-field hex');
+            var field = item.createChild('div', 'input-field hex');
 
-            this.$hexCode = new Dom('input', 'input', { type: 'text' });
+            this.$hexCode = field.createChild('input', 'input', { type: 'text' });
 
-            field.append(this.$hexCode);
-            field.append(new Dom('div', 'title').html('HEX'));
-
-            item.append(field);
+            field.createChild('div', 'title').html('HEX');
 
             return item;
         }
@@ -1682,38 +1667,23 @@ var ColorInformation = function (_EventMachin) {
         key: 'makeInputFieldRgb',
         value: function makeInputFieldRgb() {
             var item = new Dom('div', 'information-item rgb');
-            var field = new Dom('div', 'input-field rgb-r');
-            this.$rgb_r = new Dom('input', 'input', { type: 'text' });
 
-            field.append(this.$rgb_r);
-            field.append(new Dom('div', 'title').html('R'));
+            var field = item.createChild('div', 'input-field rgb-r');
+            this.$rgb_r = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('R');
 
-            item.append(field);
+            field = item.createChild('div', 'input-field rgb-g');
+            this.$rgb_g = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('G');
 
-            field = new Dom('div', 'input-field rgb-g');
-            this.$rgb_g = new Dom('input', 'input', { type: 'text' });
-
-            field.append(this.$rgb_g);
-            field.append(new Dom('div', 'title').html('G'));
-
-            item.append(field);
-
-            field = new Dom('div', 'input-field rgb-b');
-            this.$rgb_b = new Dom('input', 'input', { type: 'text' });
-
-            field.append(this.$rgb_b);
-            field.append(new Dom('div', 'title').html('B'));
-
-            item.append(field);
+            field = item.createChild('div', 'input-field rgb-b');
+            this.$rgb_b = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('B');
 
             // rgba
-            field = new Dom('div', 'input-field rgb-a');
-            this.$rgb_a = new Dom('input', 'input', { type: 'text' });
-
-            field.append(this.$rgb_a);
-            field.append(new Dom('div', 'title').html('A'));
-
-            item.append(field);
+            field = item.createChild('div', 'input-field rgb-a');
+            this.$rgb_a = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('A');
 
             return item;
         }
@@ -1721,38 +1691,24 @@ var ColorInformation = function (_EventMachin) {
         key: 'makeInputFieldHsl',
         value: function makeInputFieldHsl() {
             var item = new Dom('div', 'information-item hsl');
-            var field = new Dom('div', 'input-field hsl-h');
-            this.$hsl_h = new Dom('input', 'input', { type: 'text' });
 
-            field.append(this.$hsl_h);
-            field.append(new Dom('div', 'title').html('H'));
+            var field = item.createChild('div', 'input-field hsl-h');
+            this.$hsl_h = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('H');
 
-            item.append(field);
+            field = item.createChild('div', 'input-field hsl-s');
+            this.$hsl_s = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('S');
 
-            field = new Dom('div', 'input-field hsl-s');
-            this.$hsl_s = new Dom('input', 'input', { type: 'text' });
-
-            field.append(this.$hsl_s);
-            field.append(new Dom('div', 'title').html('S'));
-
-            item.append(field);
-
-            field = new Dom('div', 'input-field hsl-l');
-            this.$hsl_l = new Dom('input', 'input', { type: 'text' });
-
-            field.append(this.$hsl_l);
-            field.append(new Dom('div', 'title').html('L'));
-
-            item.append(field);
+            field = item.createChild('div', 'input-field hsl-l');
+            this.$hsl_l = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('L');
 
             // rgba
-            field = new Dom('div', 'input-field hsl-a');
-            this.$hsl_a = new Dom('input', 'input', { type: 'text' });
+            field = item.createChild('div', 'input-field hsl-a');
+            this.$hsl_a = field.createChild('input', 'input', { type: 'text' });
+            field.createChild('div', 'title').html('A');
 
-            field.append(this.$hsl_a);
-            field.append(new Dom('div', 'title').html('A'));
-
-            item.append(field);
             return item;
         }
     }, {
@@ -2003,13 +1959,9 @@ var ColorPallet = function (_EventMachin) {
         key: 'initialize',
         value: function initialize() {
             this.$el = new Dom('div', 'color');
-            this.$drag_pointer = new Dom('div', 'drag-pointer');
-            this.$value = new Dom('div', 'value');
-            this.$saturation = new Dom('div', 'saturation');
-
-            this.$value.append(this.$drag_pointer);
-            this.$saturation.append(this.$value);
-            this.$el.append(this.$saturation);
+            this.$saturation = this.$el.createChild('div', 'saturation');
+            this.$value = this.$saturation.createChild('div', 'value');
+            this.$drag_pointer = this.$value.createChild('div', 'drag-pointer');
         }
     }, {
         key: 'setBackgroundColor',
@@ -2131,20 +2083,15 @@ var ColorSetsChooser = function (_EventMachin) {
             // make colorset-chooser 
             this.$el = new Dom('div', 'color-chooser');
 
-            var $container = new Dom('div', 'color-chooser-container');
-            this.$el.append($container);
+            var $container = this.$el.createChild('div', 'color-chooser-container');
 
-            var $header = new Dom('div', 'colorsets-item colorsets-item-header');
+            var $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
 
-            this.$toggleButton = new Dom('span', 'items').html('&times;');
+            $header.createChild('h1', 'title').html('Color Pallets');
 
-            $header.append(new Dom('h1', 'title').html('Color Pallets'));
-            $header.append(this.$toggleButton);
+            this.$toggleButton = $header.createChild('span', 'items').html('&times;');
 
-            $container.append($header);
-
-            this.$colorsetsList = new Dom('div', 'colorsets-list');
-            $container.append(this.$colorsetsList);
+            this.$colorsetsList = $container.createChild('div', 'colorsets-list');
 
             this.refresh();
         }
@@ -2163,15 +2110,13 @@ var ColorSetsChooser = function (_EventMachin) {
 
             for (var i = 0, len = colors.length; i < len && i < maxCount; i++) {
                 var color = colors[i];
-                var $item = new Dom('div', 'color-item', {
+                var $item = $list.createChild('div', 'color-item', {
                     title: color
                 });
-                var $colorView = new Dom('div', 'color-view');
-                $colorView.css({ 'background-color': color });
 
-                $item.append($colorView);
-
-                $list.append($item);
+                $item.createChild('div', 'color-view', null, {
+                    'background-color': color
+                });
             }
 
             return $list;
@@ -2186,15 +2131,11 @@ var ColorSetsChooser = function (_EventMachin) {
             // colorsets 
             var colorSets = this.colorpicker.getColorSetsList();
             colorSets.forEach(function (element, index) {
-                var $item = new Dom('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
+                var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
 
-                var $span = new Dom('div', 'items');
-                $span.append(_this2.makeColorItemList(element.colors, 5));
+                $item.createChild('h1', 'title').html(element.name);
 
-                $item.append(new Dom('h1', 'title').html(element.name));
-                $item.append($span);
-
-                $div.append($item);
+                $item.createChild('div', 'items').append(_this2.makeColorItemList(element.colors, 5));
             });
 
             return $div;
@@ -2406,21 +2347,20 @@ var CurrentColorSets = function (_EventMachin) {
 
             for (var i = 0, len = colors.length; i < len; i++) {
                 var color = colors[i];
-                var item = new Dom('div', 'color-item', {
+                var item = list.createChild('div', 'color-item', {
                     'title': color,
                     'data-index': i,
                     'data-color': color
                 });
 
                 item.createChild('div', 'empty');
-                item.createChild('div', 'color-view', null, { 'background-color': color });
-
-                list.append(item);
+                item.createChild('div', 'color-view', null, {
+                    'background-color': color
+                });
             }
 
             if (currentColorSets.edit) {
-                var item = new Dom('div', 'add-color-item').html('+');
-                list.append(item);
+                list.createChild('div', 'add-color-item').html('+');
             }
 
             return list;
@@ -2431,19 +2371,14 @@ var CurrentColorSets = function (_EventMachin) {
             // make colorsets view 
             this.$el = new Dom('div', 'colorsets');
 
-            this.$colorSets = this.$el;
-            this.$colorSetsMenu = new Dom('div', 'menu', {
+            var $colorSetsMenu = this.$el.createChild('div', 'menu', {
                 title: 'Open Color Pallets'
             });
-            this.$colorSetsColorList = new Dom('div', 'color-list');
+            this.$colorSetsColorList = this.$el.createChild('div', 'color-list');
 
-            this.$colorSetsChooseButton = new Dom('button', 'color-sets-choose-btn arrow-button', {
+            this.$colorSetsChooseButton = $colorSetsMenu.createChild('button', 'color-sets-choose-btn arrow-button', {
                 type: 'button'
             });
-            this.$colorSetsMenu.append(this.$colorSetsChooseButton);
-
-            this.$el.append(this.$colorSetsMenu);
-            this.$el.append(this.$colorSetsColorList);
 
             this.refresh();
         }
@@ -2564,17 +2499,17 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
             // make colorsets view 
             this.$el = new Dom('ul', 'colorsets-contextmenu');
 
-            this.$el.append(new Dom('li', 'menu-item small-hide', {
+            this.$el.createChild('li', 'menu-item small-hide', {
                 'data-type': 'remove-color'
-            }).html('Remove color'));
+            }).html('Remove color');
 
-            this.$el.append(new Dom('li', 'menu-item small-hide', {
+            this.$el.createChild('li', 'menu-item small-hide', {
                 'data-type': 'remove-all-to-the-right'
-            }).html('Remove all to the right'));
+            }).html('Remove all to the right');
 
-            this.$el.append(new Dom('li', 'menu-item', {
+            this.$el.createChild('li', 'menu-item', {
                 'data-type': 'clear-palette'
-            }).html('Clear palette'));
+            }).html('Clear palette');
         }
     }, {
         key: 'show',

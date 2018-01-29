@@ -26,23 +26,21 @@ export default class CurrentColorSets extends EventMachin {
     
         for(var i = 0, len = colors.length; i < len; i++) {
             var color = colors[i];
-            var item = new Dom('div', 'color-item', { 
+            var item = list.createChild('div', 'color-item', { 
                 'title' : color,  
                 'data-index' : i,
                 'data-color' : color
             });
 
             item.createChild('div', 'empty');
-            item.createChild('div', 'color-view', null, { 'background-color': color })
-
-    
-            list.append(item);
+            item.createChild('div', 'color-view', null, { 
+                'background-color': color 
+            })
         }
 
         
         if (currentColorSets.edit) {
-            var item = new Dom('div', 'add-color-item').html('+'); 
-            list.append(item);        
+            list.createChild('div', 'add-color-item').html('+'); 
         }
     
         return list; 
@@ -52,19 +50,14 @@ export default class CurrentColorSets extends EventMachin {
         // make colorsets view 
         this.$el = new Dom('div', 'colorsets' );
 
-        this.$colorSets = this.$el; 
-        this.$colorSetsMenu = new Dom('div', 'menu', {
+        const $colorSetsMenu = this.$el.createChild('div', 'menu', {
             title: 'Open Color Pallets'
         });
-        this.$colorSetsColorList = new Dom('div', 'color-list' );
+        this.$colorSetsColorList = this.$el.createChild('div', 'color-list' );
 
-        this.$colorSetsChooseButton = new Dom('button', 'color-sets-choose-btn arrow-button', {
+        this.$colorSetsChooseButton = $colorSetsMenu.createChild('button', 'color-sets-choose-btn arrow-button', {
             type : 'button'
         });
-        this.$colorSetsMenu.append(this.$colorSetsChooseButton)
-
-        this.$el.append(this.$colorSetsMenu);
-        this.$el.append(this.$colorSetsColorList);
     
         this.refresh();
     }

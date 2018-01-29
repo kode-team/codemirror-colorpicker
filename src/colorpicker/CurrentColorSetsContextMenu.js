@@ -21,17 +21,17 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
         // make colorsets view 
         this.$el = new Dom('ul', 'colorsets-contextmenu' );
 
-        this.$el.append(new Dom('li', 'menu-item small-hide', {
+        this.$el.createChild('li', 'menu-item small-hide', {
             'data-type' : 'remove-color'
-        }).html('Remove color')) 
+        }).html('Remove color') 
 
-        this.$el.append(new Dom('li', 'menu-item small-hide', {
+        this.$el.createChild('li', 'menu-item small-hide', {
             'data-type' : 'remove-all-to-the-right'
-        }).html('Remove all to the right'))
+        }).html('Remove all to the right')
 
-        this.$el.append(new Dom('li', 'menu-item', {
+        this.$el.createChild('li', 'menu-item', {
             'data-type' : 'clear-palette'
-        }).html('Clear palette'));
+        }).html('Clear palette')
 
     }
 

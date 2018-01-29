@@ -18,104 +18,71 @@ export default class ColorInformation extends EventMachin {
     initialize () {
         this.$el = new Dom('div', 'information hex' );
 
-        this.$informationChange = new Dom('div', 'information-change');
+        this.$informationChange = this.$el.createChild('div', 'information-change');
 
-        this.$formatChangeButton = new Dom('button', 'format-change-button arrow-button', { type : 'button'});
-        this.$informationChange.append(this.$formatChangeButton);
+        this.$formatChangeButton = this.$informationChange.createChild('button', 'format-change-button arrow-button', { type : 'button'});
  
         this.$el.append(this.makeInputFieldHex());
         this.$el.append(this.makeInputFieldRgb());
         this.$el.append(this.makeInputFieldHsl());
-        this.$el.append(this.$informationChange);     
+
     }
 
 
     makeInputFieldHex () {
         var item = new Dom('div', 'information-item hex');
-        var field = new Dom('div', 'input-field hex');
+        var field = item.createChild('div', 'input-field hex');
 
-        this.$hexCode = new Dom('input', 'input', { type : 'text' });
+        this.$hexCode = field.createChild('input', 'input', { type : 'text' });
 
-        field.append(this.$hexCode);
-        field.append(new Dom('div', 'title').html('HEX'));
-
-        item.append(field);
+        field.createChild('div', 'title').html('HEX');
     
         return item; 
     }
 
     makeInputFieldRgb () {
         var item = new Dom('div', 'information-item rgb');        
-        var field = new Dom('div', 'input-field rgb-r');
-        this.$rgb_r = new Dom('input', 'input', { type : 'text' });
 
-        field.append(this.$rgb_r);
-        field.append(new Dom('div', 'title').html('R'));
+        var field = item.createChild('div', 'input-field rgb-r');
+        this.$rgb_r = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('R');
 
-        item.append(field);
+        field = item.createChild('div', 'input-field rgb-g');
+        this.$rgb_g = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('G');
 
-        field = new Dom('div', 'input-field rgb-g');
-        this.$rgb_g = new Dom('input', 'input', { type : 'text' });
-
-        field.append(this.$rgb_g);
-        field.append(new Dom('div', 'title').html('G'));
-
-        item.append(field);
-
-        field = new Dom('div', 'input-field rgb-b');
-        this.$rgb_b = new Dom('input', 'input', { type : 'text' });
-
-        field.append(this.$rgb_b);
-        field.append(new Dom('div', 'title').html('B'));
-
-        item.append(field);
+        field = item.createChild('div', 'input-field rgb-b');
+        this.$rgb_b = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('B');
 
         // rgba
-        field = new Dom('div', 'input-field rgb-a');
-        this.$rgb_a = new Dom('input', 'input', { type : 'text' });
-
-        field.append(this.$rgb_a);
-        field.append(new Dom('div', 'title').html('A'));
-
-        item.append(field);
+        field = item.createChild('div', 'input-field rgb-a');
+        this.$rgb_a = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('A');
 
         return item; 
     }
 
     makeInputFieldHsl () {
         var item = new Dom('div', 'information-item hsl');
-        var field = new Dom('div', 'input-field hsl-h');
-        this.$hsl_h = new Dom('input', 'input', { type : 'text' });
+        
+        var field = item.createChild('div', 'input-field hsl-h');
+        this.$hsl_h = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('H');
 
-        field.append(this.$hsl_h);
-        field.append(new Dom('div', 'title').html('H'));
+        field = item.createChild('div', 'input-field hsl-s');
+        this.$hsl_s = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('S');
 
-        item.append(field);
-
-        field = new Dom('div', 'input-field hsl-s');
-        this.$hsl_s = new Dom('input', 'input', { type : 'text' });
-
-        field.append(this.$hsl_s);
-        field.append(new Dom('div', 'title').html('S'));
-
-        item.append(field);
-
-        field = new Dom('div', 'input-field hsl-l');
-        this.$hsl_l = new Dom('input', 'input', { type : 'text' });
-
-        field.append(this.$hsl_l);
-        field.append(new Dom('div', 'title').html('L'));
-
-        item.append(field);
+        field = item.createChild('div', 'input-field hsl-l');
+        this.$hsl_l = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('L');
 
         // rgba
-        field = new Dom('div', 'input-field hsl-a');
-        this.$hsl_a = new Dom('input', 'input', { type : 'text' });
+        field = item.createChild('div', 'input-field hsl-a');
+        this.$hsl_a = field.createChild('input', 'input', { type : 'text' });
+        field.createChild('div', 'title').html('A');
 
-        field.append(this.$hsl_a);
-        field.append(new Dom('div', 'title').html('A'));
-
-        item.append(field);
         return item;
     }
 

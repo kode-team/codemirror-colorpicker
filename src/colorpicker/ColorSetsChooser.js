@@ -21,21 +21,15 @@ export default class ColorSetsChooser extends EventMachin {
         // make colorset-chooser 
         this.$el = new Dom('div', 'color-chooser' );
 
-        const $container = new Dom('div', 'color-chooser-container');
-        this.$el.append($container);
+        const $container = this.$el.createChild('div', 'color-chooser-container');
 
-        const $header = new Dom('div', 'colorsets-item colorsets-item-header');
+        const $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
         
-        this.$toggleButton = new Dom('span', 'items').html('&times;');
+        $header.createChild('h1', 'title').html('Color Pallets')
 
-        $header.append(new Dom('h1', 'title').html('Color Pallets'))
-        $header.append(this.$toggleButton)
-
-        $container.append($header);
+        this.$toggleButton = $header.createChild('span', 'items').html('&times;');
                 
-
-        this.$colorsetsList = new Dom('div', 'colorsets-list' );
-        $container.append(this.$colorsetsList);
+        this.$colorsetsList = $container.createChild('div', 'colorsets-list' );
 
         this.refresh();
     }
@@ -50,15 +44,13 @@ export default class ColorSetsChooser extends EventMachin {
     
         for(var i = 0, len = colors.length; i < len && i < maxCount; i++) {
             var color = colors[i];
-            var $item = new Dom('div', 'color-item', {
+            var $item = $list.createChild('div', 'color-item', {
                 title: color
             });
-            var $colorView = new Dom('div', 'color-view');
-            $colorView.css({ 'background-color': color })
-    
-            $item.append($colorView);
-    
-            $list.append($item);
+
+            $item.createChild('div', 'color-view', null, {         
+                'background-color': color 
+            });
         }
     
         return $list;         
@@ -70,17 +62,14 @@ export default class ColorSetsChooser extends EventMachin {
         // colorsets 
         const colorSets = this.colorpicker.getColorSetsList();
         colorSets.forEach( (element, index) => {
-            const $item = new Dom('div', 'colorsets-item', {
+            const $item = $div.createChild('div', 'colorsets-item', {
                 [DATA_COLORSETS_INDEX] : index 
             });
-    
-            const $span = new Dom('div', 'items');
-            $span.append(this.makeColorItemList(element.colors, 5));
 
-            $item.append(new Dom('h1', 'title').html(element.name))
-            $item.append($span)
+            $item.createChild('h1', 'title').html(element.name)
 
-            $div.append($item);
+            $item.createChild('div', 'items').append(this.makeColorItemList(element.colors, 5))
+
         });
 
         return $div; 
