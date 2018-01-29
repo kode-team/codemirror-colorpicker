@@ -193,18 +193,7 @@ var color_names = {
           }
         },
         colorpicker : {
-            mode : 'edit',
-
-            // custom color sets 
-            colorSets: [
-              { name : 'Material', colors : [ '#ffffff', 'rgba(255, 255, 0, 0.5)' ] },
-              { name : 'My Colors', colors : function (colorpicker, list) { 
-                  shuffle(colors)
-                  return colors; 
-                } 
-                },
-              { name : 'Input Colors', edit: true  },
-            ]
+            mode : 'edit'
         }
     });
 

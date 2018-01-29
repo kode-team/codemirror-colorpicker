@@ -245,5 +245,14 @@ export default class Dom {
     getElement ( ) {
         return this.el;
     }
+
+    createChild (tag, className = '', attrs = {}, css = {}) {
+        let $element = new Dom(tag, className, attrs);
+        $element.css(css);
+
+        this.append($element);
+
+        return $element;
+    }
 }
 

@@ -1,6 +1,6 @@
 /* codemirror colorview */
 .codemirror-colorview {
-  border: 1px solid #8e8e8e;
+  border: 1px solid #cecece;
   position: relative;
   display: inline-block;
   box-sizing: border-box;
@@ -36,6 +36,7 @@
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
+    display: none;
     border-bottom: 10px solid rgba(0, 0, 0, 0.2);
     pointer-events: none; }
     .codemirror-colorpicker > .arrow:after {
@@ -269,25 +270,39 @@
       .codemirror-colorpicker > .colorsets > .color-list .color-item {
         width: 13px;
         height: 13px;
-        border-radius: 3px;
+        border-radius: 2px;
         display: inline-block;
         margin-right: 12px;
         margin-bottom: 12px;
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+        position: relative;
         background-size: contain;
-        border: 1px solid #dddddd;
         overflow: hidden;
         box-sizing: border-box;
         cursor: pointer;
         vertical-align: middle; }
         .codemirror-colorpicker > .colorsets > .color-list .color-item:hover {
           transform: scale(1.2); }
-        .codemirror-colorpicker > .colorsets > .color-list .color-item .color-view {
+        .codemirror-colorpicker > .colorsets > .color-list .color-item .empty {
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
           width: 100%;
           height: 100%;
           padding: 0px;
           margin: 0px;
           pointer-events: none; }
+        .codemirror-colorpicker > .colorsets > .color-list .color-item .color-view {
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          width: 100%;
+          height: 100%;
+          padding: 0px;
+          margin: 0px;
+          pointer-events: none;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          box-sizing: border-box; }
       .codemirror-colorpicker > .colorsets > .color-list .add-color-item {
         width: 13px;
         height: 13px;

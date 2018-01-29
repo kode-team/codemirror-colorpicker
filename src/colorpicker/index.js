@@ -22,6 +22,7 @@ export default class ColorPicker extends EventMachin {
         this.opt = opt || {}; 
         this.$body = null;
         this.$root = null;
+        this.format = 'rgb';
         this.currentA = 0;
         this.currentH = 0;
         this.currentS = 0;
@@ -115,8 +116,8 @@ export default class ColorPicker extends EventMachin {
 
         // set position
         this.$root.css({
-            left : (elementScreenLeft - 25) + 'px',
-            top : (elementScreenTop + 9) + 'px'
+            left : (elementScreenLeft) + 'px',
+            top : (elementScreenTop) + 'px'
         });
     }
 
@@ -172,10 +173,10 @@ export default class ColorPicker extends EventMachin {
 
     hide () {
         if (this.isColorPickerShow) {
-            //this.destroy();
-            //this.$root.hide();
-            //this.$root.remove();
-            //this.isColorPickerShow = false;
+           // this.destroy();
+           // this.$root.hide();
+           // this.$root.remove();  // not empty 
+           // this.isColorPickerShow = false;
         }
     }    
 
@@ -279,19 +280,28 @@ export default class ColorPicker extends EventMachin {
         this.palette.setBackgroundColor(color);
     }
 
+    setCurrentFormat (format) {
+        this.format = format; 
+        this.information.setCurrentFormat(format);
+    }
+
     initColor(newColor) {
-        var c = newColor || "#FF0000", colorObj = color.parse(c);
+        let c = newColor || "#FF0000", colorObj = color.parse(c);
     
-        this.information.setCurrentFormat(colorObj.type);
-        this.palette.setBackgroundColor(c);
+        this.setCurrentFormat(colorObj.type);
+        this.setBackgroundColor(c);
     
-        var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+        let hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
     
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
         this.setColorUI();
-        this.control.setHueColor();
+        this.setHueColor();
         this.setInputColor();
     }    
+
+    setHueColor () {
+        this.control.setHueColor();
+    }
 
     checkColorPickerClass(el) {
         var hasColorView = new Dom(el).closest('codemirror-colorview');

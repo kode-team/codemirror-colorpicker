@@ -27,13 +27,12 @@
         .color-item {
             width: 13px;
             height: 13px;
-            border-radius:3px;
+            border-radius:2px;
             display:inline-block;
             margin-right:12px;
             margin-bottom:12px;
-            @include transparent-background();
+            position:relative;
             background-size: contain;
-            border: 1px solid rgba(221, 221, 221, 1);
             overflow:hidden;
             box-sizing:border-box;
             cursor: pointer;
@@ -43,12 +42,29 @@
                 transform: scale(1.2);
             }
 
+            .empty {
+                position: absolute;
+                left:0px;
+                top:0px;
+                @include transparent-background();
+                width: 100%;
+                height: 100%;
+                padding: 0px;
+                margin: 0px;
+                pointer-events: none;
+            }
+
             .color-view {
+                position: absolute;
+                left:0px;
+                top:0px;                
                 width: 100%;
                 height: 100%;
                 padding:0px;
                 margin:0px;
                 pointer-events: none;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                box-sizing: border-box;                
             }
         }
 

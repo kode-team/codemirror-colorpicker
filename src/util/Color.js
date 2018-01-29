@@ -70,7 +70,7 @@ const color = {
         if (typeof str == 'string') {
 
             if (ColorNames.isColorName(str)) {
-                str = CodeNames.getColorByName(str);
+                str = ColorNames.getColorByName(str);
             }
 
             if (str.indexOf("rgb(") > -1) {

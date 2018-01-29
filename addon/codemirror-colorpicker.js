@@ -5,9 +5,11 @@ var CodemirrorColorpicker = (function (CodeMirror) {
 CodeMirror = CodeMirror && CodeMirror.hasOwnProperty('default') ? CodeMirror['default'] : CodeMirror;
 
 var color_names = { aliceblue: "rgb(240, 248, 255)", antiquewhite: "rgb(250, 235, 215)", aqua: "rgb(0, 255, 255)", aquamarine: "rgb(127, 255, 212)", azure: "rgb(240, 255, 255)", beige: "rgb(245, 245, 220)", bisque: "rgb(255, 228, 196)", black: "rgb(0, 0, 0)", blanchedalmond: "rgb(255, 235, 205)", blue: "rgb(0, 0, 255)", blueviolet: "rgb(138, 43, 226)", brown: "rgb(165, 42, 42)", burlywood: "rgb(222, 184, 135)", cadetblue: "rgb(95, 158, 160)", chartreuse: "rgb(127, 255, 0)", chocolate: "rgb(210, 105, 30)", coral: "rgb(255, 127, 80)", cornflowerblue: "rgb(100, 149, 237)", cornsilk: "rgb(255, 248, 220)", crimson: "rgb(237, 20, 61)", cyan: "rgb(0, 255, 255)", darkblue: "rgb(0, 0, 139)", darkcyan: "rgb(0, 139, 139)", darkgoldenrod: "rgb(184, 134, 11)", darkgray: "rgb(169, 169, 169)", darkgrey: "rgb(169, 169, 169)", darkgreen: "rgb(0, 100, 0)", darkkhaki: "rgb(189, 183, 107)", darkmagenta: "rgb(139, 0, 139)", darkolivegreen: "rgb(85, 107, 47)", darkorange: "rgb(255, 140, 0)", darkorchid: "rgb(153, 50, 204)", darkred: "rgb(139, 0, 0)", darksalmon: "rgb(233, 150, 122)", darkseagreen: "rgb(143, 188, 143)", darkslateblue: "rgb(72, 61, 139)", darkslategray: "rgb(47, 79, 79)", darkslategrey: "rgb(47, 79, 79)", darkturquoise: "rgb(0, 206, 209)", darkviolet: "rgb(148, 0, 211)", deeppink: "rgb(255, 20, 147)", deepskyblue: "rgb(0, 191, 255)", dimgray: "rgb(105, 105, 105)", dimgrey: "rgb(105, 105, 105)", dodgerblue: "rgb(30, 144, 255)", firebrick: "rgb(178, 34, 34)", floralwhite: "rgb(255, 250, 240)", forestgreen: "rgb(34, 139, 34)", fuchsia: "rgb(255, 0, 255)", gainsboro: "rgb(220, 220, 220)", ghostwhite: "rgb(248, 248, 255)", gold: "rgb(255, 215, 0)", goldenrod: "rgb(218, 165, 32)", gray: "rgb(128, 128, 128)", grey: "rgb(128, 128, 128)", green: "rgb(0, 128, 0)", greenyellow: "rgb(173, 255, 47)", honeydew: "rgb(240, 255, 240)", hotpink: "rgb(255, 105, 180)", indianred: "rgb(205, 92, 92)", indigo: "rgb(75, 0, 130)", ivory: "rgb(255, 255, 240)", khaki: "rgb(240, 230, 140)", lavender: "rgb(230, 230, 250)", lavenderblush: "rgb(255, 240, 245)", lawngreen: "rgb(124, 252, 0)", lemonchiffon: "rgb(255, 250, 205)", lightblue: "rgb(173, 216, 230)", lightcoral: "rgb(240, 128, 128)", lightcyan: "rgb(224, 255, 255)", lightgoldenrodyellow: "rgb(250, 250, 210)", lightgreen: "rgb(144, 238, 144)", lightgray: "rgb(211, 211, 211)", lightgrey: "rgb(211, 211, 211)", lightpink: "rgb(255, 182, 193)", lightsalmon: "rgb(255, 160, 122)", lightseagreen: "rgb(32, 178, 170)", lightskyblue: "rgb(135, 206, 250)", lightslategray: "rgb(119, 136, 153)", lightslategrey: "rgb(119, 136, 153)", lightsteelblue: "rgb(176, 196, 222)", lightyellow: "rgb(255, 255, 224)", lime: "rgb(0, 255, 0)", limegreen: "rgb(50, 205, 50)", linen: "rgb(250, 240, 230)", magenta: "rgb(255, 0, 255)", maroon: "rgb(128, 0, 0)", mediumaquamarine: "rgb(102, 205, 170)", mediumblue: "rgb(0, 0, 205)", mediumorchid: "rgb(186, 85, 211)", mediumpurple: "rgb(147, 112, 219)", mediumseagreen: "rgb(60, 179, 113)", mediumslateblue: "rgb(123, 104, 238)", mediumspringgreen: "rgb(0, 250, 154)", mediumturquoise: "rgb(72, 209, 204)", mediumvioletred: "rgb(199, 21, 133)", midnightblue: "rgb(25, 25, 112)", mintcream: "rgb(245, 255, 250)", mistyrose: "rgb(255, 228, 225)", moccasin: "rgb(255, 228, 181)", navajowhite: "rgb(255, 222, 173)", navy: "rgb(0, 0, 128)", oldlace: "rgb(253, 245, 230)", olive: "rgb(128, 128, 0)", olivedrab: "rgb(107, 142, 35)", orange: "rgb(255, 165, 0)", orangered: "rgb(255, 69, 0)", orchid: "rgb(218, 112, 214)", palegoldenrod: "rgb(238, 232, 170)", palegreen: "rgb(152, 251, 152)", paleturquoise: "rgb(175, 238, 238)", palevioletred: "rgb(219, 112, 147)", papayawhip: "rgb(255, 239, 213)", peachpuff: "rgb(255, 218, 185)", peru: "rgb(205, 133, 63)", pink: "rgb(255, 192, 203)", plum: "rgb(221, 160, 221)", powderblue: "rgb(176, 224, 230)", purple: "rgb(128, 0, 128)", rebeccapurple: "rgb(102, 51, 153)", red: "rgb(255, 0, 0)", rosybrown: "rgb(188, 143, 143)", royalblue: "rgb(65, 105, 225)", saddlebrown: "rgb(139, 69, 19)", salmon: "rgb(250, 128, 114)", sandybrown: "rgb(244, 164, 96)", seagreen: "rgb(46, 139, 87)", seashell: "rgb(255, 245, 238)", sienna: "rgb(160, 82, 45)", silver: "rgb(192, 192, 192)", skyblue: "rgb(135, 206, 235)", slateblue: "rgb(106, 90, 205)", slategray: "rgb(112, 128, 144)", slategrey: "rgb(112, 128, 144)", snow: "rgb(255, 250, 250)", springgreen: "rgb(0, 255, 127)", steelblue: "rgb(70, 130, 180)", tan: "rgb(210, 180, 140)", teal: "rgb(0, 128, 128)", thistle: "rgb(216, 191, 216)", tomato: "rgb(255, 99, 71)", turquoise: "rgb(64, 224, 208)", violet: "rgb(238, 130, 238)", wheat: "rgb(245, 222, 179)", white: "rgb(255, 255, 255)", whitesmoke: "rgb(245, 245, 245)", yellow: "rgb(255, 255, 0)", yellowgreen: "rgb(154, 205, 50)", transparent: "rgba(0, 0, 0, 0)" };
+
 function isColorName(name) {
     return !!color_names[name];
 }
+
 function getColorByName(name) {
     return color_names[name];
 }
@@ -618,7 +620,7 @@ var color$1 = {
         if (typeof str == 'string') {
 
             if (ColorNames.isColorName(str)) {
-                str = CodeNames.getColorByName(str);
+                str = ColorNames.getColorByName(str);
             }
 
             if (str.indexOf("rgb(") > -1) {
@@ -1168,6 +1170,20 @@ var Dom = function () {
         key: 'getElement',
         value: function getElement() {
             return this.el;
+        }
+    }, {
+        key: 'createChild',
+        value: function createChild(tag) {
+            var className = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+            var attrs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+            var css = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+            var $element = new Dom(tag, className, attrs);
+            $element.css(css);
+
+            this.append($element);
+
+            return $element;
         }
     }]);
     return Dom;
@@ -2228,7 +2244,17 @@ var ColorSetsChooser = function (_EventMachin) {
     return ColorSetsChooser;
 }(EventMachin);
 
-var colorSetsList = [{ name: "Material", 'colors': ['rgba(255, 255, 0, 0.5)', '#f00', '#0ff', '#f0f', '#fff', '#f00', '#0ff', '#f0f', '#fff', '#f00', '#0ff', '#f0f'] }, { name: "Custom", "edit": true, 'colors': [] }, { name: "Pages", 'colors': ['#fff', '#f00', '#0ff', '#f0f'] }];
+var colorSetsList = [{
+    name: "Material",
+    colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
+}, {
+    name: "Custom",
+    "edit": true,
+    'colors': []
+}, {
+    name: "Pages",
+    'colors': ['#fff', '#f00', '#0ff', '#f0f']
+}];
 
 var ColorSetsList = function () {
     function ColorSetsList(colorpicker) {
@@ -2256,8 +2282,18 @@ var ColorSetsList = function () {
     }, {
         key: 'resetUserList',
         value: function resetUserList() {
+            var _this = this;
+
             if (this.userList && this.userList.length) {
                 this.userList = this.userList.map(function (element, index) {
+
+                    if (typeof element.colors == 'function') {
+                        var makeCallback = element.colors;
+
+                        element.colors = makeCallback(_this.colorpicker, _this);
+                        element._colors = makeCallback;
+                    }
+
                     return Object.assign({
                         name: 'color-' + index,
                         colors: []
@@ -2284,11 +2320,6 @@ var ColorSetsList = function () {
     }, {
         key: 'getCurrentColorSets',
         value: function getCurrentColorSets() {
-
-            if (typeof this.currentColorSets.colors == 'function') {
-                this.currentColorSets.edit = false;
-            }
-
             return this.currentColorSets;
         }
     }, {
@@ -2327,21 +2358,17 @@ var ColorSetsList = function () {
     }, {
         key: 'getColors',
         value: function getColors(element) {
-            if (typeof element.colors == 'function') {
-                return element.colors(this.colorpicker, this);
-            }
-
             return element.colors || [];
         }
     }, {
         key: 'getColorSetsList',
         value: function getColorSetsList() {
-            var _this = this;
+            var _this2 = this;
 
             return this.list().map(function (element) {
                 return {
                     name: element.name,
-                    colors: _this.getColors(element)
+                    colors: _this2.getColors(element)
                 };
             });
         }
@@ -2382,10 +2409,9 @@ var CurrentColorSets = function (_EventMachin) {
                     'data-index': i,
                     'data-color': color
                 });
-                var colorView = new Dom('div', 'color-view');
-                colorView.css({ 'background-color': color });
 
-                item.append(colorView);
+                item.createChild('div', 'empty');
+                item.createChild('div', 'color-view', null, { 'background-color': color });
 
                 list.append(item);
             }
@@ -2621,6 +2647,7 @@ var ColorPicker = function (_EventMachin) {
         _this.opt = opt || {};
         _this.$body = null;
         _this.$root = null;
+        _this.format = 'rgb';
         _this.currentA = 0;
         _this.currentH = 0;
         _this.currentS = 0;
@@ -2724,8 +2751,8 @@ var ColorPicker = function (_EventMachin) {
 
             // set position
             this.$root.css({
-                left: elementScreenLeft - 25 + 'px',
-                top: elementScreenTop + 9 + 'px'
+                left: elementScreenLeft + 'px',
+                top: elementScreenTop + 'px'
             });
         }
     }, {
@@ -2785,10 +2812,10 @@ var ColorPicker = function (_EventMachin) {
         key: 'hide',
         value: function hide() {
             if (this.isColorPickerShow) {
-                //this.destroy();
-                //this.$root.hide();
-                //this.$root.remove();
-                //this.isColorPickerShow = false;
+                // this.destroy();
+                // this.$root.hide();
+                // this.$root.remove();  // not empty 
+                // this.isColorPickerShow = false;
             }
         }
     }, {
@@ -2895,20 +2922,31 @@ var ColorPicker = function (_EventMachin) {
             this.palette.setBackgroundColor(color);
         }
     }, {
+        key: 'setCurrentFormat',
+        value: function setCurrentFormat(format) {
+            this.format = format;
+            this.information.setCurrentFormat(format);
+        }
+    }, {
         key: 'initColor',
         value: function initColor(newColor) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
 
-            this.information.setCurrentFormat(colorObj.type);
-            this.palette.setBackgroundColor(c);
+            this.setCurrentFormat(colorObj.type);
+            this.setBackgroundColor(c);
 
             var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
 
             this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
             this.setColorUI();
-            this.control.setHueColor();
+            this.setHueColor();
             this.setInputColor();
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor() {
+            this.control.setHueColor();
         }
     }, {
         key: 'checkColorPickerClass',

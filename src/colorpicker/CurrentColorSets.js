@@ -31,10 +31,10 @@ export default class CurrentColorSets extends EventMachin {
                 'data-index' : i,
                 'data-color' : color
             });
-            var colorView = new Dom('div', 'color-view');
-            colorView.css({ 'background-color': color })
-    
-            item.append(colorView);
+
+            item.createChild('div', 'empty');
+            item.createChild('div', 'color-view', null, { 'background-color': color })
+
     
             list.append(item);
         }

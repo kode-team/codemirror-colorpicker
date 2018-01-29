@@ -6,6 +6,7 @@ const EVENT_SAPARATOR = ' '
 
 export default class EventMachin {
 
+
   destroyEventMachin () {
     this.removeEventAll();
   }
