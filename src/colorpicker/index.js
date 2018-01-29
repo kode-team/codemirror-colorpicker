@@ -12,7 +12,6 @@ import CurrentColorSets from './CurrentColorSets'
 import CurrentColorSetsContextMenu from './CurrentColorSetsContextMenu'
 
 const color = ColorUtil.color;
-const hue_color = ColorUtil.hue_color;
 
 
 export default class ColorPicker extends EventMachin {
@@ -32,7 +31,7 @@ export default class ColorPicker extends EventMachin {
 
         this.isColorPickerShow = false;
         this.isShortCut = false;
-        this.hideDelay = 2000;
+        this.hideDelay = this.opt.hideDeplay || 2000;
         this.timerCloseColorPicker;
         this.autoHide = this.opt.autoHide || true; 
 
@@ -156,14 +155,15 @@ export default class ColorPicker extends EventMachin {
 
     setHideDelay (delayTime) {
         delayTime = delayTime || 0;
-        Event.removeEvent(this.$root.el, 'mouseenter');
-        Event.removeEvent(this.$root.el, 'mouseleave');
 
-        Event.addEvent(this.$root.el, 'mouseenter', () => {
+        this.$root.off('mouseenter');
+        this.$root.off('mouseleave');
+
+        this.$root.on('mouseenter', () => {
             clearTimeout(this.timerCloseColorPicker);
         });
 
-        Event.addEvent(this.$root.el, 'mouseleave', ()  => { 
+        this.$root.on('mouseleave', ()  => { 
             clearTimeout(this.timerCloseColorPicker);
             this.timerCloseColorPicker = setTimeout(this.hide.bind(this), delayTime);
         });
@@ -376,7 +376,7 @@ export default class ColorPicker extends EventMachin {
     } 
 
     destroy() {
-        this.destroyEventMachin();
+        super.destroy();
 
         this.control.destroy();
         this.palette.destroy();

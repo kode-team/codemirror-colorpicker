@@ -4,7 +4,6 @@ import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
 
 const color = ColorUtil.color;
-const hue_color = ColorUtil.hue_color;
 
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
@@ -35,8 +34,7 @@ export default class ColorSetsChooser extends EventMachin {
     }
 
     refresh () {
-        this.$colorsetsList.empty();
-        this.$colorsetsList.append(this.makeColorSetsList());
+        this.$colorsetsList.html(this.makeColorSetsList());
     }
 
     makeColorItemList (colors, maxCount = 5) {
@@ -109,7 +107,4 @@ export default class ColorSetsChooser extends EventMachin {
 
     }
 
-    destroy () {
-        this.destroyEventMachin();
-    }
 }

@@ -346,6 +346,6 @@ initHueColors();
 
 
 export default {
-    color : color,
-    hue_color : hue_color
+    color: color,
+    hue_color: hue_color
 }

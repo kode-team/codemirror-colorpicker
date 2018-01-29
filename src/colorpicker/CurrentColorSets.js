@@ -2,10 +2,8 @@ import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
-import ColorSetsList from './ColorSetsList'
 
 const color = ColorUtil.color;
-const hue_color = ColorUtil.hue_color;
 
 export default class CurrentColorSets extends EventMachin {
     constructor (colorpicker) {
@@ -63,8 +61,7 @@ export default class CurrentColorSets extends EventMachin {
     }
 
     refresh () {
-        this.$colorSetsColorList.empty();
-        this.$colorSetsColorList.append(this.makeCurrentColorSets())    
+        this.$colorSetsColorList.html(this.makeCurrentColorSets())    
     }
 
     refreshAll () {
@@ -136,12 +133,6 @@ export default class CurrentColorSets extends EventMachin {
     }
 
     initializeEvent () {
-        this.initializeEventMachin();
-
-        
-    }
-
-    destroy() {
-        this.destroyEventMachin();       
+        this.initializeEventMachin();   
     }
 }

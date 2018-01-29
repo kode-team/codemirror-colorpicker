@@ -78,7 +78,30 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
 
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -864,10 +887,10 @@ var color$1 = {
     checkHueColor: function checkHueColor(p) {
         var startColor, endColor;
 
-        for (var i = 0; i < hue_color$1.length; i++) {
-            if (hue_color$1[i].start >= p) {
-                startColor = hue_color$1[i - 1];
-                endColor = hue_color$1[i];
+        for (var i = 0; i < hue_color.length; i++) {
+            if (hue_color[i].start >= p) {
+                startColor = hue_color[i - 1];
+                endColor = hue_color[i];
                 break;
             }
         }
@@ -876,15 +899,15 @@ var color$1 = {
             return this.scale(startColor, endColor, (p - startColor.start) / (endColor.start - startColor.start));
         }
 
-        return hue_color$1[0].rgb;
+        return hue_color[0].rgb;
     }
 };
 
-var hue_color$1 = [{ rgb: '#ff0000', start: .0 }, { rgb: '#ffff00', start: .17 }, { rgb: '#00ff00', start: .33 }, { rgb: '#00ffff', start: .50 }, { rgb: '#0000ff', start: .67 }, { rgb: '#ff00ff', start: .83 }, { rgb: '#ff0000', start: 1 }];
+var hue_color = [{ rgb: '#ff0000', start: .0 }, { rgb: '#ffff00', start: .17 }, { rgb: '#00ff00', start: .33 }, { rgb: '#00ffff', start: .50 }, { rgb: '#0000ff', start: .67 }, { rgb: '#ff00ff', start: .83 }, { rgb: '#ff0000', start: 1 }];
 
 function initHueColors() {
-    for (var i = 0, len = hue_color$1.length; i < len; i++) {
-        var hue = hue_color$1[i];
+    for (var i = 0, len = hue_color.length; i < len; i++) {
+        var hue = hue_color[i];
 
         var obj = color$1.parse(hue.rgb);
 
@@ -898,7 +921,7 @@ initHueColors();
 
 var ColorUtil = {
     color: color$1,
-    hue_color: hue_color$1
+    hue_color: hue_color
 };
 
 var color$2 = ColorUtil.color;
@@ -998,7 +1021,12 @@ var Dom = function () {
     }, {
         key: 'html',
         value: function html(_html) {
-            this.el.innerHTML = _html;
+
+            if (typeof _html == 'string') {
+                this.el.innerHTML = _html;
+            } else {
+                this.empty().append(_html);
+            }
 
             return this;
         }
@@ -1224,6 +1252,11 @@ var EventMachin = function () {
   }
 
   createClass(EventMachin, [{
+    key: 'destroy',
+    value: function destroy() {
+      this.destroyEventMachin();
+    }
+  }, {
     key: 'destroyEventMachin',
     value: function destroyEventMachin() {
       this.removeEventAll();
@@ -1364,6 +1397,7 @@ var EventMachin = function () {
 }();
 
 var color$3 = ColorUtil.color;
+
 var ColorControl = function (_EventMachin) {
     inherits(ColorControl, _EventMachin);
 
@@ -1610,11 +1644,6 @@ var ColorControl = function (_EventMachin) {
         key: 'initializeEvent',
         value: function initializeEvent() {
             this.initializeEventMachin();
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
         }
     }]);
     return ColorControl;
@@ -1905,33 +1934,6 @@ var ColorInformation = function (_EventMachin) {
         key: 'initializeEvent',
         value: function initializeEvent() {
             this.initializeEventMachin();
-
-            Event.addEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
-            Event.addEvent(this.$hexCode.el, 'keyup', this.$EventHexCodeKeyUp);
-
-            Event.addEvent(this.$rgb_r.el, 'keydown', this.$checkNumberKey);
-            Event.addEvent(this.$rgb_r.el, 'keyup', this.$setRGBtoHexColor);
-            Event.addEvent(this.$rgb_g.el, 'keydown', this.$checkNumberKey);
-            Event.addEvent(this.$rgb_g.el, 'keyup', this.$setRGBtoHexColor);
-            Event.addEvent(this.$rgb_b.el, 'keydown', this.$checkNumberKey);
-            Event.addEvent(this.$rgb_b.el, 'keyup', this.$setRGBtoHexColor);
-
-            Event.addEvent(this.$formatChangeButton.el, 'click', this.$EventFormatChangeClick);
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
-
-            Event.removeEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
-            Event.removeEvent(this.$hexCode.el, 'keyup', this.$EventHexCodeKeyUp);
-            Event.removeEvent(this.$rgb_r.el, 'keydown', this.$checkNumberKey);
-            Event.removeEvent(this.$rgb_r.el, 'keyup', this.$setRGBtoHexColor);
-            Event.removeEvent(this.$rgb_g.el, 'keydown', this.$checkNumberKey);
-            Event.removeEvent(this.$rgb_g.el, 'keyup', this.$setRGBtoHexColor);
-            Event.removeEvent(this.$rgb_b.el, 'keydown', this.$checkNumberKey);
-            Event.removeEvent(this.$rgb_b.el, 'keyup', this.$setRGBtoHexColor);
-            Event.removeEvent(this.$formatChangeButton.el, 'click', this.$EventFormatChangeClick);
         }
     }, {
         key: 'refresh',
@@ -2050,11 +2052,6 @@ var ColorPallet = function (_EventMachin) {
         value: function initializeEvent() {
             this.initializeEventMachin();
         }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
-        }
     }]);
     return ColorPallet;
 }(EventMachin);
@@ -2096,8 +2093,7 @@ var ColorSetsChooser = function (_EventMachin) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.$colorsetsList.empty();
-            this.$colorsetsList.append(this.makeColorSetsList());
+            this.$colorsetsList.html(this.makeColorSetsList());
         }
     }, {
         key: 'makeColorItemList',
@@ -2175,11 +2171,6 @@ var ColorSetsChooser = function (_EventMachin) {
         key: 'initializeEvent',
         value: function initializeEvent() {
             this.initializeEventMachin();
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
         }
     }]);
     return ColorSetsChooser;
@@ -2383,8 +2374,7 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.$colorSetsColorList.empty();
-            this.$colorSetsColorList.append(this.makeCurrentColorSets());
+            this.$colorSetsColorList.html(this.makeCurrentColorSets());
         }
     }, {
         key: 'refreshAll',
@@ -2466,11 +2456,6 @@ var CurrentColorSets = function (_EventMachin) {
         key: 'initializeEvent',
         value: function initializeEvent() {
             this.initializeEventMachin();
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
         }
     }]);
     return CurrentColorSets;
@@ -2561,16 +2546,12 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
         value: function initializeEvent() {
             this.initializeEventMachin();
         }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.destroyEventMachin();
-        }
     }]);
     return CurrentColorSetsContextMenu;
 }(EventMachin);
 
 var color = ColorUtil.color;
+
 var ColorPicker = function (_EventMachin) {
     inherits(ColorPicker, _EventMachin);
 
@@ -2592,7 +2573,7 @@ var ColorPicker = function (_EventMachin) {
 
         _this.isColorPickerShow = false;
         _this.isShortCut = false;
-        _this.hideDelay = 2000;
+        _this.hideDelay = _this.opt.hideDeplay || 2000;
         _this.timerCloseColorPicker;
         _this.autoHide = _this.opt.autoHide || true;
 
@@ -2729,14 +2710,15 @@ var ColorPicker = function (_EventMachin) {
             var _this2 = this;
 
             delayTime = delayTime || 0;
-            Event.removeEvent(this.$root.el, 'mouseenter');
-            Event.removeEvent(this.$root.el, 'mouseleave');
 
-            Event.addEvent(this.$root.el, 'mouseenter', function () {
+            this.$root.off('mouseenter');
+            this.$root.off('mouseleave');
+
+            this.$root.on('mouseenter', function () {
                 clearTimeout(_this2.timerCloseColorPicker);
             });
 
-            Event.addEvent(this.$root.el, 'mouseleave', function () {
+            this.$root.on('mouseleave', function () {
                 clearTimeout(_this2.timerCloseColorPicker);
                 _this2.timerCloseColorPicker = setTimeout(_this2.hide.bind(_this2), delayTime);
             });
@@ -2970,7 +2952,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'destroy',
         value: function destroy() {
-            this.destroyEventMachin();
+            get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'destroy', this).call(this);
 
             this.control.destroy();
             this.palette.destroy();

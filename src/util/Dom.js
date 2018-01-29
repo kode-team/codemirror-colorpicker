@@ -91,8 +91,13 @@ export default class Dom {
     }
     
     html (html) {
-        this.el.innerHTML = html;
-    
+
+        if (typeof html == 'string') {
+            this.el.innerHTML = html;
+        } else {
+            this.empty().append(html);
+        }
+
         return this;
     }
     

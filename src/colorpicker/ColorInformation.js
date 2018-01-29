@@ -246,33 +246,6 @@ export default class ColorInformation extends EventMachin {
 
     initializeEvent() {
         this.initializeEventMachin();
-
-
-        Event.addEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
-        Event.addEvent(this.$hexCode.el, 'keyup', this.$EventHexCodeKeyUp);
-    
-        Event.addEvent(this.$rgb_r.el, 'keydown', this.$checkNumberKey);
-        Event.addEvent(this.$rgb_r.el, 'keyup', this.$setRGBtoHexColor);
-        Event.addEvent(this.$rgb_g.el, 'keydown', this.$checkNumberKey);
-        Event.addEvent(this.$rgb_g.el, 'keyup', this.$setRGBtoHexColor);
-        Event.addEvent(this.$rgb_b.el, 'keydown', this.$checkNumberKey);
-        Event.addEvent(this.$rgb_b.el, 'keyup', this.$setRGBtoHexColor);
-        
-        Event.addEvent(this.$formatChangeButton.el, 'click', this.$EventFormatChangeClick)
-    }
-
-    destroy () {
-        this.destroyEventMachin();
-
-        Event.removeEvent(this.$hexCode.el, 'keydown', this.$EventHexCodeKeyDown);
-        Event.removeEvent(this.$hexCode.el, 'keyup', this.$EventHexCodeKeyUp);
-        Event.removeEvent(this.$rgb_r.el, 'keydown', this.$checkNumberKey);
-        Event.removeEvent(this.$rgb_r.el, 'keyup', this.$setRGBtoHexColor);
-        Event.removeEvent(this.$rgb_g.el, 'keydown', this.$checkNumberKey);
-        Event.removeEvent(this.$rgb_g.el, 'keyup', this.$setRGBtoHexColor);
-        Event.removeEvent(this.$rgb_b.el, 'keydown', this.$checkNumberKey);
-        Event.removeEvent(this.$rgb_b.el, 'keyup', this.$setRGBtoHexColor);
-        Event.removeEvent(this.$formatChangeButton.el, 'click', this.$EventFormatChangeClick);
     }
 
     refresh () {

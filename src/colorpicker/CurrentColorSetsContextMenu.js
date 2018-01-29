@@ -2,10 +2,8 @@ import ColorUtil from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
-import ColorSetsList from './ColorSetsList'
 
 const color = ColorUtil.color;
-const hue_color = ColorUtil.hue_color;
 
 export default class CurrentColorSetsContextMenu extends EventMachin {
     constructor (colorpicker) {
@@ -83,7 +81,4 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
         this.initializeEventMachin();
     }
 
-    destroy() {
-        this.destroyEventMachin();
-    }
 }

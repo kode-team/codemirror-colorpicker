@@ -6,7 +6,6 @@ import EventMachin from '../util/EventMachin'
 
 
 const color = ColorUtil.color;
-const hue_color = ColorUtil.hue_color;
 
 export default class ColorControl extends EventMachin {
     constructor (colorpicker) {
@@ -237,9 +236,5 @@ export default class ColorControl extends EventMachin {
 
     initializeEvent () {
         this.initializeEventMachin();
-    }
-
-    destroy() {
-        this.destroyEventMachin();
     }
 }
