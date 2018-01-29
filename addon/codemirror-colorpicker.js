@@ -2594,6 +2594,7 @@ var ColorPicker = function (_EventMachin) {
         _this.isShortCut = false;
         _this.hideDelay = 2000;
         _this.timerCloseColorPicker;
+        _this.autoHide = _this.opt.autoHide || true;
 
         _this.control = new ColorControl(_this);
         _this.palette = new ColorPallet(_this);
@@ -2747,10 +2748,10 @@ var ColorPicker = function (_EventMachin) {
         key: 'hide',
         value: function hide() {
             if (this.isColorPickerShow) {
-                // this.destroy();
-                // this.$root.hide();
-                // this.$root.remove();  // not empty 
-                // this.isColorPickerShow = false;
+                this.destroy();
+                this.$root.hide();
+                this.$root.remove(); // not empty 
+                this.isColorPickerShow = false;
             }
         }
     }, {

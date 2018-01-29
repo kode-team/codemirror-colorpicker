@@ -34,6 +34,7 @@ export default class ColorPicker extends EventMachin {
         this.isShortCut = false;
         this.hideDelay = 2000;
         this.timerCloseColorPicker;
+        this.autoHide = this.opt.autoHide || true; 
 
         this.control = new ColorControl(this);
         this.palette = new ColorPalette(this);
@@ -173,10 +174,10 @@ export default class ColorPicker extends EventMachin {
 
     hide () {
         if (this.isColorPickerShow) {
-           // this.destroy();
-           // this.$root.hide();
-           // this.$root.remove();  // not empty 
-           // this.isColorPickerShow = false;
+           this.destroy();
+           this.$root.hide();
+           this.$root.remove();  // not empty 
+           this.isColorPickerShow = false;
         }
     }    
 
