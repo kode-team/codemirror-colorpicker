@@ -1,6 +1,8 @@
 # CodeMirror Colorpicker Addon 
 
 CodeMirror ColorPicker Addon like Chrome devtool style  
+
+[![](https://data.jsdelivr.com/v1/package/npm/codemirror-colorpicker/badge)](https://www.jsdelivr.com/package/npm/codemirror-colorpicker)
    
 # How to use (for  browser) 
 
