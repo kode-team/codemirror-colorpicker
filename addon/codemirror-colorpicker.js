@@ -2172,6 +2172,13 @@ var ColorSetsChooser = function (_EventMachin) {
         value: function initializeEvent() {
             this.initializeEventMachin();
         }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            get(ColorSetsChooser.prototype.__proto__ || Object.getPrototypeOf(ColorSetsChooser.prototype), 'destroy', this).call(this);
+
+            this.hide();
+        }
     }]);
     return ColorSetsChooser;
 }(EventMachin);

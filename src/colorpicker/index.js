@@ -174,7 +174,7 @@ export default class ColorPicker extends EventMachin {
 
     hide () {
         if (this.isColorPickerShow) {
-           this.destroy();
+           this.destroy();           
            this.$root.hide();
            this.$root.remove();  // not empty 
            this.isColorPickerShow = false;

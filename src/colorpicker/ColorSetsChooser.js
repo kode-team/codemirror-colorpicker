@@ -107,4 +107,10 @@ export default class ColorSetsChooser extends EventMachin {
 
     }
 
+    destroy () {
+        super.destroy();
+
+        this.hide();
+    }
+
 }
