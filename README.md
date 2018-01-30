@@ -4,6 +4,21 @@ CodeMirror ColorPicker Addon like Chrome devtool style
 
 [![](https://data.jsdelivr.com/v1/package/npm/codemirror-colorpicker/badge)](https://www.jsdelivr.com/package/npm/codemirror-colorpicker)
    
+
+# Install 
+
+## npm 
+
+```npm
+npm install codemirror-colorpicker
+```
+
+## bower 
+
+```
+bower install codemirror-colorpicker 
+```   
+   
 # How to use (for  browser) 
 
 ```
@@ -104,18 +119,20 @@ You can set custom color sets (ex : material, ...).
 
 https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
 
-# Install 
 
-## npm 
+# Developments 
 
-```npm
-npm install codemirror-colorpicker
-```
-
-## bower 
+## local dev 
 
 ```
-bower install codemirror-colorpicker 
+npm run dev 
+open localhost:10001 
+```
+
+## build 
+
+```
+npm run build 
 ```
 
 # License : MIT 
