@@ -125,6 +125,9 @@ https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
 ## local dev 
 
 ```
+git clone https://github.com/easylogic/codemirror-colorpicker
+cd codemirror-colorpicker
+npm install 
 npm run dev 
 open localhost:10001 
 ```
