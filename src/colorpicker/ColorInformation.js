@@ -26,6 +26,7 @@ export default class ColorInformation extends EventMachin {
         this.$el.append(this.makeInputFieldRgb());
         this.$el.append(this.makeInputFieldHsl());
 
+        this.format = 'hex'; 
     }
 
 
@@ -87,24 +88,24 @@ export default class ColorInformation extends EventMachin {
     }
 
     currentFormat () {
-        var current_format = this.$el.data('format') || 'hex';
+        var current_format = this.format || 'hex';
         if (this.colorpicker.currentA < 1 && current_format == 'hex' ) {
             var next_format = 'rgb';
             this.$el.removeClass(current_format);
             this.$el.addClass(next_format);
-            this.$el.data('format', next_format);
+            this.format = next_format;
     
             this.colorpicker.setInputColor();
         }
     }
 
     setCurrentFormat (format) {
-        this.$el.data('format', format);
+        this.format = format
         this.initFormat();
     }
     
     initFormat () {
-        var current_format = this.$el.data('format') || 'hex';
+        var current_format = this.format || 'hex';
     
         this.$el.removeClass('hex');
         this.$el.removeClass('rgb');
@@ -113,7 +114,7 @@ export default class ColorInformation extends EventMachin {
     }
     
     nextFormat() {
-        var current_format = this.$el.data('format') || 'hex';
+        var current_format = this.format || 'hex';
 
         var next_format = 'hex';
         if (current_format == 'hex') {
@@ -130,7 +131,7 @@ export default class ColorInformation extends EventMachin {
 
         this.$el.removeClass(current_format);
         this.$el.addClass(next_format);
-        this.$el.data('format', next_format);
+        this.format = next_format;
 
         this.colorpicker.setInputColor();
     }
@@ -194,12 +195,12 @@ export default class ColorInformation extends EventMachin {
     }
 
     getFormat () {
-        return this.$el.data('format') || 'hex';   
+        return this.format || 'hex';   
     }
 
     setInputColor() {
         var format = this.getFormat();
-    
+
         var rgb = null;
         if (format == 'hex') {
             this.$hexCode.val(this.convertHEX());
@@ -238,14 +239,9 @@ export default class ColorInformation extends EventMachin {
             this.colorpicker.initColor(code);
         }
     }
-
     
     'click $formatChangeButton' (e) {
         this.nextFormat();
-    }
-
-    initializeEvent() {
-        this.initializeEventMachin();
     }
 
     refresh () {

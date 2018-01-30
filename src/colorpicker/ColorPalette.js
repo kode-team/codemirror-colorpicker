@@ -29,7 +29,7 @@ export default class ColorPallet extends EventMachin {
     }
 
     caculateSV () {
-        var pos = this.$drag_pointer.data('pos') || { x : 0, y : 0 };
+        var pos = this.drag_pointer_pos || { x : 0, y : 0 };
 
         var width = this.$el.width();
         var height = this.$el.height();
@@ -48,7 +48,7 @@ export default class ColorPallet extends EventMachin {
             top : (y - 5) + "px"
         });
     
-        this.$drag_pointer.data('pos', { x  : x, y : y });
+        this.drag_pointer_pos = { x , y };
     }
 
 
@@ -72,7 +72,7 @@ export default class ColorPallet extends EventMachin {
             top: (y - 5) + 'px'
         });
     
-        this.$drag_pointer.data('pos', { x: x, y : y});
+        this.drag_pointer_pos = { x , y }
     
         this.colorpicker.caculateHSV()
         this.colorpicker.setInputColor();
@@ -80,28 +80,23 @@ export default class ColorPallet extends EventMachin {
 
 
     EventDocumentMouseUp (e) {
-        this.$el.data('isDown', false);    
+        this.isDown = false; 
     }
 
     EventDocumentMouseMove(e) {
-        if (this.$el.data('isDown')) {
+        if (this.isDown) {
             this.setMainColor(e);
         }
     } 
 
 
     mousedown (e) {
-        this.$el.data('isDown', true);
+        this.isDown = true; 
         this.setMainColor(e);
     }
     
     mouseup (e) {
-        this.$el.data('isDown', false);
+        this.isDown = false; 
     }
 
-
-    initializeEvent () {
-        this.initializeEventMachin();
-
-    }
 }

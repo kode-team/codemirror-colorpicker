@@ -24,7 +24,7 @@ export default class ColorSetsChooser extends EventMachin {
 
         const $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
         
-        $header.createChild('h1', 'title').html('Color Pallets')
+        $header.createChild('h1', 'title').html('Color Paletts')
 
         this.$toggleButton = $header.createChild('span', 'items').html('&times;');
                 
@@ -100,11 +100,6 @@ export default class ColorSetsChooser extends EventMachin {
             this.colorpicker.setCurrentColorSets(index);
             this.hide();
         }
-    }
-
-    initializeEvent() {
-        this.initializeEventMachin();
-
     }
 
     destroy () {

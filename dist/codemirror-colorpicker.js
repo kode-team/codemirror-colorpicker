@@ -391,7 +391,7 @@ var ColorView = function () {
             if (this.colorpicker) {
                 if (evt.key == 'Escape') {
                     this.colorpicker.hide();
-                } else if (this.colorpicker.isShortCut() == false) {
+                } else if (this.colorpicker.isShortCut == false) {
                     this.colorpicker.hide();
                 }
             }
@@ -1254,6 +1254,11 @@ var EventMachin = function () {
   }
 
   createClass(EventMachin, [{
+    key: 'initializeEvent',
+    value: function initializeEvent() {
+      this.initializeEventMachin();
+    }
+  }, {
     key: 'destroy',
     value: function destroy() {
       this.destroyEventMachin();
@@ -1424,11 +1429,13 @@ var ColorControl = function (_EventMachin) {
 
             this.$hueContainer = this.$hue.createChild('div', 'hue-container');
             this.$drag_bar = this.$hueContainer.createChild('div', 'drag-bar');
+            this.drag_bar_pos = {};
 
             this.$opacityContainer = this.$opacity.createChild('div', 'opacity-container');
             this.$opacityColorBar = this.$opacityContainer.createChild('div', 'color-bar');
 
             this.$opacity_drag_bar = this.$opacityContainer.createChild('div', 'drag-bar2');
+            this.opacity_drag_bar_pos = {};
         }
     }, {
         key: 'setBackgroundColor',
@@ -1450,8 +1457,6 @@ var ColorControl = function (_EventMachin) {
                 left: x - 5 + "px",
                 top: y - 5 + "px"
             });
-
-            this.$drag_pointer.data('pos', { x: x, y: y });
         }
     }, {
         key: 'setMainColor',
@@ -1472,8 +1477,6 @@ var ColorControl = function (_EventMachin) {
                 left: x - 5 + 'px',
                 top: y - 5 + 'px'
             });
-
-            this.$drag_pointer.data('pos', { x: x, y: y });
 
             this.colorpicker.caculateHSV();
             this.colorpicker.setInputColor();
@@ -1513,7 +1516,7 @@ var ColorControl = function (_EventMachin) {
                 left: x - Math.ceil(this.$opacity_drag_bar.width() / 2) + 'px'
             });
 
-            this.$opacity_drag_bar.data('pos', { x: x });
+            this.opacity_drag_bar_pos = { x: x };
 
             this.colorpicker.setCurrentA(this.caculateOpacity());
             this.colorpicker.currentFormat();
@@ -1538,7 +1541,7 @@ var ColorControl = function (_EventMachin) {
                 left: hueX - 7.5 + 'px'
             });
 
-            this.$drag_bar.data('pos', { x: hueX });
+            this.drag_bar_pos = { x: hueX };
 
             var opacityX = this.$opacityContainer.width() * (this.colorpicker.currentA || 0);
 
@@ -1546,13 +1549,13 @@ var ColorControl = function (_EventMachin) {
                 left: opacityX - 7.5 + 'px'
             });
 
-            this.$opacity_drag_bar.data('pos', { x: opacityX });
+            this.opacity_drag_bar_pos = { x: opacityX };
         }
     }, {
         key: 'caculateH',
         value: function caculateH() {
 
-            var huePos = this.$drag_bar.data('pos') || { x: 0 };
+            var huePos = this.drag_bar_pos || { x: 0 };
 
             var h = huePos.x / this.$hueContainer.width() * 360;
 
@@ -1561,7 +1564,7 @@ var ColorControl = function (_EventMachin) {
     }, {
         key: 'caculateOpacity',
         value: function caculateOpacity() {
-            var opacityPos = this.$opacity_drag_bar.data('pos') || { x: 0 };
+            var opacityPos = this.opacity_drag_bar_pos || { x: 0 };
             var a = Math.round(opacityPos.x / this.$opacityContainer.width() * 100) / 100;
 
             return isNaN(a) ? 1 : a;
@@ -1569,19 +1572,19 @@ var ColorControl = function (_EventMachin) {
     }, {
         key: 'EventDocumentMouseMove',
         value: function EventDocumentMouseMove(e) {
-            if (this.$hue.data('isDown')) {
+            if (this.isHueDown) {
                 this.setHueColor(e);
             }
 
-            if (this.$opacity.data('isDown')) {
+            if (this.isOpacityDown) {
                 this.setOpacity(e);
             }
         }
     }, {
         key: 'EventDocumentMouseUp',
         value: function EventDocumentMouseUp(e) {
-            this.$hue.data('isDown', false);
-            this.$opacity.data('isDown', false);
+            this.isHueDown = false;
+            this.isOpacityDown = false;
         }
     }, {
         key: 'setControlColor',
@@ -1610,7 +1613,7 @@ var ColorControl = function (_EventMachin) {
                 left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
             });
 
-            this.$drag_bar.data('pos', { x: x });
+            this.drag_bar_pos = { x: x };
 
             var hueColor = color$3.checkHueColor(dist / 100);
 
@@ -1622,30 +1625,25 @@ var ColorControl = function (_EventMachin) {
         key: 'mousedown $drag_bar',
         value: function mousedown$drag_bar(e) {
             e.preventDefault();
-            this.$hue.data('isDown', true);
+            this.isHueDown = true;
         }
     }, {
         key: 'mousedown $opacity_drag_bar',
         value: function mousedown$opacity_drag_bar(e) {
             e.preventDefault();
-            this.$opacity.data('isDown', true);
+            this.isOpacityDown = true;
         }
     }, {
         key: 'mousedown $hueContainer',
         value: function mousedown$hueContainer(e) {
-            this.$hue.data('isDown', true);
+            this.isHueDown = true;
             this.setHueColor(e);
         }
     }, {
         key: 'mousedown $opacityContainer',
         value: function mousedown$opacityContainer(e) {
-            this.$opacity.data('isDown', true);
+            this.isOpacityDown = true;
             this.setOpacity(e);
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
         }
     }]);
     return ColorControl;
@@ -1679,6 +1677,8 @@ var ColorInformation = function (_EventMachin) {
             this.$el.append(this.makeInputFieldHex());
             this.$el.append(this.makeInputFieldRgb());
             this.$el.append(this.makeInputFieldHsl());
+
+            this.format = 'hex';
         }
     }, {
         key: 'makeInputFieldHex',
@@ -1743,12 +1743,12 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'currentFormat',
         value: function currentFormat() {
-            var current_format = this.$el.data('format') || 'hex';
+            var current_format = this.format || 'hex';
             if (this.colorpicker.currentA < 1 && current_format == 'hex') {
                 var next_format = 'rgb';
                 this.$el.removeClass(current_format);
                 this.$el.addClass(next_format);
-                this.$el.data('format', next_format);
+                this.format = next_format;
 
                 this.colorpicker.setInputColor();
             }
@@ -1756,13 +1756,13 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'setCurrentFormat',
         value: function setCurrentFormat(format) {
-            this.$el.data('format', format);
+            this.format = format;
             this.initFormat();
         }
     }, {
         key: 'initFormat',
         value: function initFormat() {
-            var current_format = this.$el.data('format') || 'hex';
+            var current_format = this.format || 'hex';
 
             this.$el.removeClass('hex');
             this.$el.removeClass('rgb');
@@ -1772,7 +1772,7 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'nextFormat',
         value: function nextFormat() {
-            var current_format = this.$el.data('format') || 'hex';
+            var current_format = this.format || 'hex';
 
             var next_format = 'hex';
             if (current_format == 'hex') {
@@ -1789,7 +1789,7 @@ var ColorInformation = function (_EventMachin) {
 
             this.$el.removeClass(current_format);
             this.$el.addClass(next_format);
-            this.$el.data('format', next_format);
+            this.format = next_format;
 
             this.colorpicker.setInputColor();
         }
@@ -1858,7 +1858,7 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getFormat',
         value: function getFormat() {
-            return this.$el.data('format') || 'hex';
+            return this.format || 'hex';
         }
     }, {
         key: 'setInputColor',
@@ -1933,11 +1933,6 @@ var ColorInformation = function (_EventMachin) {
             this.nextFormat();
         }
     }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
-        }
-    }, {
         key: 'refresh',
         value: function refresh() {}
     }]);
@@ -1978,7 +1973,7 @@ var ColorPallet = function (_EventMachin) {
     }, {
         key: 'caculateSV',
         value: function caculateSV() {
-            var pos = this.$drag_pointer.data('pos') || { x: 0, y: 0 };
+            var pos = this.drag_pointer_pos || { x: 0, y: 0 };
 
             var width = this.$el.width();
             var height = this.$el.height();
@@ -1999,7 +1994,7 @@ var ColorPallet = function (_EventMachin) {
                 top: y - 5 + "px"
             });
 
-            this.$drag_pointer.data('pos', { x: x, y: y });
+            this.drag_pointer_pos = { x: x, y: y };
         }
     }, {
         key: 'setMainColor',
@@ -2021,7 +2016,7 @@ var ColorPallet = function (_EventMachin) {
                 top: y - 5 + 'px'
             });
 
-            this.$drag_pointer.data('pos', { x: x, y: y });
+            this.drag_pointer_pos = { x: x, y: y };
 
             this.colorpicker.caculateHSV();
             this.colorpicker.setInputColor();
@@ -2029,30 +2024,25 @@ var ColorPallet = function (_EventMachin) {
     }, {
         key: 'EventDocumentMouseUp',
         value: function EventDocumentMouseUp(e) {
-            this.$el.data('isDown', false);
+            this.isDown = false;
         }
     }, {
         key: 'EventDocumentMouseMove',
         value: function EventDocumentMouseMove(e) {
-            if (this.$el.data('isDown')) {
+            if (this.isDown) {
                 this.setMainColor(e);
             }
         }
     }, {
         key: 'mousedown',
         value: function mousedown(e) {
-            this.$el.data('isDown', true);
+            this.isDown = true;
             this.setMainColor(e);
         }
     }, {
         key: 'mouseup',
         value: function mouseup(e) {
-            this.$el.data('isDown', false);
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
+            this.isDown = false;
         }
     }]);
     return ColorPallet;
@@ -2084,7 +2074,7 @@ var ColorSetsChooser = function (_EventMachin) {
 
             var $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
 
-            $header.createChild('h1', 'title').html('Color Pallets');
+            $header.createChild('h1', 'title').html('Color Paletts');
 
             this.$toggleButton = $header.createChild('span', 'items').html('&times;');
 
@@ -2168,11 +2158,6 @@ var ColorSetsChooser = function (_EventMachin) {
                 this.colorpicker.setCurrentColorSets(index);
                 this.hide();
             }
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
         }
     }, {
         key: 'destroy',
@@ -2461,11 +2446,6 @@ var CurrentColorSets = function (_EventMachin) {
                 }
             }
         }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
-        }
     }]);
     return CurrentColorSets;
 }(EventMachin);
@@ -2549,11 +2529,6 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
             var $item = new Dom(e.delegateTarget);
             this.runCommand($item.attr('data-type'));
             this.hide();
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-            this.initializeEventMachin();
         }
     }]);
     return CurrentColorSetsContextMenu;

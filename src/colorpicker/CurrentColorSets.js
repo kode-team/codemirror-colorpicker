@@ -132,7 +132,4 @@ export default class CurrentColorSets extends EventMachin {
         }
     }
 
-    initializeEvent () {
-        this.initializeEventMachin();   
-    }
 }

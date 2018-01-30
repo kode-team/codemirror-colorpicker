@@ -6,6 +6,10 @@ const EVENT_SAPARATOR = ' '
 
 export default class EventMachin {
 
+  initializeEvent () {
+    this.initializeEventMachin();
+  }
+
   destroy() {
     this.destroyEventMachin();
   }

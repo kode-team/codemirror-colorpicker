@@ -77,8 +77,4 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
         this.hide();        
     }
 
-    initializeEvent () {
-        this.initializeEventMachin();
-    }
-
 }

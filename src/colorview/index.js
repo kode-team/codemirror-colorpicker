@@ -237,7 +237,7 @@ export default class ColorView {
         if (this.colorpicker ) {
             if (evt.key == 'Escape') {
                 this.colorpicker.hide();
-            } else if (this.colorpicker.isShortCut() == false) {
+            } else if (this.colorpicker.isShortCut == false) {
                 this.colorpicker.hide();
             }
         }
