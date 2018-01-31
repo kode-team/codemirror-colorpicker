@@ -124,6 +124,12 @@ You can set custom color sets (ex : material, ...).
 https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
 
 
+# Change Logs 
+
+## v1.5.0 
+* change bundler - rollup based   
+* support color palettes 
+
 # Developments 
 
 ## local dev 

@@ -1,8 +1,8 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.5.0",
+  "version": "1.5.0-alpha",
   "description": "colorpicker for codemirror",
-  "main": "dist/codemirror-colorpicker.js",
+  "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pub": "npm run build && npm publish",
