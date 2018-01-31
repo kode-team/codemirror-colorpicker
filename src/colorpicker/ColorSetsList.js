@@ -7,12 +7,7 @@ let colorSetsList = [
     },
     { 
         name : "Custom",  
-        "edit" : true,  
-        'colors': [ ]
-    },             
-    { 
-        name : "Pages",  
-        'colors': [ '#fff', '#f00', '#0ff', '#f0f' ]
+        "edit" : true
     }
 ]
 

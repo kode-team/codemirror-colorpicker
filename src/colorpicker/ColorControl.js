@@ -210,6 +210,33 @@ export default class ColorControl extends EventMachin {
         this.colorpicker.setInputColor();
     }    
 
+    setOnlyHueColor() {
+        var min = this.$hueContainer.offset().left;
+        var max = min + this.$hueContainer.width();
+        var current = min + (max - min) * (this.colorpicker.currentH / 360);
+    
+        var dist;
+        if (current < min) {
+            dist = 0;
+        } else if (current > max) {
+            dist = 100;
+        } else {
+            dist = (current - min) / (max - min) * 100;
+        }
+    
+        var x = (this.$hueContainer.width() * (dist/100));
+    
+        this.$drag_bar.css({
+            left: (x -Math.ceil(this.$drag_bar.width()/2)) + 'px'
+        });
+    
+        this.drag_bar_pos = { x };
+    
+        var hueColor = color.checkHueColor(dist/100);
+        this.colorpicker.setBackgroundColor(hueColor);        
+        this.colorpicker.setCurrentH((dist/100) * 360);
+    }       
+
     'mousedown $drag_bar' (e) {
         e.preventDefault();
         this.isHueDown = true; 

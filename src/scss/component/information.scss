@@ -12,6 +12,17 @@
       padding: 0 0 0 2px;
       box-sizing: border-box;
       user-select: text;
+
+      &[type=number] {
+        -webkit-appearance: none;
+      }
+
+      &[type=number]::-webkit-inner-spin-button,
+      &[type=number]::-webkit-outer-spin-button
+      {
+        -webkit-appearance: none;
+        margin: 0;
+      }
     }
 
     &.hex > .information-item.hex {
@@ -30,6 +41,7 @@
       display:none;
       position: relative;
       padding: 0px 5px;
+      padding-left: 9px;
       box-sizing: border-box;
       margin-right:40px;
 
@@ -56,6 +68,17 @@
           user-select: text;
           border: 1px solid #cbcbcb;
           border-radius:2px;
+
+          &[type=number] {
+            -webkit-appearance: none;
+          }
+
+          &[type=number]::-webkit-inner-spin-button,
+          &[type=number]::-webkit-outer-spin-button
+          {
+            -webkit-appearance: none;
+            margin: 0;
+          }
         }
       }
     }

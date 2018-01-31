@@ -6,7 +6,7 @@
 
     > .color, > .empty {
       position: absolute;
-      left: 9px;
+      left: 12px;
       top: 14px;
       width: 30px;
       height: 30px;
@@ -21,7 +21,7 @@
     > .hue {
       position: relative;
       padding: 6px 16px;
-      margin: 0px 0px 0px 38px;
+      margin: 0px 0px 0px 42px;
       box-sizing: border-box;
       cursor: pointer;
 
@@ -37,7 +37,7 @@
     > .opacity {
       position: relative;
       padding: 3px 16px;
-      margin: 0px 0px 0px 38px;
+      margin: 0px 0px 0px 42px;
       box-sizing: border-box;
       cursor: pointer;
 

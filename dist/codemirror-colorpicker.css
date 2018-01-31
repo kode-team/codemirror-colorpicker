@@ -121,7 +121,7 @@
     user-select: none; }
     .codemirror-colorpicker > .control > .color, .codemirror-colorpicker > .control > .empty {
       position: absolute;
-      left: 9px;
+      left: 12px;
       top: 14px;
       width: 30px;
       height: 30px;
@@ -132,7 +132,7 @@
     .codemirror-colorpicker > .control > .hue {
       position: relative;
       padding: 6px 16px;
-      margin: 0px 0px 0px 38px;
+      margin: 0px 0px 0px 42px;
       box-sizing: border-box;
       cursor: pointer; }
       .codemirror-colorpicker > .control > .hue > .hue-container {
@@ -143,7 +143,7 @@
     .codemirror-colorpicker > .control > .opacity {
       position: relative;
       padding: 3px 16px;
-      margin: 0px 0px 0px 38px;
+      margin: 0px 0px 0px 42px;
       box-sizing: border-box;
       cursor: pointer; }
       .codemirror-colorpicker > .control > .opacity > .opacity-container {
@@ -196,6 +196,11 @@
       padding: 0 0 0 2px;
       box-sizing: border-box;
       user-select: text; }
+      .codemirror-colorpicker > .information > input[type=number] {
+        -webkit-appearance: none; }
+      .codemirror-colorpicker > .information > input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0; }
     .codemirror-colorpicker > .information.hex > .information-item.hex {
       display: flex; }
     .codemirror-colorpicker > .information.rgb > .information-item.rgb {
@@ -206,6 +211,7 @@
       display: none;
       position: relative;
       padding: 0px 5px;
+      padding-left: 9px;
       box-sizing: border-box;
       margin-right: 40px; }
       .codemirror-colorpicker > .information > .information-item > .input-field {
@@ -228,6 +234,11 @@
           user-select: text;
           border: 1px solid #cbcbcb;
           border-radius: 2px; }
+          .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number] {
+            -webkit-appearance: none; }
+          .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0; }
     .codemirror-colorpicker > .information > .information-change {
       position: absolute;
       display: block;
@@ -264,7 +275,7 @@
     .codemirror-colorpicker > .colorsets > .color-list {
       margin-right: 30px;
       display: block;
-      padding: 12px 8px 0px 8px;
+      padding: 12px 0px 0px 12px;
       box-sizing: border-box;
       line-height: 0; }
       .codemirror-colorpicker > .colorsets > .color-list .color-item {

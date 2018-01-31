@@ -95,7 +95,11 @@ export default class ColorPicker extends EventMachin {
         return rgb;
     }
 
-    definePostion (opt) {
+    definePositionForArrow (opt, elementScreenLeft, elementScreenTop) {
+        //this.$arrow.css({})
+    }
+
+    definePosition (opt) {
 
         var width = this.$root.width();
         var height = this.$root.height();
@@ -114,6 +118,7 @@ export default class ColorPicker extends EventMachin {
         }
         if (elementScreenTop < 0) { elementScreenTop = 0; }
 
+
         // set position
         this.$root.css({
             left : (elementScreenLeft) + 'px',
@@ -121,7 +126,7 @@ export default class ColorPicker extends EventMachin {
         });
     }
 
-    show (opt, color,  callback) {
+    show (opt, color,  callback) { 
         this.destroy();
         this.initializeEvent();
         this.$root.appendTo(document.body);
@@ -132,7 +137,7 @@ export default class ColorPicker extends EventMachin {
             top : '-10000px'
         }).show();
 
-        this.definePostion(opt);
+        this.definePosition(opt);
 
         this.isColorPickerShow = true;
 
@@ -174,10 +179,10 @@ export default class ColorPicker extends EventMachin {
 
     hide () {
         if (this.isColorPickerShow) {
-           this.destroy();           
-           this.$root.hide();
-           this.$root.remove();  // not empty 
-           this.isColorPickerShow = false;
+           //this.destroy();           
+           //this.$root.hide();
+           //this.$root.remove();  // not empty 
+           //this.isColorPickerShow = false;
         }
     }    
 
@@ -195,7 +200,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     getCurrentColor () {
-        return this.getFormattedColor(this.information.getFormat());
+        return this.information.getFormattedColor();
     }
 
     getFormattedColor (format) {
@@ -217,22 +222,28 @@ export default class ColorPicker extends EventMachin {
 
 
 
-    setInputColor() {
-    
+    setInputColor(isNoInputColor) {
+        this.information.setInputColor(isNoInputColor);
+        this.control.setInputColor(isNoInputColor);
 
-        this.information.setInputColor();
+        this.callbackColorValue();
+    }    
+
+    changeInputColorAfterNextFormat() {
         this.control.setInputColor();
 
-    
+        this.callbackColorValue();
+    }        
+
+    callbackColorValue () {
         if (typeof this.colorpickerCallback == 'function') {
-    
+            
             if (!isNaN(this.currentA)) {
                 this.colorpickerCallback(this.getCurrentColor());
             }
     
         }
-    }    
-
+    }
     
     caculateHSV() {
 
@@ -286,22 +297,33 @@ export default class ColorPicker extends EventMachin {
         this.information.setCurrentFormat(format);
     }
 
-    initColor(newColor) {
+    initColor(newColor, format) {
         let c = newColor || "#FF0000", colorObj = color.parse(c);
     
-        this.setCurrentFormat(colorObj.type);
-        this.setBackgroundColor(c);
+        this.setCurrentFormat(format || colorObj.type);
+
+        let hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+
+        this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+        this.setColorUI();
+        this.setHueColor();
+        this.setInputColor(); 
+    }    
+
+    changeInformationColor(newColor) {
+        let c = newColor || "#FF0000", colorObj = color.parse(c);
     
         let hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
     
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
         this.setColorUI();
         this.setHueColor();
-        this.setInputColor();
-    }    
+        this.control.setInputColor();
+        this.callbackColorValue();
+    }        
 
     setHueColor () {
-        this.control.setHueColor();
+        this.control.setOnlyHueColor();
     }
 
     checkColorPickerClass(el) {

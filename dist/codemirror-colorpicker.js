@@ -1164,6 +1164,11 @@ var Dom = function () {
             return parseInt(this.val(), 10);
         }
     }, {
+        key: 'float',
+        value: function float() {
+            return parseFloat(this.val());
+        }
+    }, {
         key: 'show',
         value: function show() {
             return this.css('display', 'block');
@@ -1219,16 +1224,22 @@ var Dom = function () {
     return Dom;
 }();
 
+var CHECK_NUMBER_KEYS = ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space', 'Escape', 'Enter', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Period', 'Backspace', 'Tab'];
+
+var CHECK_UPDOWN_KEYS = ['ArrowDown', 'ArrowUp'];
+
 var Event = {
+    isArrowDown: function isArrowDown(e) {
+        return e.code == 'ArrowDown';
+    },
+    isArrowUp: function isArrowUp(e) {
+        return e.code == 'ArrowUp';
+    },
+    checkUpDownKey: function checkUpDownKey(e) {
+        return CHECK_UPDOWN_KEYS.includes(e.code);
+    },
     checkNumberKey: function checkNumberKey(e) {
-        var code = e.which,
-            isExcept = false;
-
-        if (code == 37 || code == 39 || code == 8 || code == 46 || code == 9) isExcept = true;
-
-        if (!isExcept && (code < 48 || code > 57)) return false;
-
-        return true;
+        return CHECK_NUMBER_KEYS.includes(e.code);
     },
     addEvent: function addEvent(dom, eventName, callback) {
         dom.addEventListener(eventName, callback);
@@ -1245,8 +1256,9 @@ var Event = {
     }
 };
 
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu)/ig;
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
 var EVENT_SAPARATOR = ' ';
+var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
 
 var EventMachin = function () {
   function EventMachin() {
@@ -1305,6 +1317,43 @@ var EventMachin = function () {
       return el;
     }
   }, {
+    key: 'getDefaultEventObject',
+    value: function getDefaultEventObject(eventName) {
+      var _this = this;
+
+      var arr = eventName.split('.');
+      var realEventName = arr.shift();
+
+      var isControl = arr.includes('Control');
+      var isShift = arr.includes('Shift');
+      var isAlt = arr.includes('Alt');
+      var isMeta = arr.includes('Meta');
+
+      arr = arr.filter(function (code) {
+        return META_KEYS.includes(code) === false;
+      });
+
+      var checkMethodList = arr.filter(function (code) {
+        return !!_this[code];
+      });
+
+      arr = arr.filter(function (code) {
+        return checkMethodList.includes(code) === false;
+      }).map(function (code) {
+        return code.toLowerCase();
+      });
+
+      return {
+        eventName: realEventName,
+        isControl: isControl,
+        isShift: isShift,
+        isAlt: isAlt,
+        isMeta: isMeta,
+        codes: arr,
+        checkMethodList: checkMethodList
+      };
+    }
+  }, {
     key: 'bindingEvent',
     value: function bindingEvent(_ref, callback) {
       var _ref2 = toArray(_ref),
@@ -1313,8 +1362,12 @@ var EventMachin = function () {
           delegate = _ref2.slice(2);
 
       dom = this.getDefaultDomElement(dom);
+      var eventObject = this.getDefaultEventObject(eventName);
 
-      this.addEvent(eventName, dom, delegate.join(EVENT_SAPARATOR), callback);
+      eventObject.dom = dom;
+      eventObject.delegate = delegate.join(EVENT_SAPARATOR);
+
+      this.addEvent(eventObject, callback);
     }
   }, {
     key: 'matchPath',
@@ -1348,45 +1401,70 @@ var EventMachin = function () {
       this._bindings = [];
     }
   }, {
+    key: 'checkEventType',
+    value: function checkEventType(e, eventObject) {
+      var _this2 = this;
+
+      var onlyControl = e.ctrlKey ? eventObject.isControl : true;
+      var onlyShift = e.shiftKey ? eventObject.isShift : true;
+      var onlyAlt = e.altKey ? eventObject.isAlt : true;
+      var onlyMeta = e.metaKey ? eventObject.isMeta : true;
+
+      var hasKeyCode = true;
+      if (eventObject.codes.length) {
+        hasKeyCode = eventObject.codes.includes(e.code.toLowerCase()) || eventObject.codes.includes(e.key.toLowerCase());
+      }
+
+      var isAllCheck = true;
+      if (eventObject.checkMethodList.length) {
+        // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
+        isAllCheck = eventObject.checkMethodList.every(function (method) {
+          return _this2[method].call(_this2, e);
+        });
+      }
+
+      return onlyControl && onlyAlt && onlyShift && onlyMeta && hasKeyCode && isAllCheck;
+    }
+  }, {
     key: 'makeCallback',
-    value: function makeCallback(eventName, dom, delegate, callback) {
-      var _this = this;
+    value: function makeCallback(eventObject, callback) {
+      var _this3 = this;
 
-      if (delegate) {
+      if (eventObject.delegate) {
         return function (e) {
-          var delegateTarget = _this.matchPath(e.target || e.srcElement, delegate);
 
-          if (delegateTarget) {
-            // delegate target 이 있는 경우만 callback 실행 
-            e.delegateTarget = delegateTarget;
-            callback(e);
+          if (_this3.checkEventType(e, eventObject)) {
+            var delegateTarget = _this3.matchPath(e.target || e.srcElement, eventObject.delegate);
+
+            if (delegateTarget) {
+              // delegate target 이 있는 경우만 callback 실행 
+              e.delegateTarget = delegateTarget;
+              return callback(e);
+            }
           }
         };
       } else {
         return function (e) {
-          callback(e);
+          if (_this3.checkEventType(e, eventObject)) {
+            return callback(e);
+          }
         };
       }
     }
   }, {
     key: 'addEvent',
-    value: function addEvent(eventName, dom, delegate, callback) {
-      var eventObject = {
-        eventName: eventName,
-        dom: dom,
-        delegate: delegate,
-        callback: this.makeCallback(eventName, dom, delegate, callback)
-      };
+    value: function addEvent(eventObject, callback) {
+      eventObject.callback = this.makeCallback(eventObject, callback);
       this.addBinding(eventObject);
       Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback);
     }
   }, {
     key: 'removeEventAll',
     value: function removeEventAll() {
-      var _this2 = this;
+      var _this4 = this;
 
       this.getBindings().forEach(function (obj) {
-        _this2.removeEvent(obj);
+        _this4.removeEvent(obj);
       });
       this.initBindings();
     }
@@ -1622,6 +1700,34 @@ var ColorControl = function (_EventMachin) {
             this.colorpicker.setInputColor();
         }
     }, {
+        key: 'setOnlyHueColor',
+        value: function setOnlyHueColor() {
+            var min = this.$hueContainer.offset().left;
+            var max = min + this.$hueContainer.width();
+            var current = min + (max - min) * (this.colorpicker.currentH / 360);
+
+            var dist;
+            if (current < min) {
+                dist = 0;
+            } else if (current > max) {
+                dist = 100;
+            } else {
+                dist = (current - min) / (max - min) * 100;
+            }
+
+            var x = this.$hueContainer.width() * (dist / 100);
+
+            this.$drag_bar.css({
+                left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
+            });
+
+            this.drag_bar_pos = { x: x };
+
+            var hueColor = color$3.checkHueColor(dist / 100);
+            this.colorpicker.setBackgroundColor(hueColor);
+            this.colorpicker.setCurrentH(dist / 100 * 360);
+        }
+    }, {
         key: 'mousedown $drag_bar',
         value: function mousedown$drag_bar(e) {
             e.preventDefault();
@@ -1698,20 +1804,20 @@ var ColorInformation = function (_EventMachin) {
             var item = new Dom('div', 'information-item rgb');
 
             var field = item.createChild('div', 'input-field rgb-r');
-            this.$rgb_r = field.createChild('input', 'input', { type: 'text' });
+            this.$rgb_r = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
             field.createChild('div', 'title').html('R');
 
             field = item.createChild('div', 'input-field rgb-g');
-            this.$rgb_g = field.createChild('input', 'input', { type: 'text' });
+            this.$rgb_g = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
             field.createChild('div', 'title').html('G');
 
             field = item.createChild('div', 'input-field rgb-b');
-            this.$rgb_b = field.createChild('input', 'input', { type: 'text' });
+            this.$rgb_b = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
             field.createChild('div', 'title').html('B');
 
             // rgba
             field = item.createChild('div', 'input-field rgb-a');
-            this.$rgb_a = field.createChild('input', 'input', { type: 'text' });
+            this.$rgb_a = field.createChild('input', 'input', { type: 'number', step: 0.01, min: 0, max: 1 });
             field.createChild('div', 'title').html('A');
 
             return item;
@@ -1750,6 +1856,7 @@ var ColorInformation = function (_EventMachin) {
                 this.$el.addClass(next_format);
                 this.format = next_format;
 
+                console.log('curentFormat');
                 this.colorpicker.setInputColor();
             }
         }
@@ -1791,24 +1898,8 @@ var ColorInformation = function (_EventMachin) {
             this.$el.addClass(next_format);
             this.format = next_format;
 
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'setRGBtoHexColor',
-        value: function setRGBtoHexColor(e) {
-            var r = this.$rgb_r.val(),
-                g = this.$rgb_g.val(),
-                b = this.$rgb_b.val();
-
-            if (r == "" || g == "" || b == "") return;
-
-            if (parseInt(r) > 255) this.$rgb_r.val(255);else this.$rgb_r.val(parseInt(r));
-
-            if (parseInt(g) > 255) this.$rgb_g.val(255);else this.$rgb_g.val(parseInt(g));
-
-            if (parseInt(b) > 255) this.$rgb_b.val(255);else this.$rgb_b.val(parseInt(b));
-
-            this.colorpicker.initColor(this.getHexFormat());
+            this.setInputColor();
+            this.colorpicker.changeInputColorAfterNextFormat();
         }
     }, {
         key: 'setRGBInput',
@@ -1836,6 +1927,26 @@ var ColorInformation = function (_EventMachin) {
             }, 'hex');
         }
     }, {
+        key: 'getRgbFormat',
+        value: function getRgbFormat() {
+            return color$4.format({
+                r: this.$rgb_r.int(),
+                g: this.$rgb_g.int(),
+                b: this.$rgb_b.int(),
+                a: this.$rgb_a.float()
+            }, 'rgb');
+        }
+    }, {
+        key: 'getHslFormat',
+        value: function getHslFormat() {
+            return color$4.format({
+                r: this.$hsl_h.val(),
+                g: this.$hsl_s.val().replace('%', ''),
+                b: this.$hsl_l.val().replace('%', ''),
+                a: this.$hsl_a.float()
+            }, 'hsl');
+        }
+    }, {
         key: 'convertRGB',
         value: function convertRGB() {
             return this.colorpicker.convertRGB();
@@ -1853,7 +1964,14 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getFormattedColor',
         value: function getFormattedColor(format) {
-            return this.colorpicker.getFormattedColor(format);
+            format = format || this.getFormat();
+            if (format == 'hex') {
+                return this.$hexCode.val();
+            } else if (format == 'rgb') {
+                return this.getRgbFormat();
+            } else if (format == 'hsl') {
+                return this.getHslFormat();
+            }
         }
     }, {
         key: 'getFormat',
@@ -1882,34 +2000,43 @@ var ColorInformation = function (_EventMachin) {
             return Event.checkNumberKey(e);
         }
     }, {
-        key: 'keydown $rgb_r',
-        value: function keydown$rgb_r(e) {
-            return this.checkNumberKey(e);
+        key: 'checkNotNumberKey',
+        value: function checkNotNumberKey(e) {
+            return !Event.checkNumberKey(e);
+        }
+
+        //'keydown.checkNotNumberKey $rgb_r' (e) {  e.preventDefault(); }
+        //'keydown.checkNotNumberKey $rgb_g' (e) {  e.preventDefault(); }
+        //'keydown.checkNotNumberKey $rgb_b' (e) {  e.preventDefault(); }
+
+        //'keydown.checkNumberKey $rgb_r' (e) { this.setRGBtoHexColor(e); }
+        //'keydown.checkNumberKey $rgb_g' (e) { this.setRGBtoHexColor(e); }
+        //'keydown.checkNumberKey $rgb_b' (e) { this.setRGBtoHexColor(e); }
+
+    }, {
+        key: 'changeRgbColor',
+        value: function changeRgbColor() {
+            this.colorpicker.changeInformationColor(this.getRgbFormat());
         }
     }, {
-        key: 'keydown $rgb_g',
-        value: function keydown$rgb_g(e) {
-            return this.checkNumberKey(e);
+        key: 'change $rgb_r',
+        value: function change$rgb_r(e) {
+            this.changeRgbColor();
         }
     }, {
-        key: 'keydown $rgb_b',
-        value: function keydown$rgb_b(e) {
-            return this.checkNumberKey(e);
+        key: 'change $rgb_g',
+        value: function change$rgb_g(e) {
+            this.changeRgbColor();
         }
     }, {
-        key: 'keyup $rgb_r',
-        value: function keyup$rgb_r(e) {
-            return this.setRGBtoHexColor(e);
+        key: 'change $rgb_b',
+        value: function change$rgb_b(e) {
+            this.changeRgbColor();
         }
     }, {
-        key: 'keyup $rgb_g',
-        value: function keyup$rgb_g(e) {
-            return this.setRGBtoHexColor(e);
-        }
-    }, {
-        key: 'keyup $rgb_b',
-        value: function keyup$rgb_b(e) {
-            return this.setRGBtoHexColor(e);
+        key: 'change $rgb_a',
+        value: function change$rgb_a(e) {
+            this.changeRgbColor();
         }
     }, {
         key: 'keydown $hexCode',
@@ -1924,7 +2051,7 @@ var ColorInformation = function (_EventMachin) {
             var code = this.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.colorpicker.initColor(code);
+                this.colorpicker.changeInformationColor(code);
             }
         }
     }, {
@@ -2094,8 +2221,8 @@ var ColorSetsChooser = function (_EventMachin) {
 
             var $list = new Dom('div');
 
-            for (var i = 0, len = colors.length; i < len && i < maxCount; i++) {
-                var color = colors[i];
+            for (var i = 0; i < maxCount; i++) {
+                var color = colors[i] || 'rgba(255, 255, 255, 1)';
                 var $item = $list.createChild('div', 'color-item', {
                     title: color
                 });
@@ -2175,11 +2302,7 @@ var colorSetsList = [{
     colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
 }, {
     name: "Custom",
-    "edit": true,
-    'colors': []
-}, {
-    name: "Pages",
-    'colors': ['#fff', '#f00', '#0ff', '#f0f']
+    "edit": true
 }];
 
 var ColorSetsList = function () {
@@ -2626,8 +2749,13 @@ var ColorPicker = function (_EventMachin) {
             return rgb;
         }
     }, {
-        key: 'definePostion',
-        value: function definePostion(opt) {
+        key: 'definePositionForArrow',
+        value: function definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
+            //this.$arrow.css({})
+        }
+    }, {
+        key: 'definePosition',
+        value: function definePosition(opt) {
 
             var width = this.$root.width();
             var height = this.$root.height();
@@ -2669,7 +2797,7 @@ var ColorPicker = function (_EventMachin) {
                 top: '-10000px'
             }).show();
 
-            this.definePostion(opt);
+            this.definePosition(opt);
 
             this.isColorPickerShow = true;
 
@@ -2714,10 +2842,10 @@ var ColorPicker = function (_EventMachin) {
         key: 'hide',
         value: function hide() {
             if (this.isColorPickerShow) {
-                this.destroy();
-                this.$root.hide();
-                this.$root.remove(); // not empty 
-                this.isColorPickerShow = false;
+                //this.destroy();           
+                //this.$root.hide();
+                //this.$root.remove();  // not empty 
+                //this.isColorPickerShow = false;
             }
         }
     }, {
@@ -2739,7 +2867,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'getCurrentColor',
         value: function getCurrentColor() {
-            return this.getFormattedColor(this.information.getFormat());
+            return this.information.getFormattedColor();
         }
     }, {
         key: 'getFormattedColor',
@@ -2761,11 +2889,22 @@ var ColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'setInputColor',
-        value: function setInputColor() {
+        value: function setInputColor(isNoInputColor) {
+            this.information.setInputColor(isNoInputColor);
+            this.control.setInputColor(isNoInputColor);
 
-            this.information.setInputColor();
+            this.callbackColorValue();
+        }
+    }, {
+        key: 'changeInputColorAfterNextFormat',
+        value: function changeInputColorAfterNextFormat() {
             this.control.setInputColor();
 
+            this.callbackColorValue();
+        }
+    }, {
+        key: 'callbackColorValue',
+        value: function callbackColorValue() {
             if (typeof this.colorpickerCallback == 'function') {
 
                 if (!isNaN(this.currentA)) {
@@ -2831,12 +2970,11 @@ var ColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'initColor',
-        value: function initColor(newColor) {
+        value: function initColor(newColor, format) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
 
-            this.setCurrentFormat(colorObj.type);
-            this.setBackgroundColor(c);
+            this.setCurrentFormat(format || colorObj.type);
 
             var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
 
@@ -2846,9 +2984,23 @@ var ColorPicker = function (_EventMachin) {
             this.setInputColor();
         }
     }, {
+        key: 'changeInformationColor',
+        value: function changeInformationColor(newColor) {
+            var c = newColor || "#FF0000",
+                colorObj = color.parse(c);
+
+            var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+
+            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+            this.setColorUI();
+            this.setHueColor();
+            this.control.setInputColor();
+            this.callbackColorValue();
+        }
+    }, {
         key: 'setHueColor',
         value: function setHueColor() {
-            this.control.setHueColor();
+            this.control.setOnlyHueColor();
         }
     }, {
         key: 'checkColorPickerClass',

@@ -40,8 +40,8 @@ export default class ColorSetsChooser extends EventMachin {
     makeColorItemList (colors, maxCount = 5) {
         var $list = new Dom('div');
     
-        for(var i = 0, len = colors.length; i < len && i < maxCount; i++) {
-            var color = colors[i];
+        for(var i = 0; i < maxCount; i++) {
+            var color = colors[i] || 'rgba(255, 255, 255, 1)';
             var $item = $list.createChild('div', 'color-item', {
                 title: color
             });

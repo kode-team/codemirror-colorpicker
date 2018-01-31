@@ -1,16 +1,27 @@
-export default {
+const CHECK_NUMBER_KEYS = [
+    'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space', 'Escape', 'Enter',
+    'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
+    'Period', 'Backspace','Tab'
+];
+
+const CHECK_UPDOWN_KEYS = [ 'ArrowDown', 'ArrowUp' ];
+
+export default {    
+
+    isArrowDown (e) {
+        return e.code == 'ArrowDown';
+    },
+
+    isArrowUp (e) {
+        return e.code == 'ArrowUp';
+    },    
+
+    checkUpDownKey(e) {
+        return CHECK_UPDOWN_KEYS.includes(e.code);
+    },
 
     checkNumberKey(e) {
-        var code = e.which,
-            isExcept = false;
-
-        if(code == 37 || code == 39 || code == 8 || code == 46 || code == 9)
-            isExcept = true;
-
-        if(!isExcept && (code < 48 || code > 57))
-            return false;
-
-        return true;
+        return CHECK_NUMBER_KEYS.includes(e.code);
     },
     addEvent (dom, eventName, callback) {
         dom.addEventListener(eventName, callback);

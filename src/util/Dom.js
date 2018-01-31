@@ -218,6 +218,10 @@ export default class Dom {
     int () {
         return parseInt(this.val(), 10);
     }
+
+    float () {
+        return parseFloat(this.val());
+    }
     
     show () {
         return this.css('display', 'block');

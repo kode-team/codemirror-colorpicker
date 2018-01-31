@@ -45,20 +45,20 @@ export default class ColorInformation extends EventMachin {
         var item = new Dom('div', 'information-item rgb');        
 
         var field = item.createChild('div', 'input-field rgb-r');
-        this.$rgb_r = field.createChild('input', 'input', { type : 'text' });
+        this.$rgb_r = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
         field.createChild('div', 'title').html('R');
 
         field = item.createChild('div', 'input-field rgb-g');
-        this.$rgb_g = field.createChild('input', 'input', { type : 'text' });
+        this.$rgb_g = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
         field.createChild('div', 'title').html('G');
 
         field = item.createChild('div', 'input-field rgb-b');
-        this.$rgb_b = field.createChild('input', 'input', { type : 'text' });
+        this.$rgb_b = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
         field.createChild('div', 'title').html('B');
 
         // rgba
         field = item.createChild('div', 'input-field rgb-a');
-        this.$rgb_a = field.createChild('input', 'input', { type : 'text' });
+        this.$rgb_a = field.createChild('input', 'input', { type : 'number', step : 0.01, min : 0, max : 1 });
         field.createChild('div', 'title').html('A');
 
         return item; 
@@ -95,6 +95,7 @@ export default class ColorInformation extends EventMachin {
             this.$el.addClass(next_format);
             this.format = next_format;
     
+            console.log('curentFormat');
             this.colorpicker.setInputColor();
         }
     }
@@ -133,27 +134,10 @@ export default class ColorInformation extends EventMachin {
         this.$el.addClass(next_format);
         this.format = next_format;
 
-        this.colorpicker.setInputColor();
+        this.setInputColor();
+        this.colorpicker.changeInputColorAfterNextFormat();
     }
     
-    setRGBtoHexColor(e) {
-        var r = this.$rgb_r.val(),
-            g = this.$rgb_g.val(),
-            b = this.$rgb_b.val();
-
-        if(r == "" || g == "" || b == "") return;
-
-        if(parseInt(r) > 255) this.$rgb_r.val(255);
-        else this.$rgb_r.val(parseInt(r));
-
-        if(parseInt(g) > 255) this.$rgb_g.val(255);
-        else this.$rgb_g.val(parseInt(g));
-
-        if(parseInt(b) > 255) this.$rgb_b.val(255);
-        else this.$rgb_b.val(parseInt(b));
-
-        this.colorpicker.initColor(this.getHexFormat());
-    }
 
 
     setRGBInput(r, g, b) {
@@ -177,6 +161,25 @@ export default class ColorInformation extends EventMachin {
             b : this.$rgb_b.int()
         }, 'hex');
     }
+
+    getRgbFormat() {
+        return color.format({
+            r : this.$rgb_r.int(),
+            g : this.$rgb_g.int(),
+            b : this.$rgb_b.int(),
+            a : this.$rgb_a.float()
+        }, 'rgb');
+    }    
+
+    getHslFormat() {
+        return color.format({
+            r : this.$hsl_h.val(),
+            g : this.$hsl_s.val().replace('%', ''),
+            b : this.$hsl_l.val().replace('%', ''),
+            a : this.$hsl_a.float()
+        }, 'hsl');
+    }        
+    
     
     convertRGB() {
         return this.colorpicker.convertRGB();
@@ -191,7 +194,14 @@ export default class ColorInformation extends EventMachin {
     }
     
     getFormattedColor (format) {
-        return this.colorpicker.getFormattedColor(format);
+        format = format || this.getFormat();
+        if (format == 'hex') {
+            return this.$hexCode.val();
+        } else if (format == 'rgb') {
+            return this.getRgbFormat();
+        } else if (format == 'hsl') {
+            return this.getHslFormat();
+        }
     }
 
     getFormat () {
@@ -218,14 +228,27 @@ export default class ColorInformation extends EventMachin {
         return Event.checkNumberKey(e);
     }    
 
-    'keydown $rgb_r' (e) { return this.checkNumberKey(e) }
-    'keydown $rgb_g' (e) { return this.checkNumberKey(e) }
-    'keydown $rgb_b' (e) { return this.checkNumberKey(e) }
+    checkNotNumberKey(e) {
+        return !Event.checkNumberKey(e);
+    }        
 
-    'keyup $rgb_r' (e) { return this.setRGBtoHexColor(e) }
-    'keyup $rgb_g' (e) { return this.setRGBtoHexColor(e) }
-    'keyup $rgb_b' (e) { return this.setRGBtoHexColor(e) }
-    
+    //'keydown.checkNotNumberKey $rgb_r' (e) {  e.preventDefault(); }
+    //'keydown.checkNotNumberKey $rgb_g' (e) {  e.preventDefault(); }
+    //'keydown.checkNotNumberKey $rgb_b' (e) {  e.preventDefault(); }
+
+    //'keydown.checkNumberKey $rgb_r' (e) { this.setRGBtoHexColor(e); }
+    //'keydown.checkNumberKey $rgb_g' (e) { this.setRGBtoHexColor(e); }
+    //'keydown.checkNumberKey $rgb_b' (e) { this.setRGBtoHexColor(e); }
+
+    changeRgbColor () {
+        this.colorpicker.changeInformationColor(this.getRgbFormat());
+    }
+
+    'change $rgb_r' (e) {  this.changeRgbColor(); }
+    'change $rgb_g' (e) {  this.changeRgbColor(); }
+    'change $rgb_b' (e) {  this.changeRgbColor(); }
+    'change $rgb_a' (e) {  this.changeRgbColor(); }    
+
     'keydown $hexCode' (e) {
         if(e.which < 65 || e.which > 70) {
             return this.checkNumberKey(e);
@@ -236,7 +259,7 @@ export default class ColorInformation extends EventMachin {
         var code = this.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
-            this.colorpicker.initColor(code);
+            this.colorpicker.changeInformationColor(code);
         }
     }
     
