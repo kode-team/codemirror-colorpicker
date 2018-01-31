@@ -36,18 +36,18 @@ const color = {
             var b = obj.b.toString(16);
             if (obj.b < 16) b = "0" + b;
 
-            return "#" + [r, g, b].join("");
+            return `#${r}${g}${b}`;
         } else if (type == 'rgb') {
-            if (typeof obj.a == 'undefined') {
-                return "rgb(" + [obj.r, obj.g, obj.b].join(",") + ")";
+            if (obj.a == 1) {
+                return `rgb(${obj.r},${obj.g},${obj.b})`;
             } else {
-                return "rgba(" + [obj.r, obj.g, obj.b, obj.a].join(",") + ")";
+                return `rgba(${obj.r},${obj.g},${obj.b},${obj.a})`;
             }
         } else if (type == 'hsl') {
-            if (typeof obj.a == 'undefined') {
-                return "hsl(" + [obj.h, obj.s + '%', obj.l + '%'].join(",") + ")";
+            if (obj.a == 1) {
+                return `hsl(${obj.h},${obj.s}%,${obj.l}%)`;                
             } else {
-                return "hsla(" + [obj.h, obj.s + '%', obj.l + '%', obj.a].join(",") + ")";
+                return `hsla(${obj.h},${obj.s}%,${obj.l}%,${obj.a})`;
             }
         }
 
@@ -209,7 +209,7 @@ const color = {
 
         var R1 = R / 255;
         var G1 = G / 255;
-        var B1 = B / 255;
+        var B1 = B / 255; 
 
         var MaxC = Math.max(R1, G1, B1);
         var MinC = Math.min(R1, G1, B1);
@@ -241,6 +241,12 @@ const color = {
         return { h : H, s : S, v :  V };
     },
 
+    HSVtoHSL : function (h, s, v) {
+        const rgb = this.HSVtoRGB(h, s, v);
+
+        return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
+    },
+
     RGBtoHSL : function (r, g, b) {
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -270,6 +276,12 @@ const color = {
         if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
         return p;
     },
+    
+    HSLtoHSV : function (h, s, l) {
+        const rgb = this.HSLtoRGB(h, s, l);
+
+        return this.RGBtoHSV(rgb.r, rgb.g, rgb.b);
+    }, 
 
     HSLtoRGB : function (h, s, l) {
         var r, g, b;
@@ -288,7 +300,7 @@ const color = {
             b = this.HUEtoRGB(p, q, h - 1/3);
         }
 
-        return { r : r * 255, g : g * 255, b : b * 255 };
+        return { r : Math.round(r * 255), g : Math.round(g * 255), b : Math.round(b * 255) };
     },
     scale (startColor, endColor, t) {
         var obj = {

@@ -179,10 +179,10 @@ export default class ColorPicker extends EventMachin {
 
     hide () {
         if (this.isColorPickerShow) {
-           //this.destroy();           
-           //this.$root.hide();
-           //this.$root.remove();  // not empty 
-           //this.isColorPickerShow = false;
+           this.destroy();           
+           this.$root.hide();
+           this.$root.remove();  // not empty 
+           this.isColorPickerShow = false;
         }
     }    
 
@@ -194,9 +194,8 @@ export default class ColorPicker extends EventMachin {
         return color.format(this.convertRGB(), 'hex');
     }
     
-    convertHSL() {
-        var rgb = color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-        return color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
+    convertHSL() { 
+        return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
     }
 
     getCurrentColor () {
@@ -208,11 +207,11 @@ export default class ColorPicker extends EventMachin {
     
         if (format == 'rgb') {
             var rgb = this.convertRGB();
-            rgb.a = this.currentA == 1 ? undefined : this.currentA;
+            rgb.a = this.currentA;
             return color.format(rgb, 'rgb');
         } else if (format == 'hsl') {
             var hsl = this.convertHSL();
-            hsl.a = this.currentA == 1 ? undefined : this.currentA;
+            hsl.a = this.currentA;
             return color.format(hsl, 'hsl');
         } else {
             var rgb = this.convertRGB();
@@ -297,13 +296,22 @@ export default class ColorPicker extends EventMachin {
         this.information.setCurrentFormat(format);
     }
 
+    getHSV (colorObj) {
+        if (colorObj.type == 'hsl') {
+            return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
+        } else {
+            return color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+        } 
+
+    }
+
     initColor(newColor, format) {
         let c = newColor || "#FF0000", colorObj = color.parse(c);
+        format = format || colorObj.type;
     
-        this.setCurrentFormat(format || colorObj.type);
+        this.setCurrentFormat(format);
 
-        let hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
-
+        let hsv = this.getHSV(colorObj);
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
         this.setColorUI();
         this.setHueColor();
@@ -313,8 +321,7 @@ export default class ColorPicker extends EventMachin {
     changeInformationColor(newColor) {
         let c = newColor || "#FF0000", colorObj = color.parse(c);
     
-        let hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
-    
+        let hsv = this.getHSV(colorObj);
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
         this.setColorUI();
         this.setHueColor();

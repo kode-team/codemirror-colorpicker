@@ -14,13 +14,13 @@
       user-select: text;
 
       &[type=number] {
-        -webkit-appearance: none;
+        appearance: none;
       }
 
       &[type=number]::-webkit-inner-spin-button,
       &[type=number]::-webkit-outer-spin-button
       {
-        -webkit-appearance: none;
+        appearance: none;
         margin: 0;
       }
     }
@@ -50,6 +50,7 @@
         flex:1;
         padding: 3px;
         box-sizing: border-box;
+        position: relative;
 
         > .title {
           text-align:center;
@@ -58,10 +59,11 @@
           padding-top:2px;
         }
 
-        > input {
+        input {
           text-align: center;
           width:100%;
           padding:3px;
+          height: 21px;
           font-size:11px;
           color: #333;
           box-sizing: border-box;
@@ -70,15 +72,39 @@
           border-radius:2px;
 
           &[type=number] {
-            -webkit-appearance: none;
+            appearance: none;
           }
 
           &[type=number]::-webkit-inner-spin-button,
           &[type=number]::-webkit-outer-spin-button
           {
-            -webkit-appearance: none;
+            appearance: none;
             margin: 0;
           }
+        }
+
+        &.hsl-l,
+        &.hsl-s {
+          
+          input[type=number] {
+            padding-left: 1px;
+            padding-right: 10px;
+
+          }
+          
+        }
+
+        .postfix {
+          display:inline-block;
+          position: absolute;
+          right:4px;
+          top:2px;
+          height: 21px;
+          line-height: 2;
+          padding: 2px;
+          box-sizing: border-box;
+          text-align:center;
+          font-size: 11px;
         }
       }
     }

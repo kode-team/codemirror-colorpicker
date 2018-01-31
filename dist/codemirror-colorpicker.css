@@ -197,9 +197,9 @@
       box-sizing: border-box;
       user-select: text; }
       .codemirror-colorpicker > .information > input[type=number] {
-        -webkit-appearance: none; }
+        appearance: none; }
       .codemirror-colorpicker > .information > input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
         margin: 0; }
     .codemirror-colorpicker > .information.hex > .information-item.hex {
       display: flex; }
@@ -218,27 +218,43 @@
         display: block;
         flex: 1;
         padding: 3px;
-        box-sizing: border-box; }
+        box-sizing: border-box;
+        position: relative; }
         .codemirror-colorpicker > .information > .information-item > .input-field > .title {
           text-align: center;
           font-size: 12px;
           color: #a9a9a9;
           padding-top: 2px; }
-        .codemirror-colorpicker > .information > .information-item > .input-field > input {
+        .codemirror-colorpicker > .information > .information-item > .input-field input {
           text-align: center;
           width: 100%;
           padding: 3px;
+          height: 21px;
           font-size: 11px;
           color: #333;
           box-sizing: border-box;
           user-select: text;
           border: 1px solid #cbcbcb;
           border-radius: 2px; }
-          .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number] {
-            -webkit-appearance: none; }
-          .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > .information-item > .input-field > input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
+          .codemirror-colorpicker > .information > .information-item > .input-field input[type=number] {
+            appearance: none; }
+          .codemirror-colorpicker > .information > .information-item > .input-field input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > .information-item > .input-field input[type=number]::-webkit-outer-spin-button {
+            appearance: none;
             margin: 0; }
+        .codemirror-colorpicker > .information > .information-item > .input-field.hsl-l input[type=number], .codemirror-colorpicker > .information > .information-item > .input-field.hsl-s input[type=number] {
+          padding-left: 1px;
+          padding-right: 10px; }
+        .codemirror-colorpicker > .information > .information-item > .input-field .postfix {
+          display: inline-block;
+          position: absolute;
+          right: 4px;
+          top: 2px;
+          height: 21px;
+          line-height: 2;
+          padding: 2px;
+          box-sizing: border-box;
+          text-align: center;
+          font-size: 11px; }
     .codemirror-colorpicker > .information > .information-change {
       position: absolute;
       display: block;

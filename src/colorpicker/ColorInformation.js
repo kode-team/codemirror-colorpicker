@@ -68,20 +68,22 @@ export default class ColorInformation extends EventMachin {
         var item = new Dom('div', 'information-item hsl');
         
         var field = item.createChild('div', 'input-field hsl-h');
-        this.$hsl_h = field.createChild('input', 'input', { type : 'text' });
+        this.$hsl_h = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 360 });
         field.createChild('div', 'title').html('H');
 
         field = item.createChild('div', 'input-field hsl-s');
-        this.$hsl_s = field.createChild('input', 'input', { type : 'text' });
+        this.$hsl_s = field.createChild('input', 'input', { type : 'number', step: 1, min: 0, max : 100 });
+        field.createChild('div', 'postfix').html('%');
         field.createChild('div', 'title').html('S');
 
         field = item.createChild('div', 'input-field hsl-l');
-        this.$hsl_l = field.createChild('input', 'input', { type : 'text' });
+        this.$hsl_l = field.createChild('input', 'input', { type : 'number', step: 1, min: 0, max : 100 });
+        field.createChild('div', 'postfix').html('%');        
         field.createChild('div', 'title').html('L');
 
         // rgba
         field = item.createChild('div', 'input-field hsl-a');
-        this.$hsl_a = field.createChild('input', 'input', { type : 'text' });
+        this.$hsl_a = field.createChild('input', 'input', { type : 'number', step : 0.01, min : 0, max : 1 });
         field.createChild('div', 'title').html('A');
 
         return item;
@@ -95,7 +97,6 @@ export default class ColorInformation extends EventMachin {
             this.$el.addClass(next_format);
             this.format = next_format;
     
-            console.log('curentFormat');
             this.colorpicker.setInputColor();
         }
     }
@@ -149,8 +150,8 @@ export default class ColorInformation extends EventMachin {
     
     setHSLInput(h, s, l) {
         this.$hsl_h.val(h);
-        this.$hsl_s.val(s + '%');
-        this.$hsl_l.val(l + '%');
+        this.$hsl_s.val(s);
+        this.$hsl_l.val(l);
         this.$hsl_a.val(this.colorpicker.currentA);
     }
     
@@ -162,22 +163,22 @@ export default class ColorInformation extends EventMachin {
         }, 'hex');
     }
 
-    getRgbFormat() {
+    getRgbFormat(fixed = false) {
         return color.format({
             r : this.$rgb_r.int(),
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int(),
             a : this.$rgb_a.float()
-        }, 'rgb');
+        }, 'rgb', fixed);
     }    
 
     getHslFormat() {
         return color.format({
-            r : this.$hsl_h.val(),
-            g : this.$hsl_s.val().replace('%', ''),
-            b : this.$hsl_l.val().replace('%', ''),
+            h : this.$hsl_h.val(),
+            s : this.$hsl_s.val(),
+            l : this.$hsl_l.val(),
             a : this.$hsl_a.float()
-        }, 'hsl');
+        }, 'hsl', fixed);
     }        
     
     
@@ -193,14 +194,14 @@ export default class ColorInformation extends EventMachin {
         return this.colorpicker.convertHSL();
     }
     
-    getFormattedColor (format) {
+    getFormattedColor (format, fixed = false) {
         format = format || this.getFormat();
         if (format == 'hex') {
             return this.$hexCode.val();
         } else if (format == 'rgb') {
-            return this.getRgbFormat();
+            return this.getRgbFormat(fixed);
         } else if (format == 'hsl') {
-            return this.getHslFormat();
+            return this.getHslFormat(fixed);
         }
     }
 
@@ -244,10 +245,19 @@ export default class ColorInformation extends EventMachin {
         this.colorpicker.changeInformationColor(this.getRgbFormat());
     }
 
+    changeHslColor () {
+        this.colorpicker.changeInformationColor(this.getHslFormat());
+    }    
+
     'change $rgb_r' (e) {  this.changeRgbColor(); }
     'change $rgb_g' (e) {  this.changeRgbColor(); }
     'change $rgb_b' (e) {  this.changeRgbColor(); }
-    'change $rgb_a' (e) {  this.changeRgbColor(); }    
+    'change $rgb_a' (e) {  this.changeRgbColor(); }  
+    
+    'change $hsl_h' (e) {  this.changeHslColor(); }
+    'change $hsl_s' (e) {  this.changeHslColor(); }
+    'change $hsl_l' (e) {  this.changeHslColor(); }
+    'change $hsl_a' (e) {  this.changeHslColor(); }      
 
     'keydown $hexCode' (e) {
         if(e.which < 65 || e.which > 70) {

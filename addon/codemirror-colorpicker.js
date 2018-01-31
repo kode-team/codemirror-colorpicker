@@ -609,18 +609,18 @@ var color$1 = {
             var b = obj.b.toString(16);
             if (obj.b < 16) b = "0" + b;
 
-            return "#" + [r, g, b].join("");
+            return '#' + r + g + b;
         } else if (type == 'rgb') {
-            if (typeof obj.a == 'undefined') {
-                return "rgb(" + [obj.r, obj.g, obj.b].join(",") + ")";
+            if (obj.a == 1) {
+                return 'rgb(' + obj.r + ',' + obj.g + ',' + obj.b + ')';
             } else {
-                return "rgba(" + [obj.r, obj.g, obj.b, obj.a].join(",") + ")";
+                return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + obj.a + ')';
             }
         } else if (type == 'hsl') {
-            if (typeof obj.a == 'undefined') {
-                return "hsl(" + [obj.h, obj.s + '%', obj.l + '%'].join(",") + ")";
+            if (obj.a == 1) {
+                return 'hsl(' + obj.h + ',' + obj.s + '%,' + obj.l + '%)';
             } else {
-                return "hsla(" + [obj.h, obj.s + '%', obj.l + '%', obj.a].join(",") + ")";
+                return 'hsla(' + obj.h + ',' + obj.s + '%,' + obj.l + '%,' + obj.a + ')';
             }
         }
 
@@ -820,6 +820,12 @@ var color$1 = {
         return { h: H, s: S, v: V };
     },
 
+    HSVtoHSL: function HSVtoHSL(h, s, v) {
+        var rgb = this.HSVtoRGB(h, s, v);
+
+        return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
+    },
+
     RGBtoHSL: function RGBtoHSL(r, g, b) {
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b),
@@ -856,6 +862,12 @@ var color$1 = {
         return p;
     },
 
+    HSLtoHSV: function HSLtoHSV(h, s, l) {
+        var rgb = this.HSLtoRGB(h, s, l);
+
+        return this.RGBtoHSV(rgb.r, rgb.g, rgb.b);
+    },
+
     HSLtoRGB: function HSLtoRGB(h, s, l) {
         var r, g, b;
 
@@ -873,7 +885,7 @@ var color$1 = {
             b = this.HUEtoRGB(p, q, h - 1 / 3);
         }
 
-        return { r: r * 255, g: g * 255, b: b * 255 };
+        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     },
     scale: function scale(startColor, endColor, t) {
         var obj = {
@@ -1826,20 +1838,22 @@ var ColorInformation = function (_EventMachin) {
             var item = new Dom('div', 'information-item hsl');
 
             var field = item.createChild('div', 'input-field hsl-h');
-            this.$hsl_h = field.createChild('input', 'input', { type: 'text' });
+            this.$hsl_h = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 360 });
             field.createChild('div', 'title').html('H');
 
             field = item.createChild('div', 'input-field hsl-s');
-            this.$hsl_s = field.createChild('input', 'input', { type: 'text' });
+            this.$hsl_s = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 100 });
+            field.createChild('div', 'postfix').html('%');
             field.createChild('div', 'title').html('S');
 
             field = item.createChild('div', 'input-field hsl-l');
-            this.$hsl_l = field.createChild('input', 'input', { type: 'text' });
+            this.$hsl_l = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 100 });
+            field.createChild('div', 'postfix').html('%');
             field.createChild('div', 'title').html('L');
 
             // rgba
             field = item.createChild('div', 'input-field hsl-a');
-            this.$hsl_a = field.createChild('input', 'input', { type: 'text' });
+            this.$hsl_a = field.createChild('input', 'input', { type: 'number', step: 0.01, min: 0, max: 1 });
             field.createChild('div', 'title').html('A');
 
             return item;
@@ -1854,7 +1868,6 @@ var ColorInformation = function (_EventMachin) {
                 this.$el.addClass(next_format);
                 this.format = next_format;
 
-                console.log('curentFormat');
                 this.colorpicker.setInputColor();
             }
         }
@@ -1911,8 +1924,8 @@ var ColorInformation = function (_EventMachin) {
         key: 'setHSLInput',
         value: function setHSLInput(h, s, l) {
             this.$hsl_h.val(h);
-            this.$hsl_s.val(s + '%');
-            this.$hsl_l.val(l + '%');
+            this.$hsl_s.val(s);
+            this.$hsl_l.val(l);
             this.$hsl_a.val(this.colorpicker.currentA);
         }
     }, {
@@ -1927,22 +1940,24 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getRgbFormat',
         value: function getRgbFormat() {
+            var fixed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
             return color$4.format({
                 r: this.$rgb_r.int(),
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int(),
                 a: this.$rgb_a.float()
-            }, 'rgb');
+            }, 'rgb', fixed);
         }
     }, {
         key: 'getHslFormat',
         value: function getHslFormat() {
             return color$4.format({
-                r: this.$hsl_h.val(),
-                g: this.$hsl_s.val().replace('%', ''),
-                b: this.$hsl_l.val().replace('%', ''),
+                h: this.$hsl_h.val(),
+                s: this.$hsl_s.val(),
+                l: this.$hsl_l.val(),
                 a: this.$hsl_a.float()
-            }, 'hsl');
+            }, 'hsl', fixed);
         }
     }, {
         key: 'convertRGB',
@@ -1962,13 +1977,15 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getFormattedColor',
         value: function getFormattedColor(format) {
+            var fixed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
             format = format || this.getFormat();
             if (format == 'hex') {
                 return this.$hexCode.val();
             } else if (format == 'rgb') {
-                return this.getRgbFormat();
+                return this.getRgbFormat(fixed);
             } else if (format == 'hsl') {
-                return this.getHslFormat();
+                return this.getHslFormat(fixed);
             }
         }
     }, {
@@ -2017,6 +2034,11 @@ var ColorInformation = function (_EventMachin) {
             this.colorpicker.changeInformationColor(this.getRgbFormat());
         }
     }, {
+        key: 'changeHslColor',
+        value: function changeHslColor() {
+            this.colorpicker.changeInformationColor(this.getHslFormat());
+        }
+    }, {
         key: 'change $rgb_r',
         value: function change$rgb_r(e) {
             this.changeRgbColor();
@@ -2035,6 +2057,26 @@ var ColorInformation = function (_EventMachin) {
         key: 'change $rgb_a',
         value: function change$rgb_a(e) {
             this.changeRgbColor();
+        }
+    }, {
+        key: 'change $hsl_h',
+        value: function change$hsl_h(e) {
+            this.changeHslColor();
+        }
+    }, {
+        key: 'change $hsl_s',
+        value: function change$hsl_s(e) {
+            this.changeHslColor();
+        }
+    }, {
+        key: 'change $hsl_l',
+        value: function change$hsl_l(e) {
+            this.changeHslColor();
+        }
+    }, {
+        key: 'change $hsl_a',
+        value: function change$hsl_a(e) {
+            this.changeHslColor();
         }
     }, {
         key: 'keydown $hexCode',
@@ -2840,10 +2882,10 @@ var ColorPicker = function (_EventMachin) {
         key: 'hide',
         value: function hide() {
             if (this.isColorPickerShow) {
-                //this.destroy();           
-                //this.$root.hide();
-                //this.$root.remove();  // not empty 
-                //this.isColorPickerShow = false;
+                this.destroy();
+                this.$root.hide();
+                this.$root.remove(); // not empty 
+                this.isColorPickerShow = false;
             }
         }
     }, {
@@ -2859,8 +2901,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'convertHSL',
         value: function convertHSL() {
-            var rgb = color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-            return color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
+            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
         }
     }, {
         key: 'getCurrentColor',
@@ -2874,11 +2915,11 @@ var ColorPicker = function (_EventMachin) {
 
             if (format == 'rgb') {
                 var rgb = this.convertRGB();
-                rgb.a = this.currentA == 1 ? undefined : this.currentA;
+                rgb.a = this.currentA;
                 return color.format(rgb, 'rgb');
             } else if (format == 'hsl') {
                 var hsl = this.convertHSL();
-                hsl.a = this.currentA == 1 ? undefined : this.currentA;
+                hsl.a = this.currentA;
                 return color.format(hsl, 'hsl');
             } else {
                 var rgb = this.convertRGB();
@@ -2967,15 +3008,24 @@ var ColorPicker = function (_EventMachin) {
             this.information.setCurrentFormat(format);
         }
     }, {
+        key: 'getHSV',
+        value: function getHSV(colorObj) {
+            if (colorObj.type == 'hsl') {
+                return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
+            } else {
+                return color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+            }
+        }
+    }, {
         key: 'initColor',
         value: function initColor(newColor, format) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
+            format = format || colorObj.type;
 
-            this.setCurrentFormat(format || colorObj.type);
+            this.setCurrentFormat(format);
 
-            var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
-
+            var hsv = this.getHSV(colorObj);
             this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
             this.setColorUI();
             this.setHueColor();
@@ -2987,8 +3037,7 @@ var ColorPicker = function (_EventMachin) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
 
-            var hsv = color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
-
+            var hsv = this.getHSV(colorObj);
             this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
             this.setColorUI();
             this.setHueColor();
