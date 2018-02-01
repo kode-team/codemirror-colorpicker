@@ -150,6 +150,7 @@ export default class EventMachin {
   
           if (delegateTarget) { // delegate target 이 있는 경우만 callback 실행 
             e.delegateTarget = delegateTarget;
+            e.$delegateTarget = new Dom(delegateTarget);
             return callback(e);
           } 
         }

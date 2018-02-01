@@ -1,8 +1,8 @@
 import packageJSON from '../package.json'
-import scss from 'rollup-plugin-scss'
+import postcss from 'rollup-plugin-postcss'
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
-import minify from 'rollup-plugin-minify'
+import autoprefixer from 'autoprefixer'
 
 // rollup.config.js
 export default [{
@@ -12,11 +12,19 @@ export default [{
     format: 'iife',
     globals: {
       "codemirror" : "CodeMirror"
-    }
+    },
+    external: ['codemirror']
   },
-  name: 'CodemirrorColorpicker',  
+  name: 'CodeMirrorColorPicker',  
   plugins : [
-    scss({output : 'dist/' + packageJSON.name + '.css'}),
+    //scss({output : 'dist/' + packageJSON.name + '.css'}),
+    postcss({
+      extract: 'dist/' + packageJSON.name + '.css',
+      plugins: [
+        autoprefixer()
+      ],
+      extensions: ['.scss']
+    }),     
     babel({
       exclude: 'node_modules/**'
     }),
@@ -30,7 +38,13 @@ export default [{
   },
   name: 'codemirror-colorpicker',
   plugins : [
-    scss({output : 'dist/' + packageJSON.name + '.css'}),
+    postcss({
+      extract: 'dist/' + packageJSON.name + '.css',
+      plugins: [
+        autoprefixer()
+      ],
+      extensions: ['.scss']
+    }),         
     babel({
       exclude: 'node_modules/**'
     })

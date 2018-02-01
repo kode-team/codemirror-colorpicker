@@ -72,8 +72,7 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
     'click $el .menu-item' (e) {
         e.preventDefault();
 
-        const $item = new Dom(e.delegateTarget);
-        this.runCommand($item.attr('data-type'));
+        this.runCommand(e.$delegateTarget.attr('data-type'));
         this.hide();        
     }
 

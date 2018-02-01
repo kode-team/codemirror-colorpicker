@@ -1,5 +1,4 @@
 import packageJSON from '../package.json'
-import scss from 'rollup-plugin-scss'
 import postcss from 'rollup-plugin-postcss'
 import babel from 'rollup-plugin-babel';
 import serve from 'rollup-plugin-serve'
@@ -16,9 +15,9 @@ export default {
     globals: {
       "codemirror" : "CodeMirror"
     },
-    external: ['codemirror'],
+    external: ['codemirror']
   },
-  name: 'CodemirrorColorpicker',  
+  name: 'CodeMirrorColorPicker',  
   plugins : [
     serve(),
     livereload({watch: 'addon'}),

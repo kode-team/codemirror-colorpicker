@@ -163,13 +163,13 @@ export default class ColorInformation extends EventMachin {
         }, 'hex');
     }
 
-    getRgbFormat(fixed = false) {
+    getRgbFormat() {
         return color.format({
             r : this.$rgb_r.int(),
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int(),
             a : this.$rgb_a.float()
-        }, 'rgb', fixed);
+        }, 'rgb');
     }    
 
     getHslFormat() {
@@ -178,7 +178,7 @@ export default class ColorInformation extends EventMachin {
             s : this.$hsl_s.val(),
             l : this.$hsl_l.val(),
             a : this.$hsl_a.float()
-        }, 'hsl', fixed);
+        }, 'hsl');
     }        
     
     

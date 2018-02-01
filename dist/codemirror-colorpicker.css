@@ -3,7 +3,8 @@
   border: 1px solid #cecece;
   position: relative;
   display: inline-block;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   margin: 0px 2px;
   width: 10px;
   height: 10px;
@@ -27,7 +28,8 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   background-color: #fff;
   border-radius: 3px;
-  box-shadow: 0 0px 10px 2px rgba(0, 0, 0, 0.12); }
+  -webkit-box-shadow: 0 0px 10px 2px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 0px 10px 2px rgba(0, 0, 0, 0.12); }
   .codemirror-colorpicker > .arrow {
     position: absolute;
     top: -10px;
@@ -69,7 +71,8 @@
       border-bottom: 3px solid black;
       pointer-events: none;
       margin: 2px;
-      box-sizing: border-box; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
     .codemirror-colorpicker .arrow-button:after {
       content: "";
       display: inline-block;
@@ -85,7 +88,8 @@
       border-top: 3px solid black;
       pointer-events: none;
       margin: 2px;
-      box-sizing: border-box; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
   .codemirror-colorpicker > .color {
     position: relative;
     height: 120px;
@@ -108,17 +112,23 @@
           top: -5px; }
     .codemirror-colorpicker > .color > .saturation {
       background-color: rgba(204, 154, 129, 0);
+      background-image: -webkit-gradient(linear, left top, right top, from(#FFF), to(rgba(204, 154, 129, 0)));
       background-image: linear-gradient(to right, #FFF, rgba(204, 154, 129, 0));
       background-repeat: repeat-x; }
       .codemirror-colorpicker > .color > .saturation > .value {
+        background-image: -webkit-gradient(linear, left bottom, left top, from(#000000), to(rgba(204, 154, 129, 0)));
         background-image: linear-gradient(to top, #000000, rgba(204, 154, 129, 0)); }
         .codemirror-colorpicker > .color > .saturation > .value > .drag-pointer {
           border: 1px solid #fff;
-          box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05); }
+          -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05);
+                  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.05); }
   .codemirror-colorpicker > .control {
     position: relative;
     padding: 10px 0px 10px 0px;
-    user-select: none; }
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none; }
     .codemirror-colorpicker > .control > .color, .codemirror-colorpicker > .control > .empty {
       position: absolute;
       left: 12px;
@@ -126,14 +136,16 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      box-sizing: border-box; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
     .codemirror-colorpicker > .control > .color {
       border: 1px solid rgba(0, 0, 0, 0.1); }
     .codemirror-colorpicker > .control > .hue {
       position: relative;
       padding: 6px 16px;
       margin: 0px 0px 0px 42px;
-      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
       cursor: pointer; }
       .codemirror-colorpicker > .control > .hue > .hue-container {
         position: relative;
@@ -144,14 +156,13 @@
       position: relative;
       padding: 3px 16px;
       margin: 0px 0px 0px 42px;
-      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
       cursor: pointer; }
       .codemirror-colorpicker > .control > .opacity > .opacity-container {
         position: relative;
         width: 100%;
         height: 10px;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
         border-radius: 3px; }
     .codemirror-colorpicker > .control .drag-bar, .codemirror-colorpicker > .control .drag-bar2 {
       position: absolute;
@@ -161,10 +172,9 @@
       left: -3px;
       width: 12px;
       height: 12px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
       border-radius: 50px; }
     .codemirror-colorpicker > .control > .hue > .hue-container {
+      background: -webkit-gradient(linear, left top, right top, from(#ff0000), color-stop(17%, #ffff00), color-stop(33%, #00ff00), color-stop(50%, #00ffff), color-stop(67%, #0000ff), color-stop(83%, #ff00ff), to(#ff0000));
       background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }
     .codemirror-colorpicker > .control > .opacity > .opacity-container {
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
@@ -176,49 +186,69 @@
         right: 0px;
         bottom: 0px;
         top: 0px;
+        background: -webkit-gradient(linear, left top, right top, from(rgba(232, 232, 232, 0)), to(#e8e8e8));
         background: linear-gradient(to right, rgba(232, 232, 232, 0), #e8e8e8); }
     .codemirror-colorpicker > .control > .empty {
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
     .codemirror-colorpicker > .control .drag-bar,
     .codemirror-colorpicker > .control .drag-bar2 {
       border: 1px solid rgba(0, 0, 0, 0.05);
-      box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.2);
+      -webkit-box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.2);
+              box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.2);
       background-color: #fefefe; }
   .codemirror-colorpicker > .information {
     /*border-top: 1px solid #e8e8e8;*/
     position: relative;
-    box-sizing: padding-box; }
+    -webkit-box-sizing: padding-box;
+            box-sizing: padding-box; }
     .codemirror-colorpicker > .information > input {
       position: absolute;
       font-size: 10px;
       height: 20px;
       bottom: 20px;
       padding: 0 0 0 2px;
-      box-sizing: border-box;
-      user-select: text; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      -webkit-user-select: text;
+         -moz-user-select: text;
+          -ms-user-select: text;
+              user-select: text; }
       .codemirror-colorpicker > .information > input[type=number] {
-        appearance: none; }
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none; }
       .codemirror-colorpicker > .information > input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > input[type=number]::-webkit-outer-spin-button {
-        appearance: none;
+        -webkit-appearance: none;
+                appearance: none;
         margin: 0; }
     .codemirror-colorpicker > .information.hex > .information-item.hex {
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex; }
     .codemirror-colorpicker > .information.rgb > .information-item.rgb {
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex; }
     .codemirror-colorpicker > .information.hsl > .information-item.hsl {
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex; }
     .codemirror-colorpicker > .information > .information-item {
       display: none;
       position: relative;
       padding: 0px 5px;
       padding-left: 9px;
-      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
       margin-right: 40px; }
       .codemirror-colorpicker > .information > .information-item > .input-field {
         display: block;
-        flex: 1;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
         padding: 3px;
-        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
         position: relative; }
         .codemirror-colorpicker > .information > .information-item > .input-field > .title {
           text-align: center;
@@ -232,14 +262,21 @@
           height: 21px;
           font-size: 11px;
           color: #333;
-          box-sizing: border-box;
-          user-select: text;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-user-select: text;
+             -moz-user-select: text;
+              -ms-user-select: text;
+                  user-select: text;
           border: 1px solid #cbcbcb;
           border-radius: 2px; }
           .codemirror-colorpicker > .information > .information-item > .input-field input[type=number] {
-            appearance: none; }
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none; }
           .codemirror-colorpicker > .information > .information-item > .input-field input[type=number]::-webkit-inner-spin-button, .codemirror-colorpicker > .information > .information-item > .input-field input[type=number]::-webkit-outer-spin-button {
-            appearance: none;
+            -webkit-appearance: none;
+                    appearance: none;
             margin: 0; }
         .codemirror-colorpicker > .information > .information-item > .input-field.hsl-l input[type=number], .codemirror-colorpicker > .information > .information-item > .input-field.hsl-s input[type=number] {
           padding-left: 1px;
@@ -252,7 +289,8 @@
           height: 21px;
           line-height: 2;
           padding: 2px;
-          box-sizing: border-box;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
           text-align: center;
           font-size: 11px; }
     .codemirror-colorpicker > .information > .information-change {
@@ -263,10 +301,12 @@
       right: 0px;
       bottom: 0px;
       text-align: center;
-      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
       padding-top: 5px; }
       .codemirror-colorpicker > .information > .information-change > .format-change-button {
-        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
         background: transparent;
         border: 0px;
         cursor: pointer;
@@ -292,7 +332,8 @@
       margin-right: 30px;
       display: block;
       padding: 12px 0px 0px 12px;
-      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
       line-height: 0; }
       .codemirror-colorpicker > .colorsets > .color-list .color-item {
         width: 13px;
@@ -304,11 +345,13 @@
         position: relative;
         background-size: contain;
         overflow: hidden;
-        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
         cursor: pointer;
         vertical-align: middle; }
         .codemirror-colorpicker > .colorsets > .color-list .color-item:hover {
-          transform: scale(1.2); }
+          -webkit-transform: scale(1.2);
+                  transform: scale(1.2); }
         .codemirror-colorpicker > .colorsets > .color-list .color-item .empty {
           position: absolute;
           left: 0px;
@@ -329,7 +372,8 @@
           margin: 0px;
           pointer-events: none;
           border: 1px solid rgba(0, 0, 0, 0.1);
-          box-sizing: border-box; }
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
       .codemirror-colorpicker > .colorsets > .color-list .add-color-item {
         width: 13px;
         height: 13px;
@@ -352,6 +396,7 @@
     top: 0px;
     opacity: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    -webkit-transition: opacity 0.05s ease-out;
     transition: opacity 0.05s ease-out;
     pointer-events: none; }
     .codemirror-colorpicker > .color-chooser.open {
@@ -370,15 +415,21 @@
         left: 0px;
         right: 0px;
         height: 34px;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
         padding: 3px 0px;
-        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
         border-bottom: 1px solid rgba(0, 0, 0, 0.2); }
         .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-item-header .title {
-          flex: 2;
+          -webkit-box-flex: 2;
+              -ms-flex: 2;
+                  flex: 2;
           font-weight: bold;
           font-size: 15px;
-          box-sizing: border-box;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
           margin-right: 30px;
           vertical-align: middle;
           margin: 0px;
@@ -388,7 +439,9 @@
           text-overflow: ellipsis;
           white-space: nowrap; }
         .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-item-header .items {
-          flex: 1;
+          -webkit-box-flex: 1;
+              -ms-flex: 1;
+                  flex: 1;
           text-align: right;
           padding-right: 10px;
           display: block;
@@ -404,15 +457,20 @@
         overflow: auto; }
         .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item {
           cursor: pointer;
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
           padding: 3px 0px;
           border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
           .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item:hover {
             background-color: rgba(0, 0, 0, 0.05); }
           .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item .title {
-            flex: 2;
+            -webkit-box-flex: 2;
+                -ms-flex: 2;
+                    flex: 2;
             font-size: 14px;
-            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
             margin-right: 30px;
             vertical-align: middle;
             pointer-events: none;
@@ -425,7 +483,9 @@
             text-overflow: ellipsis;
             white-space: nowrap; }
           .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item .items {
-            flex: 3;
+            -webkit-box-flex: 3;
+                -ms-flex: 3;
+                    flex: 3;
             display: block;
             height: 100%;
             line-height: 1.6;
@@ -441,7 +501,8 @@
               background-size: contain;
               border: 1px solid #dddddd;
               overflow: hidden;
-              box-sizing: border-box;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
               cursor: pointer;
               vertical-align: middle; }
               .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item .items .color-item .color-view {

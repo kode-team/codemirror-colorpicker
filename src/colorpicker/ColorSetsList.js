@@ -6,8 +6,7 @@ let colorSetsList = [
         ]
     },
     { 
-        name : "Custom",  
-        "edit" : true
+        name : "Custom", "edit" : true, "colors" : [] 
     }
 ]
 

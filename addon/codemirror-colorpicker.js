@@ -1,5 +1,5 @@
 (function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
-var CodemirrorColorpicker = (function (CodeMirror) {
+var CodeMirrorColorPicker = (function (CodeMirror) {
 'use strict';
 
 CodeMirror = CodeMirror && CodeMirror.hasOwnProperty('default') ? CodeMirror['default'] : CodeMirror;
@@ -1449,6 +1449,7 @@ var EventMachin = function () {
             if (delegateTarget) {
               // delegate target 이 있는 경우만 callback 실행 
               e.delegateTarget = delegateTarget;
+              e.$delegateTarget = new Dom(delegateTarget);
               return callback(e);
             }
           }
@@ -1940,14 +1941,12 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getRgbFormat',
         value: function getRgbFormat() {
-            var fixed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
             return color$4.format({
                 r: this.$rgb_r.int(),
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int(),
                 a: this.$rgb_a.float()
-            }, 'rgb', fixed);
+            }, 'rgb');
         }
     }, {
         key: 'getHslFormat',
@@ -1957,7 +1956,7 @@ var ColorInformation = function (_EventMachin) {
                 s: this.$hsl_s.val(),
                 l: this.$hsl_l.val(),
                 a: this.$hsl_a.float()
-            }, 'hsl', fixed);
+            }, 'hsl');
         }
     }, {
         key: 'convertRGB',
@@ -2341,8 +2340,7 @@ var colorSetsList = [{
     name: "Material",
     colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
 }, {
-    name: "Custom",
-    "edit": true
+    name: "Custom", "edit": true, "colors": []
 }];
 
 var ColorSetsList = function () {
@@ -2591,23 +2589,14 @@ var CurrentColorSets = function (_EventMachin) {
             }
         }
     }, {
-        key: 'click $colorSetsColorList',
-        value: function click$colorSetsColorList(e) {
-            e.preventDefault();
-            var $target = new Dom(e.target);
-
-            var $item = $target.closest('color-item');
-
-            if ($item) {
-                var _color = $item.attr('data-color');
-                this.colorpicker.setColor(_color);
-            } else {
-                var $addColorItem = $target.closest('add-color-item');
-
-                if ($addColorItem) {
-                    this.addColor(this.colorpicker.getCurrentColor());
-                }
-            }
+        key: 'click $colorSetsColorList .add-color-item',
+        value: function click$colorSetsColorListAddColorItem(e) {
+            this.addColor(this.colorpicker.getCurrentColor());
+        }
+    }, {
+        key: 'click $colorSetsColorList .color-item',
+        value: function click$colorSetsColorListColorItem(e) {
+            this.colorpicker.setColor(e.$delegateTarget.attr('data-color'));
         }
     }]);
     return CurrentColorSets;
@@ -2689,8 +2678,7 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
         value: function click$elMenuItem(e) {
             e.preventDefault();
 
-            var $item = new Dom(e.delegateTarget);
-            this.runCommand($item.attr('data-type'));
+            this.runCommand(e.$delegateTarget.attr('data-type'));
             this.hide();
         }
     }]);

@@ -1,13 +1,14 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.5.0-alpha",
+  "version": "1.5.0-alpha.1",
   "description": "colorpicker for codemirror",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pub": "npm run build && npm publish",
     "build": "rollup --config config/rollup.config.prod.js",
-    "dev": "rollup -w --config config/rollup.config.dev.js"
+    "dev": "rollup -w --config config/rollup.config.dev.js",
+    "docs" : "http-server ./docs"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "babel-preset-minify": "^0.2.0",
     "codemirror": "^5.33.0",
     "cross-env": "^5.1.1",
+    "http-server": "^0.11.1",
     "rollup": "^0.52.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-css-only": "^0.2.0",

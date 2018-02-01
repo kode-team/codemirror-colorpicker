@@ -114,22 +114,12 @@ export default class CurrentColorSets extends EventMachin {
         }
     }
 
-    'click $colorSetsColorList'  (e) {
-        e.preventDefault();
-        const $target = new Dom(e.target);
-        
-        const $item = $target.closest('color-item');
+    'click $colorSetsColorList .add-color-item' (e) {
+        this.addColor(this.colorpicker.getCurrentColor());
+    }
 
-        if ($item) {
-            const color = $item.attr('data-color');
-            this.colorpicker.setColor(color);
-        } else {
-            const $addColorItem = $target.closest('add-color-item');
-
-            if ($addColorItem) {
-                this.addColor(this.colorpicker.getCurrentColor());
-            }
-        }
+    'click $colorSetsColorList .color-item'  (e) {
+        this.colorpicker.setColor(e.$delegateTarget.attr('data-color'));
     }
 
 }
