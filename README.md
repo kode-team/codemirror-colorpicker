@@ -2,6 +2,9 @@
 
 CodeMirror ColorPicker Addon like Chrome devtool style  
 
+https://easylogic.github.com/codemirror-colorpicker/
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![](https://data.jsdelivr.com/v1/package/npm/codemirror-colorpicker/badge)](https://www.jsdelivr.com/package/npm/codemirror-colorpicker)
@@ -117,11 +120,6 @@ You can set custom color sets (ex : material, ...).
 ## Sample demo - Edit mode 
 
 <img src="http://i.giphy.com/26xBI1fdHFsAjCwqQ.gif" />
-
-
-## Sample Page 
-
-https://store.jui.io/v2/view.php?id=58930a1a94976c9b562541a6
 
 
 # Change Logs 
