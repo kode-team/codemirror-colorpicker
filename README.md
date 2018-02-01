@@ -111,15 +111,9 @@ You can set custom color sets (ex : material, ...).
 ```
 
 
-# Samples
+# Sample Image 
 
-## Sample demo - View mode 
-
-<img src="http://i.giphy.com/l3q2SDCDRUCaTiEKs.gif" />
-
-## Sample demo - Edit mode 
-
-<img src="http://i.giphy.com/26xBI1fdHFsAjCwqQ.gif" />
+<img src="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
 
 
 # Change Logs 
