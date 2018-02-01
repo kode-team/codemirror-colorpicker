@@ -104,7 +104,7 @@ You can set custom color sets (ex : material, ...).
       colorSets: [
         { name : 'Material', colors : [ '#ffff', 'rgba(255, 255, 0, 0.5)' ] },
         { name : 'My Colors', colors : [ 'red', 'blue', 'white' ] },
-        { name : 'Input Colors', edit: true  },
+        { name : 'Input Colors', edit: true  },   // editable 
       ]
   }
 }
