@@ -100,9 +100,9 @@ It can open color picker on current cursor.
 }
 ```
 
-## Support custom color sets (since v1.5)
+## Support custom color paletts (since v1.5)
 
-You can set custom color sets (ex : material, ...).
+You can set custom color paletts (ex : material, ...).
 
 ```javascript
 {
