@@ -181,6 +181,12 @@ var color_names = {
 
 </textarea>
 
+Default Html Sample 
+
+<div>
+    <button type="button" onclick="showColor(event)" data-color="green">green</a>
+</div>
+
 
 <script type="text/javascript">
     function shuffle(a) {
@@ -210,6 +216,22 @@ var color_names = {
     setTimeout(function(){
         cm.refresh();
     }, 100);
+
+    function showColor(event) {
+        var colorpicker = new CodeMirrorColorPicker.ColorPicker();
+
+        var color = event.target.getAttribute('data-color');
+        var target = event.target;
+
+        colorpicker.show({
+            left : (target.offsetWidth + target.offsetLeft),
+            top : event.clientY 
+        }, color, function (newColor) {
+            target.style.backgroundColor = newColor;
+            target.textContent = newColor;
+            //console.log(color, newColor);
+        });
+    }
 
 </script>
 

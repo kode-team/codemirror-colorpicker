@@ -1,4 +1,5 @@
 import ColorNames from '../util/ColorNames'
+import ColorPicker from '../colorpicker/index';
 
 const colorpicker_class = 'codemirror-colorview';
 const colorpicker_background_class = 'codemirror-colorview-background';
@@ -81,9 +82,9 @@ export default class ColorView {
 
         if (typeof opt == 'boolean')
         {
-            opt = { mode : 'view' };
+            opt = { mode : 'edit' };
         } else {
-            opt = Object.assign({ mode: 'view' }, opt || {});
+            opt = Object.assign({ mode: 'edit' }, opt || {});
         }
 
         this.opt = opt;
@@ -96,7 +97,7 @@ export default class ColorView {
         if (this.opt.colorpicker) {
             this.colorpicker = this.opt.colorpicker;
         } else {
-            this.colorpicker = this.cm.colorpicker(this.opt);
+            this.colorpicker = new ColorPicker(this.opt);
         }
 
         this.init_event();

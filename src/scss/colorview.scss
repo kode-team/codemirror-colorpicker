@@ -9,6 +9,7 @@
 	width : 10px;
 	height : 10px;
     cursor: pointer;
+    vertical-align: middle;
     @include transparent-background();
 
     .codemirror-colorview-background {

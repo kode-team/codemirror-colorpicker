@@ -19,561 +19,6 @@ var ColorNames = {
     getColorByName: getColorByName
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var toArray = function (arr) {
-  return Array.isArray(arr) ? arr : Array.from(arr);
-};
-
-var colorpicker_class = 'codemirror-colorview';
-var colorpicker_background_class = 'codemirror-colorview-background';
-var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
-// Excluded tokens do not show color views..
-var excluded_token = ['comment'];
-
-function onChange(cm, evt) {
-    if (evt.origin == 'setValue') {
-        // if content is changed by setValue method, it initialize markers
-        cm.state.colorpicker.close_color_picker();
-        cm.state.colorpicker.init_color_update();
-        cm.state.colorpicker.style_color_update();
-    } else {
-        cm.state.colorpicker.style_color_update(cm.getCursor().line);
-    }
-}
-
-function onUpdate(cm, evt) {
-    if (!cm.state.colorpicker.isUpdate) {
-        cm.state.colorpicker.isUpdate = true;
-        cm.state.colorpicker.close_color_picker();
-        cm.state.colorpicker.init_color_update();
-        cm.state.colorpicker.style_color_update();
-    }
-}
-
-function onRefresh(cm, evt) {
-    onChange(cm, { origin: 'setValue' });
-}
-
-function onKeyup(cm, evt) {
-    cm.state.colorpicker.keyup(evt);
-}
-
-function onMousedown(cm, evt) {
-    if (cm.state.colorpicker.is_edit_mode()) {
-        cm.state.colorpicker.check_mousedown(evt);
-    }
-}
-
-function onPaste(cm, evt) {
-    onChange(cm, { origin: 'setValue' });
-}
-
-function onScroll(cm) {
-    cm.state.colorpicker.close_color_picker();
-}
-
-function debounce(callback, delay) {
-
-    var t = undefined;
-
-    return function (cm, e) {
-        if (t) {
-            clearTimeout(t);
-        }
-
-        t = setTimeout(function () {
-            callback(cm, e);
-        }, delay || 300);
-    };
-}
-
-function has_class(el, cls) {
-    if (!el || !el.className) {
-        return false;
-    } else {
-        var newClass = ' ' + el.className + ' ';
-        return newClass.indexOf(' ' + cls + ' ') > -1;
-    }
-}
-
-var ColorView = function () {
-    function ColorView(cm, opt) {
-        classCallCheck(this, ColorView);
-
-        if (typeof opt == 'boolean') {
-            opt = { mode: 'view' };
-        } else {
-            opt = Object.assign({ mode: 'view' }, opt || {});
-        }
-
-        this.opt = opt;
-        this.cm = cm;
-        this.markers = {};
-
-        // set excluded token 
-        this.excluded_token = this.opt.excluded_token || excluded_token;
-
-        if (this.opt.colorpicker) {
-            this.colorpicker = this.opt.colorpicker;
-        } else {
-            this.colorpicker = this.cm.colorpicker(this.opt);
-        }
-
-        this.init_event();
-    }
-
-    createClass(ColorView, [{
-        key: 'init_event',
-        value: function init_event() {
-
-            this.cm.on('mousedown', onMousedown);
-            this.cm.on('keyup', onKeyup);
-            this.cm.on('change', onChange);
-            this.cm.on('update', onUpdate);
-            this.cm.on('refresh', onRefresh);
-
-            // create paste callback
-            this.onPasteCallback = function (cm, callback) {
-                return function (evt) {
-                    callback.call(this, cm, evt);
-                };
-            }(this.cm, onPaste);
-
-            this.cm.getWrapperElement().addEventListener('paste', this.onPasteCallback);
-
-            if (this.is_edit_mode()) {
-                this.cm.on('scroll', debounce(onScroll, 50));
-            }
-        }
-    }, {
-        key: 'is_edit_mode',
-        value: function is_edit_mode() {
-            return this.opt.mode == 'edit';
-        }
-    }, {
-        key: 'is_view_mode',
-        value: function is_view_mode() {
-            return this.opt.mode == 'view';
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.cm.off('mousedown', onMousedown);
-            this.cm.off('keyup', onKeyup);
-            this.cm.off('change', onChange);
-            this.cm.getWrapperElement().removeEventListener('paste', this.onPasteCallback);
-
-            if (this.is_edit_mode()) {
-                this.cm.off('scroll');
-            }
-        }
-    }, {
-        key: 'hasClass',
-        value: function hasClass(el, className) {
-            if (!el.className) {
-                return false;
-            } else {
-                var newClass = ' ' + el.className + ' ';
-                return newClass.indexOf(' ' + className + ' ') > -1;
-            }
-        }
-    }, {
-        key: 'check_mousedown',
-        value: function check_mousedown(evt) {
-            if (this.hasClass(evt.target, colorpicker_background_class)) {
-                this.open_color_picker(evt.target.parentNode);
-            } else {
-                this.close_color_picker();
-            }
-        }
-    }, {
-        key: 'popup_color_picker',
-        value: function popup_color_picker(defalutColor) {
-            var cursor = this.cm.getCursor();
-            var self = this;
-            var colorMarker = {
-                lineNo: cursor.line,
-                ch: cursor.ch,
-                color: defalutColor || '#FFFFFF',
-                isShortCut: true
-            };
-
-            Object.keys(this.markers).forEach(function (key) {
-                var searchKey = "#" + key;
-                if (searchKey.indexOf("#" + colorMarker.lineNo + ":") > -1) {
-                    var marker = self.markers[key];
-
-                    if (marker.ch <= colorMarker.ch && colorMarker.ch <= marker.ch + marker.color.length) {
-                        // when cursor has marker
-                        colorMarker.ch = marker.ch;
-                        colorMarker.color = marker.color;
-                        colorMarker.nameColor = marker.nameColor;
-                    }
-                }
-            });
-
-            this.open_color_picker(colorMarker);
-        }
-    }, {
-        key: 'open_color_picker',
-        value: function open_color_picker(el) {
-            var lineNo = el.lineNo;
-            var ch = el.ch;
-            var nameColor = el.nameColor;
-            var color = el.color;
-
-            if (this.colorpicker) {
-                var self = this;
-                var prevColor = color;
-                var pos = this.cm.charCoords({ line: lineNo, ch: ch });
-                this.colorpicker.show({
-                    left: pos.left,
-                    top: pos.bottom,
-                    isShortCut: el.isShortCut || false,
-                    hideDelay: self.opt.hideDelay || 2000
-                }, nameColor || color, function (newColor) {
-                    self.cm.replaceRange(newColor, { line: lineNo, ch: ch }, { line: lineNo, ch: ch + prevColor.length }, '*colorpicker');
-                    prevColor = newColor;
-                });
-            }
-        }
-    }, {
-        key: 'close_color_picker',
-        value: function close_color_picker(el) {
-            if (this.colorpicker) {
-                this.colorpicker.hide();
-            }
-        }
-    }, {
-        key: 'key',
-        value: function key(lineNo, ch) {
-            return [lineNo, ch].join(":");
-        }
-    }, {
-        key: 'keyup',
-        value: function keyup(evt) {
-
-            if (this.colorpicker) {
-                if (evt.key == 'Escape') {
-                    this.colorpicker.hide();
-                } else if (this.colorpicker.isShortCut == false) {
-                    this.colorpicker.hide();
-                }
-            }
-        }
-    }, {
-        key: 'init_color_update',
-        value: function init_color_update() {
-            this.markers = {}; // initialize marker list
-        }
-    }, {
-        key: 'style_color_update',
-        value: function style_color_update(lineHandle) {
-            if (lineHandle) {
-                this.match(lineHandle);
-            } else {
-                var max = this.cm.lineCount();
-
-                for (var lineNo = 0; lineNo < max; lineNo++) {
-                    this.match(lineNo);
-                }
-            }
-        }
-    }, {
-        key: 'empty_marker',
-        value: function empty_marker(lineNo, lineHandle) {
-            var list = lineHandle.markedSpans || [];
-
-            for (var i = 0, len = list.length; i < len; i++) {
-                var key = this.key(lineNo, list[i].from);
-
-                if (key && has_class(list[i].marker.replacedWith, colorpicker_class)) {
-                    delete this.markers[key];
-                    list[i].marker.clear();
-                }
-            }
-        }
-    }, {
-        key: 'match_result',
-        value: function match_result(lineHandle) {
-            return lineHandle.text.match(color_regexp);
-        }
-    }, {
-        key: 'submatch',
-        value: function submatch(lineNo, lineHandle) {
-
-            this.empty_marker(lineNo, lineHandle);
-
-            var result = this.match_result(lineHandle);
-            if (result && result.length) {
-                var obj = { next: 0 };
-                for (var i = 0, len = result.length; i < len; i++) {
-
-                    if (result[i].indexOf('#') > -1 || result[i].indexOf('rgb') > -1 || result[i].indexOf('hsl') > -1) {
-                        this.render(obj, lineNo, lineHandle, result[i]);
-                    } else {
-
-                        var nameColor = ColorNames.getColorByName(result[i]);
-
-                        if (nameColor) {
-                            this.render(obj, lineNo, lineHandle, result[i], nameColor);
-                        }
-                    }
-                }
-            }
-        }
-    }, {
-        key: 'match',
-        value: function match(lineNo) {
-            var lineHandle = this.cm.getLineHandle(lineNo);
-            var self = this;
-            this.cm.operation(function () {
-                self.submatch(lineNo, lineHandle);
-            });
-        }
-    }, {
-        key: 'make_element',
-        value: function make_element() {
-            var el = document.createElement('div');
-
-            el.className = colorpicker_class;
-
-            if (this.is_edit_mode()) {
-                el.title = "open color picker";
-            } else {
-                el.title = "";
-            }
-
-            el.back_element = this.make_background_element();
-            el.appendChild(el.back_element);
-
-            return el;
-        }
-    }, {
-        key: 'make_background_element',
-        value: function make_background_element() {
-            var el = document.createElement('div');
-
-            el.className = colorpicker_background_class;
-
-            return el;
-        }
-    }, {
-        key: 'set_state',
-        value: function set_state(lineNo, start, color, nameColor) {
-            var marker = this.create_marker(lineNo, start);
-
-            marker.lineNo = lineNo;
-            marker.ch = start;
-            marker.color = color;
-            marker.nameColor = nameColor;
-
-            return marker;
-        }
-    }, {
-        key: 'create_marker',
-        value: function create_marker(lineNo, start) {
-
-            var key = this.key(lineNo, start);
-
-            if (!this.markers[key]) {
-                this.markers[key] = this.make_element();
-            }
-
-            return this.markers[key];
-        }
-    }, {
-        key: 'has_marker',
-        value: function has_marker(lineNo, start) {
-            var key = this.key(lineNo, start);
-            return !!this.markers[key];
-        }
-    }, {
-        key: 'update_element',
-        value: function update_element(el, color) {
-            el.back_element.style.backgroundColor = color;
-        }
-    }, {
-        key: 'set_mark',
-        value: function set_mark(line, ch, el) {
-            this.cm.setBookmark({ line: line, ch: ch }, { widget: el, handleMouseEvents: true });
-        }
-    }, {
-        key: 'is_excluded_token',
-        value: function is_excluded_token(line, ch) {
-            var type = this.cm.getTokenTypeAt({ line: line, ch: ch });
-            var count = 0;
-            for (var i = 0, len = this.excluded_token.length; i < len; i++) {
-                if (type === this.excluded_token[i]) {
-                    count++;
-                    break;
-                }
-            }
-
-            return count > 0; // true is that it has a excluded token 
-        }
-    }, {
-        key: 'render',
-        value: function render(cursor, lineNo, lineHandle, color, nameColor) {
-            var start = lineHandle.text.indexOf(color, cursor.next);
-
-            if (this.is_excluded_token(lineNo, start) === true) {
-                // excluded token do not show.
-                return;
-            }
-
-            cursor.next = start + color.length;
-
-            if (this.has_marker(lineNo, start)) {
-                this.update_element(this.create_marker(lineNo, start), nameColor || color);
-                this.set_state(lineNo, start, color, nameColor);
-                return;
-            }
-
-            var el = this.create_marker(lineNo, start);
-
-            this.update_element(el, nameColor || color);
-
-            this.set_state(lineNo, start, color, nameColor || color);
-            this.set_mark(lineNo, start, el);
-        }
-    }]);
-    return ColorView;
-}();
-
 var color$1 = {
 
     trim: function trim(str) {
@@ -934,6 +379,144 @@ initHueColors();
 var ColorUtil = {
     color: color$1,
     hue_color: hue_color
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toArray = function (arr) {
+  return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
 var color$2 = ColorUtil.color;
@@ -2731,7 +2314,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'initialize',
         value: function initialize() {
-            this.$body = new Dom(document.body);
+            this.$body = new Dom(this.opt.container || document.body);
             this.$root = new Dom('div', 'codemirror-colorpicker');
 
             this.$arrow = new Dom('div', 'arrow');
@@ -3140,27 +2723,442 @@ var ColorPicker = function (_EventMachin) {
     return ColorPicker;
 }(EventMachin);
 
-CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
-    if (old && old != CodeMirror.Init) {
+var colorpicker_class = 'codemirror-colorview';
+var colorpicker_background_class = 'codemirror-colorview-background';
+var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
+// Excluded tokens do not show color views..
+var excluded_token = ['comment'];
 
-        if (cm.state.colorpicker) {
-            cm.state.colorpicker.destroy();
-            cm.state.colorpicker = null;
+function onChange(cm, evt) {
+    if (evt.origin == 'setValue') {
+        // if content is changed by setValue method, it initialize markers
+        cm.state.colorpicker.close_color_picker();
+        cm.state.colorpicker.init_color_update();
+        cm.state.colorpicker.style_color_update();
+    } else {
+        cm.state.colorpicker.style_color_update(cm.getCursor().line);
+    }
+}
+
+function onUpdate(cm, evt) {
+    if (!cm.state.colorpicker.isUpdate) {
+        cm.state.colorpicker.isUpdate = true;
+        cm.state.colorpicker.close_color_picker();
+        cm.state.colorpicker.init_color_update();
+        cm.state.colorpicker.style_color_update();
+    }
+}
+
+function onRefresh(cm, evt) {
+    onChange(cm, { origin: 'setValue' });
+}
+
+function onKeyup(cm, evt) {
+    cm.state.colorpicker.keyup(evt);
+}
+
+function onMousedown(cm, evt) {
+    if (cm.state.colorpicker.is_edit_mode()) {
+        cm.state.colorpicker.check_mousedown(evt);
+    }
+}
+
+function onPaste(cm, evt) {
+    onChange(cm, { origin: 'setValue' });
+}
+
+function onScroll(cm) {
+    cm.state.colorpicker.close_color_picker();
+}
+
+function debounce(callback, delay) {
+
+    var t = undefined;
+
+    return function (cm, e) {
+        if (t) {
+            clearTimeout(t);
         }
-        // remove event listener
+
+        t = setTimeout(function () {
+            callback(cm, e);
+        }, delay || 300);
+    };
+}
+
+function has_class(el, cls) {
+    if (!el || !el.className) {
+        return false;
+    } else {
+        var newClass = ' ' + el.className + ' ';
+        return newClass.indexOf(' ' + cls + ' ') > -1;
+    }
+}
+
+var ColorView = function () {
+    function ColorView(cm, opt) {
+        classCallCheck(this, ColorView);
+
+        if (typeof opt == 'boolean') {
+            opt = { mode: 'edit' };
+        } else {
+            opt = Object.assign({ mode: 'edit' }, opt || {});
+        }
+
+        this.opt = opt;
+        this.cm = cm;
+        this.markers = {};
+
+        // set excluded token 
+        this.excluded_token = this.opt.excluded_token || excluded_token;
+
+        if (this.opt.colorpicker) {
+            this.colorpicker = this.opt.colorpicker;
+        } else {
+            this.colorpicker = new ColorPicker(this.opt);
+        }
+
+        this.init_event();
     }
 
-    if (val) {
-        cm.state.colorpicker = new ColorView(cm, val);
-    }
-});
+    createClass(ColorView, [{
+        key: 'init_event',
+        value: function init_event() {
 
-CodeMirror.defineExtension("colorpicker", function (opt) {
-    return new ColorPicker(opt);
-});
+            this.cm.on('mousedown', onMousedown);
+            this.cm.on('keyup', onKeyup);
+            this.cm.on('change', onChange);
+            this.cm.on('update', onUpdate);
+            this.cm.on('refresh', onRefresh);
+
+            // create paste callback
+            this.onPasteCallback = function (cm, callback) {
+                return function (evt) {
+                    callback.call(this, cm, evt);
+                };
+            }(this.cm, onPaste);
+
+            this.cm.getWrapperElement().addEventListener('paste', this.onPasteCallback);
+
+            if (this.is_edit_mode()) {
+                this.cm.on('scroll', debounce(onScroll, 50));
+            }
+        }
+    }, {
+        key: 'is_edit_mode',
+        value: function is_edit_mode() {
+            return this.opt.mode == 'edit';
+        }
+    }, {
+        key: 'is_view_mode',
+        value: function is_view_mode() {
+            return this.opt.mode == 'view';
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.cm.off('mousedown', onMousedown);
+            this.cm.off('keyup', onKeyup);
+            this.cm.off('change', onChange);
+            this.cm.getWrapperElement().removeEventListener('paste', this.onPasteCallback);
+
+            if (this.is_edit_mode()) {
+                this.cm.off('scroll');
+            }
+        }
+    }, {
+        key: 'hasClass',
+        value: function hasClass(el, className) {
+            if (!el.className) {
+                return false;
+            } else {
+                var newClass = ' ' + el.className + ' ';
+                return newClass.indexOf(' ' + className + ' ') > -1;
+            }
+        }
+    }, {
+        key: 'check_mousedown',
+        value: function check_mousedown(evt) {
+            if (this.hasClass(evt.target, colorpicker_background_class)) {
+                this.open_color_picker(evt.target.parentNode);
+            } else {
+                this.close_color_picker();
+            }
+        }
+    }, {
+        key: 'popup_color_picker',
+        value: function popup_color_picker(defalutColor) {
+            var cursor = this.cm.getCursor();
+            var self = this;
+            var colorMarker = {
+                lineNo: cursor.line,
+                ch: cursor.ch,
+                color: defalutColor || '#FFFFFF',
+                isShortCut: true
+            };
+
+            Object.keys(this.markers).forEach(function (key) {
+                var searchKey = "#" + key;
+                if (searchKey.indexOf("#" + colorMarker.lineNo + ":") > -1) {
+                    var marker = self.markers[key];
+
+                    if (marker.ch <= colorMarker.ch && colorMarker.ch <= marker.ch + marker.color.length) {
+                        // when cursor has marker
+                        colorMarker.ch = marker.ch;
+                        colorMarker.color = marker.color;
+                        colorMarker.nameColor = marker.nameColor;
+                    }
+                }
+            });
+
+            this.open_color_picker(colorMarker);
+        }
+    }, {
+        key: 'open_color_picker',
+        value: function open_color_picker(el) {
+            var lineNo = el.lineNo;
+            var ch = el.ch;
+            var nameColor = el.nameColor;
+            var color = el.color;
+
+            if (this.colorpicker) {
+                var self = this;
+                var prevColor = color;
+                var pos = this.cm.charCoords({ line: lineNo, ch: ch });
+                this.colorpicker.show({
+                    left: pos.left,
+                    top: pos.bottom,
+                    isShortCut: el.isShortCut || false,
+                    hideDelay: self.opt.hideDelay || 2000
+                }, nameColor || color, function (newColor) {
+                    self.cm.replaceRange(newColor, { line: lineNo, ch: ch }, { line: lineNo, ch: ch + prevColor.length }, '*colorpicker');
+                    prevColor = newColor;
+                });
+            }
+        }
+    }, {
+        key: 'close_color_picker',
+        value: function close_color_picker(el) {
+            if (this.colorpicker) {
+                this.colorpicker.hide();
+            }
+        }
+    }, {
+        key: 'key',
+        value: function key(lineNo, ch) {
+            return [lineNo, ch].join(":");
+        }
+    }, {
+        key: 'keyup',
+        value: function keyup(evt) {
+
+            if (this.colorpicker) {
+                if (evt.key == 'Escape') {
+                    this.colorpicker.hide();
+                } else if (this.colorpicker.isShortCut == false) {
+                    this.colorpicker.hide();
+                }
+            }
+        }
+    }, {
+        key: 'init_color_update',
+        value: function init_color_update() {
+            this.markers = {}; // initialize marker list
+        }
+    }, {
+        key: 'style_color_update',
+        value: function style_color_update(lineHandle) {
+            if (lineHandle) {
+                this.match(lineHandle);
+            } else {
+                var max = this.cm.lineCount();
+
+                for (var lineNo = 0; lineNo < max; lineNo++) {
+                    this.match(lineNo);
+                }
+            }
+        }
+    }, {
+        key: 'empty_marker',
+        value: function empty_marker(lineNo, lineHandle) {
+            var list = lineHandle.markedSpans || [];
+
+            for (var i = 0, len = list.length; i < len; i++) {
+                var key = this.key(lineNo, list[i].from);
+
+                if (key && has_class(list[i].marker.replacedWith, colorpicker_class)) {
+                    delete this.markers[key];
+                    list[i].marker.clear();
+                }
+            }
+        }
+    }, {
+        key: 'match_result',
+        value: function match_result(lineHandle) {
+            return lineHandle.text.match(color_regexp);
+        }
+    }, {
+        key: 'submatch',
+        value: function submatch(lineNo, lineHandle) {
+
+            this.empty_marker(lineNo, lineHandle);
+
+            var result = this.match_result(lineHandle);
+            if (result && result.length) {
+                var obj = { next: 0 };
+                for (var i = 0, len = result.length; i < len; i++) {
+
+                    if (result[i].indexOf('#') > -1 || result[i].indexOf('rgb') > -1 || result[i].indexOf('hsl') > -1) {
+                        this.render(obj, lineNo, lineHandle, result[i]);
+                    } else {
+
+                        var nameColor = ColorNames.getColorByName(result[i]);
+
+                        if (nameColor) {
+                            this.render(obj, lineNo, lineHandle, result[i], nameColor);
+                        }
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'match',
+        value: function match(lineNo) {
+            var lineHandle = this.cm.getLineHandle(lineNo);
+            var self = this;
+            this.cm.operation(function () {
+                self.submatch(lineNo, lineHandle);
+            });
+        }
+    }, {
+        key: 'make_element',
+        value: function make_element() {
+            var el = document.createElement('div');
+
+            el.className = colorpicker_class;
+
+            if (this.is_edit_mode()) {
+                el.title = "open color picker";
+            } else {
+                el.title = "";
+            }
+
+            el.back_element = this.make_background_element();
+            el.appendChild(el.back_element);
+
+            return el;
+        }
+    }, {
+        key: 'make_background_element',
+        value: function make_background_element() {
+            var el = document.createElement('div');
+
+            el.className = colorpicker_background_class;
+
+            return el;
+        }
+    }, {
+        key: 'set_state',
+        value: function set_state(lineNo, start, color, nameColor) {
+            var marker = this.create_marker(lineNo, start);
+
+            marker.lineNo = lineNo;
+            marker.ch = start;
+            marker.color = color;
+            marker.nameColor = nameColor;
+
+            return marker;
+        }
+    }, {
+        key: 'create_marker',
+        value: function create_marker(lineNo, start) {
+
+            var key = this.key(lineNo, start);
+
+            if (!this.markers[key]) {
+                this.markers[key] = this.make_element();
+            }
+
+            return this.markers[key];
+        }
+    }, {
+        key: 'has_marker',
+        value: function has_marker(lineNo, start) {
+            var key = this.key(lineNo, start);
+            return !!this.markers[key];
+        }
+    }, {
+        key: 'update_element',
+        value: function update_element(el, color) {
+            el.back_element.style.backgroundColor = color;
+        }
+    }, {
+        key: 'set_mark',
+        value: function set_mark(line, ch, el) {
+            this.cm.setBookmark({ line: line, ch: ch }, { widget: el, handleMouseEvents: true });
+        }
+    }, {
+        key: 'is_excluded_token',
+        value: function is_excluded_token(line, ch) {
+            var type = this.cm.getTokenTypeAt({ line: line, ch: ch });
+            var count = 0;
+            for (var i = 0, len = this.excluded_token.length; i < len; i++) {
+                if (type === this.excluded_token[i]) {
+                    count++;
+                    break;
+                }
+            }
+
+            return count > 0; // true is that it has a excluded token 
+        }
+    }, {
+        key: 'render',
+        value: function render(cursor, lineNo, lineHandle, color, nameColor) {
+            var start = lineHandle.text.indexOf(color, cursor.next);
+
+            if (this.is_excluded_token(lineNo, start) === true) {
+                // excluded token do not show.
+                return;
+            }
+
+            cursor.next = start + color.length;
+
+            if (this.has_marker(lineNo, start)) {
+                this.update_element(this.create_marker(lineNo, start), nameColor || color);
+                this.set_state(lineNo, start, color, nameColor);
+                return;
+            }
+
+            var el = this.create_marker(lineNo, start);
+
+            this.update_element(el, nameColor || color);
+
+            this.set_state(lineNo, start, color, nameColor || color);
+            this.set_mark(lineNo, start, el);
+        }
+    }]);
+    return ColorView;
+}();
+
+if (CodeMirror) {
+
+    CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
+        if (old && old != CodeMirror.Init) {
+
+            if (cm.state.colorpicker) {
+                cm.state.colorpicker.destroy();
+                cm.state.colorpicker = null;
+            }
+            // remove event listener
+        }
+
+        if (val) {
+            cm.state.colorpicker = new ColorView(cm, val);
+        }
+    });
+}
 
 var index = {
-    ColorView: ColorView,
     ColorPicker: ColorPicker
 };
 

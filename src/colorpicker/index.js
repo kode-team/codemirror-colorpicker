@@ -50,7 +50,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     initialize () {
-        this.$body = new Dom(document.body);
+        this.$body = new Dom(this.opt.container || document.body);
         this.$root = new Dom('div', 'codemirror-colorpicker');
 
         this.$arrow = new Dom('div', 'arrow');

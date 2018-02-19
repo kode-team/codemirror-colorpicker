@@ -12,6 +12,13 @@ https://easylogic.github.com/codemirror-colorpicker/
 [![NPM](https://nodei.co/npm/codemirror-colorpicker.png)](https://npmjs.org/package/codemirror-colorpicker)
 
 
+
+# Sample Image 
+
+<img width="500px" src="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
+
+
+
 # Install 
 
 ## npm 
@@ -110,17 +117,8 @@ You can set custom color sets (ex : material, ...).
 }
 ```
 
-
-# Sample Image 
-
 <img width="500px" src="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
 
-
-# Change Logs 
-
-## v1.5.0 
-* change bundler - rollup based   
-* support color palettes 
 
 # Developments 
 
