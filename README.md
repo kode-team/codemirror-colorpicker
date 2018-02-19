@@ -117,9 +117,9 @@ You can set custom color sets (ex : material, ...).
 }
 ```
 
-<img style="max-width: 200px; display:inline-block;vertical-align:middle;"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/colorpicker.png" />
+<img width="235px"   src="https://easylogic.github.com/codemirror-colorpicker/resources/image/colorpicker.png" />
 
-<img style="max-width: 200px; display:inline-block;vertical-align:middle;" src="https://easylogic.github.com/codemirror-colorpicker/resources/image/colorpaletts.png" />
+<img width="235px"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/colorpaletts.png" />
 
 
 # Developments 
