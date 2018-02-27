@@ -12,6 +12,36 @@
     h1.title {
         margin-bottom: 50px;
     }
+
+    .color-scale {
+        display:flex;
+        max-width: 500px;
+        margin-bottom: 5px;
+    }
+
+    .color-scale:before {
+        content: attr(data-colors) ' ' attr(data-count);
+        margin-right: 10px;
+        min-width: 100px;
+        display:inline-block;
+    }
+
+    .color-scale * {
+        flex: 1; 
+        height: 30px;
+        position: relative;        
+    }
+
+    .color-scale *:hover:after {
+        display: inline-block;
+        content: attr(title);
+        position:absolute;
+        left:50%;
+        bottom:100%;
+        background-color: black;
+        color: white;
+        transform:translateX(-50%);
+    }
     </style>
 </head>
 <body>
@@ -184,8 +214,21 @@ var color_names = {
 <h1 class="title">Default Html Sample </h1>
 
 <div>
-        <button type="button" id="gray-scale" ></button><br />    
+    <button type="button" id="gray-scale" >gray scale</button><br />    
     <button type="button" onclick="showColor(event)" data-color="green">green</a>
+</div>
+
+<div>
+    <h2> Color Scales</h2>
+    <div class="color-scale" data-colors="red,yellow" data-count="50">
+
+    </div>
+    <div class="color-scale" data-colors="red,blue" data-count="25">
+
+    </div>
+    <div class="color-scale" data-colors="red,black" data-count="105">
+
+    </div>    
 
 </div>
 
@@ -247,6 +290,28 @@ var color_names = {
             document.getElementById('gray-scale').style.backgroundColor = gray;
 
         });
+    }
+
+    var Color = CodeMirrorColorPicker.Color;
+    var nodes = document.querySelectorAll(".color-scale");
+    for(var i = 0, len = nodes.length; i < len; i++) {
+        var item = nodes[i];
+
+        var colors = item.getAttribute('data-colors').split(",");
+        var count = +item.getAttribute('data-count');
+
+        var scaleColors = Color.scale(colors, count);
+
+        var fragment = document.createDocumentFragment();
+        for (var index = 0, scaleCount = scaleColors.length; index < scaleCount; index++) {
+            var dom = document.createElement('div');
+            dom.style.backgroundColor = scaleColors[index];
+            dom.setAttribute('title', scaleColors[index])
+            fragment.appendChild(dom);
+        }
+
+        item.appendChild(fragment);
+
     }
 
 </script>
