@@ -2132,7 +2132,7 @@ var colorSetsList = [{
 }, {
     name: "Custom", "edit": true, "colors": []
 }, {
-    name: "Color Scale", "scale": ['yellow', 'red', 'black'], count: 5
+    name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
 }];
 
 var ColorSetsList = function () {

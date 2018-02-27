@@ -121,6 +121,23 @@ You can set custom color paletts (ex : material, ...).
 
 <img width="235px"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/colorpaletts.png" align="absmiddle" />
 
+## Support color scale  for palette 
+
+```javascript
+{
+  colorpicker : {
+      mode : 'edit',
+      colorSets: [
+        { name : 'Scale Colors', scale: ['red', 'yellow', 'black'], count : 5  }, 
+      ]
+  }
+}
+
+```
+
+<img width="235px"   src="https://easylogic.github.com/codemirror-colorpicker/resources/image/scalecolors-title.png" align="absmiddle" />
+
+<img width="235px"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/scalecolors.png" align="absmiddle" />
 
 # Developments 
 
