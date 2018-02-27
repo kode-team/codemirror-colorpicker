@@ -34,7 +34,11 @@ export default [{
   input: 'src/index.js',
   output: {
     file: 'dist/' + packageJSON.name + '.js',
-    format: 'umd'
+    format: 'umd',
+    globals: {
+      "codemirror" : "CodeMirror"
+    },
+    external: ['codemirror']
   },
   name: 'codemirror-colorpicker',
   plugins : [

@@ -21,7 +21,48 @@ var ColorNames = {
     getColorByName: getColorByName
 };
 
-var color$1 = {
+var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
+
+var color = {
+
+    matches: function matches(str) {
+        var hasColorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        var matches = str.match(color_regexp);
+        var result = [];
+
+        if (!matches) {
+            return result;
+        }
+
+        for (var i = 0, len = matches.length; i < len; i++) {
+
+            if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
+                result.push({ color: matches[i] });
+            } else {
+
+                if (hasColorName) {
+                    var nameColor = ColorNames.getColorByName(matches[i]);
+
+                    if (nameColor) {
+                        result.push({ color: matches[i], nameColor: nameColor });
+                    }
+                }
+            }
+        }
+
+        var pos = { next: 0 };
+        result.forEach(function (item) {
+            var startIndex = str.indexOf(item.color, pos.next);
+
+            item.startIndex = startIndex;
+            item.endIndex = startIndex + item.color.length;
+
+            pos.next = item.endIndex;
+        });
+
+        return result;
+    },
 
     trim: function trim(str) {
         return str.replace(/^\s+|\s+$/g, '');
@@ -97,7 +138,7 @@ var color$1 = {
                 var arr = str.replace("rgb(", "").replace(")", "").split(",");
 
                 for (var i = 0, len = arr.length; i < len; i++) {
-                    arr[i] = parseInt(color$1.trim(arr[i]), 10);
+                    arr[i] = parseInt(color.trim(arr[i]), 10);
                 }
 
                 return { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
@@ -107,9 +148,9 @@ var color$1 = {
                 for (var i = 0, len = arr.length; i < len; i++) {
 
                     if (len - 1 == i) {
-                        arr[i] = parseFloat(color$1.trim(arr[i]));
+                        arr[i] = parseFloat(color.trim(arr[i]));
                     } else {
-                        arr[i] = parseInt(color$1.trim(arr[i]), 10);
+                        arr[i] = parseInt(color.trim(arr[i]), 10);
                     }
                 }
 
@@ -118,12 +159,12 @@ var color$1 = {
                 var arr = str.replace("hsl(", "").replace(")", "").split(",");
 
                 for (var i = 0, len = arr.length; i < len; i++) {
-                    arr[i] = parseInt(color$1.trim(arr[i]), 10);
+                    arr[i] = parseFloat(color.trim(arr[i]));
                 }
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: 1 };
 
-                var temp = color$1.HSLtoRGB(obj.h, obj.s, obj.l);
+                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
 
                 obj.r = temp.r;
                 obj.g = temp.g;
@@ -136,15 +177,15 @@ var color$1 = {
                 for (var i = 0, len = arr.length; i < len; i++) {
 
                     if (len - 1 == i) {
-                        arr[i] = parseFloat(color$1.trim(arr[i]));
+                        arr[i] = parseFloat(color.trim(arr[i]));
                     } else {
-                        arr[i] = parseInt(color$1.trim(arr[i]), 10);
+                        arr[i] = parseInt(color.trim(arr[i]), 10);
                     }
                 }
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3] };
 
-                var temp = color$1.HSLtoRGB(obj.h, obj.s, obj.l);
+                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
 
                 obj.r = temp.r;
                 obj.g = temp.g;
@@ -273,6 +314,27 @@ var color$1 = {
         return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     },
 
+    RGBtoCMYK: function RGBtoCMYK(r, g, b) {
+        var R1 = r / 255;
+        var G1 = g / 255;
+        var B1 = b / 255;
+
+        var K = 1 - Math.max(R1, G1, B1);
+        var C = (1 - R1 - K) / (1 - K);
+        var M = (1 - G1 - K) / (1 - K);
+        var Y = (1 - B1 - K) / (1 - K);
+
+        return { c: C, m: M, y: Y, k: K };
+    },
+
+    CMYKtoRGB: function CMYKtoRGB(c, m, y, k) {
+        var R = 255 * (1 - c) * (1 - k);
+        var G = 255 * (1 - m) * (1 - k);
+        var B = 255 * (1 - y) * (1 - k);
+
+        return { r: R, g: G, b: B };
+    },
+
     RGBtoHSL: function RGBtoHSL(r, g, b) {
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b),
@@ -334,6 +396,31 @@ var color$1 = {
 
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     },
+    gray: function gray(_gray) {
+        return { r: _gray, g: _gray, b: _gray };
+    },
+    RGBtoSimpleGray: function RGBtoSimpleGray(r, g, b) {
+        return this.gray(Math.ceil((r + g + b) / 3));
+    },
+    RGBtoGray: function RGBtoGray(r, g, b) {
+        return this.gray(this.RGBtoYCrCb(r, g, b).y);
+    },
+    RGBtoYCrCb: function RGBtoYCrCb(r, g, b) {
+        var Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        var Cb = 0.564 * (b - Y);
+        var Cr = 0.713 * (r - Y);
+
+        return { y: Math.ceil(Y), cr: Cr, cb: Cb };
+    },
+    YCrCbtoRGB: function YCrCbtoRGB(y, cr, cb) {
+        var bit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+        var R = y + 1.402 * (cr - bit);
+        var G = y - 0.344 * (cb - bit) - 0.714 * (cr - bit);
+        var B = y + 1.772 * (cb - bit);
+
+        return { r: Math.ceil(R), g: Math.ceil(G), b: Math.ceil(B) };
+    },
     scale: function scale(startColor, endColor, t) {
         var obj = {
             r: parseInt(startColor.r + (endColor.r - startColor.r) * t, 10),
@@ -341,34 +428,35 @@ var color$1 = {
             b: parseInt(startColor.b + (endColor.b - startColor.b) * t, 10)
         };
 
-        return color$1.format(obj, 'hex');
-    },
-    checkHueColor: function checkHueColor(p) {
-        var startColor, endColor;
-
-        for (var i = 0; i < hue_color.length; i++) {
-            if (hue_color[i].start >= p) {
-                startColor = hue_color[i - 1];
-                endColor = hue_color[i];
-                break;
-            }
-        }
-
-        if (startColor && endColor) {
-            return this.scale(startColor, endColor, (p - startColor.start) / (endColor.start - startColor.start));
-        }
-
-        return hue_color[0].rgb;
+        return color.format(obj, 'hex');
     }
 };
 
 var hue_color = [{ rgb: '#ff0000', start: .0 }, { rgb: '#ffff00', start: .17 }, { rgb: '#00ff00', start: .33 }, { rgb: '#00ffff', start: .50 }, { rgb: '#0000ff', start: .67 }, { rgb: '#ff00ff', start: .83 }, { rgb: '#ff0000', start: 1 }];
 
+function checkHueColor(p) {
+    var startColor, endColor;
+
+    for (var i = 0; i < hue_color.length; i++) {
+        if (hue_color[i].start >= p) {
+            startColor = hue_color[i - 1];
+            endColor = hue_color[i];
+            break;
+        }
+    }
+
+    if (startColor && endColor) {
+        return color.scale(startColor, endColor, (p - startColor.start) / (endColor.start - startColor.start));
+    }
+
+    return hue_color[0].rgb;
+}
+
 function initHueColors() {
     for (var i = 0, len = hue_color.length; i < len; i++) {
         var hue = hue_color[i];
 
-        var obj = color$1.parse(hue.rgb);
+        var obj = color.parse(hue.rgb);
 
         hue.r = obj.r;
         hue.g = obj.g;
@@ -378,9 +466,9 @@ function initHueColors() {
 
 initHueColors();
 
-var ColorUtil = {
-    color: color$1,
-    hue_color: hue_color
+var HueColor = {
+    colors: hue_color,
+    checkHueColor: checkHueColor
 };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -521,8 +609,6 @@ var toArray = function (arr) {
   return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
-var color$2 = ColorUtil.color;
-
 var counter = 0;
 var cached = [];
 
@@ -587,7 +673,7 @@ var Dom = function () {
     }, {
         key: 'removeClass',
         value: function removeClass(cls) {
-            this.el.className = color$2.trim((' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' '));
+            this.el.className = (' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' ').trim();
         }
     }, {
         key: 'hasClass',
@@ -1077,8 +1163,6 @@ var EventMachin = function () {
   return EventMachin;
 }();
 
-var color$3 = ColorUtil.color;
-
 var ColorControl = function (_EventMachin) {
     inherits(ColorControl, _EventMachin);
 
@@ -1113,8 +1197,8 @@ var ColorControl = function (_EventMachin) {
         }
     }, {
         key: 'setBackgroundColor',
-        value: function setBackgroundColor(color) {
-            this.$controlColor.css("background-color", color);
+        value: function setBackgroundColor(color$$1) {
+            this.$controlColor.css("background-color", color$$1);
         }
     }, {
         key: 'refresh',
@@ -1158,13 +1242,13 @@ var ColorControl = function (_EventMachin) {
     }, {
         key: 'setOpacityColorBar',
         value: function setOpacityColorBar(hueColor) {
-            var rgb = color$3.parse(hueColor);
+            var rgb = color.parse(hueColor);
 
             rgb.a = 0;
-            var start = color$3.format(rgb, 'rgb');
+            var start = color.format(rgb, 'rgb');
 
             rgb.a = 1;
-            var end = color$3.format(rgb, 'rgb');
+            var end = color.format(rgb, 'rgb');
 
             this.$opacityColorBar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
         }
@@ -1202,7 +1286,7 @@ var ColorControl = function (_EventMachin) {
             this.setBackgroundColor(this.colorpicker.getFormattedColor('rgb'));
 
             var rgb = this.colorpicker.convertRGB();
-            var colorString = color$3.format(rgb, 'rgb');
+            var colorString = color.format(rgb, 'rgb');
             this.setOpacityColorBar(colorString);
         }
     }, {
@@ -1262,8 +1346,8 @@ var ColorControl = function (_EventMachin) {
         }
     }, {
         key: 'setControlColor',
-        value: function setControlColor(color) {
-            this.$controlColor.css('background-color', color);
+        value: function setControlColor(color$$1) {
+            this.$controlColor.css('background-color', color$$1);
         }
     }, {
         key: 'setHueColor',
@@ -1289,7 +1373,7 @@ var ColorControl = function (_EventMachin) {
 
             this.drag_bar_pos = { x: x };
 
-            var hueColor = color$3.checkHueColor(dist / 100);
+            var hueColor = HueColor.checkHueColor(dist / 100);
 
             this.colorpicker.setBackgroundColor(hueColor);
             this.colorpicker.setCurrentH(dist / 100 * 360);
@@ -1319,7 +1403,7 @@ var ColorControl = function (_EventMachin) {
 
             this.drag_bar_pos = { x: x };
 
-            var hueColor = color$3.checkHueColor(dist / 100);
+            var hueColor = HueColor.checkHueColor(dist / 100);
             this.colorpicker.setBackgroundColor(hueColor);
             this.colorpicker.setCurrentH(dist / 100 * 360);
         }
@@ -1350,8 +1434,6 @@ var ColorControl = function (_EventMachin) {
     }]);
     return ColorControl;
 }(EventMachin);
-
-var color$4 = ColorUtil.color;
 
 var ColorInformation = function (_EventMachin) {
     inherits(ColorInformation, _EventMachin);
@@ -1517,7 +1599,7 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getHexFormat',
         value: function getHexFormat() {
-            return color$4.format({
+            return color.format({
                 r: this.$rgb_r.int(),
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int()
@@ -1526,7 +1608,7 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getRgbFormat',
         value: function getRgbFormat() {
-            return color$4.format({
+            return color.format({
                 r: this.$rgb_r.int(),
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int(),
@@ -1536,7 +1618,7 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'getHslFormat',
         value: function getHslFormat() {
-            return color$4.format({
+            return color.format({
                 h: this.$hsl_h.val(),
                 s: this.$hsl_s.val(),
                 l: this.$hsl_l.val(),
@@ -1713,8 +1795,8 @@ var ColorPallet = function (_EventMachin) {
         }
     }, {
         key: 'setBackgroundColor',
-        value: function setBackgroundColor(color) {
-            this.$el.css("background-color", color);
+        value: function setBackgroundColor(color$$1) {
+            this.$el.css("background-color", color$$1);
         }
     }, {
         key: 'refresh',
@@ -1846,13 +1928,13 @@ var ColorSetsChooser = function (_EventMachin) {
             var $list = new Dom('div');
 
             for (var i = 0; i < maxCount; i++) {
-                var color = colors[i] || 'rgba(255, 255, 255, 1)';
+                var color$$1 = colors[i] || 'rgba(255, 255, 255, 1)';
                 var $item = $list.createChild('div', 'color-item', {
-                    title: color
+                    title: color$$1
                 });
 
                 $item.createChild('div', 'color-view', null, {
-                    'background-color': color
+                    'background-color': color$$1
                 });
             }
 
@@ -2075,16 +2157,16 @@ var CurrentColorSets = function (_EventMachin) {
             var colors = this.colorSetsList.getCurrentColors();
 
             for (var i = 0, len = colors.length; i < len; i++) {
-                var color = colors[i];
+                var color$$1 = colors[i];
                 var item = list.createChild('div', 'color-item', {
-                    'title': color,
+                    'title': color$$1,
                     'data-index': i,
-                    'data-color': color
+                    'data-color': color$$1
                 });
 
                 item.createChild('div', 'empty');
                 item.createChild('div', 'color-view', null, {
-                    'background-color': color
+                    'background-color': color$$1
                 });
             }
 
@@ -2124,8 +2206,8 @@ var CurrentColorSets = function (_EventMachin) {
         }
     }, {
         key: 'addColor',
-        value: function addColor(color) {
-            this.colorSetsList.addCurrentColor(color);
+        value: function addColor(color$$1) {
+            this.colorSetsList.addCurrentColor(color$$1);
             this.refreshAll();
         }
     }, {
@@ -2270,8 +2352,6 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
     return CurrentColorSetsContextMenu;
 }(EventMachin);
 
-var color = ColorUtil.color;
-
 var ColorPicker = function (_EventMachin) {
     inherits(ColorPicker, _EventMachin);
 
@@ -2399,7 +2479,7 @@ var ColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'show',
-        value: function show(opt, color, callback) {
+        value: function show(opt, color$$1, callback) {
             this.destroy();
             this.initializeEvent();
             this.$root.appendTo(document.body);
@@ -2416,7 +2496,7 @@ var ColorPicker = function (_EventMachin) {
 
             this.isShortCut = opt.isShortCut || false;
 
-            this.initColor(color);
+            this.initColor(color$$1);
 
             // define colorpicker callback
             this.colorpickerCallback = function (colorString) {
@@ -2571,8 +2651,8 @@ var ColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'setBackgroundColor',
-        value: function setBackgroundColor(color) {
-            this.palette.setBackgroundColor(color);
+        value: function setBackgroundColor(color$$1) {
+            this.palette.setBackgroundColor(color$$1);
         }
     }, {
         key: 'setCurrentFormat',
@@ -2727,7 +2807,6 @@ var ColorPicker = function (_EventMachin) {
 
 var colorpicker_class = 'codemirror-colorview';
 var colorpicker_background_class = 'codemirror-colorview-background';
-var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 // Excluded tokens do not show color views..
 var excluded_token = ['comment'];
 
@@ -2921,18 +3000,18 @@ var ColorView = function () {
             var lineNo = el.lineNo;
             var ch = el.ch;
             var nameColor = el.nameColor;
-            var color = el.color;
+            var color$$1 = el.color;
 
             if (this.colorpicker) {
                 var self = this;
-                var prevColor = color;
+                var prevColor = color$$1;
                 var pos = this.cm.charCoords({ line: lineNo, ch: ch });
                 this.colorpicker.show({
                     left: pos.left,
                     top: pos.bottom,
                     isShortCut: el.isShortCut || false,
                     hideDelay: self.opt.hideDelay || 2000
-                }, nameColor || color, function (newColor) {
+                }, nameColor || color$$1, function (newColor) {
                     self.cm.replaceRange(newColor, { line: lineNo, ch: ch }, { line: lineNo, ch: ch + prevColor.length }, '*colorpicker');
                     prevColor = newColor;
                 });
@@ -2997,31 +3076,21 @@ var ColorView = function () {
     }, {
         key: 'match_result',
         value: function match_result(lineHandle) {
-            return lineHandle.text.match(color_regexp);
+            return color.matches(lineHandle.text, true /* has color names */);
         }
     }, {
         key: 'submatch',
         value: function submatch(lineNo, lineHandle) {
+            var _this = this;
 
             this.empty_marker(lineNo, lineHandle);
 
             var result = this.match_result(lineHandle);
-            if (result && result.length) {
-                var obj = { next: 0 };
-                for (var i = 0, len = result.length; i < len; i++) {
+            var obj = { next: 0 };
 
-                    if (result[i].indexOf('#') > -1 || result[i].indexOf('rgb') > -1 || result[i].indexOf('hsl') > -1) {
-                        this.render(obj, lineNo, lineHandle, result[i]);
-                    } else {
-
-                        var nameColor = ColorNames.getColorByName(result[i]);
-
-                        if (nameColor) {
-                            this.render(obj, lineNo, lineHandle, result[i], nameColor);
-                        }
-                    }
-                }
-            }
+            result.forEach(function (item) {
+                _this.render(obj, lineNo, lineHandle, item.color, item.nameColor);
+            });
         }
     }, {
         key: 'match',
@@ -3061,12 +3130,12 @@ var ColorView = function () {
         }
     }, {
         key: 'set_state',
-        value: function set_state(lineNo, start, color, nameColor) {
+        value: function set_state(lineNo, start, color$$1, nameColor) {
             var marker = this.create_marker(lineNo, start);
 
             marker.lineNo = lineNo;
             marker.ch = start;
-            marker.color = color;
+            marker.color = color$$1;
             marker.nameColor = nameColor;
 
             return marker;
@@ -3091,8 +3160,8 @@ var ColorView = function () {
         }
     }, {
         key: 'update_element',
-        value: function update_element(el, color) {
-            el.back_element.style.backgroundColor = color;
+        value: function update_element(el, color$$1) {
+            el.back_element.style.backgroundColor = color$$1;
         }
     }, {
         key: 'set_mark',
@@ -3115,27 +3184,27 @@ var ColorView = function () {
         }
     }, {
         key: 'render',
-        value: function render(cursor, lineNo, lineHandle, color, nameColor) {
-            var start = lineHandle.text.indexOf(color, cursor.next);
+        value: function render(cursor, lineNo, lineHandle, color$$1, nameColor) {
+            var start = lineHandle.text.indexOf(color$$1, cursor.next);
 
             if (this.is_excluded_token(lineNo, start) === true) {
                 // excluded token do not show.
                 return;
             }
 
-            cursor.next = start + color.length;
+            cursor.next = start + color$$1.length;
 
             if (this.has_marker(lineNo, start)) {
-                this.update_element(this.create_marker(lineNo, start), nameColor || color);
-                this.set_state(lineNo, start, color, nameColor);
+                this.update_element(this.create_marker(lineNo, start), nameColor || color$$1);
+                this.set_state(lineNo, start, color$$1, nameColor);
                 return;
             }
 
             var el = this.create_marker(lineNo, start);
 
-            this.update_element(el, nameColor || color);
+            this.update_element(el, nameColor || color$$1);
 
-            this.set_state(lineNo, start, color, nameColor || color);
+            this.set_state(lineNo, start, color$$1, nameColor || color$$1);
             this.set_mark(lineNo, start, el);
         }
     }]);
@@ -3161,6 +3230,9 @@ if (CodeMirror) {
 }
 
 var index = {
+    Color: color,
+    ColorNames: ColorNames,
+    HueColor: HueColor,
     ColorPicker: ColorPicker
 };
 
