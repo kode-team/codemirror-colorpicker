@@ -4,11 +4,11 @@
   "description": "colorpicker for codemirror",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "pub": "npm run build && npm publish",
-    "build": "rollup --config config/rollup.config.prod.js",
-    "dev": "rollup -w --config config/rollup.config.dev.js",
-    "docs" : "http-server ./docs"
+    "build": "NODE_ENV=production rollup --config config/rollup.config.prod.js",
+    "dev": "NODE_ENV=development rollup -w --config config/rollup.config.dev.js",
+    "docs": "http-server ./docs",
+    "test": "NODE_ENV=test jest --watch"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,10 @@
   "devDependencies": {
     "autoprefixer": "^7.2.5",
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-jest": "^22.4.1",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2015-rollup": "^3.0.0",
@@ -35,6 +39,9 @@
     "codemirror": "^5.33.0",
     "cross-env": "^5.1.1",
     "http-server": "^0.11.1",
+    "jest": "^22.4.2",
+    "jest-cli": "^22.4.2",
+    "jest-report": "^0.1.11",
     "rollup": "^0.52.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-css-only": "^0.2.0",
@@ -48,5 +55,21 @@
     "rollup-watch": "^4.3.1",
     "uglify-es": "^3.2.2"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "jest": {
+    "modulePaths": [
+      "<rootDir>/src",
+      "<rootDir>/node_modules"
+    ],
+    "globals": {
+      "NODE_ENV": "test"
+    },
+    "verbose": false,
+    "moduleFileExtensions": [
+      "js",
+      "json"
+    ],
+    "testRegex": "test/.*\\.spec\\.js$",
+    "testEnvironment": "node"
+  }
 }

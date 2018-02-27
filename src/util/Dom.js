@@ -62,7 +62,7 @@ export default class Dom {
     }
     
     removeClass (cls) {
-        this.el.className = color.trim((` ${this.el.className} `).replace(` ${cls} `, ' '));
+        this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
     }
     
     hasClass (cls) {

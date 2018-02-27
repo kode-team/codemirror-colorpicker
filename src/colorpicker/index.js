@@ -1,4 +1,4 @@
-import ColorUtil from '../util/Color'
+import Color from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
@@ -10,9 +10,6 @@ import ColorSetsChooser from './ColorSetsChooser'
 import ColorSetsList from './ColorSetsList'
 import CurrentColorSets from './CurrentColorSets'
 import CurrentColorSetsContextMenu from './CurrentColorSetsContextMenu'
-
-const color = ColorUtil.color;
-
 
 export default class ColorPicker extends EventMachin {
     constructor (opt) {
@@ -78,7 +75,7 @@ export default class ColorPicker extends EventMachin {
             if(!value.r || !value.g || !value.b)
                 return;
 
-            this.initColor(color.format(value, "hex"));
+            this.initColor(Color.format(value, "hex"));
         } else if(typeof(value) == "string") {
             this.initColor(value); 
         }
@@ -89,7 +86,7 @@ export default class ColorPicker extends EventMachin {
         var rgb = this.convertRGB();
 
         if (type) {
-            return color.format(rgb, type);
+            return Color.format(rgb, type);
         }
 
         return rgb;
@@ -187,15 +184,15 @@ export default class ColorPicker extends EventMachin {
     }    
 
     convertRGB() {
-        return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
+        return Color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
     }
     
     convertHEX() {
-        return color.format(this.convertRGB(), 'hex');
+        return Color.format(this.convertRGB(), 'hex');
     }
     
     convertHSL() { 
-        return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
+        return Color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
     }
 
     getCurrentColor () {
@@ -208,14 +205,14 @@ export default class ColorPicker extends EventMachin {
         if (format == 'rgb') {
             var rgb = this.convertRGB();
             rgb.a = this.currentA;
-            return color.format(rgb, 'rgb');
+            return Color.format(rgb, 'rgb');
         } else if (format == 'hsl') {
             var hsl = this.convertHSL();
             hsl.a = this.currentA;
-            return color.format(hsl, 'hsl');
+            return Color.format(hsl, 'hsl');
         } else {
             var rgb = this.convertRGB();
-            return color.format(rgb, 'hex');
+            return Color.format(rgb, 'hex');
         }
     }
 
@@ -298,15 +295,15 @@ export default class ColorPicker extends EventMachin {
 
     getHSV (colorObj) {
         if (colorObj.type == 'hsl') {
-            return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
+            return Color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
         } else {
-            return color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+            return Color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
         } 
 
     }
 
     initColor(newColor, format) {
-        let c = newColor || "#FF0000", colorObj = color.parse(c);
+        let c = newColor || "#FF0000", colorObj = Color.parse(c);
         format = format || colorObj.type;
     
         this.setCurrentFormat(format);
@@ -319,7 +316,7 @@ export default class ColorPicker extends EventMachin {
     }    
 
     changeInformationColor(newColor) {
-        let c = newColor || "#FF0000", colorObj = color.parse(c);
+        let c = newColor || "#FF0000", colorObj = Color.parse(c);
     
         let hsv = this.getHSV(colorObj);
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);

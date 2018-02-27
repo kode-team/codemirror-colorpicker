@@ -1,8 +1,27 @@
 {
-    "presets" : [
-        [ "es2015", {"modules" : false } ]
-    ],
-    "plugins": [
-        "external-helpers"
-    ]
+    "env": {
+        "test": {
+            "presets" : [ ["env"]  ],
+            "plugins": [
+                "transform-es2015-modules-commonjs"
+            ]
+        },
+        "development" : {
+            "presets" : [
+                [ "env", {"modules" : false } ]
+            ],
+            "plugins": [    
+                "external-helpers"
+            ]
+        },
+        "production" : {
+            "presets" : [
+                [ "env", {"modules" : false } ]
+            ],
+            "plugins": [    
+                "external-helpers"
+            ]
+        }
+    }
+
 }

@@ -1,9 +1,9 @@
+import Color from '../util/Color'
 import ColorNames from '../util/ColorNames'
 import ColorPicker from '../colorpicker/index';
 
 const colorpicker_class = 'codemirror-colorview';
 const colorpicker_background_class = 'codemirror-colorview-background';
-const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 // Excluded tokens do not show color views..
 let excluded_token = ['comment'];
 
@@ -278,32 +278,19 @@ export default class ColorView {
 
     
     match_result(lineHandle) {
-        return lineHandle.text.match(color_regexp);
+        return Color.matches(lineHandle.text, true /* has color names */);
     }
 
     submatch(lineNo, lineHandle) {
 
         this.empty_marker(lineNo, lineHandle);
         
-        var result = this.match_result(lineHandle);
-        if (result && result.length)
-        {
-            var obj = { next : 0 };
-            for(var i = 0, len = result.length; i < len; i++) {
+        const result = this.match_result(lineHandle); 
+        let obj = { next : 0 };
 
-                if (result[i].indexOf('#') > -1 || result[i].indexOf('rgb') > -1 || result[i].indexOf('hsl') > -1) {
-                    this.render(obj, lineNo, lineHandle, result[i]);
-                } else {
-                    
-                    var nameColor = ColorNames.getColorByName(result[i]);
-
-                    if (nameColor) {
-                        this.render(obj, lineNo, lineHandle, result[i], nameColor);
-                    }
-                }
-            }
-
-        }
+        result.forEach(item => {
+            this.render(obj, lineNo, lineHandle, item.color, item.nameColor);
+        });
     }
 
     match(lineNo) {

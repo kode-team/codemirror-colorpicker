@@ -1,7 +1,48 @@
 import ColorNames from './ColorNames'
 
+const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 
 const color = {
+    
+    matches : function (str, hasColorName = false ) {
+        const matches = str.match(color_regexp);
+        let result = [] ;
+
+        if (!matches) {
+            return result;
+        }
+
+
+        var obj = { next : 0 };
+        for(var i = 0, len = matches.length; i < len; i++) {
+
+            if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
+                result.push({ color : matches[i] });
+            } else {
+                
+                if (hasColorName) {
+                    var nameColor = ColorNames.getColorByName(matches[i]);
+    
+                    if (nameColor) {
+                        result.push({ color : matches[i], nameColor : nameColor });
+                    }
+                }
+
+            }
+        }
+
+        var pos = { next : 0 }
+        result.forEach(item => {
+            const startIndex = str.indexOf(item.color, pos.next);
+
+            item.startIndex = startIndex;
+            item.endIndex = startIndex + item.color.length; 
+
+            pos.next = item.endIndex;
+        });
+        
+        return result;
+    },
 
     trim : function (str) {
         return str.replace(/^\s+|\s+$/g, '');
@@ -98,7 +139,7 @@ const color = {
                 var arr = str.replace("hsl(", "").replace(")","").split(",");
 
                 for(var i = 0, len = arr.length; i < len; i++) {
-                    arr[i] = parseInt(color.trim(arr[i]), 10);
+                    arr[i] = parseFloat(color.trim(arr[i]));
                 }
 
                 var obj = { type : 'hsl', h : arr[0], s : arr[1], l : arr[2], a : 1	};
@@ -247,6 +288,27 @@ const color = {
         return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     },
 
+    RGBtoCMYK : function (r, g, b) {
+        const R1 = r / 255; 
+        const G1 = g / 255; 
+        const B1 = b / 255; 
+
+        const K = 1 - Math.max(R1, G1, B1);
+        const C = (1 - R1 - K) / ( 1 - K );
+        const M = (1 - G1 - K) / ( 1 - K );
+        const Y = (1 - B1 - K) / ( 1 - K );
+
+        return { c : C, m : M, y : Y , k : K  };
+    },
+
+    CMYKtoRGB : function (c, m, y, k) {
+        const R = 255 * ( 1 - c ) * (1 - k);
+        const G = 255 * ( 1 - m ) * (1 - k);
+        const B = 255 * ( 1 - y ) * (1 - k);
+
+        return { r: R, g : G, b : B }
+    },
+
     RGBtoHSL : function (r, g, b) {
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -302,6 +364,29 @@ const color = {
 
         return { r : Math.round(r * 255), g : Math.round(g * 255), b : Math.round(b * 255) };
     },
+    gray : function (gray) {
+        return { r : gray, g : gray, b : gray };
+    },    
+    RGBtoSimpleGray : function (r, g, b) {
+        return this.gray(Math.ceil((r + g + b)/3));
+    },    
+    RGBtoGray : function (r, g, b) {
+        return this.gray(this.RGBtoYCrCb(r, g, b).y);
+    },
+    RGBtoYCrCb : function (r, g, b) {
+        const Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        const Cb = 0.564 * (b - Y) 
+        const Cr = 0.713 * (r - Y) 
+
+        return { y : Math.ceil(Y), cr : Cr, cb : Cb }; 
+    },
+    YCrCbtoRGB : function (y, cr, cb, bit = 0) {
+        const R = y + 1.402 * (cr - bit) ;
+        const G = y - 0.344 * (cb - bit)  - 0.714 * (cr - bit); 
+        const B = y + 1.772 * (cb - bit);
+
+        return { r: Math.ceil(R), g : Math.ceil(G), b : Math.ceil(B) }
+    },
     scale (startColor, endColor, t) {
         var obj = {
             r : parseInt(startColor.r + (endColor.r - startColor.r) * t, 10) ,
@@ -311,53 +396,7 @@ const color = {
     
         return color.format(obj, 'hex');
     
-    },
-    checkHueColor(p) {
-        var startColor, endColor;
-    
-        for(var i = 0; i < hue_color.length;i++) {
-            if (hue_color[i].start >= p) {
-                startColor = hue_color[i-1];
-                endColor = hue_color[i];
-                break;
-            }
-        }
-    
-        if (startColor && endColor) {
-            return this.scale(startColor, endColor, (p - startColor.start)/(endColor.start - startColor.start));
-        }
-    
-        return hue_color[0].rgb;
     }
 }
 
-const hue_color = [
-    { rgb : '#ff0000', start : .0 },
-    { rgb : '#ffff00', start : .17 },
-    { rgb : '#00ff00', start : .33 },
-    { rgb : '#00ffff', start : .50 },
-    { rgb : '#0000ff', start : .67 },
-    { rgb : '#ff00ff', start : .83 },
-    { rgb : '#ff0000', start : 1 }
-];
-
-
-function initHueColors () {
-    for(var i = 0, len = hue_color.length; i < len; i++) {
-        var hue = hue_color[i];
-
-        var obj = color.parse(hue.rgb);
-
-        hue.r = obj.r;
-        hue.g = obj.g;
-        hue.b = obj.b;
-    }
-}
-
-initHueColors();
-
-
-export default {
-    color: color,
-    hue_color: hue_color
-}
+export default color; 

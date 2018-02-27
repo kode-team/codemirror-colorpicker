@@ -1,6 +1,9 @@
 import './scss/index.scss'
 
 import CodeMirror from 'codemirror'
+import Color from './util/Color'
+import HueColor from './util/HueColor'
+import ColorNames from './util/ColorNames'
 import ColorView from './colorview/index'
 import ColorPicker from './colorpicker/index'
 
@@ -27,5 +30,8 @@ if (CodeMirror) {
 
 
 export default {
+    Color,
+    ColorNames,
+    HueColor,
     ColorPicker 
 }

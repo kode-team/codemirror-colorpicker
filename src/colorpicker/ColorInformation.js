@@ -1,9 +1,7 @@
-import ColorUtil from '../util/Color'
+import Color from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
-
-const color = ColorUtil.color;
 
 export default class ColorInformation extends EventMachin {
 
@@ -156,7 +154,7 @@ export default class ColorInformation extends EventMachin {
     }
     
     getHexFormat() {
-        return color.format({
+        return Color.format({
             r : this.$rgb_r.int(),
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int()
@@ -164,7 +162,7 @@ export default class ColorInformation extends EventMachin {
     }
 
     getRgbFormat() {
-        return color.format({
+        return Color.format({
             r : this.$rgb_r.int(),
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int(),
@@ -173,7 +171,7 @@ export default class ColorInformation extends EventMachin {
     }    
 
     getHslFormat() {
-        return color.format({
+        return Color.format({
             h : this.$hsl_h.val(),
             s : this.$hsl_s.val(),
             l : this.$hsl_l.val(),

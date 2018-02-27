@@ -1,11 +1,10 @@
 
-import ColorUtil from '../util/Color'
+import Color from '../util/Color'
+import HueColor from '../util/HueColor'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
 
-
-const color = ColorUtil.color;
 
 export default class ColorControl extends EventMachin {
     constructor (colorpicker) {
@@ -77,13 +76,13 @@ export default class ColorControl extends EventMachin {
 
 
     setOpacityColorBar(hueColor) {
-        var rgb = color.parse(hueColor);
+        var rgb = Color.parse(hueColor);
     
         rgb.a = 0;
-        var start = color.format(rgb, 'rgb');
+        var start = Color.format(rgb, 'rgb');
     
         rgb.a = 1;
-        var end = color.format(rgb, 'rgb');
+        var end = Color.format(rgb, 'rgb');
     
         var prefix = cssPrefix;
         this.$opacityColorBar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
@@ -120,7 +119,7 @@ export default class ColorControl extends EventMachin {
         this.setBackgroundColor(this.colorpicker.getFormattedColor('rgb'));
         
         var rgb = this.colorpicker.convertRGB();
-        var colorString = color.format(rgb, 'rgb');
+        var colorString = Color.format(rgb, 'rgb');
         this.setOpacityColorBar(colorString);        
     }
 
@@ -203,7 +202,7 @@ export default class ColorControl extends EventMachin {
     
         this.drag_bar_pos = { x };
     
-        var hueColor = color.checkHueColor(dist/100);
+        var hueColor = HueColor.checkHueColor(dist/100);
     
         this.colorpicker.setBackgroundColor(hueColor);
         this.colorpicker.setCurrentH((dist/100) * 360);
@@ -232,7 +231,7 @@ export default class ColorControl extends EventMachin {
     
         this.drag_bar_pos = { x };
     
-        var hueColor = color.checkHueColor(dist/100);
+        var hueColor = HueColor.checkHueColor(dist/100);
         this.colorpicker.setBackgroundColor(hueColor);        
         this.colorpicker.setCurrentH((dist/100) * 360);
     }       

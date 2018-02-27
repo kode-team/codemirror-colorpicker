@@ -1,9 +1,7 @@
-import ColorUtil from '../util/Color'
+import Color from '../util/Color'
 import Dom from '../util/Dom'
 import Event from '../util/Event'
 import EventMachin from '../util/EventMachin'
-
-const color = ColorUtil.color;
 
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
