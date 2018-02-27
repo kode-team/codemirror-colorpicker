@@ -549,8 +549,6 @@ var color = {
             var start = this.parse(_scale[i]);
             var end = this.parse(_scale[i + 1]);
 
-            console.log(start, end);
-
             for (var index = 0; index < count; index++) {
                 colors.push(this.interpolateRGB(start, end, index / count));
             }
@@ -2136,7 +2134,7 @@ var colorSetsList = [{
 }, {
     name: "Custom", "edit": true, "colors": []
 }, {
-    name: "Color Scale", "scale": ['yellow', 'red', 'black'], count: 5
+    name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
 }];
 
 var ColorSetsList = function () {
