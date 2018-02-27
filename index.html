@@ -184,7 +184,9 @@ var color_names = {
 <h1 class="title">Default Html Sample </h1>
 
 <div>
+        <button type="button" id="gray-scale" ></button><br />    
     <button type="button" onclick="showColor(event)" data-color="green">green</a>
+
 </div>
 
 <script type="text/javascript">
@@ -217,6 +219,7 @@ var color_names = {
     }, 100);
 
     function showColor(event) {
+        var Color = CodeMirrorColorPicker.Color;
         var colorpicker = new CodeMirrorColorPicker.ColorPicker();
 
         var color = event.target.getAttribute('data-color');
@@ -226,9 +229,23 @@ var color_names = {
             left : (target.offsetWidth + target.offsetLeft),
             top : event.clientY 
         }, color, function (newColor) {
+
+            var temp = Color.parse(newColor);
+            
+            var textColor = Color.format(Color.c(temp), 'hex');
+
             target.style.backgroundColor = newColor;
+            target.style.color = textColor;
             target.textContent = newColor;
             //console.log(color, newColor);
+
+
+            var rgb = Color.RGBtoGray(temp);
+
+            var gray = Color.format(rgb, "hex")
+            document.getElementById('gray-scale').textContent = gray;
+            document.getElementById('gray-scale').style.backgroundColor = gray;
+
         });
     }
 

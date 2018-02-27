@@ -22,7 +22,7 @@ function checkHueColor(p) {
     }
 
     if (startColor && endColor) {
-        return Color.scale(startColor, endColor, (p - startColor.start)/(endColor.start - startColor.start));
+        return Color.interpolateRGB(startColor, endColor, (p - startColor.start)/(endColor.start - startColor.start));
     }
 
     return hue_color[0].rgb;

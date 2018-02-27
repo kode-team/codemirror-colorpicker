@@ -227,7 +227,18 @@ var color = {
      * @param {Number} V  Value number 		(min : 0, max : 1 )
      * @returns {Object}
      */
-    HSVtoRGB: function HSVtoRGB(H, S, V) {
+    HSVtoRGB: function HSVtoRGB(h, s, v) {
+
+        if (arguments.length == 1) {
+            var _arguments$ = arguments[0],
+                h = _arguments$.h,
+                s = _arguments$.s,
+                v = _arguments$.v;
+        }
+
+        var H = h;
+        var S = s;
+        var V = v;
 
         if (H == 360) {
             H = 0;
@@ -272,11 +283,18 @@ var color = {
      * @param {Number} B  blue color value
      * @return {Object}  hsv color code
      */
-    RGBtoHSV: function RGBtoHSV(R, G, B) {
+    RGBtoHSV: function RGBtoHSV(r, g, b) {
 
-        var R1 = R / 255;
-        var G1 = G / 255;
-        var B1 = B / 255;
+        if (arguments.length == 1) {
+            var _arguments$2 = arguments[0],
+                r = _arguments$2.r,
+                g = _arguments$2.g,
+                b = _arguments$2.b;
+        }
+
+        var R1 = r / 255;
+        var G1 = g / 255;
+        var B1 = b / 255;
 
         var MaxC = Math.max(R1, G1, B1);
         var MinC = Math.min(R1, G1, B1);
@@ -309,12 +327,28 @@ var color = {
     },
 
     HSVtoHSL: function HSVtoHSL(h, s, v) {
+
+        if (arguments.length == 1) {
+            var _arguments$3 = arguments[0],
+                h = _arguments$3.h,
+                s = _arguments$3.s,
+                v = _arguments$3.v;
+        }
+
         var rgb = this.HSVtoRGB(h, s, v);
 
         return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     },
 
     RGBtoCMYK: function RGBtoCMYK(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$4 = arguments[0],
+                r = _arguments$4.r,
+                g = _arguments$4.g,
+                b = _arguments$4.b;
+        }
+
         var R1 = r / 255;
         var G1 = g / 255;
         var B1 = b / 255;
@@ -328,6 +362,15 @@ var color = {
     },
 
     CMYKtoRGB: function CMYKtoRGB(c, m, y, k) {
+
+        if (arguments.length == 1) {
+            var _arguments$5 = arguments[0],
+                c = _arguments$5.c,
+                m = _arguments$5.m,
+                y = _arguments$5.y,
+                k = _arguments$5.k;
+        }
+
         var R = 255 * (1 - c) * (1 - k);
         var G = 255 * (1 - m) * (1 - k);
         var B = 255 * (1 - y) * (1 - k);
@@ -336,6 +379,14 @@ var color = {
     },
 
     RGBtoHSL: function RGBtoHSL(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$6 = arguments[0],
+                r = _arguments$6.r,
+                g = _arguments$6.g,
+                b = _arguments$6.b;
+        }
+
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b),
             min = Math.min(r, g, b);
@@ -372,12 +423,27 @@ var color = {
     },
 
     HSLtoHSV: function HSLtoHSV(h, s, l) {
+
+        if (arguments.length == 1) {
+            var _arguments$7 = arguments[0],
+                h = _arguments$7.h,
+                s = _arguments$7.s,
+                v = _arguments$7.v;
+        }
         var rgb = this.HSLtoRGB(h, s, l);
 
         return this.RGBtoHSV(rgb.r, rgb.g, rgb.b);
     },
 
     HSLtoRGB: function HSLtoRGB(h, s, l) {
+
+        if (arguments.length == 1) {
+            var _arguments$8 = arguments[0],
+                h = _arguments$8.h,
+                s = _arguments$8.s,
+                v = _arguments$8.v;
+        }
+
         var r, g, b;
 
         h /= 360;
@@ -396,16 +462,47 @@ var color = {
 
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     },
+    c: function c(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$9 = arguments[0],
+                r = _arguments$9.r,
+                g = _arguments$9.g,
+                b = _arguments$9.b;
+        }
+        return this.gray((r + g + b) / 3 > 90 ? 0 : 255);
+    },
     gray: function gray(_gray) {
         return { r: _gray, g: _gray, b: _gray };
     },
     RGBtoSimpleGray: function RGBtoSimpleGray(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$10 = arguments[0],
+                r = _arguments$10.r,
+                g = _arguments$10.g,
+                b = _arguments$10.b;
+        }
         return this.gray(Math.ceil((r + g + b) / 3));
     },
     RGBtoGray: function RGBtoGray(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$11 = arguments[0],
+                r = _arguments$11.r,
+                g = _arguments$11.g,
+                b = _arguments$11.b;
+        }
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
     RGBtoYCrCb: function RGBtoYCrCb(r, g, b) {
+
+        if (arguments.length == 1) {
+            var _arguments$12 = arguments[0],
+                r = _arguments$12.r,
+                g = _arguments$12.g,
+                b = _arguments$12.b;
+        }
         var Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
         var Cb = 0.564 * (b - Y);
         var Cr = 0.713 * (r - Y);
@@ -415,13 +512,22 @@ var color = {
     YCrCbtoRGB: function YCrCbtoRGB(y, cr, cb) {
         var bit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
+
+        if (arguments.length == 1) {
+            var _arguments$13 = arguments[0],
+                y = _arguments$13.y,
+                cr = _arguments$13.cr,
+                cb = _arguments$13.cb,
+                _arguments$13$bit = _arguments$13.bit,
+                bit = _arguments$13$bit === undefined ? 0 : _arguments$13$bit;
+        }
         var R = y + 1.402 * (cr - bit);
         var G = y - 0.344 * (cb - bit) - 0.714 * (cr - bit);
         var B = y + 1.772 * (cb - bit);
 
         return { r: Math.ceil(R), g: Math.ceil(G), b: Math.ceil(B) };
     },
-    scale: function scale(startColor, endColor, t) {
+    interpolateRGB: function interpolateRGB(startColor, endColor, t) {
         var obj = {
             r: parseInt(startColor.r + (endColor.r - startColor.r) * t, 10),
             g: parseInt(startColor.g + (endColor.g - startColor.g) * t, 10),
@@ -429,6 +535,27 @@ var color = {
         };
 
         return color.format(obj, 'hex');
+    },
+    scale: function scale(_scale) {
+        var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+
+        if (!_scale) return [];
+
+        _scale = _scale || [];
+        var len = _scale.length;
+
+        var colors = [];
+        for (var i = 0; i < len - 1; i++) {
+            var start = this.parse(_scale[i]);
+            var end = this.parse(_scale[i + 1]);
+
+            console.log(start, end);
+
+            for (var index = 0; index < count; index++) {
+                colors.push(this.interpolateRGB(start, end, index / count));
+            }
+        }
+        return colors;
     }
 };
 
@@ -446,7 +573,7 @@ function checkHueColor(p) {
     }
 
     if (startColor && endColor) {
-        return color.scale(startColor, endColor, (p - startColor.start) / (endColor.start - startColor.start));
+        return color.interpolateRGB(startColor, endColor, (p - startColor.start) / (endColor.start - startColor.start));
     }
 
     return hue_color[0].rgb;
@@ -2008,6 +2135,8 @@ var colorSetsList = [{
     colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
 }, {
     name: "Custom", "edit": true, "colors": []
+}, {
+    name: "Color Scale", "scale": ['yellow', 'red', 'black'], count: 5
 }];
 
 var ColorSetsList = function () {
@@ -2078,9 +2207,9 @@ var ColorSetsList = function () {
         }
     }, {
         key: 'addCurrentColor',
-        value: function addCurrentColor(color) {
+        value: function addCurrentColor(color$$1) {
             if (Array.isArray(this.currentColorSets.colors)) {
-                this.currentColorSets.colors.push(color);
+                this.currentColorSets.colors.push(color$$1);
             }
         }
     }, {
@@ -2112,6 +2241,11 @@ var ColorSetsList = function () {
     }, {
         key: 'getColors',
         value: function getColors(element) {
+
+            if (element.scale) {
+                return color.scale(element.scale, element.count);
+            }
+
             return element.colors || [];
         }
     }, {
@@ -2666,7 +2800,7 @@ var ColorPicker = function (_EventMachin) {
             if (colorObj.type == 'hsl') {
                 return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
             } else {
-                return color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+                return color.RGBtoHSV(colorObj);
             }
         }
     }, {

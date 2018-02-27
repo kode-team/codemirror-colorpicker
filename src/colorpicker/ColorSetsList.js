@@ -1,3 +1,5 @@
+import Color from '../util/Color'
+
 let colorSetsList = [
     { 
         name : "Material",  
@@ -6,7 +8,10 @@ let colorSetsList = [
         ]
     },
     { 
-        name : "Custom", "edit" : true, "colors" : [] 
+        name : "Custom", "edit" : true, "colors" : []
+    },
+    {
+        name: "Color Scale", "scale" : ['yellow', 'red', 'black' ], count : 5
     }
 ]
 
@@ -100,6 +105,11 @@ export default class ColorSetsList {
     }
 
     getColors (element) {
+
+        if (element.scale) {
+            return Color.scale(element.scale, element.count);
+        }
+        
         return element.colors || []; 
     }
 

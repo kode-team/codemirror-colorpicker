@@ -297,7 +297,7 @@ export default class ColorPicker extends EventMachin {
         if (colorObj.type == 'hsl') {
             return Color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
         } else {
-            return Color.RGBtoHSV(colorObj.r, colorObj.g, colorObj.b);
+            return Color.RGBtoHSV(colorObj);
         } 
 
     }
