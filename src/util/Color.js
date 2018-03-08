@@ -482,4 +482,31 @@ const color = {
     }
 }
 
+color.scale.parula = function (count) {
+    return color.scale(['#352a87', '#0f5cdd', '#00b5a6', '#ffc337', '#fdff00'], count);
+};
+
+color.scale.jet = function (count) {
+    return color.scale(['#00008f', '#0020ff', '#00ffff', '#51ff77', '#fdff00', '#ff0000', '#800000'], count);
+}
+
+color.scale.hsv = function (count) {
+    return color.scale(['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ff0000'], count);
+}
+
+color.scale.hot = function (count) {
+    return color.scale(['#0b0000', '#ff0000', '#ffff00', '#ffffff'], count);
+}
+color.scale.pink = function (count) { 
+    return color.scale(['#1e0000', '#bd7b7b', '#e7e5b2', '#ffffff'], count); 
+}
+
+color.scale.bone = function (count) { 
+    return color.scale(['#000000', '#4a4a68', '#a6c6c6', '#ffffff'], count); 
+}
+
+color.scale.copper = function (count) { 
+    return color.scale(['#000000', '#3d2618', '#9d623e', '#ffa167', '#ffc77f'], count);
+}
+
 export default color; 

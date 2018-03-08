@@ -23,6 +23,8 @@
         content: attr(data-colors) ' ' attr(data-count);
         margin-right: 10px;
         min-width: 100px;
+        padding: 5px 0px;
+        vertical-align: middle;
         display:inline-block;
     }
 
@@ -34,6 +36,8 @@
 
     .color-scale *:hover:after {
         display: inline-block;
+        width: 100px;
+        text-align: center;
         content: attr(title);
         position:absolute;
         left:50%;
@@ -220,6 +224,19 @@ var color_names = {
 
 <div>
     <h2> Color Scales</h2>
+    <div class="color-scale" data-title="parula" data-colors="red,yellow" data-count="20">
+
+    </div>
+    
+
+    <div class="color-scale" data-colors="hsv" data-count="40"></div>
+    <div class="color-scale" data-colors="parula" data-count="20"></div>
+    <div class="color-scale" data-colors="jet" data-count="20"></div>
+    <div class="color-scale" data-colors="hot" data-count="20"></div>
+    <div class="color-scale" data-colors="pink" data-count="20"></div>
+    <div class="color-scale" data-colors="bone" data-count="20"></div>
+    <div class="color-scale" data-colors="copper" data-count="20"></div>
+    
     <div class="color-scale" data-colors="red,yellow" data-count="50">
 
     </div>
@@ -300,13 +317,17 @@ var color_names = {
         var colors = item.getAttribute('data-colors').split(",");
         var count = +item.getAttribute('data-count');
 
-        var scaleColors = Color.scale(colors, count);
+        if (colors.length && Color.scale[colors[0]]) {
+            var scaleColors = Color.scale[colors[0]](count);
+        } else {
+            var scaleColors = Color.scale(colors, count);
+        }
 
         var fragment = document.createDocumentFragment();
         for (var index = 0, scaleCount = scaleColors.length; index < scaleCount; index++) {
             var dom = document.createElement('div');
             dom.style.backgroundColor = scaleColors[index];
-            dom.setAttribute('title', scaleColors[index])
+            dom.setAttribute('title', (index+1) + "-" + scaleColors[index])
             fragment.appendChild(dom);
         }
 
