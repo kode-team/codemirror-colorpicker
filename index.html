@@ -46,6 +46,42 @@
         color: white;
         transform:translateX(-50%);
     }
+
+    .daimond {
+        width: 200px;
+        height: 200px;
+        box-sizing:border-box;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .daimond .row {
+        flex: 1; 
+        display: flex;
+    }
+
+    .daimond .row .column {
+        flex: 1;
+        height: 100%;
+        position: relative;
+
+    }
+
+    .daimond .row .column:hover:after {
+        display: inline-block;
+        width: 100px;
+        text-align: center;
+        content: attr(title);
+        position:absolute;
+        left:50%;
+        bottom:100%;
+        background-color: black;
+        color: white;
+        transform:translateX(-50%);
+        pointer-events: none;
+    }
+
     </style>
 </head>
 <body>
@@ -223,6 +259,13 @@ var color_names = {
 </div>
 
 <div>
+    <h2> Saturation Scale (yellow, S, 100)</h2>    
+    <div class="daimond" data-background-color="yellow" data-target='S'></div>
+    <h2> Value Scale (yellow, V, 100)</h2>    
+    <div class="daimond" data-background-color="yellow" data-target='V'></div>
+</div>
+
+<div>
     <h2> Color Scales</h2>
     <div class="color-scale" data-title="parula" data-colors="red,yellow" data-count="20">
 
@@ -335,6 +378,36 @@ var color_names = {
 
     }
 
+    var nodes = document.querySelectorAll(".daimond");
+    for(var index = 0, len = nodes.length; index < len; index++) {
+        var item = nodes[index];
+        
+        var color = item.getAttribute('data-background-color');
+        var target = item.getAttribute('data-target');
+        item.style.backgroundColor = color;
+        
+        var results = Color['scale' + target](color, 100, 'hex');
+        var layerCount = 10; 
+
+        var fragment = document.createDocumentFragment();
+        for (var i = 0; i < layerCount; i++) {
+            var dom = document.createElement('div');
+            dom.classList.add('row');
+
+            for(var j = 0; j < layerCount; j++) {
+                var it = document.createElement('div');
+                it.classList.add('column');
+
+                it.setAttribute('title', results[i*layerCount + j]);
+                it.style.backgroundColor =  results[i*layerCount + j];
+
+                dom.appendChild(it);
+            }
+            fragment.appendChild(dom);
+        }
+
+        item.appendChild(fragment);
+    }
 </script>
 
 

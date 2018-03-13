@@ -97,13 +97,13 @@ var color = {
 
             return '#' + r + g + b;
         } else if (type == 'rgb') {
-            if (obj.a == 1) {
+            if (obj.a == 1 || typeof obj.a == 'undefined') {
                 return 'rgb(' + obj.r + ',' + obj.g + ',' + obj.b + ')';
             } else {
                 return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + obj.a + ')';
             }
         } else if (type == 'hsl') {
-            if (obj.a == 1) {
+            if (obj.a == 1 || typeof obj.a == 'undefined') {
                 return 'hsl(' + obj.h + ',' + obj.s + '%,' + obj.l + '%)';
             } else {
                 return 'hsla(' + obj.h + ',' + obj.s + '%,' + obj.l + '%,' + obj.a + ')';
@@ -552,6 +552,50 @@ var color = {
             }
         }
         return colors;
+    },
+    scaleHSV: function scaleHSV(color) {
+        var target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'h';
+        var count = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 9;
+        var format = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'rgb';
+        var min = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+        var max = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
+        var dist = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 100;
+
+        var colorObj = this.parse(color);
+        var hsv = this.RGBtoHSV(colorObj);
+        var unit = (max - min) * dist / count;
+
+        var results = [];
+        for (var i = 1; i <= count; i++) {
+            hsv[target] = Math.abs((dist - unit * i) / dist);
+            results.push(this.format(this.HSVtoRGB(hsv), format));
+        }
+
+        return results;
+    },
+    scaleH: function scaleH(color) {
+        var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 9;
+        var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'rgb';
+        var min = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+        var max = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 360;
+
+        return this.scaleHSV(color, 'h', count, format, min, max, 1);
+    },
+    scaleS: function scaleS(color) {
+        var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 9;
+        var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'rgb';
+        var min = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+        var max = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+
+        return this.scaleHSV(color, 's', count, format, min, max, 100);
+    },
+    scaleV: function scaleV(color) {
+        var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 9;
+        var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'rgb';
+        var min = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+        var max = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+
+        return this.scaleHSV(color, 'v', count, format, min, max, 100);
     }
 };
 

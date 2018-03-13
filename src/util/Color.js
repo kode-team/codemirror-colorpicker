@@ -79,13 +79,13 @@ const color = {
 
             return `#${r}${g}${b}`;
         } else if (type == 'rgb') {
-            if (obj.a == 1) {
+            if (obj.a == 1 || typeof obj.a == 'undefined') {
                 return `rgb(${obj.r},${obj.g},${obj.b})`;
             } else {
                 return `rgba(${obj.r},${obj.g},${obj.b},${obj.a})`;
             }
         } else if (type == 'hsl') {
-            if (obj.a == 1) {
+            if (obj.a == 1 || typeof obj.a == 'undefined') {
                 return `hsl(${obj.h},${obj.s}%,${obj.l}%)`;
             } else {
                 return `hsla(${obj.h},${obj.s}%,${obj.l}%,${obj.a})`;
@@ -478,7 +478,29 @@ const color = {
 
         }
         return colors;
+    },
 
+    scaleHSV (color, target = 'h', count = 9, format = 'rgb', min = 0, max = 1, dist = 100) {
+        var colorObj = this.parse(color);
+        var hsv = this.RGBtoHSV(colorObj);
+        var unit = ((max - min) * dist / count);
+
+        var results = [];
+        for(var i = 1; i <= count; i++) {
+            hsv[target] = Math.abs((dist - unit * i) / dist);
+            results.push(this.format(this.HSVtoRGB(hsv), format));
+        } 
+        
+        return results; 
+    },
+    scaleH (color, count = 9, format = 'rgb', min = 0, max = 360) {
+        return this.scaleHSV(color, 'h', count, format, min , max, 1);
+    },
+    scaleS (color, count = 9, format = 'rgb', min = 0, max = 1) {
+        return this.scaleHSV(color, 's', count, format, min , max, 100);
+    },
+    scaleV (color, count = 9, format = 'rgb', min = 0, max = 1) {
+        return this.scaleHSV(color, 'v', count, format, min , max, 100);
     }
 }
 
