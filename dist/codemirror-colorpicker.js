@@ -1310,10 +1310,15 @@ var Dom = function () {
     }, {
         key: 'position',
         value: function position() {
-            return {
-                top: parseFloat(this.el.style.top),
-                left: parseFloat(this.el.style.left)
-            };
+
+            if (this.el.style.top) {
+                return {
+                    top: parseFloat(this.css('top')),
+                    left: parseFloat(this.css('left'))
+                };
+            } else {
+                return this.el.getBoundingClientRect();
+            }
         }
     }, {
         key: 'width',
@@ -3898,8 +3903,6 @@ var ChromeColorControl = function (_EventMachin) {
 
             var h = huePos.x / this.$hueContainer.width() * 360;
 
-            console.log(h);
-
             return { h: h };
         }
     }, {
@@ -5164,8 +5167,6 @@ var ChromeDevtool = function (_EventMachin) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
             format = format || colorObj.type;
-
-            console.log(colorObj);
 
             this.setCurrentFormat(format);
 

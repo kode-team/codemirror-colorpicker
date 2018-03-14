@@ -164,10 +164,16 @@ export default class Dom {
     }
     
     position () {
-        return {
-            top: parseFloat(this.el.style.top),
-            left: parseFloat(this.el.style.left)
-        };
+
+        if (this.el.style.top) {
+            return {
+                top: parseFloat(this.css('top')),
+                left: parseFloat(this.css('left'))
+            };
+        } else {
+            return this.el.getBoundingClientRect();
+        }
+
     }
     
     width () {
