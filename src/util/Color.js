@@ -261,9 +261,9 @@ const color = {
         else if (300 <= H && H < 360) { temp = [C, 0, X]; }
 
         return {
-            r: Math.ceil((temp[0] + m) * 255),
-            g: Math.ceil((temp[1] + m) * 255),
-            b: Math.ceil((temp[2] + m) * 255)
+            r: Math.round((temp[0] + m) * 255),
+            g: Math.round((temp[1] + m) * 255),
+            b: Math.round((temp[2] + m) * 255)
         };
     },
 

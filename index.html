@@ -262,6 +262,11 @@ var color_names = {
 </textarea>
 
 
+<h1 >Chrom Devtool Style</h1>
+<div class="colorpicker-style" data-type="ChromeDevtool">
+
+</div>
+
 
 <h1 class="title">Default Html Sample </h1>
 
@@ -454,6 +459,26 @@ var color_names = {
         }
 
         item.appendChild(fragment);
+    }
+
+
+    var Color = CodeMirrorColorPicker.Color;
+    var nodes = document.querySelectorAll(".colorpicker-style");
+    for(var i = 0, len = nodes.length; i < len; i++) {
+        var item = nodes[i];
+
+        var type = item.getAttribute('data-type');
+
+        for(var j = 0; j < 3; j++) {
+            var picker = new CodeMirrorColorPicker[type]({
+                target: item,
+                color: 'blue',
+                onChange : function (c) {
+                    console.log(c);
+                }
+            });
+        }
+
     }
 </script>
 
