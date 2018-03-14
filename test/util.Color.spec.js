@@ -15,6 +15,21 @@ test('Color parse for hex', () => {
     expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
 });
 
+test('Color parse for hex Number', () => {
+    const colorCode = 0x229933;
+    const result = Color.parse(colorCode);
+
+    expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
+});
+
+test('Color parse for hex Number 2', () => {
+    const colorCode = 0x229933ff;
+    const result = Color.parse(colorCode);
+
+    expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
+});
+
+
 
 test('Color parse for hsl', () => {
     const colorCode = 'hsl(0,0%,69%)';

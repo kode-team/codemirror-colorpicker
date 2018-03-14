@@ -21,6 +21,435 @@ var ColorNames = {
     getColorByName: getColorByName
 };
 
+function array_equals(v1, v2) {
+    if (v1.length !== v2.length) return false;
+    for (var i = 0, len = v1.length; i < len; ++i) {
+        if (v1[i] !== v2[i]) return false;
+    }
+    return true;
+}
+
+function euclidean(v1, v2) {
+    var total = 0;
+
+    for (var i = 0, len = v1.length; i < len; i++) {
+        total += Math.pow(v2[i] - v1[i], 2);
+    }
+
+    return Math.sqrt(total);
+}
+
+function manhattan(v1, v2) {
+    var total = 0;
+
+    for (var i = 0, len = v1.length; i < len; i++) {
+        total += Math.abs(v2[i] - v1[i]);
+    }
+
+    return total;
+}
+
+function max(v1, v2) {
+    var max = 0;
+    for (var i = 0, len = v1.length; i < len; i++) {
+        max = Math.max(max, Math.abs(v2[i] - v1[i]));
+    }
+
+    return max;
+}
+
+var distances = {
+    euclidean: euclidean,
+    manhattan: manhattan,
+    max: max
+
+    // 임이의 몇개(k)를 찾는다. 
+};function randomCentroids(points, k) {
+    var centeroids = points.slice(0);
+
+    centeroids.sort(function () {
+        return Math.round(Math.random()) - 0.5;
+    });
+
+    return centeroids.slice(0, k);
+}
+
+// k 단계 중에 가장 가까운 거리에 있는 index 를 찾아보자. 
+function closestCenteroid(point, centeroids, distance) {
+    var min = Infinity,
+        index = 0;
+
+    centeroids.forEach(function (center, i) {
+        var dist = distance(point, center);
+
+        if (dist < min) {
+            min = dist;
+            index = i;
+        }
+    });
+
+    return index; // 가장 가까운 k 
+}
+
+function getCenteroid(assigned) {
+
+    if (assigned.length === 0) return [];
+
+    // Calculate running means.
+    var centeroid = assigned[0].map(function (it) {
+        return 0;
+    });
+
+    assigned.forEach(function (it, index) {
+
+        it.forEach(function (item, j) {
+            centeroid[j] += (item - centeroid[j]) / (index + 1);
+        });
+    });
+
+    return centeroid;
+}
+
+function unique_array(arrays) {
+    // 배열 중복을 제거 하자.
+    var set = {};
+    var count = arrays.length;
+    var it = null;
+    while (count--) {
+        it = arrays[count];
+        set[JSON.stringify(it)] = it;
+    }
+
+    return Object.values(set);
+}
+
+function kmeans(points, k, distance) {
+    var period = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
+
+    points = unique_array(points);
+
+    k = k || Math.max(2, Math.ceil(Math.sqrt(points.length / 2)));
+
+    distance = distance || 'euclidean';
+    if (typeof distance == 'string') {
+        distance = distances[distance];
+    }
+
+    var rng_seed = 0;
+    var random = function random() {
+        rng_seed = (rng_seed * 9301 + 49297) % 233280;
+        return rng_seed / 233280;
+    };
+
+    var centeroids = randomCentroids(points, k);
+
+    var movement = true;
+    var iterations = 0;
+
+    var _loop = function _loop() {
+        var assignment = new Array(k); // 현재 k 에 할당된 값들 (계속 변경됨)
+
+        for (i = 0; i < k; i++) {
+            assignment[i] = [];
+        }
+
+        // 포인트별 그룹 위치 저장 
+        points.forEach(function (point) {
+            var index = closestCenteroid(point, centeroids, distance);
+            assignment[index].push(point);
+        });
+
+        movement = false; //  한번 실행 했으니 그걸로 끝 ? 
+
+
+        var _loop2 = function _loop2() {
+            var assigned = [];
+
+            assignment.forEach(function (kIndex, index) {
+                if (kIndex == i) {
+                    assigned.push(points[index]);
+                }
+            });
+
+            // 중심점 구하기 
+            var centeroid = centeroids[i];
+            var newCenteroid = new Array(centeroid.length); // 새로운 중심점 생성하기 위한 객체 
+
+            if (assigned.length > 0) {
+                newCenteroid = getCenteroid(assigned);
+            } else {
+                // For an empty cluster, set a random point as the centroid.
+                idx = Math.floor(random() * points.length);
+
+                newCenteroid = points[idx];
+            }
+
+            // 그 값이 다르면  루프를 계속 돈다. 마지막으로 같을 때까지 
+            if (array_equals(newCenteroid, centeroid)) {
+                movement = false;
+            } else {
+                movement = true;
+            }
+
+            // 해당 그룹 k 의 중심 점 교체 
+            centeroids[i] = newCenteroid;
+        };
+
+        for (i = 0; i < k; i++) {
+            _loop2();
+        }
+
+        iterations++;
+
+        if (iterations % period == 0) {
+            return 'break';
+        }
+    };
+
+    while (movement) {
+        var i;
+        var i;
+        var idx;
+
+        var _ret = _loop();
+
+        if (_ret === 'break') break;
+    }
+
+    return centeroids;
+}
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toArray = function (arr) {
+  return Array.isArray(arr) ? arr : Array.from(arr);
+};
+
+var ImageLoader = function () {
+    function ImageLoader(url) {
+        classCallCheck(this, ImageLoader);
+
+        this.isLoaded = false;
+        this.imageUrl = url;
+        this.initialize();
+    }
+
+    createClass(ImageLoader, [{
+        key: 'initialize',
+        value: function initialize() {
+            this.canvas = this.createCanvas();
+            this.context = this.canvas.getContext('2d');
+        }
+    }, {
+        key: 'createCanvas',
+        value: function createCanvas() {
+            return document.createElement('canvas');
+        }
+    }, {
+        key: 'load',
+        value: function load(callback) {
+            this.loadImage(callback);
+        }
+    }, {
+        key: 'loadImage',
+        value: function loadImage(callback) {
+            var _this = this;
+
+            var ctx = this.context;
+            var img = new Image();
+            img.onload = function () {
+                var ratio = img.height / img.height;
+                _this.canvas.width = 100;
+                _this.canvas.height = 100 * ratio;
+                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, _this.canvas.width, _this.canvas.height);
+                _this.isLoaded = true;
+                callback && callback();
+            };
+
+            this.getImageUrl(function (url) {
+                img.src = url;
+            });
+        }
+    }, {
+        key: 'getImageUrl',
+        value: function getImageUrl(callback) {
+            if (typeof this.imageUrl == 'string') {
+                return callback(this.imageUrl);
+            } else if (this.imageUrl instanceof Blob) {
+                var reader = new FileReader();
+
+                reader.onload = function (ev) {
+                    callback(ev.target.result);
+                };
+
+                reader.readAsDataURL(this.imageUrl);
+            }
+        }
+    }, {
+        key: 'getRGBA',
+        value: function getRGBA(r, g, b, a) {
+            return [r, g, b, a];
+        }
+    }, {
+        key: 'toArray',
+        value: function toArray$$1(filter) {
+            var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+            filter = filter || this.getRGBA;
+            var rgba = imagedata.data;
+            var results = [];
+            for (var i = 0, len = rgba.length; i < len; i += 4) {
+                var item = filter(rgba[i + 0], rgba[i + 1], rgba[i + 2], rgba[i + 3]);
+                if (item) {
+                    results[results.length] = item;
+                }
+            }
+
+            return results;
+        }
+    }, {
+        key: 'toRGB',
+        value: function toRGB() {
+            return this.toArray(function (r, g, b, a) {
+                return [r, g, b];
+            });
+        }
+    }]);
+    return ImageLoader;
+}();
+
 var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 
 var color = {
@@ -87,6 +516,11 @@ var color = {
      * @returns {*}
      */
     format: function format(obj, type) {
+
+        if (Array.isArray(obj)) {
+            obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] };
+        }
+
         if (type == 'hex') {
             var r = obj.r.toString(16);
             if (obj.r < 16) r = "0" + r;
@@ -120,9 +554,11 @@ var color = {
      *
      * parse string to rgb color
      *
-     * 		color.rgb("#FF0000") === { r : 255, g : 0, b : 0 }
+     * 		color.parse("#FF0000") === { r : 255, g : 0, b : 0 }
      *
-     * 		color.rgb("rgb(255, 0, 0)") == { r : 255, g : 0, b : }
+     * 		color.parse("rgb(255, 0, 0)") == { r : 255, g : 0, b :0 }
+     * 		color.parse(0xff0000) == { r : 255, g : 0, b : 0 }
+     * 		color.parse(0xff000000) == { r : 255, g : 0, b : 0, a: 0 }
      *
      * @param {String} str color string
      * @returns {Object}  rgb object
@@ -209,6 +645,21 @@ var color = {
                 }
 
                 return { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+            }
+        } else if (typeof str == 'number') {
+            if (0x000000 <= str && str <= 0xffffff) {
+                var r = (str & 0xff0000) >> 16;
+                var g = (str & 0x00ff00) >> 8;
+                var b = (str & 0x0000ff) >> 0;
+
+                return { type: 'hex', r: r, g: g, b: b, a: 1 };
+            } else if (0x00000000 <= str && str <= 0xffffffff) {
+                var _r = (str & 0xff000000) >> 24;
+                var _g = (str & 0x00ff0000) >> 16;
+                var _b = (str & 0x0000ff00) >> 8;
+                var a = (str & 0x000000ff) / 255;
+
+                return { type: 'hex', r: _r, g: _g, b: _b, a: a };
             }
         }
 
@@ -598,6 +1049,23 @@ var color = {
         var max = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
 
         return this.scaleHSV(color, 'v', count, format, min, max, 100);
+    },
+
+    palette: function palette(colors) {
+        var _this = this;
+
+        var k = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6;
+        var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'hex';
+
+        return kmeans(colors, k).map(function (c) {
+            return _this.format(c, format);
+        });
+    },
+    ImageToRGB: function ImageToRGB(url, callback) {
+        var img = new ImageLoader(url);
+        img.loadImage(function () {
+            callback && callback(img.toRGB());
+        });
     }
 };
 
@@ -665,144 +1133,6 @@ initHueColors();
 var HueColor = {
     colors: hue_color,
     checkHueColor: checkHueColor
-};
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var toArray = function (arr) {
-  return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
 var counter = 0;

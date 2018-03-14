@@ -1,4 +1,6 @@
 import ColorNames from './ColorNames'
+import kmeans  from './Kmeans'
+import ImageLoader from './ImageLoader'
 
 const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 
@@ -67,6 +69,11 @@ const color = {
      * @returns {*}
      */
     format: function (obj, type) {
+
+        if (Array.isArray(obj)) {
+            obj = { r : obj[0], g : obj[1], b : obj[2], a : obj[3] }
+        }
+
         if (type == 'hex') {
             var r = obj.r.toString(16);
             if (obj.r < 16) r = "0" + r;
@@ -100,9 +107,11 @@ const color = {
      *
      * parse string to rgb color
      *
-     * 		color.rgb("#FF0000") === { r : 255, g : 0, b : 0 }
+     * 		color.parse("#FF0000") === { r : 255, g : 0, b : 0 }
      *
-     * 		color.rgb("rgb(255, 0, 0)") == { r : 255, g : 0, b : }
+     * 		color.parse("rgb(255, 0, 0)") == { r : 255, g : 0, b :0 }
+     * 		color.parse(0xff0000) == { r : 255, g : 0, b : 0 }
+     * 		color.parse(0xff000000) == { r : 255, g : 0, b : 0, a: 0 }
      *
      * @param {String} str color string
      * @returns {Object}  rgb object
@@ -189,6 +198,22 @@ const color = {
                 }
 
                 return { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+            }
+        } else if (typeof str == 'number') {
+            if (0x000000 <= str && str <= 0xffffff) {
+                const r = (str & 0xff0000) >> 16;
+                const g = (str & 0x00ff00) >> 8;
+                const b = (str & 0x0000ff) >> 0;
+
+                return { type: 'hex', r, g, b, a: 1 };
+            } else if (0x00000000 <= str && str <= 0xffffffff) {
+                const r = (str & 0xff000000) >> 24;
+                const g = (str & 0x00ff0000) >> 16;
+                const b = (str & 0x0000ff00) >> 8;
+                let a = (str & 0x000000ff) / 255;
+
+                return { type: 'hex', r, g, b, a };
+
             }
         }
 
@@ -501,6 +526,17 @@ const color = {
     },
     scaleV (color, count = 9, format = 'rgb', min = 0, max = 1) {
         return this.scaleHSV(color, 'v', count, format, min , max, 100);
+    },
+    palette : function (colors, k = 6, format = 'hex') {
+        return kmeans(colors, k).map(c => {
+            return this.format(c, format);
+        });
+    },
+    ImageToRGB : function (url, callback) {
+        var img = new ImageLoader(url);
+        img.loadImage(() => {
+            callback && callback(img.toRGB());
+        })
     }
 }
 

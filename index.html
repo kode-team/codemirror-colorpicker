@@ -82,6 +82,16 @@
         pointer-events: none;
     }
 
+    .color-item {
+        display:inline-block;
+        width: 50px;
+        height: 50px;
+    }
+
+    #palette-image {
+        max-width: 200px;
+    }
+
     </style>
 </head>
 <body>
@@ -251,11 +261,23 @@ var color_names = {
 
 </textarea>
 
+
+
 <h1 class="title">Default Html Sample </h1>
 
 <div>
     <button type="button" id="gray-scale" >gray scale</button><br />    
     <button type="button" onclick="showColor(event)" data-color="green">green</a>
+</div>
+
+<div>
+    <h2> Image Palette</h2>    
+    <input type="file" id="image"  />
+    <input type="button" value="색상 고르기" onclick="generatePalette()" />
+    <img id="palette-image">
+    <div class="image-palette" id="image-palette">
+
+    </div>
 </div>
 
 <div>
@@ -293,6 +315,31 @@ var color_names = {
 </div>
 
 <script type="text/javascript">
+    function generatePalette () {
+        var blob = document.getElementById('image').files[0];
+        var Color = CodeMirrorColorPicker.Color;
+        document.getElementById('palette-image').src = URL.createObjectURL(blob);
+
+        Color.ImageToRGB(blob, function (results) {
+            const colors = Color.palette(results, 10);
+
+            var fragment = document.createDocumentFragment();
+            for (var i = 0, len = colors.length; i < len; i++) {
+                var dom = document.createElement('div');
+                dom.classList.add('color-item');
+    
+
+                dom.setAttribute('title', colors[i]);
+                dom.style.backgroundColor =  colors[i];
+
+                fragment.appendChild(dom);
+            }
+
+            document.getElementById('image-palette').innerHTML = "";
+            document.getElementById('image-palette').appendChild(fragment);
+        })
+    }
+
     function shuffle(a) {
         var j, x, i;
         for (i = a.length - 1; i > 0; i--) {
