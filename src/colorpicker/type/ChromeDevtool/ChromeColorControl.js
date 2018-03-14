@@ -149,8 +149,6 @@ export default class ChromeColorControl extends EventMachin {
         
         var h = (huePos.x / this.$hueContainer.width()) * 360;
 
-        console.log(h);
-
         return { h } ; 
     }
 

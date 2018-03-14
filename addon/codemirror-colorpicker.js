@@ -3896,8 +3896,6 @@ var ChromeColorControl = function (_EventMachin) {
 
             var h = huePos.x / this.$hueContainer.width() * 360;
 
-            console.log(h);
-
             return { h: h };
         }
     }, {
@@ -5162,8 +5160,6 @@ var ChromeDevtool = function (_EventMachin) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
             format = format || colorObj.type;
-
-            console.log(colorObj);
 
             this.setCurrentFormat(format);
 

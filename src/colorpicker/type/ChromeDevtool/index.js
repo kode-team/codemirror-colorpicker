@@ -213,8 +213,6 @@ export default class ChromeDevtool extends EventMachin {
     initColor(newColor, format) {
         let c = newColor || "#FF0000", colorObj = Color.parse(c);
         format = format || colorObj.type;
-
-        console.log(colorObj);
     
         this.setCurrentFormat(format);
 
