@@ -92,6 +92,11 @@
         max-width: 200px;
     }
 
+    .colorpicker-type {
+        display: inline-block;
+        width: 300px;
+    }
+
     </style>
 </head>
 <body>
@@ -262,10 +267,19 @@ var color_names = {
 </textarea>
 
 
-<h1 >Chrom Devtool Style</h1>
-<div class="colorpicker-style" data-type="ChromeDevtool">
-
+<h1 >ColorPicker Style</h1>
+<div>
+    <div class="colorpicker-type">
+        <h3>Chrome Devtool Style</h3>
+        <div class="colorpicker-style" data-type="default"></div>
+    </div>
+    <div class="colorpicker-type">
+        <h3>Sketch Style</h3>
+        <div class="colorpicker-style" data-type="sketch"></div>
+    </div>
 </div>
+
+
 
 
 <h1 class="title">Default Html Sample </h1>
@@ -365,6 +379,7 @@ var color_names = {
         },
         colorpicker : {
             mode : 'edit',
+            type: 'sketch',
             hideDelay: 1000000
         }
     });
@@ -469,12 +484,13 @@ var color_names = {
 
         var type = item.getAttribute('data-type');
 
-        for(var j = 0; j < 3; j++) {
-            var picker = new CodeMirrorColorPicker[type]({
-                target: item,
+        for(var j = 0; j < 1; j++) {
+            var picker = new CodeMirrorColorPicker.ColorPicker({
+                container: item,
+                type: type,
                 color: 'blue',
                 onChange : function (c) {
-                    console.log(c);
+                    console.log(this, c);
                 }
             });
         }

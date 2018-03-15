@@ -7,8 +7,6 @@ import ColorNames from './util/ColorNames'
 import ColorView from './colorview/index'
 import ColorPicker from './colorpicker/index'
 
-import ChromeDevtool from './colorpicker/type/ChromeDevtool/index'
-
 if (CodeMirror) {
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
@@ -35,6 +33,5 @@ export default {
     Color,
     ColorNames,
     HueColor,
-    ColorPicker,
-    ChromeDevtool
+    ColorPicker
 }

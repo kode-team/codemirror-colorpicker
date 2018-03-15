@@ -154,6 +154,14 @@ export default class Dom {
     
         return this;
     }
+
+    cssFloat (key) {
+        return parseFloat(this.css(key));
+    }
+
+    cssInt (key) {
+        return parseInt(this.css(key));
+    }
     
     offset () {
         var rect = this.el.getBoundingClientRect();

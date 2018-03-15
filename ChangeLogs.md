@@ -1,7 +1,8 @@
 
 # Change Logs 
 
-## 1.6.2 
+## 1.6.3 
+* Support Sketch Style 
 * support color palette for image 
 * support parsing for number color code (ex: 0xffffff ->  {hex, r, g, b, a})
 

@@ -213,9 +213,12 @@ export default class ColorInformation extends EventMachin {
         var rgb = null;
         if (format == 'hex') {
             this.$hexCode.val(this.convertHEX());
+            var rgb = this.convertRGB();
+            this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);            
         } else if (format == 'rgb') {
             var rgb = this.convertRGB();
             this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
+            this.$hexCode.val(this.convertHEX());
         } else if (format == 'hsl') {
             var hsl = this.convertHSL();
             this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
@@ -268,6 +271,7 @@ export default class ColorInformation extends EventMachin {
     
         if(code.charAt(0) == '#' && code.length == 7) {
             this.colorpicker.changeInformationColor(code);
+            this.setInputColor();
         }
     }
     

@@ -52,10 +52,10 @@ export default class ColorPallet extends EventMachin {
 
     setMainColor(e) {
         e.preventDefault();
-        var pos = this.colorpicker.$root.position();         // position for screen
-        var w = this.$el.width();
-        var h = this.$el.height();
-    
+        var pos = this.$el.position();         // position for screen
+        var w = this.$el.width() - this.$el.cssFloat('padding-left') - this.$el.cssFloat('padding-right');
+        var h = this.$el.height() - this.$el.cssFloat('padding-top') - this.$el.cssFloat('padding-bottom');
+
         var x = e.clientX - pos.left;
         var y = e.clientY - pos.top;
     

@@ -37,12 +37,21 @@
     }   
   }
 
+
   @import './component/button';
   @import './component/pallet';
   @import './component/control';
   @import './component/information';
   @import './component/colorsets'; 
   @import './component/colorchooser'; 
+
+  &.chromedevtool {
+
+  }
+
+  /* theme */
+  @import './themes/sketch'; 
+  
 }   
 
 @import './component/colorsets-contextmenu'; 

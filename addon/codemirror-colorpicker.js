@@ -1297,6 +1297,16 @@ var Dom = function () {
             return this;
         }
     }, {
+        key: 'cssFloat',
+        value: function cssFloat(key) {
+            return parseFloat(this.css(key));
+        }
+    }, {
+        key: 'cssInt',
+        value: function cssInt(key) {
+            return parseInt(this.css(key));
+        }
+    }, {
         key: 'offset',
         value: function offset() {
             var rect = this.el.getBoundingClientRect();
@@ -2196,9 +2206,12 @@ var ColorInformation = function (_EventMachin) {
             var rgb = null;
             if (format == 'hex') {
                 this.$hexCode.val(this.convertHEX());
+                var rgb = this.convertRGB();
+                this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
             } else if (format == 'rgb') {
                 var rgb = this.convertRGB();
                 this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
+                this.$hexCode.val(this.convertHEX());
             } else if (format == 'hsl') {
                 var hsl = this.convertHSL();
                 this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
@@ -2287,6 +2300,7 @@ var ColorInformation = function (_EventMachin) {
 
             if (code.charAt(0) == '#' && code.length == 7) {
                 this.colorpicker.changeInformationColor(code);
+                this.setInputColor();
             }
         }
     }, {
@@ -2362,9 +2376,9 @@ var ColorPallet = function (_EventMachin) {
         key: 'setMainColor',
         value: function setMainColor(e) {
             e.preventDefault();
-            var pos = this.colorpicker.$root.position(); // position for screen
-            var w = this.$el.width();
-            var h = this.$el.height();
+            var pos = this.$el.position(); // position for screen
+            var w = this.$el.width() - this.$el.cssFloat('padding-left') - this.$el.cssFloat('padding-right');
+            var h = this.$el.height() - this.$el.cssFloat('padding-top') - this.$el.cssFloat('padding-bottom');
 
             var x = e.clientX - pos.left;
             var y = e.clientY - pos.top;
@@ -2930,10 +2944,23 @@ var ColorPicker = function (_EventMachin) {
             return this.opt[key];
         }
     }, {
+        key: 'getContainer',
+        value: function getContainer() {
+            return this.opt.container || document.body;
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
-            this.$body = new Dom(this.opt.container || document.body);
+            this.$body = new Dom(this.getContainer());
             this.$root = new Dom('div', 'codemirror-colorpicker');
+
+            //  append colorpicker to container (ex : body)
+            this.$body.append(this.$root);
+
+            if (this.opt.type) {
+                // to change css style
+                this.$root.addClass(this.opt.type);
+            }
 
             this.$arrow = new Dom('div', 'arrow');
 
@@ -2947,7 +2974,10 @@ var ColorPicker = function (_EventMachin) {
 
             this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
-            this.initColor();
+            this.initColor(this.opt.color);
+
+            // register all events 
+            this.initializeEvent();
         }
     }, {
         key: 'showContextMenu',
@@ -3014,17 +3044,33 @@ var ColorPicker = function (_EventMachin) {
             });
         }
     }, {
+        key: 'getInitalizePosition',
+        value: function getInitalizePosition() {
+            if (this.opt.position == 'inline') {
+                return {
+                    position: 'relative',
+                    left: 'auto',
+                    top: 'auto',
+                    display: 'inline-block'
+                };
+            } else {
+                return {
+                    position: 'fixed', // color picker has fixed position
+                    left: '-10000px',
+                    top: '-10000px'
+                };
+            }
+        }
+    }, {
         key: 'show',
         value: function show(opt, color$$1, callback) {
+            var _this2 = this;
+
             this.destroy();
             this.initializeEvent();
-            this.$root.appendTo(document.body);
+            this.$root.appendTo(this.$body);
 
-            this.$root.css({
-                position: 'fixed', // color picker has fixed position
-                left: '-10000px',
-                top: '-10000px'
-            }).show();
+            this.$root.css(this.getInitalizePosition()).show();
 
             this.definePosition(opt);
 
@@ -3036,6 +3082,9 @@ var ColorPicker = function (_EventMachin) {
 
             // define colorpicker callback
             this.colorpickerCallback = function (colorString) {
+                if (typeof _this2.opt.onChange == 'function') {
+                    _this2.opt.onChange(colorString);
+                }
                 callback(colorString);
             };
 
@@ -3048,7 +3097,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'setHideDelay',
         value: function setHideDelay(delayTime) {
-            var _this2 = this;
+            var _this3 = this;
 
             delayTime = delayTime || 0;
 
@@ -3056,12 +3105,12 @@ var ColorPicker = function (_EventMachin) {
             this.$root.off('mouseleave');
 
             this.$root.on('mouseenter', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
+                clearTimeout(_this3.timerCloseColorPicker);
             });
 
             this.$root.on('mouseleave', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
-                _this2.timerCloseColorPicker = setTimeout(_this2.hide.bind(_this2), delayTime);
+                clearTimeout(_this3.timerCloseColorPicker);
+                _this3.timerCloseColorPicker = setTimeout(_this3.hide.bind(_this3), delayTime);
             });
 
             clearTimeout(this.timerCloseColorPicker);
@@ -3133,8 +3182,13 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'callbackColorValue',
         value: function callbackColorValue() {
-            if (typeof this.colorpickerCallback == 'function') {
+            if (typeof this.opt.onChange == 'function') {
+                if (!isNaN(this.currentA)) {
+                    this.opt.onChange(this.getCurrentColor());
+                }
+            }
 
+            if (typeof this.colorpickerCallback == 'function') {
                 if (!isNaN(this.currentA)) {
                     this.colorpickerCallback(this.getCurrentColor());
                 }
@@ -3747,1547 +3801,6 @@ var ColorView = function () {
     return ColorView;
 }();
 
-var ChromeColorControl = function (_EventMachin) {
-    inherits(ChromeColorControl, _EventMachin);
-
-    function ChromeColorControl(colorpicker) {
-        classCallCheck(this, ChromeColorControl);
-
-        var _this = possibleConstructorReturn(this, (ChromeColorControl.__proto__ || Object.getPrototypeOf(ChromeColorControl)).call(this));
-
-        _this.colorpicker = colorpicker;
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeColorControl, [{
-        key: 'initialize',
-        value: function initialize() {
-            this.$el = new Dom('div', 'control');
-            this.$hue = this.$el.createChild('div', 'hue');
-            this.$opacity = this.$el.createChild('div', 'opacity');
-            this.$controlPattern = this.$el.createChild('div', 'empty');
-            this.$controlColor = this.$el.createChild('div', 'color');
-
-            this.$hueContainer = this.$hue.createChild('div', 'hue-container');
-            this.$drag_bar = this.$hueContainer.createChild('div', 'drag-bar');
-            this.drag_bar_pos = {};
-
-            this.$opacityContainer = this.$opacity.createChild('div', 'opacity-container');
-            this.$opacityColorBar = this.$opacityContainer.createChild('div', 'color-bar');
-
-            this.$opacity_drag_bar = this.$opacityContainer.createChild('div', 'drag-bar2');
-            this.opacity_drag_bar_pos = {};
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.$controlColor.css("background-color", color$$1);
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            var x = this.$el.width() * this.colorpicker.currentS,
-                y = this.$el.height() * (1 - this.colorpicker.currentV);
-
-            this.$drag_pointer.css({
-                left: x - 5 + "px",
-                top: y - 5 + "px"
-            });
-        }
-    }, {
-        key: 'setMainColor',
-        value: function setMainColor(e) {
-            e.preventDefault();
-            var pos = this.colorpicker.$root.position(); // position for screen
-            var w = $color.width();
-            var h = $color.height();
-
-            var x = e.clientX - pos.left;
-            var y = e.clientY - pos.top;
-
-            if (x < 0) x = 0;else if (x > w) x = w;
-
-            if (y < 0) y = 0;else if (y > h) y = h;
-
-            this.$drag_pointer.css({
-                left: x - 5 + 'px',
-                top: y - 5 + 'px'
-            });
-
-            this.colorpicker.caculateHSV();
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'setOpacityColorBar',
-        value: function setOpacityColorBar(hueColor) {
-            var rgb = color.parse(hueColor);
-
-            rgb.a = 0;
-            var start = color.format(rgb, 'rgb');
-
-            rgb.a = 1;
-            var end = color.format(rgb, 'rgb');
-
-            this.$opacityColorBar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
-        }
-    }, {
-        key: 'setOpacity',
-        value: function setOpacity(e) {
-            var min = this.$opacityContainer.offset().left;
-            var max = min + this.$opacityContainer.width();
-            var current = Event.pos(e).clientX;
-            var dist;
-
-            if (current < min) {
-                dist = 0;
-            } else if (current > max) {
-                dist = 100;
-            } else {
-                dist = (current - min) / (max - min) * 100;
-            }
-
-            var x = this.$opacityContainer.width() * (dist / 100);
-
-            this.$opacity_drag_bar.css({
-                left: x - Math.ceil(this.$opacity_drag_bar.width() / 2) + 'px'
-            });
-
-            this.opacity_drag_bar_pos = { x: x };
-
-            this.colorpicker.setCurrentA(this.caculateOpacity());
-            this.colorpicker.currentFormat();
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor() {
-            this.setBackgroundColor(this.colorpicker.getFormattedColor('rgb'));
-
-            var rgb = this.colorpicker.convertRGB();
-            var colorString = color.format(rgb, 'rgb');
-            this.setOpacityColorBar(colorString);
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-
-            var hueX = this.$hueContainer.width() * (this.colorpicker.currentH / 360);
-
-            this.$drag_bar.css({
-                left: hueX - 7.5 + 'px'
-            });
-
-            this.drag_bar_pos = { x: hueX };
-
-            var opacityX = this.$opacityContainer.width() * (this.colorpicker.currentA || 0);
-
-            this.$opacity_drag_bar.css({
-                left: opacityX - 7.5 + 'px'
-            });
-
-            this.opacity_drag_bar_pos = { x: opacityX };
-        }
-    }, {
-        key: 'caculateH',
-        value: function caculateH() {
-
-            var huePos = this.drag_bar_pos || { x: 0 };
-
-            var h = huePos.x / this.$hueContainer.width() * 360;
-
-            return { h: h };
-        }
-    }, {
-        key: 'caculateOpacity',
-        value: function caculateOpacity() {
-            var opacityPos = this.opacity_drag_bar_pos || { x: 0 };
-            var a = Math.round(opacityPos.x / this.$opacityContainer.width() * 100) / 100;
-
-            return isNaN(a) ? 1 : a;
-        }
-    }, {
-        key: 'EventDocumentMouseMove',
-        value: function EventDocumentMouseMove(e) {
-            if (this.isHueDown) {
-                this.setHueColor(e);
-            }
-
-            if (this.isOpacityDown) {
-                this.setOpacity(e);
-            }
-        }
-    }, {
-        key: 'EventDocumentMouseUp',
-        value: function EventDocumentMouseUp(e) {
-            this.isHueDown = false;
-            this.isOpacityDown = false;
-        }
-    }, {
-        key: 'setControlColor',
-        value: function setControlColor(color$$1) {
-            this.$controlColor.css('background-color', color$$1);
-        }
-    }, {
-        key: 'setHueColor',
-        value: function setHueColor(e) {
-            var min = this.$hueContainer.offset().left;
-            var max = min + this.$hueContainer.width();
-            var current = e ? Event.pos(e).clientX : min + (max - min) * (this.colorpicker.currentH / 360);
-
-            var dist;
-            if (current < min) {
-                dist = 0;
-            } else if (current > max) {
-                dist = 100;
-            } else {
-                dist = (current - min) / (max - min) * 100;
-            }
-
-            var x = this.$hueContainer.width() * (dist / 100);
-
-            this.$drag_bar.css({
-                left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
-            });
-
-            this.drag_bar_pos = { x: x };
-
-            var hueColor = HueColor.checkHueColor(dist / 100);
-
-            this.colorpicker.setBackgroundColor(hueColor);
-            this.colorpicker.setCurrentH(dist / 100 * 360);
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'setOnlyHueColor',
-        value: function setOnlyHueColor() {
-            var min = this.$hueContainer.offset().left;
-            var max = min + this.$hueContainer.width();
-            var current = min + (max - min) * (this.colorpicker.currentH / 360);
-            var dist;
-            if (current < min) {
-                dist = 0;
-            } else if (current > max) {
-                dist = 100;
-            } else {
-                dist = (current - min) / (max - min) * 100;
-            }
-
-            var x = this.$hueContainer.width() * (dist / 100);
-
-            this.$drag_bar.css({
-                left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
-            });
-
-            this.drag_bar_pos = { x: x };
-
-            var hueColor = HueColor.checkHueColor(dist / 100);
-            this.colorpicker.setBackgroundColor(hueColor);
-            this.colorpicker.setCurrentH(dist / 100 * 360);
-        }
-    }, {
-        key: 'mousedown $drag_bar',
-        value: function mousedown$drag_bar(e) {
-            e.preventDefault();
-            this.isHueDown = true;
-        }
-    }, {
-        key: 'mousedown $opacity_drag_bar',
-        value: function mousedown$opacity_drag_bar(e) {
-            e.preventDefault();
-            this.isOpacityDown = true;
-        }
-    }, {
-        key: 'mousedown $hueContainer',
-        value: function mousedown$hueContainer(e) {
-            this.isHueDown = true;
-            this.setHueColor(e);
-        }
-    }, {
-        key: 'mousedown $opacityContainer',
-        value: function mousedown$opacityContainer(e) {
-            this.isOpacityDown = true;
-            this.setOpacity(e);
-        }
-    }]);
-    return ChromeColorControl;
-}(EventMachin);
-
-var ChromeColorInformation = function (_EventMachin) {
-    inherits(ChromeColorInformation, _EventMachin);
-
-    function ChromeColorInformation(colorpicker) {
-        classCallCheck(this, ChromeColorInformation);
-
-        var _this = possibleConstructorReturn(this, (ChromeColorInformation.__proto__ || Object.getPrototypeOf(ChromeColorInformation)).call(this));
-
-        _this.colorpicker = colorpicker;
-        _this.initialize();
-
-        return _this;
-    }
-
-    createClass(ChromeColorInformation, [{
-        key: 'initialize',
-        value: function initialize() {
-            this.$el = new Dom('div', 'information hex');
-
-            this.$informationChange = this.$el.createChild('div', 'information-change');
-
-            this.$formatChangeButton = this.$informationChange.createChild('button', 'format-change-button arrow-button', { type: 'button' });
-
-            this.$el.append(this.makeInputFieldHex());
-            this.$el.append(this.makeInputFieldRgb());
-            this.$el.append(this.makeInputFieldHsl());
-
-            this.format = 'hex';
-        }
-    }, {
-        key: 'makeInputFieldHex',
-        value: function makeInputFieldHex() {
-            var item = new Dom('div', 'information-item hex');
-            var field = item.createChild('div', 'input-field hex');
-
-            this.$hexCode = field.createChild('input', 'input', { type: 'text' });
-
-            field.createChild('div', 'title').html('HEX');
-
-            return item;
-        }
-    }, {
-        key: 'makeInputFieldRgb',
-        value: function makeInputFieldRgb() {
-            var item = new Dom('div', 'information-item rgb');
-
-            var field = item.createChild('div', 'input-field rgb-r');
-            this.$rgb_r = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
-            field.createChild('div', 'title').html('R');
-
-            field = item.createChild('div', 'input-field rgb-g');
-            this.$rgb_g = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
-            field.createChild('div', 'title').html('G');
-
-            field = item.createChild('div', 'input-field rgb-b');
-            this.$rgb_b = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 255 });
-            field.createChild('div', 'title').html('B');
-
-            // rgba
-            field = item.createChild('div', 'input-field rgb-a');
-            this.$rgb_a = field.createChild('input', 'input', { type: 'number', step: 0.01, min: 0, max: 1 });
-            field.createChild('div', 'title').html('A');
-
-            return item;
-        }
-    }, {
-        key: 'makeInputFieldHsl',
-        value: function makeInputFieldHsl() {
-            var item = new Dom('div', 'information-item hsl');
-
-            var field = item.createChild('div', 'input-field hsl-h');
-            this.$hsl_h = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 360 });
-            field.createChild('div', 'title').html('H');
-
-            field = item.createChild('div', 'input-field hsl-s');
-            this.$hsl_s = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 100 });
-            field.createChild('div', 'postfix').html('%');
-            field.createChild('div', 'title').html('S');
-
-            field = item.createChild('div', 'input-field hsl-l');
-            this.$hsl_l = field.createChild('input', 'input', { type: 'number', step: 1, min: 0, max: 100 });
-            field.createChild('div', 'postfix').html('%');
-            field.createChild('div', 'title').html('L');
-
-            // rgba
-            field = item.createChild('div', 'input-field hsl-a');
-            this.$hsl_a = field.createChild('input', 'input', { type: 'number', step: 0.01, min: 0, max: 1 });
-            field.createChild('div', 'title').html('A');
-
-            return item;
-        }
-    }, {
-        key: 'currentFormat',
-        value: function currentFormat() {
-            var current_format = this.format || 'hex';
-            if (this.colorpicker.currentA < 1 && current_format == 'hex') {
-                var next_format = 'rgb';
-                this.$el.removeClass(current_format);
-                this.$el.addClass(next_format);
-                this.format = next_format;
-
-                this.colorpicker.setInputColor();
-            }
-        }
-    }, {
-        key: 'setCurrentFormat',
-        value: function setCurrentFormat(format) {
-            this.format = format;
-            this.initFormat();
-        }
-    }, {
-        key: 'initFormat',
-        value: function initFormat() {
-            var current_format = this.format || 'hex';
-
-            this.$el.removeClass('hex');
-            this.$el.removeClass('rgb');
-            this.$el.removeClass('hsl');
-            this.$el.addClass(current_format);
-        }
-    }, {
-        key: 'nextFormat',
-        value: function nextFormat() {
-            var current_format = this.format || 'hex';
-
-            var next_format = 'hex';
-            if (current_format == 'hex') {
-                next_format = 'rgb';
-            } else if (current_format == 'rgb') {
-                next_format = 'hsl';
-            } else if (current_format == 'hsl') {
-                if (this.colorpicker.currentA == 1) {
-                    next_format = 'hex';
-                } else {
-                    next_format = 'rgb';
-                }
-            }
-
-            this.$el.removeClass(current_format);
-            this.$el.addClass(next_format);
-            this.format = next_format;
-
-            this.setInputColor();
-            this.colorpicker.changeInputColorAfterNextFormat();
-        }
-    }, {
-        key: 'setRGBInput',
-        value: function setRGBInput(r, g, b) {
-            this.$rgb_r.val(r);
-            this.$rgb_g.val(g);
-            this.$rgb_b.val(b);
-            this.$rgb_a.val(this.colorpicker.currentA);
-        }
-    }, {
-        key: 'setHSLInput',
-        value: function setHSLInput(h, s, l) {
-            this.$hsl_h.val(h);
-            this.$hsl_s.val(s);
-            this.$hsl_l.val(l);
-            this.$hsl_a.val(this.colorpicker.currentA);
-        }
-    }, {
-        key: 'getHexFormat',
-        value: function getHexFormat() {
-            return color.format({
-                r: this.$rgb_r.int(),
-                g: this.$rgb_g.int(),
-                b: this.$rgb_b.int()
-            }, 'hex');
-        }
-    }, {
-        key: 'getRgbFormat',
-        value: function getRgbFormat() {
-            return color.format({
-                r: this.$rgb_r.int(),
-                g: this.$rgb_g.int(),
-                b: this.$rgb_b.int(),
-                a: this.$rgb_a.float()
-            }, 'rgb');
-        }
-    }, {
-        key: 'getHslFormat',
-        value: function getHslFormat() {
-            return color.format({
-                h: this.$hsl_h.val(),
-                s: this.$hsl_s.val(),
-                l: this.$hsl_l.val(),
-                a: this.$hsl_a.float()
-            }, 'hsl');
-        }
-    }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return this.colorpicker.convertRGB();
-        }
-    }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return this.colorpicker.convertHEX();
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return this.colorpicker.convertHSL();
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            var fixed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-            format = format || this.getFormat();
-            if (format == 'hex') {
-                return this.$hexCode.val();
-            } else if (format == 'rgb') {
-                return this.getRgbFormat(fixed);
-            } else if (format == 'hsl') {
-                return this.getHslFormat(fixed);
-            }
-        }
-    }, {
-        key: 'getFormat',
-        value: function getFormat() {
-            return this.format || 'hex';
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor() {
-            var format = this.getFormat();
-
-            var rgb = null;
-            if (format == 'hex') {
-                this.$hexCode.val(this.convertHEX());
-            } else if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
-            }
-        }
-    }, {
-        key: 'checkNumberKey',
-        value: function checkNumberKey(e) {
-            return Event.checkNumberKey(e);
-        }
-    }, {
-        key: 'checkNotNumberKey',
-        value: function checkNotNumberKey(e) {
-            return !Event.checkNumberKey(e);
-        }
-
-        //'keydown.checkNotNumberKey $rgb_r' (e) {  e.preventDefault(); }
-        //'keydown.checkNotNumberKey $rgb_g' (e) {  e.preventDefault(); }
-        //'keydown.checkNotNumberKey $rgb_b' (e) {  e.preventDefault(); }
-
-        //'keydown.checkNumberKey $rgb_r' (e) { this.setRGBtoHexColor(e); }
-        //'keydown.checkNumberKey $rgb_g' (e) { this.setRGBtoHexColor(e); }
-        //'keydown.checkNumberKey $rgb_b' (e) { this.setRGBtoHexColor(e); }
-
-    }, {
-        key: 'changeRgbColor',
-        value: function changeRgbColor() {
-            this.colorpicker.changeInformationColor(this.getRgbFormat());
-        }
-    }, {
-        key: 'changeHslColor',
-        value: function changeHslColor() {
-            this.colorpicker.changeInformationColor(this.getHslFormat());
-        }
-    }, {
-        key: 'change $rgb_r',
-        value: function change$rgb_r(e) {
-            this.changeRgbColor();
-        }
-    }, {
-        key: 'change $rgb_g',
-        value: function change$rgb_g(e) {
-            this.changeRgbColor();
-        }
-    }, {
-        key: 'change $rgb_b',
-        value: function change$rgb_b(e) {
-            this.changeRgbColor();
-        }
-    }, {
-        key: 'change $rgb_a',
-        value: function change$rgb_a(e) {
-            this.changeRgbColor();
-        }
-    }, {
-        key: 'change $hsl_h',
-        value: function change$hsl_h(e) {
-            this.changeHslColor();
-        }
-    }, {
-        key: 'change $hsl_s',
-        value: function change$hsl_s(e) {
-            this.changeHslColor();
-        }
-    }, {
-        key: 'change $hsl_l',
-        value: function change$hsl_l(e) {
-            this.changeHslColor();
-        }
-    }, {
-        key: 'change $hsl_a',
-        value: function change$hsl_a(e) {
-            this.changeHslColor();
-        }
-    }, {
-        key: 'keydown $hexCode',
-        value: function keydown$hexCode(e) {
-            if (e.which < 65 || e.which > 70) {
-                return this.checkNumberKey(e);
-            }
-        }
-    }, {
-        key: 'keyup $hexCode',
-        value: function keyup$hexCode(e) {
-            var code = this.$hexCode.val();
-
-            if (code.charAt(0) == '#' && code.length == 7) {
-                this.colorpicker.changeInformationColor(code);
-            }
-        }
-    }, {
-        key: 'click $formatChangeButton',
-        value: function click$formatChangeButton(e) {
-            this.nextFormat();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {}
-    }]);
-    return ChromeColorInformation;
-}(EventMachin);
-
-var ChromeColorPallet = function (_EventMachin) {
-    inherits(ChromeColorPallet, _EventMachin);
-
-    function ChromeColorPallet(colorpicker) {
-        classCallCheck(this, ChromeColorPallet);
-
-        var _this = possibleConstructorReturn(this, (ChromeColorPallet.__proto__ || Object.getPrototypeOf(ChromeColorPallet)).call(this));
-
-        _this.colorpicker = colorpicker;
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeColorPallet, [{
-        key: 'initialize',
-        value: function initialize() {
-            this.$el = new Dom('div', 'color');
-            this.$saturation = this.$el.createChild('div', 'saturation');
-            this.$value = this.$saturation.createChild('div', 'value');
-            this.$drag_pointer = this.$value.createChild('div', 'drag-pointer');
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.$el.css("background-color", color$$1);
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'caculateSV',
-        value: function caculateSV() {
-            var pos = this.drag_pointer_pos || { x: 0, y: 0 };
-
-            var width = this.$el.width();
-            var height = this.$el.height();
-
-            var s = pos.x / width;
-            var v = (height - pos.y) / height;
-
-            return { s: s, v: v, width: width, height: height };
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            var x = this.$el.width() * this.colorpicker.currentS,
-                y = this.$el.height() * (1 - this.colorpicker.currentV);
-
-            this.$drag_pointer.css({
-                left: x - 5 + "px",
-                top: y - 5 + "px"
-            });
-
-            this.drag_pointer_pos = { x: x, y: y };
-        }
-    }, {
-        key: 'setMainColor',
-        value: function setMainColor(e) {
-            e.preventDefault();
-            var pos = this.$el.position();
-            var w = this.$el.width();
-            var h = this.$el.height();
-
-            var x = e.clientX - pos.left;
-            var y = e.clientY - pos.top;
-
-            if (x < 0) x = 0;else if (x > w) x = w;
-
-            if (y < 0) y = 0;else if (y > h) y = h;
-
-            this.$drag_pointer.css({
-                left: x - 5 + 'px',
-                top: y - 5 + 'px'
-            });
-
-            this.drag_pointer_pos = { x: x, y: y };
-
-            this.colorpicker.caculateHSV();
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'EventDocumentMouseUp',
-        value: function EventDocumentMouseUp(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'EventDocumentMouseMove',
-        value: function EventDocumentMouseMove(e) {
-            if (this.isDown) {
-                this.setMainColor(e);
-            }
-        }
-    }, {
-        key: 'mousedown',
-        value: function mousedown(e) {
-            this.isDown = true;
-            this.setMainColor(e);
-        }
-    }, {
-        key: 'mouseup',
-        value: function mouseup(e) {
-            this.isDown = false;
-        }
-    }]);
-    return ChromeColorPallet;
-}(EventMachin);
-
-var DATA_COLORSETS_INDEX$1 = 'data-colorsets-index';
-
-var ChromeColorSetsChooser = function (_EventMachin) {
-    inherits(ChromeColorSetsChooser, _EventMachin);
-
-    function ChromeColorSetsChooser(colorpicker) {
-        classCallCheck(this, ChromeColorSetsChooser);
-
-        var _this = possibleConstructorReturn(this, (ChromeColorSetsChooser.__proto__ || Object.getPrototypeOf(ChromeColorSetsChooser)).call(this));
-
-        _this.colorpicker = colorpicker;
-
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeColorSetsChooser, [{
-        key: 'initialize',
-        value: function initialize() {
-            // make colorset-chooser 
-            this.$el = new Dom('div', 'color-chooser');
-
-            var $container = this.$el.createChild('div', 'color-chooser-container');
-
-            var $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
-
-            $header.createChild('h1', 'title').html('Color Paletts');
-
-            this.$toggleButton = $header.createChild('span', 'items').html('&times;');
-
-            this.$colorsetsList = $container.createChild('div', 'colorsets-list');
-
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.$colorsetsList.html(this.makeColorSetsList());
-        }
-    }, {
-        key: 'makeColorItemList',
-        value: function makeColorItemList(colors) {
-            var maxCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
-
-            var $list = new Dom('div');
-
-            for (var i = 0; i < maxCount; i++) {
-                var color$$1 = colors[i] || 'rgba(255, 255, 255, 1)';
-                var $item = $list.createChild('div', 'color-item', {
-                    title: color$$1
-                });
-
-                $item.createChild('div', 'color-view', null, {
-                    'background-color': color$$1
-                });
-            }
-
-            return $list;
-        }
-    }, {
-        key: 'makeColorSetsList',
-        value: function makeColorSetsList() {
-            var _this2 = this;
-
-            var $div = new Dom('div');
-
-            // colorsets 
-            var colorSets = this.colorpicker.getColorSetsList();
-            colorSets.forEach(function (element, index) {
-                var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX$1, index));
-
-                $item.createChild('h1', 'title').html(element.name);
-
-                $item.createChild('div', 'items').append(_this2.makeColorItemList(element.colors, 5));
-            });
-
-            return $div;
-        }
-    }, {
-        key: 'show',
-        value: function show() {
-            this.$el.addClass('open');
-        }
-    }, {
-        key: 'hide',
-        value: function hide() {
-            this.$el.removeClass('open');
-        }
-    }, {
-        key: 'toggle',
-        value: function toggle() {
-            this.$el.toggleClass('open');
-        }
-    }, {
-        key: 'click $toggleButton',
-        value: function click$toggleButton(e) {
-            this.toggle();
-        }
-    }, {
-        key: 'click $colorsetsList',
-        value: function click$colorsetsList(e) {
-            e.preventDefault();
-            var $item = new Dom(e.target).closest('colorsets-item');
-
-            if ($item) {
-
-                var index = parseInt($item.attr(DATA_COLORSETS_INDEX$1));
-                this.colorpicker.setCurrentColorSets(index);
-                this.hide();
-            }
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            get(ChromeColorSetsChooser.prototype.__proto__ || Object.getPrototypeOf(ChromeColorSetsChooser.prototype), 'destroy', this).call(this);
-
-            this.hide();
-        }
-    }]);
-    return ChromeColorSetsChooser;
-}(EventMachin);
-
-var colorSetsList$1 = [{
-    name: "Material",
-    colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
-}, {
-    name: "Custom", "edit": true, "colors": []
-}, {
-    name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
-}];
-
-var ChromeColorSetsList = function () {
-    function ChromeColorSetsList(colorpicker) {
-        classCallCheck(this, ChromeColorSetsList);
-
-        this.colorpicker = colorpicker;
-
-        this.setUserList(this.colorpicker.getOption('colorSets'));
-    }
-
-    createClass(ChromeColorSetsList, [{
-        key: 'list',
-        value: function list() {
-            return this.userList || colorSetsList$1;
-        }
-    }, {
-        key: 'setUserList',
-        value: function setUserList(list) {
-            this.userList = list;
-
-            this.resetUserList();
-
-            this.setCurrentColorSets();
-        }
-    }, {
-        key: 'resetUserList',
-        value: function resetUserList() {
-            var _this = this;
-
-            if (this.userList && this.userList.length) {
-                this.userList = this.userList.map(function (element, index) {
-
-                    if (typeof element.colors == 'function') {
-                        var makeCallback = element.colors;
-
-                        element.colors = makeCallback(_this.colorpicker, _this);
-                        element._colors = makeCallback;
-                    }
-
-                    return Object.assign({
-                        name: 'color-' + index,
-                        colors: []
-                    }, element);
-                });
-            }
-        }
-    }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
-
-            var _list = this.list();
-
-            if (typeof nameOrIndex == 'undefined') {
-                this.currentColorSets = _list[0];
-            } else if (typeof nameOrIndex == 'number') {
-                this.currentColorSets = _list[nameOrIndex];
-            } else {
-                this.currentColorSets = _list.filter(function (obj) {
-                    return obj.name == nameOrIndex;
-                })[0];
-            }
-        }
-    }, {
-        key: 'getCurrentColorSets',
-        value: function getCurrentColorSets() {
-            return this.currentColorSets;
-        }
-    }, {
-        key: 'addCurrentColor',
-        value: function addCurrentColor(color$$1) {
-            if (Array.isArray(this.currentColorSets.colors)) {
-                this.currentColorSets.colors.push(color$$1);
-            }
-        }
-    }, {
-        key: 'removeCurrentColor',
-        value: function removeCurrentColor(index) {
-            if (this.currentColorSets.colors[index]) {
-                this.currentColorSets.colors.splice(index, 1);
-            }
-        }
-    }, {
-        key: 'removeCurrentColorToTheRight',
-        value: function removeCurrentColorToTheRight(index) {
-            if (this.currentColorSets.colors[index]) {
-                this.currentColorSets.colors.splice(index, Number.MAX_VALUE);
-            }
-        }
-    }, {
-        key: 'clearPalette',
-        value: function clearPalette() {
-            if (this.currentColorSets.colors) {
-                this.currentColorSets.colors = [];
-            }
-        }
-    }, {
-        key: 'getCurrentColors',
-        value: function getCurrentColors() {
-            return this.getColors(this.currentColorSets);
-        }
-    }, {
-        key: 'getColors',
-        value: function getColors(element) {
-
-            if (element.scale) {
-                return color.scale(element.scale, element.count);
-            }
-
-            return element.colors || [];
-        }
-    }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            var _this2 = this;
-
-            return this.list().map(function (element) {
-                return {
-                    name: element.name,
-                    colors: _this2.getColors(element)
-                };
-            });
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {}
-    }]);
-    return ChromeColorSetsList;
-}();
-
-var ChromeCurrentColorSets = function (_EventMachin) {
-    inherits(ChromeCurrentColorSets, _EventMachin);
-
-    function ChromeCurrentColorSets(colorpicker) {
-        classCallCheck(this, ChromeCurrentColorSets);
-
-        var _this = possibleConstructorReturn(this, (ChromeCurrentColorSets.__proto__ || Object.getPrototypeOf(ChromeCurrentColorSets)).call(this));
-
-        _this.colorpicker = colorpicker;
-
-        _this.colorSetsList = _this.colorpicker.colorSetsList;
-
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeCurrentColorSets, [{
-        key: 'makeCurrentColorSets',
-        value: function makeCurrentColorSets() {
-            var list = new Dom('div', 'current-color-sets');
-            var currentColorSets = this.colorSetsList.getCurrentColorSets();
-            var colors = this.colorSetsList.getCurrentColors();
-
-            for (var i = 0, len = colors.length; i < len; i++) {
-                var color$$1 = colors[i];
-                var item = list.createChild('div', 'color-item', {
-                    'title': color$$1,
-                    'data-index': i,
-                    'data-color': color$$1
-                });
-
-                item.createChild('div', 'empty');
-                item.createChild('div', 'color-view', null, {
-                    'background-color': color$$1
-                });
-            }
-
-            if (currentColorSets.edit) {
-                list.createChild('div', 'add-color-item').html('+');
-            }
-
-            return list;
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            // make colorsets view 
-            this.$el = new Dom('div', 'colorsets');
-
-            var $colorSetsMenu = this.$el.createChild('div', 'menu', {
-                title: 'Open Color Pallets'
-            });
-            this.$colorSetsColorList = this.$el.createChild('div', 'color-list');
-
-            this.$colorSetsChooseButton = $colorSetsMenu.createChild('button', 'color-sets-choose-btn arrow-button', {
-                type: 'button'
-            });
-
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.$colorSetsColorList.html(this.makeCurrentColorSets());
-        }
-    }, {
-        key: 'refreshAll',
-        value: function refreshAll() {
-            this.refresh();
-            this.colorpicker.refreshColorSetsChooser();
-        }
-    }, {
-        key: 'addColor',
-        value: function addColor(color$$1) {
-            this.colorSetsList.addCurrentColor(color$$1);
-            this.refreshAll();
-        }
-    }, {
-        key: 'removeColor',
-        value: function removeColor(index) {
-            this.colorSetsList.removeCurrentColor(index);
-            this.refreshAll();
-        }
-    }, {
-        key: 'removeAllToTheRight',
-        value: function removeAllToTheRight(index) {
-            this.colorSetsList.removeCurrentColorToTheRight(index);
-            this.refreshAll();
-        }
-    }, {
-        key: 'clearPalette',
-        value: function clearPalette() {
-            this.colorSetsList.clearPalette();
-            this.refreshAll();
-        }
-    }, {
-        key: 'click $colorSetsChooseButton',
-        value: function click$colorSetsChooseButton(e) {
-            this.colorpicker.toggleColorChooser();
-        }
-    }, {
-        key: 'contextmenu $colorSetsColorList',
-        value: function contextmenu$colorSetsColorList(e) {
-            e.preventDefault();
-            var currentColorSets = this.colorSetsList.getCurrentColorSets();
-
-            if (!currentColorSets.edit) {
-                return;
-            }
-
-            var $target = new Dom(e.target);
-
-            var $item = $target.closest('color-item');
-
-            if ($item) {
-                var index = parseInt($item.attr('data-index'));
-
-                this.colorpicker.showContextMenu(e, index);
-            } else {
-                this.colorpicker.showContextMenu(e);
-            }
-        }
-    }, {
-        key: 'click $colorSetsColorList .add-color-item',
-        value: function click$colorSetsColorListAddColorItem(e) {
-            this.addColor(this.colorpicker.getCurrentColor());
-        }
-    }, {
-        key: 'click $colorSetsColorList .color-item',
-        value: function click$colorSetsColorListColorItem(e) {
-            this.colorpicker.setColor(e.$delegateTarget.attr('data-color'));
-        }
-    }]);
-    return ChromeCurrentColorSets;
-}(EventMachin);
-
-var ChromeCurrentColorSetsContextMenu = function (_EventMachin) {
-    inherits(ChromeCurrentColorSetsContextMenu, _EventMachin);
-
-    function ChromeCurrentColorSetsContextMenu(colorpicker) {
-        classCallCheck(this, ChromeCurrentColorSetsContextMenu);
-
-        var _this = possibleConstructorReturn(this, (ChromeCurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(ChromeCurrentColorSetsContextMenu)).call(this));
-
-        _this.colorpicker = colorpicker;
-        _this.currentColorSets = colorpicker.currentColorSets;
-
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeCurrentColorSetsContextMenu, [{
-        key: 'initialize',
-        value: function initialize() {
-            // make colorsets view 
-            this.$el = new Dom('ul', 'colorsets-contextmenu');
-
-            this.$el.createChild('li', 'menu-item small-hide', {
-                'data-type': 'remove-color'
-            }).html('Remove color');
-
-            this.$el.createChild('li', 'menu-item small-hide', {
-                'data-type': 'remove-all-to-the-right'
-            }).html('Remove all to the right');
-
-            this.$el.createChild('li', 'menu-item', {
-                'data-type': 'clear-palette'
-            }).html('Clear palette');
-        }
-    }, {
-        key: 'show',
-        value: function show(e, index) {
-            var $event = Event.pos(e);
-
-            this.$el.css({
-                top: $event.clientY - 10 + 'px',
-                left: $event.clientX + 'px'
-            });
-            this.$el.addClass('show');
-            this.selectedColorIndex = index;
-
-            if (typeof this.selectedColorIndex == 'undefined') {
-                this.$el.addClass('small');
-            } else {
-                this.$el.removeClass('small');
-            }
-        }
-    }, {
-        key: 'hide',
-        value: function hide() {
-            this.$el.removeClass('show');
-        }
-    }, {
-        key: 'runCommand',
-        value: function runCommand(command) {
-            switch (command) {
-                case 'remove-color':
-                    this.currentColorSets.removeColor(this.selectedColorIndex);
-                    break;
-                case 'remove-all-to-the-right':
-                    this.currentColorSets.removeAllToTheRight(this.selectedColorIndex);
-                    break;
-                case 'clear-palette':
-                    this.currentColorSets.clearPalette();
-                    break;
-            }
-        }
-    }, {
-        key: 'click $el .menu-item',
-        value: function click$elMenuItem(e) {
-            e.preventDefault();
-
-            this.runCommand(e.$delegateTarget.attr('data-type'));
-            this.hide();
-        }
-    }]);
-    return ChromeCurrentColorSetsContextMenu;
-}(EventMachin);
-
-var ChromeDevtool = function (_EventMachin) {
-    inherits(ChromeDevtool, _EventMachin);
-
-    function ChromeDevtool(opt) {
-        classCallCheck(this, ChromeDevtool);
-
-        var _this = possibleConstructorReturn(this, (ChromeDevtool.__proto__ || Object.getPrototypeOf(ChromeDevtool)).call(this));
-
-        _this.opt = opt || {};
-        _this.$root = null;
-        _this.format = 'rgb';
-        _this.currentA = 0;
-        _this.currentH = 0;
-        _this.currentS = 0;
-        _this.currentV = 0;
-        _this.colorSetsList = new ChromeColorSetsList(_this);
-        _this.colorpickerCallback = _this.opt.onChange || function () {};
-
-        _this.control = new ChromeColorControl(_this);
-        _this.palette = new ChromeColorPallet(_this);
-        _this.information = new ChromeColorInformation(_this);
-        _this.colorSetsChooser = new ChromeColorSetsChooser(_this);
-        _this.currentColorSets = new ChromeCurrentColorSets(_this);
-        _this.contextMenu = new ChromeCurrentColorSetsContextMenu(_this, _this.currentColorSets);
-
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(ChromeDevtool, [{
-        key: 'getOption',
-        value: function getOption(key) {
-            return this.opt[key];
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            this.$root = new Dom('div', 'codemirror-colorpicker');
-
-            this.$root.append(this.palette.$el);
-            this.$root.append(this.control.$el);
-            this.$root.append(this.information.$el);
-            this.$root.append(this.currentColorSets.$el);
-            this.$root.append(this.colorSetsChooser.$el);
-            this.$root.append(this.contextMenu.$el);
-
-            if (this.opt.target) {
-                this.$root.appendTo(this.opt.target);
-            }
-
-            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
-
-            this.initializeEvent();
-
-            this.initColor(this.opt.color);
-        }
-    }, {
-        key: 'showContextMenu',
-        value: function showContextMenu(e, index) {
-            this.contextMenu.show(e, index);
-        }
-    }, {
-        key: 'setColor',
-        value: function setColor(value) {
-            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
-                if (!value.r || !value.g || !value.b) return;
-
-                this.initColor(color.format(value, "hex"));
-            } else if (typeof value == "string") {
-                this.initColor(value);
-            }
-        }
-    }, {
-        key: 'getColor',
-        value: function getColor(type) {
-            this.caculateHSV();
-            var rgb = this.convertRGB();
-
-            if (type) {
-                return color.format(rgb, type);
-            }
-
-            return rgb;
-        }
-    }, {
-        key: 'definePositionForArrow',
-        value: function definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
-            //this.$arrow.css({})
-        }
-    }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return color.format(this.convertRGB(), 'hex');
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'getCurrentColor',
-        value: function getCurrentColor() {
-            return this.information.getFormattedColor();
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            format = format || 'hex';
-
-            if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                rgb.a = this.currentA;
-                return color.format(rgb, 'rgb');
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                hsl.a = this.currentA;
-                return color.format(hsl, 'hsl');
-            } else {
-                var rgb = this.convertRGB();
-                return color.format(rgb, 'hex');
-            }
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor(isNoInputColor) {
-            this.information.setInputColor(isNoInputColor);
-            this.control.setInputColor(isNoInputColor);
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'changeInputColorAfterNextFormat',
-        value: function changeInputColorAfterNextFormat() {
-            this.control.setInputColor();
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'callbackColorValue',
-        value: function callbackColorValue() {
-            if (typeof this.colorpickerCallback == 'function') {
-
-                if (!isNaN(this.currentA)) {
-                    this.colorpickerCallback(this.getCurrentColor());
-                }
-            }
-        }
-    }, {
-        key: 'caculateHSV',
-        value: function caculateHSV() {
-
-            var obj = this.palette.caculateSV();
-            var control = this.control.caculateH();
-
-            var s = obj.s;
-            var v = obj.v;
-            var h = control.h;
-
-            if (obj.width == 0) {
-                h = 0;
-                s = 0;
-                v = 0;
-            }
-
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.control.setColorUI();
-            this.palette.setColorUI();
-        }
-    }, {
-        key: 'setCurrentHSV',
-        value: function setCurrentHSV(h, s, v, a) {
-            this.currentA = a;
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setCurrentH',
-        value: function setCurrentH(h) {
-            this.currentH = h;
-        }
-    }, {
-        key: 'setCurrentA',
-        value: function setCurrentA(a) {
-            this.currentA = a;
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.palette.setBackgroundColor(color$$1);
-        }
-    }, {
-        key: 'setCurrentFormat',
-        value: function setCurrentFormat(format) {
-            this.format = format;
-            this.information.setCurrentFormat(format);
-        }
-    }, {
-        key: 'getHSV',
-        value: function getHSV(colorObj) {
-            if (colorObj.type == 'hsl') {
-                return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
-            } else {
-                return color.RGBtoHSV(colorObj);
-            }
-        }
-    }, {
-        key: 'initColor',
-        value: function initColor(newColor, format) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-            format = format || colorObj.type;
-
-            this.setCurrentFormat(format);
-
-            var hsv = this.getHSV(colorObj);
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-            this.setColorUI();
-            this.setHueColor();
-            this.setInputColor();
-        }
-    }, {
-        key: 'changeInformationColor',
-        value: function changeInformationColor(newColor) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-
-            var hsv = this.getHSV(colorObj);
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-            this.setColorUI();
-            this.setHueColor();
-            this.control.setInputColor();
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'setHueColor',
-        value: function setHueColor() {
-            this.control.setOnlyHueColor();
-        }
-    }, {
-        key: 'checkColorPickerClass',
-        value: function checkColorPickerClass(el) {
-            var hasColorView = new Dom(el).closest('codemirror-colorview');
-            var hasColorPicker = new Dom(el).closest('codemirror-colorpicker');
-            var hasCodeMirror = new Dom(el).closest('CodeMirror');
-            var IsInHtml = el.nodeName == 'HTML';
-
-            return !!(hasColorPicker || hasColorView || hasCodeMirror);
-        }
-    }, {
-        key: 'checkInHtml',
-        value: function checkInHtml(el) {
-            var IsInHtml = el.nodeName == 'HTML';
-
-            return IsInHtml;
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-            this.palette.EventDocumentMouseUp(e);
-            this.control.EventDocumentMouseUp(e);
-        }
-    }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
-            this.palette.EventDocumentMouseMove(e);
-            this.control.EventDocumentMouseMove(e);
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-
-            this.initializeEventMachin();
-
-            this.palette.initializeEvent();
-            this.control.initializeEvent();
-            this.information.initializeEvent();
-            this.currentColorSets.initializeEvent();
-            this.colorSetsChooser.initializeEvent();
-            this.contextMenu.initializeEvent();
-        }
-    }, {
-        key: 'currentFormat',
-        value: function currentFormat() {
-            this.information.currentFormat();
-        }
-    }, {
-        key: 'toggleColorChooser',
-        value: function toggleColorChooser() {
-            this.colorSetsChooser.toggle();
-        }
-    }, {
-        key: 'refreshColorSetsChooser',
-        value: function refreshColorSetsChooser() {
-            this.colorSetsChooser.refresh();
-        }
-    }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            return this.colorSetsList.getColorSetsList();
-        }
-    }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
-            this.colorSetsList.setCurrentColorSets(nameOrIndex);
-            this.currentColorSets.refresh();
-        }
-    }, {
-        key: 'setColorSets',
-        value: function setColorSets(list) {
-            this.colorSetsList.setUserList(list);
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            get(ChromeDevtool.prototype.__proto__ || Object.getPrototypeOf(ChromeDevtool.prototype), 'destroy', this).call(this);
-
-            this.control.destroy();
-            this.palette.destroy();
-            this.information.destroy();
-            this.colorSetsChooser.destroy();
-            this.colorSetsList.destroy();
-            this.currentColorSets.destroy();
-            this.contextMenu.destroy();
-
-            // remove color picker callback
-            this.colorpickerCallback = undefined;
-        }
-    }]);
-    return ChromeDevtool;
-}(EventMachin);
-
 if (CodeMirror) {
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
@@ -5310,8 +3823,7 @@ var index = {
     Color: color,
     ColorNames: ColorNames,
     HueColor: HueColor,
-    ColorPicker: ColorPicker,
-    ChromeDevtool: ChromeDevtool
+    ColorPicker: ColorPicker
 };
 
 return index;
