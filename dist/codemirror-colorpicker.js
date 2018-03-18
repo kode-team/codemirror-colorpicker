@@ -62,9 +62,9 @@ var distances = {
     euclidean: euclidean,
     manhattan: manhattan,
     max: max
+};
 
-    // 임이의 몇개(k)를 찾는다. 
-};function randomCentroids(points, k) {
+function randomCentroids(points, k) {
     var centeroids = points.slice(0);
 
     centeroids.sort(function () {
@@ -74,34 +74,32 @@ var distances = {
     return centeroids.slice(0, k);
 }
 
-// k 단계 중에 가장 가까운 거리에 있는 index 를 찾아보자. 
 function closestCenteroid(point, centeroids, distance) {
     var min = Infinity,
-        index = 0;
+        kIndex = 0;
 
     centeroids.forEach(function (center, i) {
         var dist = distance(point, center);
 
         if (dist < min) {
             min = dist;
-            index = i;
+            kIndex = i;
         }
     });
 
-    return index; // 가장 가까운 k 
+    return kIndex;
 }
 
 function getCenteroid(assigned) {
 
-    if (assigned.length === 0) return [];
+    if (!assigned.length) return [];
 
-    // Calculate running means.
+    // initialize centeroid list 
     var centeroid = assigned[0].map(function (it) {
         return 0;
     });
 
     assigned.forEach(function (it, index) {
-
         it.forEach(function (item, j) {
             centeroid[j] += (item - centeroid[j]) / (index + 1);
         });
@@ -111,7 +109,6 @@ function getCenteroid(assigned) {
 }
 
 function unique_array(arrays) {
-    // 배열 중복을 제거 하자.
     var set = {};
     var count = arrays.length;
     var it = null;
@@ -123,14 +120,14 @@ function unique_array(arrays) {
     return Object.values(set);
 }
 
-function kmeans(points, k, distance) {
+function kmeans(points, k, distanceFunction) {
     var period = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
 
     points = unique_array(points);
 
     k = k || Math.max(2, Math.ceil(Math.sqrt(points.length / 2)));
 
-    distance = distance || 'euclidean';
+    var distance = distanceFunction || 'euclidean';
     if (typeof distance == 'string') {
         distance = distances[distance];
     }
@@ -147,20 +144,18 @@ function kmeans(points, k, distance) {
     var iterations = 0;
 
     var _loop = function _loop() {
-        var assignment = new Array(k); // 현재 k 에 할당된 값들 (계속 변경됨)
+        var assignment = new Array(k);
 
         for (i = 0; i < k; i++) {
             assignment[i] = [];
         }
 
-        // 포인트별 그룹 위치 저장 
         points.forEach(function (point) {
             var index = closestCenteroid(point, centeroids, distance);
             assignment[index].push(point);
         });
 
-        movement = false; //  한번 실행 했으니 그걸로 끝 ? 
-
+        movement = false;
 
         var _loop2 = function _loop2() {
             var assigned = [];
@@ -171,27 +166,23 @@ function kmeans(points, k, distance) {
                 }
             });
 
-            // 중심점 구하기 
             var centeroid = centeroids[i];
-            var newCenteroid = new Array(centeroid.length); // 새로운 중심점 생성하기 위한 객체 
+            var newCenteroid = new Array(centeroid.length);
 
             if (assigned.length > 0) {
                 newCenteroid = getCenteroid(assigned);
             } else {
-                // For an empty cluster, set a random point as the centroid.
                 idx = Math.floor(random() * points.length);
 
                 newCenteroid = points[idx];
             }
 
-            // 그 값이 다르면  루프를 계속 돈다. 마지막으로 같을 때까지 
             if (array_equals(newCenteroid, centeroid)) {
                 movement = false;
             } else {
                 movement = true;
             }
 
-            // 해당 그룹 k 의 중심 점 교체 
             centeroids[i] = newCenteroid;
         };
 
@@ -1282,6 +1273,8 @@ var Dom = function () {
     }, {
         key: 'css',
         value: function css(key, value) {
+            var _this = this;
+
             if (arguments.length == 2) {
                 this.el.style[key] = value;
             } else if (arguments.length == 1) {
@@ -1290,9 +1283,9 @@ var Dom = function () {
                     return getComputedStyle(this.el)[key];
                 } else {
                     var keys = key || {};
-                    for (var k in keys) {
-                        this.el.style[k] = keys[k];
-                    }
+                    Object.keys(keys).forEach(function (k) {
+                        _this.el.style[k] = keys[k];
+                    });
                 }
             }
 
@@ -1336,9 +1329,19 @@ var Dom = function () {
             return this.el.offsetWidth;
         }
     }, {
+        key: 'contentWidth',
+        value: function contentWidth() {
+            return this.width() - this.cssFloat('padding-left') - this.cssFloat('padding-right');
+        }
+    }, {
         key: 'height',
         value: function height() {
             return this.el.offsetHeight;
+        }
+    }, {
+        key: 'contentHeight',
+        value: function contentHeight() {
+            return this.height() - this.cssFloat('padding-top') - this.cssFloat('padding-bottom');
         }
     }, {
         key: 'dataKey',
@@ -1478,6 +1481,64 @@ var Event = {
     }
 };
 
+var DELEGATE_SPLIT = '.';
+
+var State = function () {
+  function State(masterObj) {
+    var settingObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    classCallCheck(this, State);
+
+
+    this.masterObj = masterObj;
+    this.settingObj = settingObj;
+  }
+
+  createClass(State, [{
+    key: 'set',
+    value: function set$$1(key, value) {
+      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+
+      this.settingObj[key] = value || defaultValue;
+    }
+  }, {
+    key: 'init',
+    value: function init(key) {
+
+      if (!this.has(key)) {
+
+        var arr = key.split(DELEGATE_SPLIT);
+
+        var obj = this.masterObj[arr[0]] || this.masterObj;
+        var method = arr.pop();
+
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        var value = obj[method].apply(obj, args);
+
+        this.set(key, value);
+      }
+    }
+  }, {
+    key: 'get',
+    value: function get$$1(key) {
+      var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+
+      this.init(key, defaultValue);
+
+      return this.settingObj[key] || defaultValue;
+    }
+  }, {
+    key: 'has',
+    value: function has(key) {
+      return !!this.settingObj[key];
+    }
+  }]);
+  return State;
+}();
+
 var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
 var EVENT_SAPARATOR = ' ';
 var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
@@ -1485,6 +1546,8 @@ var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
 var EventMachin = function () {
   function EventMachin() {
     classCallCheck(this, EventMachin);
+
+    this.state = new State(this);
   }
 
   createClass(EventMachin, [{
@@ -1749,37 +1812,42 @@ var ColorControl = function (_EventMachin) {
     }, {
         key: 'setColorUI',
         value: function setColorUI() {
-            var x = this.$el.width() * this.colorpicker.currentS,
-                y = this.$el.height() * (1 - this.colorpicker.currentV);
+
+            var x = this.state.get('$el.width') * this.colorpicker.currentS,
+                y = this.state.get('$el.height') * (1 - this.colorpicker.currentV);
 
             this.$drag_pointer.css({
-                left: x - 5 + "px",
-                top: y - 5 + "px"
+                left: x + "px",
+                top: y + "px"
             });
         }
-    }, {
-        key: 'setMainColor',
-        value: function setMainColor(e) {
+
+        /*
+        setMainColor(e) {
             e.preventDefault();
-            var pos = this.colorpicker.$root.position(); // position for screen
+            var pos = this.colorpicker.$root.position();         // position for screen
             var w = $color.width();
             var h = $color.height();
-
+        
             var x = e.clientX - pos.left;
             var y = e.clientY - pos.top;
-
-            if (x < 0) x = 0;else if (x > w) x = w;
-
-            if (y < 0) y = 0;else if (y > h) y = h;
-
+        
+            if (x < 0) x = 0;
+            else if (x > w) x = w;
+        
+            if (y < 0) y = 0;
+            else if (y > h) y = h;
+        
             this.$drag_pointer.css({
-                left: x - 5 + 'px',
-                top: y - 5 + 'px'
+                left: (x) + 'px',
+                top: (y) + 'px'
             });
-
-            this.colorpicker.caculateHSV();
+        
+            this.colorpicker.caculateHSV()
             this.colorpicker.setInputColor();
-        }
+        }    
+        */
+
     }, {
         key: 'setOpacityColorBar',
         value: function setOpacityColorBar(hueColor) {
@@ -1797,7 +1865,7 @@ var ColorControl = function (_EventMachin) {
         key: 'setOpacity',
         value: function setOpacity(e) {
             var min = this.$opacityContainer.offset().left;
-            var max = min + this.$opacityContainer.width();
+            var max = min + this.state.get('$opacityContainer.width');
             var current = Event.pos(e).clientX;
             var dist;
 
@@ -1809,10 +1877,10 @@ var ColorControl = function (_EventMachin) {
                 dist = (current - min) / (max - min) * 100;
             }
 
-            var x = this.$opacityContainer.width() * (dist / 100);
+            var x = this.state.get('$opacityContainer.width') * (dist / 100);
 
             this.$opacity_drag_bar.css({
-                left: x - Math.ceil(this.$opacity_drag_bar.width() / 2) + 'px'
+                left: x - Math.ceil(this.state.get('$opacity_drag_bar.width') / 2) + 'px'
             });
 
             this.opacity_drag_bar_pos = { x: x };
@@ -1834,7 +1902,7 @@ var ColorControl = function (_EventMachin) {
         key: 'setColorUI',
         value: function setColorUI() {
 
-            var hueX = this.$hueContainer.width() * (this.colorpicker.currentH / 360);
+            var hueX = this.state.get('$hueContainer.width') * (this.colorpicker.currentH / 360);
 
             this.$drag_bar.css({
                 left: hueX - 7.5 + 'px'
@@ -1842,7 +1910,7 @@ var ColorControl = function (_EventMachin) {
 
             this.drag_bar_pos = { x: hueX };
 
-            var opacityX = this.$opacityContainer.width() * (this.colorpicker.currentA || 0);
+            var opacityX = this.state.get('$opacityContainer.width') * (this.colorpicker.currentA || 0);
 
             this.$opacity_drag_bar.css({
                 left: opacityX - 7.5 + 'px'
@@ -1856,7 +1924,7 @@ var ColorControl = function (_EventMachin) {
 
             var huePos = this.drag_bar_pos || { x: 0 };
 
-            var h = huePos.x / this.$hueContainer.width() * 360;
+            var h = huePos.x / this.state.get('$hueContainer.width') * 360;
 
             return { h: h };
         }
@@ -1864,7 +1932,7 @@ var ColorControl = function (_EventMachin) {
         key: 'caculateOpacity',
         value: function caculateOpacity() {
             var opacityPos = this.opacity_drag_bar_pos || { x: 0 };
-            var a = Math.round(opacityPos.x / this.$opacityContainer.width() * 100) / 100;
+            var a = Math.round(opacityPos.x / this.state.get('$opacityContainer.width') * 100) / 100;
 
             return isNaN(a) ? 1 : a;
         }
@@ -1894,7 +1962,7 @@ var ColorControl = function (_EventMachin) {
         key: 'setHueColor',
         value: function setHueColor(e) {
             var min = this.$hueContainer.offset().left;
-            var max = min + this.$hueContainer.width();
+            var max = min + this.state.get('$hueContainer.width');
             var current = e ? Event.pos(e).clientX : min + (max - min) * (this.colorpicker.currentH / 360);
 
             var dist;
@@ -1906,10 +1974,10 @@ var ColorControl = function (_EventMachin) {
                 dist = (current - min) / (max - min) * 100;
             }
 
-            var x = this.$hueContainer.width() * (dist / 100);
+            var x = this.state.get('$hueContainer.width') * (dist / 100);
 
             this.$drag_bar.css({
-                left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
+                left: x - Math.ceil(this.state.get('$drag_bar.width') / 2) + 'px'
             });
 
             this.drag_bar_pos = { x: x };
@@ -1924,7 +1992,7 @@ var ColorControl = function (_EventMachin) {
         key: 'setOnlyHueColor',
         value: function setOnlyHueColor() {
             var min = this.$hueContainer.offset().left;
-            var max = min + this.$hueContainer.width();
+            var max = min + this.state.get('$hueContainer.width');
             var current = min + (max - min) * (this.colorpicker.currentH / 360);
 
             var dist;
@@ -1936,10 +2004,10 @@ var ColorControl = function (_EventMachin) {
                 dist = (current - min) / (max - min) * 100;
             }
 
-            var x = this.$hueContainer.width() * (dist / 100);
+            var x = this.state.get('$hueContainer.width') * (dist / 100);
 
             this.$drag_bar.css({
-                left: x - Math.ceil(this.$drag_bar.width() / 2) + 'px'
+                left: x - Math.ceil(this.state.get('$drag_bar.width') / 2) + 'px'
             });
 
             this.drag_bar_pos = { x: x };
@@ -2353,8 +2421,8 @@ var ColorPallet = function (_EventMachin) {
         value: function caculateSV() {
             var pos = this.drag_pointer_pos || { x: 0, y: 0 };
 
-            var width = this.$el.width();
-            var height = this.$el.height();
+            var width = this.state.get('$el.width');
+            var height = this.state.get('$el.height');
 
             var s = pos.x / width;
             var v = (height - pos.y) / height;
@@ -2364,8 +2432,8 @@ var ColorPallet = function (_EventMachin) {
     }, {
         key: 'setColorUI',
         value: function setColorUI() {
-            var x = this.$el.width() * this.colorpicker.currentS,
-                y = this.$el.height() * (1 - this.colorpicker.currentV);
+            var x = this.state.get('$el.width') * this.colorpicker.currentS,
+                y = this.state.get('$el.height') * (1 - this.colorpicker.currentV);
 
             this.$drag_pointer.css({
                 left: x - 5 + "px",
@@ -2379,8 +2447,8 @@ var ColorPallet = function (_EventMachin) {
         value: function setMainColor(e) {
             e.preventDefault();
             var pos = this.$el.position(); // position for screen
-            var w = this.$el.width() - this.$el.cssFloat('padding-left') - this.$el.cssFloat('padding-right');
-            var h = this.$el.height() - this.$el.cssFloat('padding-top') - this.$el.cssFloat('padding-bottom');
+            var w = this.state.get('$el.contentWidth');
+            var h = this.state.get('$el.contentHeight');
 
             var x = e.clientX - pos.left;
             var y = e.clientY - pos.top;
@@ -3066,8 +3134,6 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'show',
         value: function show(opt, color$$1, callback) {
-            var _this2 = this;
-
             this.destroy();
             this.initializeEvent();
             this.$root.appendTo(this.$body);
@@ -3083,12 +3149,7 @@ var ColorPicker = function (_EventMachin) {
             this.initColor(color$$1);
 
             // define colorpicker callback
-            this.colorpickerCallback = function (colorString) {
-                if (typeof _this2.opt.onChange == 'function') {
-                    _this2.opt.onChange(colorString);
-                }
-                callback(colorString);
-            };
+            this.colorpickerCallback = callback;
 
             // define hide delay
             this.hideDelay = opt.hideDelay || 2000;
@@ -3099,7 +3160,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'setHideDelay',
         value: function setHideDelay(delayTime) {
-            var _this3 = this;
+            var _this2 = this;
 
             delayTime = delayTime || 0;
 
@@ -3107,12 +3168,12 @@ var ColorPicker = function (_EventMachin) {
             this.$root.off('mouseleave');
 
             this.$root.on('mouseenter', function () {
-                clearTimeout(_this3.timerCloseColorPicker);
+                clearTimeout(_this2.timerCloseColorPicker);
             });
 
             this.$root.on('mouseleave', function () {
-                clearTimeout(_this3.timerCloseColorPicker);
-                _this3.timerCloseColorPicker = setTimeout(_this3.hide.bind(_this3), delayTime);
+                clearTimeout(_this2.timerCloseColorPicker);
+                _this2.timerCloseColorPicker = setTimeout(_this2.hide.bind(_this2), delayTime);
             });
 
             clearTimeout(this.timerCloseColorPicker);
@@ -3186,7 +3247,7 @@ var ColorPicker = function (_EventMachin) {
         value: function callbackColorValue() {
             if (typeof this.opt.onChange == 'function') {
                 if (!isNaN(this.currentA)) {
-                    this.opt.onChange(this.getCurrentColor());
+                    this.opt.onChange.call(this, this.getCurrentColor());
                 }
             }
 
@@ -3486,7 +3547,7 @@ var ColorView = function () {
         this.excluded_token = this.opt.excluded_token || excluded_token;
 
         if (this.opt.colorpicker) {
-            this.colorpicker = this.opt.colorpicker;
+            this.colorpicker = this.opt.colorpicker(this.opt);
         } else {
             this.colorpicker = new ColorPicker(this.opt);
         }

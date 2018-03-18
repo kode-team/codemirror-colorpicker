@@ -170,12 +170,7 @@ export default class ColorPicker extends EventMachin {
         this.initColor(color);
 
         // define colorpicker callback
-        this.colorpickerCallback = (colorString) => {
-            if (typeof this.opt.onChange == 'function') {
-                this.opt.onChange(colorString);
-            }
-            callback(colorString);
-        }
+        this.colorpickerCallback = callback;
 
         // define hide delay
         this.hideDelay = opt.hideDelay || 2000;
@@ -264,7 +259,7 @@ export default class ColorPicker extends EventMachin {
     callbackColorValue() {
         if (typeof this.opt.onChange == 'function') {
             if (!isNaN(this.currentA)) {
-                this.opt.onChange(this.getCurrentColor());
+                this.opt.onChange.call(this, this.getCurrentColor());
             }
 
         }

@@ -145,10 +145,10 @@ export default class Dom {
                 return getComputedStyle(this.el)[key];
             } else {
                 var keys = key || {};
-                for(var k in keys) {
-                    this.el.style[k] = keys[k];
-                }
-            }
+                Object.keys(keys).forEach(k => {
+                    this.el.style[k] = keys[k];    
+                })
+            } 
     
         }
     
@@ -187,9 +187,18 @@ export default class Dom {
     width () {
         return this.el.offsetWidth;
     }
+
+    contentWidth() {
+        return this.width() - this.cssFloat('padding-left') - this.cssFloat('padding-right');
+    }
     
     height () {
         return this.el.offsetHeight;
+    }
+
+
+    contentHeight() {
+        return this.height() - this.cssFloat('padding-top') - this.cssFloat('padding-bottom');
     }
     
     dataKey (key) {

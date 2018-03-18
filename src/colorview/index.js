@@ -95,7 +95,7 @@ export default class ColorView {
         this.excluded_token = this.opt.excluded_token || excluded_token;
 
         if (this.opt.colorpicker) {
-            this.colorpicker = this.opt.colorpicker;
+            this.colorpicker = this.opt.colorpicker(this.opt);
         } else {
             this.colorpicker = new ColorPicker(this.opt);
         }

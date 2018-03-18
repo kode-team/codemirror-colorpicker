@@ -1,11 +1,16 @@
 import Event from './Event'
 import Dom from './Dom'
+import State from './State'
 
 const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
 const EVENT_SAPARATOR = ' '
 const META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
 
 export default class EventMachin {
+
+  constructor() { 
+    this.state = new State(this);
+  }
 
   initializeEvent () {
     this.initializeEventMachin();

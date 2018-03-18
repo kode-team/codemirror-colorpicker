@@ -29,8 +29,8 @@ export default class ColorPallet extends EventMachin {
     caculateSV () {
         var pos = this.drag_pointer_pos || { x : 0, y : 0 };
 
-        var width = this.$el.width();
-        var height = this.$el.height();
+        var width = this.state.get('$el.width');
+        var height = this.state.get('$el.height');
 
         var s = (pos.x / width);
         var v = ((height - pos.y) / height);
@@ -39,7 +39,7 @@ export default class ColorPallet extends EventMachin {
     }
 
     setColorUI() {
-        var  x = this.$el.width() * this.colorpicker.currentS, y = this.$el.height() * ( 1 - this.colorpicker.currentV );
+        var  x = this.state.get('$el.width') * this.colorpicker.currentS, y = this.state.get('$el.height') * ( 1 - this.colorpicker.currentV );
     
         this.$drag_pointer.css({
             left : (x - 5) + "px",
@@ -53,8 +53,8 @@ export default class ColorPallet extends EventMachin {
     setMainColor(e) {
         e.preventDefault();
         var pos = this.$el.position();         // position for screen
-        var w = this.$el.width() - this.$el.cssFloat('padding-left') - this.$el.cssFloat('padding-right');
-        var h = this.$el.height() - this.$el.cssFloat('padding-top') - this.$el.cssFloat('padding-bottom');
+        var w = this.state.get('$el.contentWidth');
+        var h = this.state.get('$el.contentHeight');
 
         var x = e.clientX - pos.left;
         var y = e.clientY - pos.top;
