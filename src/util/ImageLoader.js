@@ -1,7 +1,8 @@
 class ImageLoader {
-    constructor(url) {
+    constructor(url, opt = {}) {
         this.isLoaded = false; 
         this.imageUrl = url; 
+        this.opt = opt;
         this.initialize();
     }
 
@@ -22,9 +23,9 @@ class ImageLoader {
         var ctx = this.context; 
         var img = new Image();
         img.onload = () => {
-            var ratio = img.height / img.height;
-            this.canvas.width = 100;
-            this.canvas.height = 100 * ratio; 
+            var ratio = img.height / img.width;
+            this.canvas.width = this.opt.maxWidth ? 100 : img.width;
+            this.canvas.height = this.canvas.width * ratio; 
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.canvas.width, this.canvas.height);
             this.isLoaded = true; 
             callback && callback();

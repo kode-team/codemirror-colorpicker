@@ -93,20 +93,30 @@ function getCenteroid(assigned) {
     if (!assigned.length) return [];
 
     // initialize centeroid list 
-    var centeroid = assigned[0].map(function (it) {
-        return 0;
-    });
+    var centeroid = new Array(assigned[0].length);
+    for (var i = 0, len = centeroid.length; i < len; i++) {
+        centeroid[i] = 0;
+    }
 
-    assigned.forEach(function (it, index) {
-        it.forEach(function (item, j) {
-            centeroid[j] += (item - centeroid[j]) / (index + 1);
-        });
+    for (var index = 0, len = assigned.length; index < len; index++) {
+        var it = assigned[index];
+
+        var last = index + 1;
+
+        for (var j = 0, jLen = it.length; j < jLen; j++) {
+            centeroid[j] += (it[j] - centeroid[j]) / last;
+        }
+    }
+
+    centeroid = centeroid.map(function (it) {
+        return Math.floor(it);
     });
 
     return centeroid;
 }
 
 function unique_array(arrays) {
+    return arrays;
     var set = {};
     var count = arrays.length;
     var it = null;
@@ -116,6 +126,49 @@ function unique_array(arrays) {
     }
 
     return Object.values(set);
+}
+
+function splitK(k, points, centeroids, distance) {
+    var assignment = new Array(k);
+
+    for (var i = 0; i < k; i++) {
+        assignment[i] = [];
+    }
+
+    for (var idx = 0, pointLength = points.length; idx < pointLength; idx++) {
+        var point = points[idx];
+        var index = closestCenteroid(point, centeroids, distance);
+        assignment[index].push(point);
+    }
+
+    return assignment;
+}
+
+function setNewCenteroid(k, assignment, centeroids, movement) {
+
+    for (var i = 0; i < k; i++) {
+        var assigned = assignment[i];
+
+        var centeroid = centeroids[i];
+        var newCenteroid = new Array(centeroid.length);
+
+        if (assigned.length > 0) {
+            newCenteroid = getCenteroid(assigned);
+        } else {
+            var idx = Math.floor(random() * points.length);
+            newCenteroid = points[idx];
+        }
+
+        if (array_equals(newCenteroid, centeroid)) {
+            movement = false;
+        } else {
+            movement = true;
+        }
+
+        centeroids[i] = newCenteroid;
+    }
+
+    return movement;
 }
 
 function kmeans(points, k, distanceFunction) {
@@ -130,79 +183,20 @@ function kmeans(points, k, distanceFunction) {
         distance = distances[distance];
     }
 
-    var rng_seed = 0;
-    var random = function random() {
-        rng_seed = (rng_seed * 9301 + 49297) % 233280;
-        return rng_seed / 233280;
-    };
-
     var centeroids = randomCentroids(points, k);
 
     var movement = true;
     var iterations = 0;
+    while (movement) {
+        var assignment = splitK(k, points, centeroids, distance);
 
-    var _loop = function _loop() {
-        var assignment = new Array(k);
-
-        for (i = 0; i < k; i++) {
-            assignment[i] = [];
-        }
-
-        points.forEach(function (point) {
-            var index = closestCenteroid(point, centeroids, distance);
-            assignment[index].push(point);
-        });
-
-        movement = false;
-
-        var _loop2 = function _loop2() {
-            var assigned = [];
-
-            assignment.forEach(function (kIndex, index) {
-                if (kIndex == i) {
-                    assigned.push(points[index]);
-                }
-            });
-
-            var centeroid = centeroids[i];
-            var newCenteroid = new Array(centeroid.length);
-
-            if (assigned.length > 0) {
-                newCenteroid = getCenteroid(assigned);
-            } else {
-                idx = Math.floor(random() * points.length);
-
-                newCenteroid = points[idx];
-            }
-
-            if (array_equals(newCenteroid, centeroid)) {
-                movement = false;
-            } else {
-                movement = true;
-            }
-
-            centeroids[i] = newCenteroid;
-        };
-
-        for (i = 0; i < k; i++) {
-            _loop2();
-        }
+        movement = setNewCenteroid(k, assignment, centeroids, false);
 
         iterations++;
 
         if (iterations % period == 0) {
-            return 'break';
+            break;
         }
-    };
-
-    while (movement) {
-        var i;
-        var i;
-        var idx;
-
-        var _ret = _loop();
-
-        if (_ret === 'break') break;
     }
 
     return centeroids;
@@ -348,10 +342,12 @@ var toArray = function (arr) {
 
 var ImageLoader = function () {
     function ImageLoader(url) {
+        var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         classCallCheck(this, ImageLoader);
 
         this.isLoaded = false;
         this.imageUrl = url;
+        this.opt = opt;
         this.initialize();
     }
 
@@ -379,9 +375,9 @@ var ImageLoader = function () {
             var ctx = this.context;
             var img = new Image();
             img.onload = function () {
-                var ratio = img.height / img.height;
-                _this.canvas.width = 100;
-                _this.canvas.height = 100 * ratio;
+                var ratio = img.height / img.width;
+                _this.canvas.width = _this.opt.maxWidth ? 100 : img.width;
+                _this.canvas.height = _this.canvas.width * ratio;
                 ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, _this.canvas.width, _this.canvas.height);
                 _this.isLoaded = true;
                 callback && callback();
@@ -1050,11 +1046,26 @@ var color = {
             return _this.format(c, format);
         });
     },
-    ImageToRGB: function ImageToRGB(url, callback) {
-        var img = new ImageLoader(url);
-        img.loadImage(function () {
-            callback && callback(img.toRGB());
-        });
+    ImageToRGB: function ImageToRGB(url) {
+        var callbackOrOption = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var callback = arguments[2];
+
+
+        if (!callback) {
+            var img = new ImageLoader(url);
+            img.loadImage(function () {
+                if (typeof callbackOrOption == 'function') {
+                    callbackOrOption(img.toRGB());
+                }
+            });
+        } else if (callback) {
+            var img = new ImageLoader(url, callbackOrOption);
+            img.loadImage(function () {
+                if (typeof callback == 'function') {
+                    callback(img.toRGB());
+                }
+            });
+        }
     }
 };
 

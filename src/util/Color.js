@@ -532,11 +532,26 @@ const color = {
             return this.format(c, format);
         });
     },
-    ImageToRGB : function (url, callback) {
-        var img = new ImageLoader(url);
-        img.loadImage(() => {
-            callback && callback(img.toRGB());
-        })
+    ImageToRGB : function (url, callbackOrOption = {}, callback) {
+
+        if (!callback) {
+            var img = new ImageLoader(url); 
+            img.loadImage(() => {
+                if (typeof callbackOrOption == 'function') {
+                    callbackOrOption(img.toRGB());
+                }
+                
+            })
+        } else if (callback) {
+            var img = new ImageLoader(url, callbackOrOption); 
+            img.loadImage(() => {
+                if (typeof callback == 'function') {
+                    callback(img.toRGB());
+                }
+
+            })
+        }
+
     }
 }
 

@@ -73,20 +73,30 @@ function getCenteroid (assigned) {
     if (!assigned.length) return [];
 
     // initialize centeroid list 
-    let centeroid = assigned[0].map(it => {
-        return 0
-    });
+    let centeroid = new Array(assigned[0].length);
+    for(var i = 0, len = centeroid.length; i < len; i++) {
+        centeroid[i] = 0; 
+    }
 
-    assigned.forEach((it, index) => {
-        it.forEach( (item, j) => {
-            centeroid[j] += (item - centeroid[j]) / (index + 1);
-        })
+    for (var index = 0, len = assigned.length; index < len; index++) {
+        var it = assigned[index];
+
+        var last = (index + 1);
+
+        for(var j = 0, jLen = it.length; j < jLen; j++) {
+            centeroid[j] += (it[j] - centeroid[j]) / last;
+        }
+    }
+
+    centeroid = centeroid.map(it => {
+        return Math.floor(it);
     })
 
     return centeroid;
 }
 
 function unique_array (arrays) {
+    return arrays;
     var set = {};
     var count = arrays.length; 
     let it = null;
@@ -96,6 +106,49 @@ function unique_array (arrays) {
     }
 
     return Object.values(set);
+}
+
+function splitK (k, points, centeroids, distance) {
+    let assignment = new Array(k); 
+
+    for(var i = 0; i < k; i++) {
+        assignment[i] = [];
+    }
+
+    for(var idx = 0, pointLength = points.length; idx < pointLength; idx++) {
+        var point = points[idx];
+        var index = closestCenteroid(point, centeroids, distance);
+        assignment[index].push(point);
+    } 
+
+    return assignment;
+}
+
+function setNewCenteroid (k, assignment, centeroids, movement) {
+
+    for(var i = 0; i < k; i++) {
+        let assigned = assignment[i];
+
+        const centeroid = centeroids[i];
+        let newCenteroid = new Array(centeroid.length);  
+
+        if (assigned.length > 0) {
+            newCenteroid = getCenteroid(assigned);
+        } else {
+            var idx = Math.floor(random() * points.length);
+            newCenteroid = points[idx];
+        }
+
+        if (array_equals(newCenteroid, centeroid)) {
+            movement = false; 
+        } else {
+            movement = true; 
+        }          
+
+        centeroids[i] = newCenteroid;
+    }
+
+    return movement;
 }
 
 function kmeans (points, k, distanceFunction, period = 10) {
@@ -114,51 +167,14 @@ function kmeans (points, k, distanceFunction, period = 10) {
       return rng_seed / 233280;
     };
 
-    const centeroids = randomCentroids(points, k);
+    let centeroids = randomCentroids(points, k);
     
     let movement = true;
     let iterations = 0;
     while(movement) {
-        let assignment = new Array(k); 
+        const assignment = splitK (k, points, centeroids, distance);
 
-        for(var i = 0; i < k; i++) {
-            assignment[i] = [];
-        }
-
-        points.forEach(point => {
-            var index = closestCenteroid(point, centeroids, distance);
-            assignment[index].push(point);
-        });
-
-        movement = false;  
-
-        for(var i = 0; i < k; i++) {
-            let assigned = [];
-
-            assignment.forEach((kIndex, index) => {
-                if (kIndex == i) { 
-                    assigned.push(points[index]);
-                }
-            })
-
-            const centeroid = centeroids[i];
-            let newCenteroid = new Array(centeroid.length);  
-
-            if (assigned.length > 0) {
-                newCenteroid = getCenteroid(assigned);
-            } else {
-                var idx = Math.floor(random() * points.length);
-                newCenteroid = points[idx];
-            }
-
-            if (array_equals(newCenteroid, centeroid)) {
-                movement = false; 
-            } else {
-                movement = true; 
-            }          
-
-            centeroids[i] = newCenteroid;
-        }
+        movement = setNewCenteroid(k, assignment, centeroids, false);
 
         iterations++;
 
