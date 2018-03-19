@@ -97,6 +97,7 @@
 
         box-sizing: border-box;
         text-align: center;
+        text-transform: uppercase;
     }
 
     #image-palette {
@@ -350,7 +351,7 @@ var color_names = {
         var Color = CodeMirrorColorPicker.Color;
         document.getElementById('palette-image').src = URL.createObjectURL(blob);
 
-        Color.ImageToRGB(blob, function (results) {
+        Color.ImageToRGB(blob, { maxWidth: 100 }, function (results) {
             const colors = Color.palette(results, 20);
 
             var fragment = document.createDocumentFragment();

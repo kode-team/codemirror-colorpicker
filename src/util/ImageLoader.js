@@ -24,8 +24,15 @@ class ImageLoader {
         var img = new Image();
         img.onload = () => {
             var ratio = img.height / img.width;
-            this.canvas.width = this.opt.maxWidth ? 100 : img.width;
-            this.canvas.height = this.canvas.width * ratio; 
+
+            if (this.opt.canvasWidth && this.opt.canvasHeight) {
+                this.canvas.width = this.opt.canvasWidth;
+                this.canvas.height = this.opt.canvasHeight;
+            } else {
+                this.canvas.width = this.opt.maxWidth ? this.opt.maxWidth : img.width;
+                this.canvas.height = this.canvas.width * ratio; 
+            }
+
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.canvas.width, this.canvas.height);
             this.isLoaded = true; 
             callback && callback();

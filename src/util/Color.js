@@ -528,7 +528,12 @@ const color = {
         return this.scaleHSV(color, 'v', count, format, min , max, 100);
     },
     palette : function (colors, k = 6, format = 'hex') {
-        return kmeans(colors, k).map(c => {
+
+        if (colors.length > k) {
+            colors = kmeans(colors, k);
+        }
+
+        return colors.map(c => {
             return this.format(c, format);
         });
     },

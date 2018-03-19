@@ -64,14 +64,56 @@ var distances = {
     max: max
 };
 
-function randomCentroids(points, k) {
-    var centeroids = points.slice(0);
+var create_random_number = {
+    linear: function linear(num, count) {
+        var centeroids = [];
+        var start = Math.round(Math.random() * num);
+        var dist = Math.floor(num / count);
 
-    centeroids.sort(function () {
-        return Math.round(Math.random()) - 0.5;
+        do {
+
+            centeroids.push(start);
+
+            start = (start + dist) % num;
+        } while (centeroids.length < count);
+
+        return centeroids;
+    },
+
+    shuffle: function shuffle(num, count) {
+        var centeroids = [];
+
+        while (centeroids.length < count) {
+
+            var index = Math.round(Math.random() * num);
+
+            if (centeroids.indexOf(index) == -1) {
+                centeroids.push(index);
+            }
+        }
+
+        return centeroids;
+    }
+
+};
+
+function randomCentroids(points, k) {
+    var method = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'linear';
+
+
+    var centeroids = create_random_number[method](points.length, k);
+
+    return centeroids.map(function (i) {
+        return points[i];
     });
 
-    return centeroids.slice(0, k);
+    // var centeroids = points.slice(0);
+
+    // centeroids.sort(function () {
+    //     return (Math.round(Math.random()) - 0.5);
+    // })
+
+    // return centeroids.slice(0, k); 
 }
 
 function closestCenteroid(point, centeroids, distance) {
@@ -146,7 +188,7 @@ function splitK(k, points, centeroids, distance) {
     return assignment;
 }
 
-function setNewCenteroid(k, assignment, centeroids, movement) {
+function setNewCenteroid(k, points, assignment, centeroids, movement, randomFunction) {
 
     for (var i = 0; i < k; i++) {
         var assigned = assignment[i];
@@ -157,7 +199,7 @@ function setNewCenteroid(k, assignment, centeroids, movement) {
         if (assigned.length > 0) {
             newCenteroid = getCenteroid(assigned);
         } else {
-            var idx = Math.floor(random() * points.length);
+            var idx = Math.floor(randomFunction() * points.length);
             newCenteroid = points[idx];
         }
 
@@ -175,6 +217,7 @@ function setNewCenteroid(k, assignment, centeroids, movement) {
 
 function kmeans(points, k, distanceFunction) {
     var period = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
+    var initialRandom = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'linear';
 
     points = unique_array(points);
 
@@ -185,14 +228,20 @@ function kmeans(points, k, distanceFunction) {
         distance = distances[distance];
     }
 
-    var centeroids = randomCentroids(points, k);
+    var rng_seed = 0;
+    var random = function random() {
+        rng_seed = (rng_seed * 9301 + 49297) % 233280;
+        return rng_seed / 233280;
+    };
+
+    var centeroids = randomCentroids(points, k, initialRandom);
 
     var movement = true;
     var iterations = 0;
     while (movement) {
         var assignment = splitK(k, points, centeroids, distance);
 
-        movement = setNewCenteroid(k, assignment, centeroids, false);
+        movement = setNewCenteroid(k, points, assignment, centeroids, false, random);
 
         iterations++;
 
@@ -378,8 +427,15 @@ var ImageLoader = function () {
             var img = new Image();
             img.onload = function () {
                 var ratio = img.height / img.width;
-                _this.canvas.width = _this.opt.maxWidth ? 100 : img.width;
-                _this.canvas.height = _this.canvas.width * ratio;
+
+                if (_this.opt.canvasWidth && _this.opt.canvasHeight) {
+                    _this.canvas.width = _this.opt.canvasWidth;
+                    _this.canvas.height = _this.opt.canvasHeight;
+                } else {
+                    _this.canvas.width = _this.opt.maxWidth ? _this.opt.maxWidth : img.width;
+                    _this.canvas.height = _this.canvas.width * ratio;
+                }
+
                 ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, _this.canvas.width, _this.canvas.height);
                 _this.isLoaded = true;
                 callback && callback();
@@ -1044,7 +1100,12 @@ var color = {
         var k = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6;
         var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'hex';
 
-        return kmeans(colors, k).map(function (c) {
+
+        if (colors.length > k) {
+            colors = kmeans(colors, k);
+        }
+
+        return colors.map(function (c) {
             return _this.format(c, format);
         });
     },
