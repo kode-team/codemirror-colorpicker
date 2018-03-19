@@ -117,7 +117,10 @@ export default class CurrentColorSets extends EventMachin {
     }
 
     'click $colorSetsColorList .color-item'  (e) {
-        this.colorpicker.setColor(e.$delegateTarget.attr('data-color'));
+
+        const isDirect = !!this.colorpicker.isPaletteType(); 
+
+        this.colorpicker.setColor(e.$delegateTarget.attr('data-color'), isDirect);
     }
 
 }

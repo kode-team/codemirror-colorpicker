@@ -557,6 +557,8 @@ var color = {
      * @returns {*}
      */
     format: function format(obj, type) {
+        var defaultColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'rgba(0, 0, 0, 0)';
+
 
         if (Array.isArray(obj)) {
             obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] };
@@ -574,7 +576,15 @@ var color = {
 
             return '#' + r + g + b;
         } else if (type == 'rgb') {
+
+            if (typeof obj == 'undefined') {
+                return undefined;
+            }
+
             if (obj.a == 1 || typeof obj.a == 'undefined') {
+                if (isNaN(obj.r)) {
+                    return defaultColor;
+                }
                 return 'rgb(' + obj.r + ',' + obj.g + ',' + obj.b + ')';
             } else {
                 return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + obj.a + ')';
@@ -2282,7 +2292,7 @@ var ColorInformation = function (_EventMachin) {
                 r: this.$rgb_r.int(),
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int()
-            }, 'hex');
+            }, 'hex', this.colorpicker.opt.color);
         }
     }, {
         key: 'getRgbFormat',
@@ -2292,7 +2302,7 @@ var ColorInformation = function (_EventMachin) {
                 g: this.$rgb_g.int(),
                 b: this.$rgb_b.int(),
                 a: this.$rgb_a.float()
-            }, 'rgb');
+            }, 'rgb', this.colorpicker.opt.color);
         }
     }, {
         key: 'getHslFormat',
@@ -2302,7 +2312,7 @@ var ColorInformation = function (_EventMachin) {
                 s: this.$hsl_s.val(),
                 l: this.$hsl_l.val(),
                 a: this.$hsl_a.float()
-            }, 'hsl');
+            }, 'hsl', this.colorpicker.opt.color);
         }
     }, {
         key: 'convertRGB',
@@ -2633,11 +2643,14 @@ var ColorSetsChooser = function (_EventMachin) {
             // colorsets 
             var colorSets = this.colorpicker.getColorSetsList();
             colorSets.forEach(function (element, index) {
-                var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
+                if (_this2.colorpicker.isPaletteType() && !element.edit) {
 
-                $item.createChild('h1', 'title').html(element.name);
+                    var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
 
-                $item.createChild('div', 'items').append(_this2.makeColorItemList(element.colors, 5));
+                    $item.createChild('h1', 'title').html(element.name);
+
+                    $item.createChild('div', 'items').append(_this2.makeColorItemList(element.colors, 5));
+                }
             });
 
             return $div;
@@ -2812,6 +2825,7 @@ var ColorSetsList = function () {
             return this.list().map(function (element) {
                 return {
                     name: element.name,
+                    edit: element.edit,
                     colors: _this2.getColors(element)
                 };
             });
@@ -2953,7 +2967,10 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'click $colorSetsColorList .color-item',
         value: function click$colorSetsColorListColorItem(e) {
-            this.colorpicker.setColor(e.$delegateTarget.attr('data-color'));
+
+            var isDirect = !!this.colorpicker.isPaletteType();
+
+            this.colorpicker.setColor(e.$delegateTarget.attr('data-color'), isDirect);
         }
     }]);
     return CurrentColorSets;
@@ -3084,6 +3101,21 @@ var ColorPicker = function (_EventMachin) {
             return this.opt[key];
         }
     }, {
+        key: 'isType',
+        value: function isType(key) {
+            return this.getOption('type') == key;
+        }
+    }, {
+        key: 'isPaletteType',
+        value: function isPaletteType() {
+            return this.isType('palette');
+        }
+    }, {
+        key: 'isSketchType',
+        value: function isSketchType() {
+            return this.isType('sketch');
+        }
+    }, {
         key: 'getContainer',
         value: function getContainer() {
             return this.opt.container || document.body;
@@ -3129,12 +3161,24 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'setColor',
         value: function setColor(value) {
+            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+
             if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
                 if (!value.r || !value.g || !value.b) return;
 
-                this.initColor(color.format(value, "hex"));
+                if (isDirect) {
+                    this.callbackColorValue(color.format(value, "hex"));
+                } else {
+                    this.initColor(color.format(value, "hex"));
+                }
             } else if (typeof value == "string") {
-                this.initColor(value);
+
+                if (isDirect) {
+                    this.callbackColorValue(value);
+                } else {
+                    this.initColor(value);
+                }
             }
         }
     }, {
@@ -3316,16 +3360,19 @@ var ColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'callbackColorValue',
-        value: function callbackColorValue() {
+        value: function callbackColorValue(color$$1) {
+
+            color$$1 = color$$1 || this.getCurrentColor();
+
             if (typeof this.opt.onChange == 'function') {
                 if (!isNaN(this.currentA)) {
-                    this.opt.onChange.call(this, this.getCurrentColor());
+                    this.opt.onChange.call(this, color$$1);
                 }
             }
 
             if (typeof this.colorpickerCallback == 'function') {
                 if (!isNaN(this.currentA)) {
-                    this.colorpickerCallback(this.getCurrentColor());
+                    this.colorpickerCallback(color$$1);
                 }
             }
         }

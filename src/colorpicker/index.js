@@ -46,6 +46,18 @@ export default class ColorPicker extends EventMachin {
         return this.opt[key];
     }
 
+    isType (key) {
+        return this.getOption('type') == key;
+    }
+
+    isPaletteType() {
+        return this.isType('palette');
+    }
+
+    isSketchType() {
+        return this.isType('sketch');
+    }
+
     getContainer () {
         return this.opt.container || document.body;
     }
@@ -86,14 +98,28 @@ export default class ColorPicker extends EventMachin {
         this.contextMenu.show(e, index);
     }
 
-    setColor(value) {
+    setColor(value, isDirect = false) {
+
         if (typeof (value) == "object") {
             if (!value.r || !value.g || !value.b)
                 return;
 
-            this.initColor(Color.format(value, "hex"));
+            if (isDirect) {
+                this.callbackColorValue(Color.format(value, "hex"));
+            } else {
+                this.initColor(Color.format(value, "hex"));
+            }
+
         } else if (typeof (value) == "string") {
-            this.initColor(value);
+
+            if (isDirect) {
+                this.callbackColorValue(value);
+            } else {
+                this.initColor(value);
+            }
+
+
+
         }
     }
 
@@ -258,17 +284,20 @@ export default class ColorPicker extends EventMachin {
         this.callbackColorValue();
     }
 
-    callbackColorValue() {
+    callbackColorValue(color) {
+
+        color = color || this.getCurrentColor();
+
         if (typeof this.opt.onChange == 'function') {
             if (!isNaN(this.currentA)) {
-                this.opt.onChange.call(this, this.getCurrentColor());
+                this.opt.onChange.call(this, color);
             }
 
         }
 
         if (typeof this.colorpickerCallback == 'function') {
             if (!isNaN(this.currentA)) {
-                this.colorpickerCallback(this.getCurrentColor());
+                this.colorpickerCallback(color);
             }
 
         }        

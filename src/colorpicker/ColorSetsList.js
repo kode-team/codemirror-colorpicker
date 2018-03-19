@@ -117,6 +117,7 @@ export default class ColorSetsList {
         return this.list().map(element => {
            return {
                name : element.name,
+               edit : element.edit,
                colors : this.getColors(element)
            } 
         });

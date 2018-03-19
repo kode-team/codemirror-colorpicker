@@ -39,7 +39,7 @@
 
 
   @import './component/button';
-  @import './component/pallet';
+  @import './component/palette';
   @import './component/control';
   @import './component/information';
   @import './component/colorsets'; 
@@ -51,6 +51,7 @@
 
   /* theme */
   @import './themes/sketch'; 
+  @import './themes/palette'; 
   
 }   
 

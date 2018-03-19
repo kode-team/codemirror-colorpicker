@@ -158,7 +158,7 @@ export default class ColorInformation extends EventMachin {
             r : this.$rgb_r.int(),
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int()
-        }, 'hex');
+        }, 'hex', this.colorpicker.opt.color);
     }
 
     getRgbFormat() {
@@ -167,7 +167,7 @@ export default class ColorInformation extends EventMachin {
             g : this.$rgb_g.int(),
             b : this.$rgb_b.int(),
             a : this.$rgb_a.float()
-        }, 'rgb');
+        }, 'rgb', this.colorpicker.opt.color);
     }    
 
     getHslFormat() {
@@ -176,7 +176,7 @@ export default class ColorInformation extends EventMachin {
             s : this.$hsl_s.val(),
             l : this.$hsl_l.val(),
             a : this.$hsl_a.float()
-        }, 'hsl');
+        }, 'hsl', this.colorpicker.opt.color);
     }        
     
     

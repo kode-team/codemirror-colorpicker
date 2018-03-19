@@ -68,7 +68,7 @@ const color = {
      * @param {"hex"/"rgb"} type  format string type
      * @returns {*}
      */
-    format: function (obj, type) {
+    format: function (obj, type, defaultColor = 'rgba(0, 0, 0, 0)') {
 
         if (Array.isArray(obj)) {
             obj = { r : obj[0], g : obj[1], b : obj[2], a : obj[3] }
@@ -86,7 +86,15 @@ const color = {
 
             return `#${r}${g}${b}`;
         } else if (type == 'rgb') {
+
+            if (typeof obj == 'undefined') {
+                return undefined;
+            }
+
             if (obj.a == 1 || typeof obj.a == 'undefined') {
+                if (isNaN(obj.r)) {
+                    return defaultColor;
+                }
                 return `rgb(${obj.r},${obj.g},${obj.b})`;
             } else {
                 return `rgba(${obj.r},${obj.g},${obj.b},${obj.a})`;
