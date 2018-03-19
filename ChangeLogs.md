@@ -1,6 +1,10 @@
 
 # Change Logs 
 
+# 1.6.5
+* improved performance of color palette for image
+* support only palette style 
+
 ## 1.6.3 
 * Support Sketch Style 
 * support color palette for image 
