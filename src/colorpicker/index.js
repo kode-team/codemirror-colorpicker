@@ -55,7 +55,9 @@ export default class ColorPicker extends EventMachin {
         this.$root = new Dom('div', 'codemirror-colorpicker');
 
         //  append colorpicker to container (ex : body)
-        this.$body.append(this.$root);
+        if (this.opt.position == 'inline') {
+            this.$body.append(this.$root);
+        }
 
         if (this.opt.type) {    // to change css style
             this.$root.addClass(this.opt.type);
