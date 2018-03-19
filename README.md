@@ -151,8 +151,19 @@ You can set custom color paletts (ex : material, ...).
 
 ```
 
-
 <img width="235px"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/sketch-type.png" align="absmiddle" />
+
+## Support only Palette Style 
+
+```javascript
+{
+  colorpicker : {
+      mode : 'edit',
+      type: 'palette'
+  }
+}
+
+```
 
 # Developments 
 
