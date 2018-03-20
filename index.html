@@ -9,8 +9,217 @@
     <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
     <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
     <style type="text/css">
+    html, body {
+        padding:0px;
+        margin:0px;
+    }
     h1.title {
-        margin-bottom: 50px;
+        margin-top:0px;
+        color: white;
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(255, 255, 255);
+    }
+
+    section {
+        background-color: rgb(29, 37, 43);
+
+    }
+
+    section.colorpicker-style-list {
+        background-color: rgb(247, 227, 213)
+    }
+
+    section.colorpicker-style-list > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: rgb(128, 198, 217);
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.colorpicker-style-list > div {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.colorpalette-area {
+        background-color: #584592;
+        position: relative;
+    }
+
+    section.colorpalette-area .circle.white {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 1px solid white;
+        left: 10px;
+        top: 50px;        
+        z-index: 0;
+    }
+
+    
+
+    section.colorpalette-area:before {
+        position: absolute;
+        content: "";
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 1px solid rgb(246, 107, 107);
+        right: 50px;
+        top: 100px;        
+        z-index: 0;
+    }    
+
+    section.colorpalette-area:after {
+        position: absolute;
+        content: "";
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgb(246, 107, 107);
+        left: 150px;
+        bottom: 100px;        
+    }    
+
+
+    section.colorpalette-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: #e2cf32;
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.colorpalette-area > div:not(.circle) {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.colorpalette-area .area-item {
+        width: 400px;
+        box-sizing: border-box;
+        border:0px;
+        margin:0px;
+        display: inline-block;
+        height: 400px;
+        box-shadow: 0 0 0 0 rgba(213, 235, 255, 0.192);
+        vertical-align: middle;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    section.colorpalette-area .area-item .image-select-input {
+        padding: 5px 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: rgba(213, 235, 255, 0.192);
+    }
+
+    section.colorpalette-area .area-item  img{
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+
+
+    section.color-scale-area {
+        background-color: #80c6d9;
+        position: relative;
+    }
+
+    section.color-scale-area:before {
+        position: absolute;
+        content: "";
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background-color: rgb(226, 207, 50);
+        left: -250px;
+        top: 50%;
+        margin-top: -250px;
+    }
+
+    section.color-scale-area:after {
+        position: absolute;
+        content: "";
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgb(88, 69, 146);
+        left: 150px;
+        bottom: 100px;        
+    }
+
+    section.color-scale-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: white;
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.color-scale-area > div {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.color-scale-area .area-item {
+        width: 400px;
+        box-sizing: border-box;
+        border:0px;
+        margin:0px;
+        display: inline-block;
+        height: 400px;
+        box-shadow: 0 0 0 0 rgba(213, 235, 255, 0.192);
+        vertical-align: middle;
+        text-align: center;
+    }    
+
+    section.color-scale-area .area-item .daimond {
+        margin: 0 auto;
+    }
+
+
+    section.color-scale-template-area {
+        background-color: rgb(248, 107, 107);
+    }
+
+    section.color-scale-template-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: #f7f7f7;
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.color-scale-template-area > div {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.color-scale-template-area > div .color-scale {
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+
+
+    .codemirror-area {
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .color-scale {
@@ -106,8 +315,19 @@
 
     .colorpicker-type {
         display: inline-block;
-        width: 300px;
+        width: 250px;
         vertical-align: top;
+    }
+
+    footer {
+        padding: 100px;
+        background-color: rgb(29, 37, 43);
+        color: #ececec;
+    }
+
+    footer .email  {
+        float: right;
+        color: rgba(252, 201, 34, 0.767);
     }
 
     </style>
@@ -115,9 +335,16 @@
 <body>
     <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 
+<section class="main">
     <h1 class="title">
         CodeMirror ColorPicker AddOn
+        <div>
+                <iframe src="https://ghbtns.com/github-btn.html?user=easylogic&repo=codemirror-colorpicker&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        </div>
+        
     </h1>
+    <div class="codemirror-area">
+        
 <textarea id="sample_text_area">
 .sample-green {
     background-color: green; 
@@ -279,7 +506,11 @@ var color_names = {
 
 </textarea>
 
+</div>
 
+</section>
+
+<section class="colorpicker-style-list">
 <h1 >ColorPicker Style</h1>
 <div>
     <div class="colorpicker-type">
@@ -296,35 +527,48 @@ var color_names = {
     </div>    
 </div>
 
+</section>
 
-
-
-<h1 class="title">Default Html Sample </h1>
-
+<section class="colorpalette-area">
+<div class="circle white"></div>
+<div class="circle yellow"></div>
+<h1> Image Palette</h1>    
 <div>
-    <button type="button" id="gray-scale" >gray scale</button><br />    
-    <button type="button" onclick="showColor(event)" data-color="green">green</a>
-</div>
-
-<div>
-    <h2> Image Palette</h2>    
-    <input type="file" id="image"  />
-    <input type="button" value="색상 고르기" onclick="generatePalette()" />
-    <img id="palette-image">
-    <div class="image-palette" id="image-palette">
-
+    <div class="area-item">
+            <div class="image-select-input">
+                <input type="file" id="image"  />
+                <input type="button" value="pick" onclick="generatePalette()" />
+            </div>            
+            <div>
+                    <img id="palette-image">
+            </div>
+        
     </div>
-</div>
+    <div class="area-item">
+        <div class="image-palette" id="image-palette">
 
-<div>
-    <h2> Saturation Scale (yellow, S, 100)</h2>    
-    <div class="daimond" data-background-color="yellow" data-target='S'></div>
-    <h2> Value Scale (yellow, V, 100)</h2>    
-    <div class="daimond" data-background-color="yellow" data-target='V'></div>
+        </div>
+    </div>    
 </div>
+</section>
 
+<section class="color-scale-area">
+<h1>Color Scales</h1>
 <div>
-    <h2> Color Scales</h2>
+    <div class="area-item">
+        <h2> Saturation Scale</h2>    
+        <div class="daimond" data-background-color="yellow" data-target='S'></div>
+    </div>
+    <div class="area-item">
+        <h2> Value Scale</h2>    
+        <div class="daimond" data-background-color="yellow" data-target='V'></div>
+    </div>    
+</div>
+</section>
+<section class="color-scale-template-area">
+<h1> Color Scales - Template </h1>
+<div>
+
     <div class="color-scale" data-title="parula" data-colors="red,yellow" data-count="20">
 
     </div>
@@ -350,6 +594,22 @@ var color_names = {
 
 </div>
 
+</section>
+
+<section style="display: none">
+<h1 class="title">Default Html Sample </h1>
+
+<div>
+    <button type="button" id="gray-scale" >gray scale</button><br />    
+    <button type="button" onclick="showColor(event)" data-color="green">green</a>
+</div>
+</section>
+
+<footer>
+    &copy; easylogic colorpicker - MIT license
+    <div class="email">cyberuls@gmail.com</div>
+</footer>
+
 <script type="text/javascript">
     function generatePalette () {
         var blob = document.getElementById('image').files[0];
@@ -357,7 +617,7 @@ var color_names = {
         document.getElementById('palette-image').src = URL.createObjectURL(blob);
 
         Color.ImageToRGB(blob, { maxWidth: 100 }, function (results) {
-            const colors = Color.palette(results, 20);
+            const colors = Color.palette(results, 16);
 
             var fragment = document.createDocumentFragment();
             for (var i = 0, len = colors.length; i < len; i++) {
