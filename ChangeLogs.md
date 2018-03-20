@@ -1,7 +1,7 @@
 
 # Change Logs 
 
-# 1.6.5
+# 1.6.4
 * improved performance of color palette for image
 * support only palette style 
 
