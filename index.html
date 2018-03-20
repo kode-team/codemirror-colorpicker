@@ -8,6 +8,10 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/css/css.js" ></script>
     <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
     <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
+    <meta property="og:title" content="ColorPicker for CodeMirror Addon" />
+    <meta property="og:description" content="Very Simple ColorPicker for CodeMirror" />
+    <meta property="og:url" content="https://easylogic.github.io/codemirror-colorpicker/" />
+    <meta property="og:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
     <style type="text/css">
     html, body {
         padding:0px;
@@ -24,6 +28,7 @@
 
     section {
         background-color: rgb(29, 37, 43);
+        height: 900px;
 
     }
 
@@ -35,7 +40,7 @@
         margin-top:0px;
         margin-bottom:0px;
         color: rgb(128, 198, 217);
-        padding: 50px;
+        padding: 70px;
         text-align: center;
         font-size: 50px;
         text-shadow: 1px 1px 1px rgb(0, 0, 0);
@@ -93,7 +98,7 @@
         margin-top:0px;
         margin-bottom:0px;
         color: #e2cf32;
-        padding: 50px;
+        padding: 70px;
         text-align: center;
         font-size: 50px;
         text-shadow: 1px 1px 1px rgb(0, 0, 0);
@@ -162,7 +167,7 @@
         margin-top:0px;
         margin-bottom:0px;
         color: white;
-        padding: 50px;
+        padding: 70px;
         text-align: center;
         font-size: 50px;
         text-shadow: 1px 1px 1px rgb(0, 0, 0);
@@ -199,7 +204,7 @@
         margin-top:0px;
         margin-bottom:0px;
         color: #f7f7f7;
-        padding: 50px;
+        padding: 70px;
         text-align: center;
         font-size: 50px;
         text-shadow: 1px 1px 1px rgb(0, 0, 0);
@@ -219,7 +224,12 @@
 
     .codemirror-area {
         max-width: 800px;
+        height: 600px;
         margin: 0 auto;
+    }
+    .CodeMirror {
+        border: 1px solid #eee;
+        height: 500px;
     }
 
     .color-scale {
@@ -257,8 +267,8 @@
     }
 
     .daimond {
-        width: 200px;
-        height: 200px;
+        width: 300px;
+        height: 300px;
         box-sizing:border-box;
         position: relative;
         display: flex;
