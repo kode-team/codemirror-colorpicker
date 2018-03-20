@@ -1531,23 +1531,7 @@ var Dom = function () {
     return Dom;
 }();
 
-var CHECK_NUMBER_KEYS = ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space', 'Escape', 'Enter', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Period', 'Backspace', 'Tab'];
-
-var CHECK_UPDOWN_KEYS = ['ArrowDown', 'ArrowUp'];
-
 var Event = {
-    isArrowDown: function isArrowDown(e) {
-        return e.code == 'ArrowDown';
-    },
-    isArrowUp: function isArrowUp(e) {
-        return e.code == 'ArrowUp';
-    },
-    checkUpDownKey: function checkUpDownKey(e) {
-        return CHECK_UPDOWN_KEYS.includes(e.code);
-    },
-    checkNumberKey: function checkNumberKey(e) {
-        return CHECK_NUMBER_KEYS.includes(e.code);
-    },
     addEvent: function addEvent(dom, eventName, callback) {
         dom.addEventListener(eventName, callback);
     },
@@ -1903,33 +1887,6 @@ var ColorControl = function (_EventMachin) {
                 top: y + "px"
             });
         }
-
-        /*
-        setMainColor(e) {
-            e.preventDefault();
-            var pos = this.colorpicker.$root.position();         // position for screen
-            var w = $color.width();
-            var h = $color.height();
-        
-            var x = e.clientX - pos.left;
-            var y = e.clientY - pos.top;
-        
-            if (x < 0) x = 0;
-            else if (x > w) x = w;
-        
-            if (y < 0) y = 0;
-            else if (y > h) y = h;
-        
-            this.$drag_pointer.css({
-                left: (x) + 'px',
-                top: (y) + 'px'
-            });
-        
-            this.colorpicker.caculateHSV()
-            this.colorpicker.setInputColor();
-        }    
-        */
-
     }, {
         key: 'setOpacityColorBar',
         value: function setOpacityColorBar(hueColor) {
@@ -2645,8 +2602,9 @@ var ColorSetsChooser = function (_EventMachin) {
             // colorsets 
             var colorSets = this.colorpicker.getColorSetsList();
             colorSets.forEach(function (element, index) {
-                if (_this2.colorpicker.isPaletteType() && !element.edit) {
-
+                if (_this2.colorpicker.isPaletteType() && element.edit) {
+                    // NOOP
+                } else {
                     var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
 
                     $item.createChild('h1', 'title').html(element.name);
@@ -2678,10 +2636,9 @@ var ColorSetsChooser = function (_EventMachin) {
             this.toggle();
         }
     }, {
-        key: 'click $colorsetsList',
-        value: function click$colorsetsList(e) {
-            e.preventDefault();
-            var $item = new Dom(e.target).closest('colorsets-item');
+        key: 'click $colorsetsList .colorsets-item',
+        value: function click$colorsetsListColorsetsItem(e) {
+            var $item = e.$delegateTarget;
 
             if ($item) {
 
