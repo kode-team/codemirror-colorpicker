@@ -165,6 +165,8 @@ You can set custom color paletts (ex : material, ...).
 
 ```
 
+<img width="235px"  src="https://easylogic.github.com/codemirror-colorpicker/resources/image/palette-type.png" align="absmiddle" />
+
 # Developments 
 
 ## local dev 
