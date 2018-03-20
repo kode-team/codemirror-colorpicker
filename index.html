@@ -8,6 +8,10 @@
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.js" ></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/css/css.js" ></script>
+    <link rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
     <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
     <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
     <meta property="og:title" content="ColorPicker for CodeMirror Addon" />
@@ -239,7 +243,7 @@
     }
     .CodeMirror {
         border: 1px solid #eee;
-        height: 500px;
+        height: 300px;
     }
 
     .color-scale {
@@ -525,7 +529,22 @@ var color_names = {
 };
 
 </textarea>
+<pre><code class="javascript">// CodeMirror Addon 
+var cm = CodeMirror.fromTextArea(document.getElementById("sample_text_area"), {
+    colorpicker : {
+        mode : 'edit'
+    }
+});</code></pre>
 
+<pre><code class="javascript">// Standalone 
+var ColorPicker = CodeMirrorColorPicker.ColorPicker;
+var colorpicker = new ColorPicker({
+    color: 'blue', // init color code 
+    position: 'inline',   // default show 
+    container : '#color-container'
+    type : 'palette' // or 'sketch',  default type is 'chromedevtool'
+})
+</code></pre>     
 </div>
 
 </section>
@@ -545,6 +564,12 @@ var color_names = {
         <h3>Only Palette Style</h3>
         <div class="colorpicker-style" data-type="palette"></div>
     </div>    
+    <pre><code class="javascript">{
+    colorpicker : {
+        type : 'palette' // or 'sketch',  default type is 'chromedevtool'
+    }    
+}</code></pre>  
+
 </div>
 
 </section>
@@ -569,6 +594,12 @@ var color_names = {
 
         </div>
     </div>    
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+Color.ImageToRGB(blob, { maxWidth: 100 }, function (results) {
+    const colors = Color.palette(results, 16);   // k = 16 
+
+    console.log(colors);
+})</code></pre>        
 </div>
 </section>
 
@@ -582,7 +613,11 @@ var color_names = {
     <div class="area-item">
         <h2> Value Scale</h2>    
         <div class="daimond" data-background-color="yellow" data-target='V'></div>
-    </div>    
+    </div>  
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+var results = Color.scaleS(color, 100, 'hex');   // Saturation 
+var results2 = Color.scaleV(color, 100, 'hex');   // Value 
+</code></pre>          
 </div>
 </section>
 <section class="color-scale-template-area">
@@ -611,7 +646,17 @@ var color_names = {
     <div class="color-scale" data-colors="red,black" data-count="105">
 
     </div>    
-
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+var colors = ['red', 'green', 'blue']
+var scaleColors = Color.scale(colors, count);
+var scaleColors = Color.scale.parula(count);   // ['#352a87', '#0f5cdd', '#00b5a6', '#ffc337', '#fdff00']
+var scaleColors = Color.scale.jet(count);   // ['#00008f', '#0020ff', '#00ffff', '#51ff77', '#fdff00', '#ff0000', '#800000']
+var scaleColors = Color.scale.hsv(count);   // ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ff0000']
+var scaleColors = Color.scale.hot(count);   // ['#0b0000', '#ff0000', '#ffff00', '#ffffff']
+var scaleColors = Color.scale.pink(count);   // ['#1e0000', '#bd7b7b', '#e7e5b2', '#ffffff']
+var scaleColors = Color.scale.bone(count);   // ['#000000', '#4a4a68', '#a6c6c6', '#ffffff']
+var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623e', '#ffa167', '#ffc77f']
+</code></pre>      
 </div>
 
 </section>
@@ -675,9 +720,7 @@ var color_names = {
           }
         },
         colorpicker : {
-            mode : 'edit',
-            type: 'palette',
-            hideDelay: 1000000
+            mode : 'edit'
         }
     });
 
@@ -795,7 +838,7 @@ var color_names = {
 
     }
 </script>
-
+<script>hljs.initHighlightingOnLoad();</script>
 
 </body>
 
