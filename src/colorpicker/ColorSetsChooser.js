@@ -58,9 +58,9 @@ export default class ColorSetsChooser extends EventMachin {
         // colorsets 
         const colorSets = this.colorpicker.getColorSetsList();
         colorSets.forEach( (element, index) => {
-            if (this.colorpicker.isPaletteType() && !element.edit ) {
-
-
+            if (this.colorpicker.isPaletteType() && element.edit ) {
+                // NOOP
+            } else {
                 const $item = $div.createChild('div', 'colorsets-item', {
                     [DATA_COLORSETS_INDEX] : index 
                 });
@@ -91,9 +91,8 @@ export default class ColorSetsChooser extends EventMachin {
         this.toggle();
     }
 
-    'click $colorsetsList' (e) {
-        e.preventDefault();
-        const $item = new Dom(e.target).closest('colorsets-item');
+    'click $colorsetsList .colorsets-item' (e) {
+        const $item = e.$delegateTarget;
 
         if ($item) {
 

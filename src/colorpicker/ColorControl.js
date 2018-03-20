@@ -50,34 +50,6 @@ export default class ColorControl extends EventMachin {
         });
     }
 
-
-    /*
-    setMainColor(e) {
-        e.preventDefault();
-        var pos = this.colorpicker.$root.position();         // position for screen
-        var w = $color.width();
-        var h = $color.height();
-    
-        var x = e.clientX - pos.left;
-        var y = e.clientY - pos.top;
-    
-        if (x < 0) x = 0;
-        else if (x > w) x = w;
-    
-        if (y < 0) y = 0;
-        else if (y > h) y = h;
-    
-        this.$drag_pointer.css({
-            left: (x) + 'px',
-            top: (y) + 'px'
-        });
-    
-        this.colorpicker.caculateHSV()
-        this.colorpicker.setInputColor();
-    }    
-    */
-
-
     setOpacityColorBar(hueColor) {
         var rgb = Color.parse(hueColor);
     
