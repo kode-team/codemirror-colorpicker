@@ -2,7 +2,7 @@ import ColorNames from './ColorNames'
 import kmeans  from './Kmeans'
 import ImageLoader from './ImageLoader'
 
-const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
+const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi; 
 
 const color = {
 
@@ -138,7 +138,11 @@ const color = {
                     arr[i] = parseInt(color.trim(arr[i]), 10);
                 }
 
-                return { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+                var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj;
             } else if (str.indexOf("rgba(") > -1) {
                 var arr = str.replace("rgba(", "").replace(")", "").split(",");
 
@@ -151,7 +155,12 @@ const color = {
                     }
                 }
 
-                return { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
+                var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj;
+
             } else if (str.indexOf("hsl(") > -1) {
                 var arr = str.replace("hsl(", "").replace(")", "").split(",");
 
@@ -161,11 +170,7 @@ const color = {
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: 1 };
 
-                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
-
-                obj.r = temp.r;
-                obj.g = temp.g;
-                obj.b = temp.b;
+                obj = Object.assign(obj, this.HSLtoRGB(obj));
 
                 return obj;
             } else if (str.indexOf("hsla(") > -1) {
@@ -182,11 +187,7 @@ const color = {
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3] };
 
-                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
-
-                obj.r = temp.r;
-                obj.g = temp.g;
-                obj.b = temp.b;
+                obj = Object.assign(obj, color.HSLtoRGB(obj));
 
                 return obj;
             } else if (str.indexOf("#") == 0) {
@@ -205,7 +206,11 @@ const color = {
                     }
                 }
 
-                return { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+                var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj; 
             }
         } else if (typeof str == 'number') {
             if (0x000000 <= str && str <= 0xffffff) {
@@ -213,15 +218,18 @@ const color = {
                 const g = (str & 0x00ff00) >> 8;
                 const b = (str & 0x0000ff) >> 0;
 
-                return { type: 'hex', r, g, b, a: 1 };
+                var obj = { type: 'hex', r, g, b, a: 1 };
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+                return obj; 
             } else if (0x00000000 <= str && str <= 0xffffffff) {
                 const r = (str & 0xff000000) >> 24;
                 const g = (str & 0x00ff0000) >> 16;
                 const b = (str & 0x0000ff00) >> 8;
-                let a = (str & 0x000000ff) / 255;
+                const a = (str & 0x000000ff) / 255;
 
-                return { type: 'hex', r, g, b, a };
-
+                var obj = { type: 'hex', r, g, b, a };
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+                return obj; 
             }
         }
 
@@ -417,7 +425,7 @@ const color = {
     HSLtoRGB: function (h, s, l) {
 
         if (arguments.length == 1) {
-            var { h, s, v } = arguments[0];
+            var { h, s, l } = arguments[0];
         }
 
         var r, g, b;
@@ -484,14 +492,136 @@ const color = {
 
         return { r: Math.ceil(R), g: Math.ceil(G), b: Math.ceil(B) }
     },
-    interpolateRGB(startColor, endColor, t) {
+    XYZtoRGB (x, y, z) {
+        if (arguments.length == 1) {
+            var { x, y, z } = arguments[0];
+        }        
+        //X, Y and Z input refer to a D65/2° standard illuminant.
+        //sR, sG and sB (standard RGB) output range = 0 ÷ 255
+
+        let X = x / 100
+        let Y = y / 100
+        let Z = z / 100
+
+        let R = X *  3.2406 + Y * -1.5372 + Z * -0.4986
+        let G = X * -0.9689 + Y *  1.8758 + Z *  0.0415
+        let B = X *  0.0557 + Y * -0.2040 + Z *  1.0570
+
+        R = ( R > 0.0031308 ) ? 1.055 * ( R ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * R;
+        G = ( G > 0.0031308 ) ? 1.055 * ( G ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * G;
+        B = ( B > 0.0031308 ) ? 1.055 * ( B ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * B;
+
+        r = Math.round(R * 255)
+        g = Math.round(G * 255)
+        b = Math.round(B * 255)
+
+        return { r, g, b };
+    },
+    RGBtoXYZ (r, g, b) {
+        //sR, sG and sB (Standard RGB) input range = 0 ÷ 255
+        //X, Y and Z output refer to a D65/2° standard illuminant.
+        if (arguments.length == 1) {
+            var { r, g, b } = arguments[0];
+        }
+
+        let R = ( r / 255 )
+        let G = ( g / 255 )
+        let B = ( b / 255 )
+
+        R = ( R > 0.04045 ) ? ( ( R + 0.055 ) / 1.055 ) ^ 2.4 : R / 12.92;
+        G = ( G > 0.04045 ) ? ( ( G + 0.055 ) / 1.055 ) ^ 2.4 : G / 12.92;
+        B = ( B > 0.04045 ) ? ( ( B + 0.055 ) / 1.055 ) ^ 2.4 : B / 12.92;
+
+        R = R * 100
+        G = G * 100
+        B = B * 100
+
+        const x = R * 0.4124 + G * 0.3576 + B * 0.1805
+        const y = R * 0.2126 + G * 0.7152 + B * 0.0722
+        const z = R * 0.0193 + G * 0.1192 + B * 0.9505
+
+        return { x, y, z }
+    },
+    LABtoXYZ (l, a, b) {
+        if (arguments.length == 1) {
+            var { l, a, b } = arguments[0];
+        }        
+        //Reference-X, Y and Z refer to specific illuminants and observers.
+        //Common reference values are available below in this same page.
+
+        let Y = ( l + 16 ) / 116
+        let X = a / 500 + Y
+        let Z = Y - b/ 200
+
+        Y = ( Y^3  > 0.008856 ) ? Y^3  : ( Y - 16 / 116 ) / 7.787;
+        X = ( X^3  > 0.008856 ) ? X^3  : ( X - 16 / 116 ) / 7.787;
+        Z = ( Z^3  > 0.008856 ) ? Z^3  : ( Z - 16 / 116 ) / 7.787;
+
+        const x = X * 95.047
+        const y = Y * 100.000
+        const z = Z * 108.883
+
+        return { x, y, z };
+    },
+    XYZtoLAB (x, y, z) {
+        if (arguments.length == 1) {
+            var { x, y, z } = arguments[0];
+        }
+
+        //Reference-X, Y and Z refer to specific illuminants and observers.
+        //Common reference values are available below in this same page.
+        // Observer= 2°, Illuminant= D65
+
+        let X = x / 95.047
+        let Y = y / 100.000
+        let Z = z / 108.883
+
+        X = ( X > 0.008856 ) ? X ^ ( 1/3 ) : ( 7.787 * X ) + ( 16 / 116 );
+        Y = ( Y > 0.008856 ) ? Y ^ ( 1/3 ) : ( 7.787 * Y ) + ( 16 / 116 );
+        Z = ( Z > 0.008856 ) ? Z ^ ( 1/3 ) : ( 7.787 * Z ) + ( 16 / 116 );
+
+        const l = ( 116 * Y ) - 16;
+        const a = 500 * ( X - Y );
+        const b = 200 * ( Y - Z );
+
+        return { l, a, b };
+    },
+    RGBtoLAB(r,g,b) {
+        if (arguments.length == 1) {
+            var { r, g, b } = arguments[0];
+        }   
+        return this.XYZtoLAB(this.RGBtoXYZ(r,g,b));
+    },
+    LABtoRGB(l,a,b) {
+        if (arguments.length == 1) {
+            var { l, a, b } = arguments[0];
+        }   
+        return this.XYZtoLAB(this.RGBtoXYZ(l,a,b));
+    },
+    blend (startColor, endColor, ratio = 0.5, format = 'hex') {
+        var s = this.parse(startColor);
+        var e = this.parse(endColor);
+        
+        return this.interpolateRGB(s, e, ratio, format);
+    },
+    /**
+     * @deprecated
+     * 
+     * instead of this,  use blend function 
+     *  
+     * @param {*} startColor 
+     * @param {*} endColor 
+     * @param {*} t 
+     */
+    interpolateRGB(startColor, endColor, t = 0.5, format = 'hex') {
         var obj = {
             r: parseInt(startColor.r + (endColor.r - startColor.r) * t, 10),
             g: parseInt(startColor.g + (endColor.g - startColor.g) * t, 10),
-            b: parseInt(startColor.b + (endColor.b - startColor.b) * t, 10)
+            b: parseInt(startColor.b + (endColor.b - startColor.b) * t, 10),
+            a: parseInt(startColor.a + (endColor.a - startColor.a) * t, 10),
         };
 
-        return color.format(obj, 'hex');
+        return this.format(obj, format);
 
     },
     scale(scale, count = 5) {
@@ -502,11 +632,8 @@ const color = {
 
         var colors = [];
         for (var i = 0; i < len - 1; i++) {
-            var start = this.parse(scale[i]);
-            var end = this.parse(scale[i + 1]);
-
             for (var index = 0; index < count; index++) {
-                colors.push(this.interpolateRGB(start, end, (index / count)));
+                colors.push(this.blend(scale[i], scale[i+1], (index / count)));
             }
 
         }

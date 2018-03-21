@@ -19,9 +19,13 @@ export default class State {
 
       const obj = this.masterObj[arr[0]] || this.masterObj;
       const method = arr.pop();
-      const value = obj[method].apply(obj, args);
 
-      this.set(key, value);
+      if (obj[method]) {
+        const value = obj[method].apply(obj, args);
+
+        this.set(key, value);
+      }
+
     }
   }
 

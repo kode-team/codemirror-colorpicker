@@ -144,3 +144,11 @@ test(" Convert RGB to YCrCb", () => {
 
     expect(gray1).toEqual({ r : 237, g : 237, b : 237})
 })
+
+
+test(" mix ", () => {
+    const c = Color.mix("red", "blue");
+
+    expect(c).toEqual('#800080');
+
+})

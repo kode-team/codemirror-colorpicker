@@ -18,11 +18,13 @@ export default class ColorPicker extends EventMachin {
         this.opt = opt || {};
         this.$body = null;
         this.$root = null;
-        this.format = 'rgb';
-        this.currentA = 0;
-        this.currentH = 0;
-        this.currentS = 0;
-        this.currentV = 0;
+
+        this.state.set('format', 'rgb');
+        this.state.set('currentA', 0);
+        this.state.set('currentH', 0);
+        this.state.set('currentS', 0);
+        this.state.set('currentV', 0);
+        
         this.colorSetsList = new ColorSetsList(this);
         this.colorpickerCallback = function () { };
 
@@ -237,7 +239,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     convertRGB() {
-        return Color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
+        return Color.HSVtoRGB(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
     }
 
     convertHEX() {
@@ -245,7 +247,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     convertHSL() {
-        return Color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
+        return Color.HSVtoHSL(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
     }
 
     getCurrentColor() {
@@ -288,19 +290,16 @@ export default class ColorPicker extends EventMachin {
 
         color = color || this.getCurrentColor();
 
-        if (typeof this.opt.onChange == 'function') {
-            if (!isNaN(this.currentA)) {
+        if (!isNaN(this.state.get('currentA'))) {
+            if (typeof this.opt.onChange == 'function') {
                 this.opt.onChange.call(this, color);
             }
+    
+            if (typeof this.colorpickerCallback == 'function') {
+                this.colorpickerCallback(color);
+            }        
 
         }
-
-        if (typeof this.colorpickerCallback == 'function') {
-            if (!isNaN(this.currentA)) {
-                this.colorpickerCallback(color);
-            }
-
-        }        
     }
 
     caculateHSV() {
@@ -319,9 +318,9 @@ export default class ColorPicker extends EventMachin {
             v = 0;
         }
 
-        this.currentH = h;
-        this.currentS = s;
-        this.currentV = v;
+        this.state.set('currentH', h);
+        this.state.set('currentS', s);
+        this.state.set('currentV', v);
     }
 
 
@@ -331,19 +330,19 @@ export default class ColorPicker extends EventMachin {
     }
 
     setCurrentHSV(h, s, v, a) {
-        this.currentA = a;
-        this.currentH = h;
-        this.currentS = s;
-        this.currentV = v;
+        this.state.set('currentA', a);
+        this.state.set('currentH', h);
+        this.state.set('currentS', s);
+        this.state.set('currentV', v);
     }
 
 
     setCurrentH(h) {
-        this.currentH = h;
+        this.state.set('currentH', h);
     }
 
     setCurrentA(a) {
-        this.currentA = a;
+        this.state.set('currentA', a);
     }
 
     setBackgroundColor(color) {
@@ -357,7 +356,7 @@ export default class ColorPicker extends EventMachin {
 
     getHSV(colorObj) {
         if (colorObj.type == 'hsl') {
-            return Color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
+            return Color.HSLtoHSV(colorObj);
         } else {
             return Color.RGBtoHSV(colorObj);
         }
@@ -367,6 +366,8 @@ export default class ColorPicker extends EventMachin {
     initColor(newColor, format) {
         let c = newColor || "#FF0000", colorObj = Color.parse(c);
         format = format || colorObj.type;
+
+        console.log(colorObj);
 
         this.setCurrentFormat(format);
 
