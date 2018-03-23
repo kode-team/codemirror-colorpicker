@@ -594,6 +594,10 @@ var colorpicker = new ColorPicker({
             <div class="image-select-input">
                 <input type="file" id="imageforfilter"  />
                 <div>
+                    <button type="button" onclick="filter_light()">light</button>
+                    <input type="range" min="0.7" max="1.3" step="0.01" value="1" id="light-value" />
+                </div>                
+                <div>
                     <button type="button" onclick="filter_gray()">Gray</button>
                     <input type="range" min="0" max="2" step="0.1" value="1" id="scale-value" />
                 </div>
@@ -753,6 +757,17 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             document.getElementById('filtered-image').src = url;
         }) 
     }
+
+    function filter_light () {
+        var file = document.getElementById('imageforfilter').files[0];
+        var scale = document.getElementById('light-value').value;
+        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        Color.ImageToURL(file, ImageFilter.light(scale), function (url) {
+            document.getElementById('filtered-image').src = url;
+        }) 
+    }    
 
     function filter_redgreen () {
         var file = document.getElementById('imageforfilter').files[0];
