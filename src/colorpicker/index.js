@@ -19,11 +19,11 @@ export default class ColorPicker extends EventMachin {
         this.$body = null;
         this.$root = null;
 
-        this.state.set('format', 'rgb');
-        this.state.set('currentA', 0);
-        this.state.set('currentH', 0);
-        this.state.set('currentS', 0);
-        this.state.set('currentV', 0);
+        this.format = 'rgb';
+        this.currentA = 0;
+        this.currentH = 0;
+        this.currentS = 0;
+        this.currentV = 0;
         
         this.colorSetsList = new ColorSetsList(this);
         this.colorpickerCallback = function () { };
@@ -239,7 +239,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     convertRGB() {
-        return Color.HSVtoRGB(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
+        return Color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
     }
 
     convertHEX() {
@@ -247,7 +247,7 @@ export default class ColorPicker extends EventMachin {
     }
 
     convertHSL() {
-        return Color.HSVtoHSL(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
+        return Color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
     }
 
     getCurrentColor() {
@@ -290,7 +290,8 @@ export default class ColorPicker extends EventMachin {
 
         color = color || this.getCurrentColor();
 
-        if (!isNaN(this.state.get('currentA'))) {
+
+        if (!isNaN(this.currentA)) {
             if (typeof this.opt.onChange == 'function') {
                 this.opt.onChange.call(this, color);
             }
@@ -330,19 +331,19 @@ export default class ColorPicker extends EventMachin {
     }
 
     setCurrentHSV(h, s, v, a) {
-        this.state.set('currentA', a);
-        this.state.set('currentH', h);
-        this.state.set('currentS', s);
-        this.state.set('currentV', v);
+        this.currentA = a;
+        this.currentH = h;
+        this.currentS = s ;
+        this.currentV = v;
     }
 
 
     setCurrentH(h) {
-        this.state.set('currentH', h);
+        this.currentH = h;
     }
 
     setCurrentA(a) {
-        this.state.set('currentA', a);
+        this.currentA = a;
     }
 
     setBackgroundColor(color) {
@@ -367,7 +368,6 @@ export default class ColorPicker extends EventMachin {
         let c = newColor || "#FF0000", colorObj = Color.parse(c);
         format = format || colorObj.type;
 
-        console.log(colorObj);
 
         this.setCurrentFormat(format);
 

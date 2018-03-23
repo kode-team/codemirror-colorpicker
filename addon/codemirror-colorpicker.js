@@ -3288,11 +3288,11 @@ var ColorPicker = function (_EventMachin) {
         _this.$body = null;
         _this.$root = null;
 
-        _this.state.set('format', 'rgb');
-        _this.state.set('currentA', 0);
-        _this.state.set('currentH', 0);
-        _this.state.set('currentS', 0);
-        _this.state.set('currentV', 0);
+        _this.format = 'rgb';
+        _this.currentA = 0;
+        _this.currentH = 0;
+        _this.currentS = 0;
+        _this.currentV = 0;
 
         _this.colorSetsList = new ColorSetsList(_this);
         _this.colorpickerCallback = function () {};
@@ -3527,7 +3527,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'convertRGB',
         value: function convertRGB() {
-            return color.HSVtoRGB(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
+            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
         }
     }, {
         key: 'convertHEX',
@@ -3537,7 +3537,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'convertHSL',
         value: function convertHSL() {
-            return color.HSVtoHSL(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
+            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
         }
     }, {
         key: 'getCurrentColor',
@@ -3583,7 +3583,7 @@ var ColorPicker = function (_EventMachin) {
 
             color$$1 = color$$1 || this.getCurrentColor();
 
-            if (!isNaN(this.state.get('currentA'))) {
+            if (!isNaN(this.currentA)) {
                 if (typeof this.opt.onChange == 'function') {
                     this.opt.onChange.call(this, color$$1);
                 }
@@ -3623,20 +3623,20 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'setCurrentHSV',
         value: function setCurrentHSV(h, s, v, a) {
-            this.state.set('currentA', a);
-            this.state.set('currentH', h);
-            this.state.set('currentS', s);
-            this.state.set('currentV', v);
+            this.currentA = a;
+            this.currentH = h;
+            this.currentS = s;
+            this.currentV = v;
         }
     }, {
         key: 'setCurrentH',
         value: function setCurrentH(h) {
-            this.state.set('currentH', h);
+            this.currentH = h;
         }
     }, {
         key: 'setCurrentA',
         value: function setCurrentA(a) {
-            this.state.set('currentA', a);
+            this.currentA = a;
         }
     }, {
         key: 'setBackgroundColor',
@@ -3664,8 +3664,6 @@ var ColorPicker = function (_EventMachin) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
             format = format || colorObj.type;
-
-            console.log(colorObj);
 
             this.setCurrentFormat(format);
 

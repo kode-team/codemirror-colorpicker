@@ -1,6 +1,10 @@
 
 # Change Logs 
 
+# 1.6.5 
+* image filter  (gray)
+* support lab color (RGBtoLAB, LABtoRGB)
+
 # 1.6.4
 * improved performance of color palette for image
 * support only palette style 
