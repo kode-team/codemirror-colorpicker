@@ -64,23 +64,25 @@ class ImageLoader {
     toArray(filter) {
         var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 
-        filter = filter || this.getRGBA;
-        var rgba = imagedata.data ;
-        var results = [];
-        for (var i = 0, len = rgba.length; i < len; i += 4){
-            var item = filter(rgba[i + 0],rgba[i + 1],rgba[i + 2],rgba[i + 3]);
-            if (item) {
-                results[results.length] = item;
-            }
-        }
+        var arr = new Uint8ClampedArray(imagedata.data);
+        imagedata.data.set(filter(arr));
 
-        return results; 
+        this.context.putImageData(imagedata, 0, 0);
+
+        return this.canvas.toDataURL('image/png');
     } 
 
     toRGB () {
-        return this.toArray(function (r, g, b, a) {
-            return [r, g, b];
-        })
+        var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+        var filter = this.getRGBA;
+        var rgba = this.toArray() ;
+        var results = [];
+        for (var i = 0, len = rgba.length; i < len; i += 4){
+            results[results.length] = [rgba[i + 0],rgba[i + 1],rgba[i + 2],rgba[i + 3]];
+        }
+
+        return results; 
     }
 
 }

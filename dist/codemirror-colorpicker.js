@@ -375,7 +375,43 @@ var possibleConstructorReturn = function (self, call) {
 
 
 
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
 
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
 
 
 
@@ -470,24 +506,26 @@ var ImageLoader = function () {
         value: function toArray$$1(filter) {
             var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 
-            filter = filter || this.getRGBA;
-            var rgba = imagedata.data;
-            var results = [];
-            for (var i = 0, len = rgba.length; i < len; i += 4) {
-                var item = filter(rgba[i + 0], rgba[i + 1], rgba[i + 2], rgba[i + 3]);
-                if (item) {
-                    results[results.length] = item;
-                }
-            }
+            var arr = new Uint8ClampedArray(imagedata.data);
+            imagedata.data.set(filter(arr));
 
-            return results;
+            this.context.putImageData(imagedata, 0, 0);
+
+            return this.canvas.toDataURL('image/png');
         }
     }, {
         key: 'toRGB',
         value: function toRGB() {
-            return this.toArray(function (r, g, b, a) {
-                return [r, g, b];
-            });
+            var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+            var filter = this.getRGBA;
+            var rgba = this.toArray();
+            var results = [];
+            for (var i = 0, len = rgba.length; i < len; i += 4) {
+                results[results.length] = [rgba[i + 0], rgba[i + 1], rgba[i + 2], rgba[i + 3]];
+            }
+
+            return results;
         }
     }]);
     return ImageLoader;
@@ -538,6 +576,10 @@ var color = {
 
     trim: function trim(str) {
         return str.replace(/^\s+|\s+$/g, '');
+    },
+
+    round: function round(n, k) {
+        return Math.round(n * k) / k;
     },
 
     /**
@@ -602,6 +644,7 @@ var color = {
         return obj;
     },
 
+
     /**
      * @method rgb
      *
@@ -630,7 +673,11 @@ var color = {
                     arr[i] = parseInt(color.trim(arr[i]), 10);
                 }
 
-                return { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+                var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj;
             } else if (str.indexOf("rgba(") > -1) {
                 var arr = str.replace("rgba(", "").replace(")", "").split(",");
 
@@ -643,7 +690,11 @@ var color = {
                     }
                 }
 
-                return { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
+                var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj;
             } else if (str.indexOf("hsl(") > -1) {
                 var arr = str.replace("hsl(", "").replace(")", "").split(",");
 
@@ -653,11 +704,7 @@ var color = {
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: 1 };
 
-                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
-
-                obj.r = temp.r;
-                obj.g = temp.g;
-                obj.b = temp.b;
+                obj = Object.assign(obj, this.HSLtoRGB(obj));
 
                 return obj;
             } else if (str.indexOf("hsla(") > -1) {
@@ -674,11 +721,7 @@ var color = {
 
                 var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3] };
 
-                var temp = color.HSLtoRGB(obj.h, obj.s, obj.l);
-
-                obj.r = temp.r;
-                obj.g = temp.g;
-                obj.b = temp.b;
+                obj = Object.assign(obj, color.HSLtoRGB(obj));
 
                 return obj;
             } else if (str.indexOf("#") == 0) {
@@ -697,7 +740,11 @@ var color = {
                     }
                 }
 
-                return { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+                var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+
+                return obj;
             }
         } else if (typeof str == 'number') {
             if (0x000000 <= str && str <= 0xffffff) {
@@ -705,19 +752,24 @@ var color = {
                 var g = (str & 0x00ff00) >> 8;
                 var b = (str & 0x0000ff) >> 0;
 
-                return { type: 'hex', r: r, g: g, b: b, a: 1 };
+                var obj = { type: 'hex', r: r, g: g, b: b, a: 1 };
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+                return obj;
             } else if (0x00000000 <= str && str <= 0xffffffff) {
                 var _r = (str & 0xff000000) >> 24;
                 var _g = (str & 0x00ff0000) >> 16;
                 var _b = (str & 0x0000ff00) >> 8;
                 var a = (str & 0x000000ff) / 255;
 
-                return { type: 'hex', r: _r, g: _g, b: _b, a: a };
+                var obj = { type: 'hex', r: _r, g: _g, b: _b, a: a };
+                obj = Object.assign(obj, this.RGBtoHSL(obj));
+                return obj;
             }
         }
 
         return str;
     },
+
 
     /**
      * @method HSVtoRGB
@@ -775,6 +827,7 @@ var color = {
         };
     },
 
+
     /**
      * @method RGBtoHSV
      *
@@ -829,7 +882,6 @@ var color = {
 
         return { h: H, s: S, v: V };
     },
-
     HSVtoHSL: function HSVtoHSL(h, s, v) {
 
         if (arguments.length == 1) {
@@ -843,7 +895,6 @@ var color = {
 
         return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     },
-
     RGBtoCMYK: function RGBtoCMYK(r, g, b) {
 
         if (arguments.length == 1) {
@@ -864,7 +915,6 @@ var color = {
 
         return { c: C, m: M, y: Y, k: K };
     },
-
     CMYKtoRGB: function CMYKtoRGB(c, m, y, k) {
 
         if (arguments.length == 1) {
@@ -881,7 +931,6 @@ var color = {
 
         return { r: R, g: G, b: B };
     },
-
     RGBtoHSL: function RGBtoHSL(r, g, b) {
 
         if (arguments.length == 1) {
@@ -916,7 +965,6 @@ var color = {
 
         return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
     },
-
     HUEtoRGB: function HUEtoRGB(p, q, t) {
         if (t < 0) t += 1;
         if (t > 1) t -= 1;
@@ -925,7 +973,6 @@ var color = {
         if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
         return p;
     },
-
     HSLtoHSV: function HSLtoHSV(h, s, l) {
 
         if (arguments.length == 1) {
@@ -938,14 +985,13 @@ var color = {
 
         return this.RGBtoHSV(rgb.r, rgb.g, rgb.b);
     },
-
     HSLtoRGB: function HSLtoRGB(h, s, l) {
 
         if (arguments.length == 1) {
             var _arguments$8 = arguments[0],
                 h = _arguments$8.h,
                 s = _arguments$8.s,
-                v = _arguments$8.v;
+                l = _arguments$8.l;
         }
 
         var r, g, b;
@@ -1013,17 +1059,16 @@ var color = {
 
         return { y: Math.ceil(Y), cr: Cr, cb: Cb };
     },
-    YCrCbtoRGB: function YCrCbtoRGB(y, cr, cb) {
-        var bit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-
+    YCrCbtoRGB: function YCrCbtoRGB(y, cr, cb, bit) {
 
         if (arguments.length == 1) {
             var _arguments$13 = arguments[0],
                 y = _arguments$13.y,
                 cr = _arguments$13.cr,
                 cb = _arguments$13.cb,
-                _arguments$13$bit = _arguments$13.bit,
-                bit = _arguments$13$bit === undefined ? 0 : _arguments$13$bit;
+                bit = _arguments$13.bit;
+
+            bit = bit || 0;
         }
         var R = y + 1.402 * (cr - bit);
         var G = y - 0.344 * (cb - bit) - 0.714 * (cr - bit);
@@ -1031,14 +1076,175 @@ var color = {
 
         return { r: Math.ceil(R), g: Math.ceil(G), b: Math.ceil(B) };
     },
-    interpolateRGB: function interpolateRGB(startColor, endColor, t) {
+    ReverseRGB: function ReverseRGB(n) {
+        return n > 0.0031308 ? 1.055 * Math.pow(n, 1 / 2.4) - 0.055 : 12.92 * n;
+    },
+    XYZtoRGB: function XYZtoRGB(x, y, z) {
+        if (arguments.length == 1) {
+            var _arguments$14 = arguments[0],
+                x = _arguments$14.x,
+                y = _arguments$14.y,
+                z = _arguments$14.z;
+        }
+        //X, Y and Z input refer to a D65/2° standard illuminant.
+        //sR, sG and sB (standard RGB) output range = 0 ÷ 255
+
+        var X = x / 100.0;
+        var Y = y / 100.0;
+        var Z = z / 100.0;
+
+        var R = X * 3.2406 + Y * -1.5372 + Z * -0.4986;
+        var G = X * -0.9689 + Y * 1.8758 + Z * 0.0415;
+        var B = X * 0.0557 + Y * -0.2040 + Z * 1.0570;
+
+        R = this.ReverseRGB(R);
+        G = this.ReverseRGB(G);
+        B = this.ReverseRGB(B);
+
+        var r = Math.round(R * 255);
+        var g = Math.round(G * 255);
+        var b = Math.round(B * 255);
+
+        return { r: r, g: g, b: b };
+    },
+    PivotRGB: function PivotRGB(n) {
+        return (n > 0.04045 ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
+    },
+    RGBtoXYZ: function RGBtoXYZ(r, g, b) {
+        //sR, sG and sB (Standard RGB) input range = 0 ÷ 255
+        //X, Y and Z output refer to a D65/2° standard illuminant.
+        if (arguments.length == 1) {
+            var _arguments$15 = arguments[0],
+                r = _arguments$15.r,
+                g = _arguments$15.g,
+                b = _arguments$15.b;
+        }
+
+        var R = r / 255;
+        var G = g / 255;
+        var B = b / 255;
+
+        R = this.PivotRGB(R);
+        G = this.PivotRGB(G);
+        B = this.PivotRGB(B);
+
+        var x = R * 0.4124 + G * 0.3576 + B * 0.1805;
+        var y = R * 0.2126 + G * 0.7152 + B * 0.0722;
+        var z = R * 0.0193 + G * 0.1192 + B * 0.9505;
+
+        return { x: x, y: y, z: z };
+    },
+    ReverseXyz: function ReverseXyz(n) {
+        return Math.pow(n, 3) > 0.008856 ? Math.pow(n, 3) : (n - 16 / 116) / 7.787;
+    },
+    LABtoXYZ: function LABtoXYZ(l, a, b) {
+        if (arguments.length == 1) {
+            var _arguments$16 = arguments[0],
+                l = _arguments$16.l,
+                a = _arguments$16.a,
+                b = _arguments$16.b;
+        }
+        //Reference-X, Y and Z refer to specific illuminants and observers.
+        //Common reference values are available below in this same page.
+
+        var Y = (l + 16) / 116;
+        var X = a / 500 + Y;
+        var Z = Y - b / 200;
+
+        Y = this.ReverseXyz(Y);
+        X = this.ReverseXyz(X);
+        Z = this.ReverseXyz(Z);
+
+        var x = X * 95.047;
+        var y = Y * 100.000;
+        var z = Z * 108.883;
+
+        return { x: x, y: y, z: z };
+    },
+    PivotXyz: function PivotXyz(n) {
+        return n > 0.008856 ? Math.pow(n, 1 / 3) : (7.787 * n + 16) / 116;
+    },
+    XYZtoLAB: function XYZtoLAB(x, y, z) {
+        if (arguments.length == 1) {
+            var _arguments$17 = arguments[0],
+                x = _arguments$17.x,
+                y = _arguments$17.y,
+                z = _arguments$17.z;
+        }
+
+        //Reference-X, Y and Z refer to specific illuminants and observers.
+        //Common reference values are available below in this same page.
+        // Observer= 2°, Illuminant= D65
+
+        var X = x / 95.047;
+        var Y = y / 100.00;
+        var Z = z / 108.883;
+
+        X = this.PivotXyz(X);
+        Y = this.PivotXyz(Y);
+        Z = this.PivotXyz(Z);
+
+        var l = 116 * Y - 16;
+        var a = 500 * (X - Y);
+        var b = 200 * (Y - Z);
+
+        return { l: l, a: a, b: b };
+    },
+    RGBtoLAB: function RGBtoLAB(r, g, b) {
+        if (arguments.length == 1) {
+            var _arguments$18 = arguments[0],
+                r = _arguments$18.r,
+                g = _arguments$18.g,
+                b = _arguments$18.b;
+        }
+        return this.XYZtoLAB(this.RGBtoXYZ(r, g, b));
+    },
+    LABtoRGB: function LABtoRGB(l, a, b) {
+        if (arguments.length == 1) {
+            var _arguments$19 = arguments[0],
+                l = _arguments$19.l,
+                a = _arguments$19.a,
+                b = _arguments$19.b;
+        }
+        return this.XYZtoRGB(this.LABtoXYZ(l, a, b));
+    },
+    blend: function blend(startColor, endColor) {
+        var ratio = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+        var format = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
+
+        var s = this.parse(startColor);
+        var e = this.parse(endColor);
+
+        return this.interpolateRGB(s, e, ratio, format);
+    },
+    mix: function mix(startcolor, endColor) {
+        var ratio = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+        var format = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
+
+        return this.blend(startcolor, endColor, ratio, format);
+    },
+
+    /**
+     * @deprecated
+     * 
+     * instead of this,  use blend function 
+     *  
+     * @param {*} startColor 
+     * @param {*} endColor 
+     * @param {*} t 
+     */
+    interpolateRGB: function interpolateRGB(startColor, endColor) {
+        var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+        var format = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
+
         var obj = {
-            r: parseInt(startColor.r + (endColor.r - startColor.r) * t, 10),
-            g: parseInt(startColor.g + (endColor.g - startColor.g) * t, 10),
-            b: parseInt(startColor.b + (endColor.b - startColor.b) * t, 10)
+            r: Math.round(startColor.r + (endColor.r - startColor.r) * t),
+            g: Math.round(startColor.g + (endColor.g - startColor.g) * t),
+            b: Math.round(startColor.b + (endColor.b - startColor.b) * t),
+            a: Math.round(startColor.a + (endColor.a - startColor.a) * t)
         };
 
-        return color.format(obj, 'hex');
+        return this.format(obj, format);
     },
     scale: function scale(_scale) {
         var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
@@ -1050,11 +1256,8 @@ var color = {
 
         var colors = [];
         for (var i = 0; i < len - 1; i++) {
-            var start = this.parse(_scale[i]);
-            var end = this.parse(_scale[i + 1]);
-
             for (var index = 0; index < count; index++) {
-                colors.push(this.interpolateRGB(start, end, index / count));
+                colors.push(this.blend(_scale[i], _scale[i + 1], index / count));
             }
         }
         return colors;
@@ -1103,7 +1306,6 @@ var color = {
 
         return this.scaleHSV(color, 'v', count, format, min, max, 100);
     },
-
     palette: function palette(colors) {
         var _this = this;
 
@@ -1139,6 +1341,14 @@ var color = {
                 }
             });
         }
+    },
+    ImageToURL: function ImageToURL(url, filter, callback) {
+        var img = new ImageLoader(url);
+        img.loadImage(function () {
+            if (typeof callback == 'function') {
+                callback(img.toArray(filter));
+            }
+        });
     }
 };
 
@@ -1206,6 +1416,54 @@ initHueColors();
 var HueColor = {
     colors: hue_color,
     checkHueColor: checkHueColor
+};
+
+function gray (rgb) {
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { scale: 1 };
+
+
+    var lab = color.RGBtoLAB({ r: rgb[0], g: rgb[1], b: rgb[2] });
+
+    lab.l = lab.l * opt.scale;
+
+    lab.a = 0;
+    lab.b = 0;
+
+    var _Color$LABtoRGB = color.LABtoRGB(lab),
+        r = _Color$LABtoRGB.r,
+        g = _Color$LABtoRGB.g,
+        b = _Color$LABtoRGB.b;
+
+    return [r, g, b];
+}
+
+var Filter = {
+    gray: gray
+};
+
+function ImageFilter(buffer) {
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { type: 'gray' };
+
+    var len = buffer.length;
+    for (var i = 0; i < len; i += 4) {
+        var _Filter$opt$type$call = Filter[opt.type].call(Filter, [buffer[i], buffer[i + 1], buffer[i + 2]], opt);
+
+        var _Filter$opt$type$call2 = slicedToArray(_Filter$opt$type$call, 3);
+
+        buffer[i] = _Filter$opt$type$call2[0];
+        buffer[i + 1] = _Filter$opt$type$call2[1];
+        buffer[i + 2] = _Filter$opt$type$call2[2];
+    }
+
+    return buffer;
+}
+
+ImageFilter.gray = function () {
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
+
+    return function (buffer) {
+        return ImageFilter(buffer, { type: 'gray', scale: scale });
+    };
 };
 
 var counter = 0;
@@ -1577,13 +1835,15 @@ var State = function () {
         var obj = this.masterObj[arr[0]] || this.masterObj;
         var method = arr.pop();
 
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
+        if (obj[method]) {
+          for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          var value = obj[method].apply(obj, args);
+
+          this.set(key, value);
         }
-
-        var value = obj[method].apply(obj, args);
-
-        this.set(key, value);
       }
     }
   }, {
@@ -3029,11 +3289,13 @@ var ColorPicker = function (_EventMachin) {
         _this.opt = opt || {};
         _this.$body = null;
         _this.$root = null;
-        _this.format = 'rgb';
-        _this.currentA = 0;
-        _this.currentH = 0;
-        _this.currentS = 0;
-        _this.currentV = 0;
+
+        _this.state.set('format', 'rgb');
+        _this.state.set('currentA', 0);
+        _this.state.set('currentH', 0);
+        _this.state.set('currentS', 0);
+        _this.state.set('currentV', 0);
+
         _this.colorSetsList = new ColorSetsList(_this);
         _this.colorpickerCallback = function () {};
 
@@ -3267,7 +3529,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'convertRGB',
         value: function convertRGB() {
-            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
+            return color.HSVtoRGB(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
         }
     }, {
         key: 'convertHEX',
@@ -3277,7 +3539,7 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'convertHSL',
         value: function convertHSL() {
-            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
+            return color.HSVtoHSL(this.state.get('currentH'), this.state.get('currentS'), this.state.get('currentV'));
         }
     }, {
         key: 'getCurrentColor',
@@ -3323,14 +3585,12 @@ var ColorPicker = function (_EventMachin) {
 
             color$$1 = color$$1 || this.getCurrentColor();
 
-            if (typeof this.opt.onChange == 'function') {
-                if (!isNaN(this.currentA)) {
+            if (!isNaN(this.state.get('currentA'))) {
+                if (typeof this.opt.onChange == 'function') {
                     this.opt.onChange.call(this, color$$1);
                 }
-            }
 
-            if (typeof this.colorpickerCallback == 'function') {
-                if (!isNaN(this.currentA)) {
+                if (typeof this.colorpickerCallback == 'function') {
                     this.colorpickerCallback(color$$1);
                 }
             }
@@ -3352,9 +3612,9 @@ var ColorPicker = function (_EventMachin) {
                 v = 0;
             }
 
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
+            this.state.set('currentH', h);
+            this.state.set('currentS', s);
+            this.state.set('currentV', v);
         }
     }, {
         key: 'setColorUI',
@@ -3365,20 +3625,20 @@ var ColorPicker = function (_EventMachin) {
     }, {
         key: 'setCurrentHSV',
         value: function setCurrentHSV(h, s, v, a) {
-            this.currentA = a;
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
+            this.state.set('currentA', a);
+            this.state.set('currentH', h);
+            this.state.set('currentS', s);
+            this.state.set('currentV', v);
         }
     }, {
         key: 'setCurrentH',
         value: function setCurrentH(h) {
-            this.currentH = h;
+            this.state.set('currentH', h);
         }
     }, {
         key: 'setCurrentA',
         value: function setCurrentA(a) {
-            this.currentA = a;
+            this.state.set('currentA', a);
         }
     }, {
         key: 'setBackgroundColor',
@@ -3395,7 +3655,7 @@ var ColorPicker = function (_EventMachin) {
         key: 'getHSV',
         value: function getHSV(colorObj) {
             if (colorObj.type == 'hsl') {
-                return color.HSLtoHSV(colorObj.h, colorObj.s, colorObj.l);
+                return color.HSLtoHSV(colorObj);
             } else {
                 return color.RGBtoHSV(colorObj);
             }
@@ -3406,6 +3666,8 @@ var ColorPicker = function (_EventMachin) {
             var c = newColor || "#FF0000",
                 colorObj = color.parse(c);
             format = format || colorObj.type;
+
+            console.log(colorObj);
 
             this.setCurrentFormat(format);
 
@@ -3962,6 +4224,8 @@ if (CodeMirror) {
 
 var index = {
     Color: color,
+    Filter: Filter,
+    ImageFilter: ImageFilter,
     ColorNames: ColorNames,
     HueColor: HueColor,
     ColorPicker: ColorPicker

@@ -1,8 +1,8 @@
 import ColorNames from './ColorNames'
-import kmeans  from './Kmeans'
+import kmeans from './Kmeans'
 import ImageLoader from './ImageLoader'
 
-const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi; 
+const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 
 const color = {
 
@@ -50,6 +50,10 @@ const color = {
         return str.replace(/^\s+|\s+$/g, '');
     },
 
+    round: function (n, k) {
+        return Math.round(n * k) / k;
+    },
+
     /**
      * @method format
      *
@@ -68,10 +72,10 @@ const color = {
      * @param {"hex"/"rgb"} type  format string type
      * @returns {*}
      */
-    format: function (obj, type, defaultColor = 'rgba(0, 0, 0, 0)') {
+    format(obj, type, defaultColor = 'rgba(0, 0, 0, 0)') {
 
         if (Array.isArray(obj)) {
-            obj = { r : obj[0], g : obj[1], b : obj[2], a : obj[3] }
+            obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] }
         }
 
         if (type == 'hex') {
@@ -124,7 +128,7 @@ const color = {
      * @param {String} str color string
      * @returns {Object}  rgb object
      */
-    parse: function (str) {
+    parse(str) {
         if (typeof str == 'string') {
 
             if (ColorNames.isColorName(str)) {
@@ -210,7 +214,7 @@ const color = {
 
                 obj = Object.assign(obj, this.RGBtoHSL(obj));
 
-                return obj; 
+                return obj;
             }
         } else if (typeof str == 'number') {
             if (0x000000 <= str && str <= 0xffffff) {
@@ -220,7 +224,7 @@ const color = {
 
                 var obj = { type: 'hex', r, g, b, a: 1 };
                 obj = Object.assign(obj, this.RGBtoHSL(obj));
-                return obj; 
+                return obj;
             } else if (0x00000000 <= str && str <= 0xffffffff) {
                 const r = (str & 0xff000000) >> 24;
                 const g = (str & 0x00ff0000) >> 16;
@@ -229,7 +233,7 @@ const color = {
 
                 var obj = { type: 'hex', r, g, b, a };
                 obj = Object.assign(obj, this.RGBtoHSL(obj));
-                return obj; 
+                return obj;
             }
         }
 
@@ -249,7 +253,7 @@ const color = {
      * @param {Number} V  Value number 		(min : 0, max : 1 )
      * @returns {Object}
      */
-    HSVtoRGB: function (h, s, v) {
+    HSVtoRGB(h, s, v) {
 
         if (arguments.length == 1) {
             var { h, s, v } = arguments[0];
@@ -295,7 +299,7 @@ const color = {
      * @param {Number} B  blue color value
      * @return {Object}  hsv color code
      */
-    RGBtoHSV: function (r, g, b) {
+    RGBtoHSV(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
@@ -335,7 +339,7 @@ const color = {
         return { h: H, s: S, v: V };
     },
 
-    HSVtoHSL: function (h, s, v) {
+    HSVtoHSL(h, s, v) {
 
         if (arguments.length == 1) {
             var { h, s, v } = arguments[0];
@@ -346,7 +350,7 @@ const color = {
         return this.RGBtoHSL(rgb.r, rgb.g, rgb.b);
     },
 
-    RGBtoCMYK: function (r, g, b) {
+    RGBtoCMYK(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
@@ -364,7 +368,7 @@ const color = {
         return { c: C, m: M, y: Y, k: K };
     },
 
-    CMYKtoRGB: function (c, m, y, k) {
+    CMYKtoRGB(c, m, y, k) {
 
         if (arguments.length == 1) {
             var { c, m, y, k } = arguments[0];
@@ -377,7 +381,7 @@ const color = {
         return { r: R, g: G, b: B }
     },
 
-    RGBtoHSL: function (r, g, b) {
+    RGBtoHSL(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
@@ -403,7 +407,7 @@ const color = {
         return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
     },
 
-    HUEtoRGB: function (p, q, t) {
+    HUEtoRGB(p, q, t) {
         if (t < 0) t += 1;
         if (t > 1) t -= 1;
         if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -412,7 +416,7 @@ const color = {
         return p;
     },
 
-    HSLtoHSV: function (h, s, l) {
+    HSLtoHSV(h, s, l) {
 
         if (arguments.length == 1) {
             var { h, s, v } = arguments[0];
@@ -422,7 +426,7 @@ const color = {
         return this.RGBtoHSV(rgb.r, rgb.g, rgb.b);
     },
 
-    HSLtoRGB: function (h, s, l) {
+    HSLtoRGB(h, s, l) {
 
         if (arguments.length == 1) {
             var { h, s, l } = arguments[0];
@@ -446,31 +450,31 @@ const color = {
 
         return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
     },
-    c: function (r, g, b) {
+    c(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
         }
         return this.gray((r + g + b) / 3 > 90 ? 0 : 255);
     },
-    gray: function (gray) {
+    gray(gray) {
         return { r: gray, g: gray, b: gray };
     },
-    RGBtoSimpleGray: function (r, g, b) {
+    RGBtoSimpleGray(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
         }
         return this.gray(Math.ceil((r + g + b) / 3));
     },
-    RGBtoGray: function (r, g, b) {
+    RGBtoGray(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
         }
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
-    RGBtoYCrCb: function (r, g, b) {
+    RGBtoYCrCb(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
@@ -481,10 +485,11 @@ const color = {
 
         return { y: Math.ceil(Y), cr: Cr, cb: Cb };
     },
-    YCrCbtoRGB: function (y, cr, cb, bit = 0) {
+    YCrCbtoRGB(y, cr, cb, bit) {
 
         if (arguments.length == 1) {
-            var { y, cr, cb, bit = 0 } = arguments[0];
+            var { y, cr, cb, bit } = arguments[0];
+            bit = bit || 0;
         }
         const R = y + 1.402 * (cr - bit);
         const G = y - 0.344 * (cb - bit) - 0.714 * (cr - bit);
@@ -492,70 +497,77 @@ const color = {
 
         return { r: Math.ceil(R), g: Math.ceil(G), b: Math.ceil(B) }
     },
-    XYZtoRGB (x, y, z) {
+
+    ReverseRGB(n) {
+        return (n > 0.0031308) ? 1.055 * (Math.pow(n, (1 / 2.4))) - 0.055 : 12.92 * n;
+    },
+    XYZtoRGB(x, y, z) {
         if (arguments.length == 1) {
             var { x, y, z } = arguments[0];
-        }        
+        }
         //X, Y and Z input refer to a D65/2° standard illuminant.
         //sR, sG and sB (standard RGB) output range = 0 ÷ 255
 
-        let X = x / 100
-        let Y = y / 100
-        let Z = z / 100
+        let X = x / 100.0
+        let Y = y / 100.0
+        let Z = z / 100.0
 
-        let R = X *  3.2406 + Y * -1.5372 + Z * -0.4986
-        let G = X * -0.9689 + Y *  1.8758 + Z *  0.0415
-        let B = X *  0.0557 + Y * -0.2040 + Z *  1.0570
+        let R = X * 3.2406 + Y * -1.5372 + Z * -0.4986;
+        let G = X * -0.9689 + Y * 1.8758 + Z * 0.0415;
+        let B = X * 0.0557 + Y * -0.2040 + Z * 1.0570;
 
-        R = ( R > 0.0031308 ) ? 1.055 * ( R ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * R;
-        G = ( G > 0.0031308 ) ? 1.055 * ( G ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * G;
-        B = ( B > 0.0031308 ) ? 1.055 * ( B ^ ( 1 / 2.4 ) ) - 0.055 : 12.92 * B;
+        R = this.ReverseRGB(R);
+        G = this.ReverseRGB(G);
+        B = this.ReverseRGB(B);
 
-        r = Math.round(R * 255)
-        g = Math.round(G * 255)
-        b = Math.round(B * 255)
+        const r = Math.round(R * 255);
+        const g = Math.round(G * 255);
+        const b = Math.round(B * 255);
 
         return { r, g, b };
     },
-    RGBtoXYZ (r, g, b) {
+
+    PivotRGB(n) {
+        return ((n > 0.04045) ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
+    },
+    RGBtoXYZ(r, g, b) {
         //sR, sG and sB (Standard RGB) input range = 0 ÷ 255
         //X, Y and Z output refer to a D65/2° standard illuminant.
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
         }
 
-        let R = ( r / 255 )
-        let G = ( g / 255 )
-        let B = ( b / 255 )
+        let R = (r / 255)
+        let G = (g / 255)
+        let B = (b / 255)
 
-        R = ( R > 0.04045 ) ? ( ( R + 0.055 ) / 1.055 ) ^ 2.4 : R / 12.92;
-        G = ( G > 0.04045 ) ? ( ( G + 0.055 ) / 1.055 ) ^ 2.4 : G / 12.92;
-        B = ( B > 0.04045 ) ? ( ( B + 0.055 ) / 1.055 ) ^ 2.4 : B / 12.92;
+        R = this.PivotRGB(R);
+        G = this.PivotRGB(G);
+        B = this.PivotRGB(B);
 
-        R = R * 100
-        G = G * 100
-        B = B * 100
-
-        const x = R * 0.4124 + G * 0.3576 + B * 0.1805
-        const y = R * 0.2126 + G * 0.7152 + B * 0.0722
-        const z = R * 0.0193 + G * 0.1192 + B * 0.9505
+        const x = R * 0.4124 + G * 0.3576 + B * 0.1805;
+        const y = R * 0.2126 + G * 0.7152 + B * 0.0722;
+        const z = R * 0.0193 + G * 0.1192 + B * 0.9505;
 
         return { x, y, z }
     },
-    LABtoXYZ (l, a, b) {
+    ReverseXyz(n) {
+        return (Math.pow(n, 3) > 0.008856) ? Math.pow(n, 3) : (n - 16 / 116) / 7.787;
+    },
+    LABtoXYZ(l, a, b) {
         if (arguments.length == 1) {
             var { l, a, b } = arguments[0];
-        }        
+        }
         //Reference-X, Y and Z refer to specific illuminants and observers.
         //Common reference values are available below in this same page.
 
-        let Y = ( l + 16 ) / 116
+        let Y = (l + 16) / 116
         let X = a / 500 + Y
-        let Z = Y - b/ 200
+        let Z = Y - b / 200
 
-        Y = ( Y^3  > 0.008856 ) ? Y^3  : ( Y - 16 / 116 ) / 7.787;
-        X = ( X^3  > 0.008856 ) ? X^3  : ( X - 16 / 116 ) / 7.787;
-        Z = ( Z^3  > 0.008856 ) ? Z^3  : ( Z - 16 / 116 ) / 7.787;
+        Y = this.ReverseXyz(Y);
+        X = this.ReverseXyz(X);
+        Z = this.ReverseXyz(Z);
 
         const x = X * 95.047
         const y = Y * 100.000
@@ -563,7 +575,10 @@ const color = {
 
         return { x, y, z };
     },
-    XYZtoLAB (x, y, z) {
+    PivotXyz(n) {
+        return (n > 0.008856) ? Math.pow(n, (1 / 3)) : (7.787 * n + 16) / 116;
+    },
+    XYZtoLAB(x, y, z) {
         if (arguments.length == 1) {
             var { x, y, z } = arguments[0];
         }
@@ -572,37 +587,41 @@ const color = {
         //Common reference values are available below in this same page.
         // Observer= 2°, Illuminant= D65
 
-        let X = x / 95.047
-        let Y = y / 100.000
-        let Z = z / 108.883
+        let X = x / 95.047;
+        let Y = y / 100.00;
+        let Z = z / 108.883;
 
-        X = ( X > 0.008856 ) ? X ^ ( 1/3 ) : ( 7.787 * X ) + ( 16 / 116 );
-        Y = ( Y > 0.008856 ) ? Y ^ ( 1/3 ) : ( 7.787 * Y ) + ( 16 / 116 );
-        Z = ( Z > 0.008856 ) ? Z ^ ( 1/3 ) : ( 7.787 * Z ) + ( 16 / 116 );
+        X = this.PivotXyz(X);
+        Y = this.PivotXyz(Y);
+        Z = this.PivotXyz(Z);
 
-        const l = ( 116 * Y ) - 16;
-        const a = 500 * ( X - Y );
-        const b = 200 * ( Y - Z );
+        const l = (116 * Y) - 16;
+        const a = 500 * (X - Y);
+        const b = 200 * (Y - Z);
+
 
         return { l, a, b };
     },
-    RGBtoLAB(r,g,b) {
+    RGBtoLAB(r, g, b) {
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
-        }   
-        return this.XYZtoLAB(this.RGBtoXYZ(r,g,b));
+        }
+        return this.XYZtoLAB(this.RGBtoXYZ(r, g, b));
     },
-    LABtoRGB(l,a,b) {
+    LABtoRGB(l, a, b) {
         if (arguments.length == 1) {
             var { l, a, b } = arguments[0];
-        }   
-        return this.XYZtoLAB(this.RGBtoXYZ(l,a,b));
+        }
+        return this.XYZtoRGB(this.LABtoXYZ(l, a, b));
     },
-    blend (startColor, endColor, ratio = 0.5, format = 'hex') {
+    blend(startColor, endColor, ratio = 0.5, format = 'hex') {
         var s = this.parse(startColor);
         var e = this.parse(endColor);
-        
+
         return this.interpolateRGB(s, e, ratio, format);
+    },
+    mix(startcolor, endColor, ratio = 0.5, format = 'hex') {
+        return this.blend(startcolor, endColor, ratio, format);
     },
     /**
      * @deprecated
@@ -615,10 +634,10 @@ const color = {
      */
     interpolateRGB(startColor, endColor, t = 0.5, format = 'hex') {
         var obj = {
-            r: parseInt(startColor.r + (endColor.r - startColor.r) * t, 10),
-            g: parseInt(startColor.g + (endColor.g - startColor.g) * t, 10),
-            b: parseInt(startColor.b + (endColor.b - startColor.b) * t, 10),
-            a: parseInt(startColor.a + (endColor.a - startColor.a) * t, 10),
+            r: Math.round(startColor.r + (endColor.r - startColor.r) * t),
+            g: Math.round(startColor.g + (endColor.g - startColor.g) * t),
+            b: Math.round(startColor.b + (endColor.b - startColor.b) * t),
+            a: Math.round(startColor.a + (endColor.a - startColor.a) * t)
         };
 
         return this.format(obj, format);
@@ -633,36 +652,36 @@ const color = {
         var colors = [];
         for (var i = 0; i < len - 1; i++) {
             for (var index = 0; index < count; index++) {
-                colors.push(this.blend(scale[i], scale[i+1], (index / count)));
+                colors.push(this.blend(scale[i], scale[i + 1], (index / count)));
             }
 
         }
         return colors;
     },
 
-    scaleHSV (color, target = 'h', count = 9, format = 'rgb', min = 0, max = 1, dist = 100) {
+    scaleHSV(color, target = 'h', count = 9, format = 'rgb', min = 0, max = 1, dist = 100) {
         var colorObj = this.parse(color);
         var hsv = this.RGBtoHSV(colorObj);
         var unit = ((max - min) * dist / count);
 
         var results = [];
-        for(var i = 1; i <= count; i++) {
+        for (var i = 1; i <= count; i++) {
             hsv[target] = Math.abs((dist - unit * i) / dist);
             results.push(this.format(this.HSVtoRGB(hsv), format));
-        } 
-        
-        return results; 
+        }
+
+        return results;
     },
-    scaleH (color, count = 9, format = 'rgb', min = 0, max = 360) {
-        return this.scaleHSV(color, 'h', count, format, min , max, 1);
+    scaleH(color, count = 9, format = 'rgb', min = 0, max = 360) {
+        return this.scaleHSV(color, 'h', count, format, min, max, 1);
     },
-    scaleS (color, count = 9, format = 'rgb', min = 0, max = 1) {
-        return this.scaleHSV(color, 's', count, format, min , max, 100);
+    scaleS(color, count = 9, format = 'rgb', min = 0, max = 1) {
+        return this.scaleHSV(color, 's', count, format, min, max, 100);
     },
-    scaleV (color, count = 9, format = 'rgb', min = 0, max = 1) {
-        return this.scaleHSV(color, 'v', count, format, min , max, 100);
+    scaleV(color, count = 9, format = 'rgb', min = 0, max = 1) {
+        return this.scaleHSV(color, 'v', count, format, min, max, 100);
     },
-    palette : function (colors, k = 6, format = 'hex') {
+    palette(colors, k = 6, format = 'hex') {
 
         if (colors.length > k) {
             colors = kmeans(colors, k);
@@ -672,18 +691,18 @@ const color = {
             return this.format(c, format);
         });
     },
-    ImageToRGB : function (url, callbackOrOption = {}, callback) {
+    ImageToRGB(url, callbackOrOption = {}, callback) {
 
         if (!callback) {
-            var img = new ImageLoader(url); 
+            var img = new ImageLoader(url);
             img.loadImage(() => {
                 if (typeof callbackOrOption == 'function') {
                     callbackOrOption(img.toRGB());
                 }
-                
+
             })
         } else if (callback) {
-            var img = new ImageLoader(url, callbackOrOption); 
+            var img = new ImageLoader(url, callbackOrOption);
             img.loadImage(() => {
                 if (typeof callback == 'function') {
                     callback(img.toRGB());
@@ -692,6 +711,16 @@ const color = {
             })
         }
 
+    },
+
+    ImageToURL(url, filter, callback) {
+        var img = new ImageLoader(url);
+        img.loadImage(() => {
+            if (typeof callback == 'function') {
+                callback(img.toArray(filter));
+            }
+
+        })
     }
 }
 
@@ -710,15 +739,15 @@ color.scale.hsv = function (count) {
 color.scale.hot = function (count) {
     return color.scale(['#0b0000', '#ff0000', '#ffff00', '#ffffff'], count);
 }
-color.scale.pink = function (count) { 
-    return color.scale(['#1e0000', '#bd7b7b', '#e7e5b2', '#ffffff'], count); 
+color.scale.pink = function (count) {
+    return color.scale(['#1e0000', '#bd7b7b', '#e7e5b2', '#ffffff'], count);
 }
 
-color.scale.bone = function (count) { 
-    return color.scale(['#000000', '#4a4a68', '#a6c6c6', '#ffffff'], count); 
+color.scale.bone = function (count) {
+    return color.scale(['#000000', '#4a4a68', '#a6c6c6', '#ffffff'], count);
 }
 
-color.scale.copper = function (count) { 
+color.scale.copper = function (count) {
     return color.scale(['#000000', '#3d2618', '#9d623e', '#ffa167', '#ffc77f'], count);
 }
 

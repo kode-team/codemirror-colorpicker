@@ -5,28 +5,51 @@ test('Color parse for rgb', () => {
     const colorCode = 'rgba(255, 255, 0, 0.5)';
     const result = Color.parse(colorCode);
 
-    expect(result).toEqual({ type: 'rgb', r: 255, g: 255, b: 0, a: 0.5 });
+    var { type, r, g, b, a } = result;
+
+    const real = { type, r, g, b, a };
+
+
+    expect(real).toEqual({ type: 'rgb', r: 255, g: 255, b: 0, a: 0.5 });
 });
 
 test('Color parse for hex', () => {
     const colorCode = '#229933';
     const result = Color.parse(colorCode);
 
-    expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
+
+    var { type, r, g, b, a } = result;
+
+    const real = { type, r, g, b, a };
+
+
+    expect(real).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
 });
 
 test('Color parse for hex Number', () => {
     const colorCode = 0x229933;
     const result = Color.parse(colorCode);
 
-    expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
+
+    var { type, r, g, b, a } = result;
+
+    const real = { type, r, g, b, a };
+
+
+    expect(real).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
 });
 
 test('Color parse for hex Number 2', () => {
     const colorCode = 0x229933ff;
     const result = Color.parse(colorCode);
 
-    expect(result).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
+
+    var { type, r, g, b, a } = result;
+
+    const real = { type, r, g, b, a };
+
+
+    expect(real).toEqual({ type: 'hex', r: 0x22, g: 0x99, b: 0x33, a: 1 });
 });
 
 
@@ -35,9 +58,9 @@ test('Color parse for hsl', () => {
     const colorCode = 'hsl(0,0%,69%)';
     const result = Color.parse(colorCode);
 
-    const rgb = Color.HSLtoRGB(result.h,result.s,result.l);
+    const rgb = Color.HSLtoRGB(result.h, result.s, result.l);
 
-    expect(result).toEqual({ type: 'hsl', h: 0, s: 0, l: 69, a: 1, r : rgb.r, g : rgb.b, b: rgb.r });
+    expect(result).toEqual({ type: 'hsl', h: 0, s: 0, l: 69, a: 1, r: rgb.r, g: rgb.b, b: rgb.r });
 });
 
 test('Color matches', () => {
@@ -81,13 +104,13 @@ test("Convert RGB to HSV", () => {
 
     const hsv = Color.RGBtoHSV(rgb.r, rgb.g, rgb.b);
 
-    expect(hsv).toEqual({ h : 240, s : 1, v : 1 });
+    expect(hsv).toEqual({ h: 240, s: 1, v: 1 });
 })
 
 test("Convert HSV to RGB", () => {
     //color.HSVtoRGB(0,0,1) === #FFFFFFF === { r : 255, g : 255, b : 255 }
 
-    const rgb = Color.HSVtoRGB(0,0,1);
+    const rgb = Color.HSVtoRGB(0, 0, 1);
     const rgb2 = Color.parse("#FFFFFF");
 
     expect(Color.format(rgb, 'hex')).toBe(Color.format(rgb2, 'hex'));
@@ -104,13 +127,13 @@ test("Convert RGB to HSL", () => {
     const rgb = Color.parse("#ffffff");
     const hsl = Color.RGBtoHSL(rgb.r, rgb.g, rgb.b);
 
-    expect(hsl).toEqual({ h : 0, s : 0, l : 100 })
+    expect(hsl).toEqual({ h: 0, s: 0, l: 100 })
 
     //Lime	#00FF00	(0,255,0)	(120°,100%,50%)
     const rgb2 = Color.parse("#00ff00");
     const hsl2 = Color.RGBtoHSL(rgb2.r, rgb2.g, rgb2.b);
 
-    expect(hsl2).toEqual({ h : 120, s : 100, l : 50 })
+    expect(hsl2).toEqual({ h: 120, s: 100, l: 50 })
 
 })
 
@@ -120,29 +143,28 @@ test("Convert RGB to CMYK ", () => {
     const rgb = Color.parse("#ffff00");
     const cmyk = Color.RGBtoCMYK(rgb.r, rgb.g, rgb.b);
 
-    expect(cmyk).toEqual({ c : 0, m : 0, y : 1, k : 0 })
+    expect(cmyk).toEqual({ c: 0, m: 0, y: 1, k: 0 })
 
 })
 
 test("Convert CMYK to RGB", () => {
     //Blue	(1,1,0,0)	(0,0,255)	#0000FF    
-    const cmyk = { c : 1, m : 1, y : 0, k : 0}
+    const cmyk = { c: 1, m: 1, y: 0, k: 0 }
     const rgb = Color.CMYKtoRGB(cmyk.c, cmyk.m, cmyk.y, cmyk.k);
 
-    expect(rgb).toEqual({ r: 0, g : 0, b : 255 })
+    expect(rgb).toEqual({ r: 0, g: 0, b: 255 })
 })
 
 test(" Convert RGB to YCrCb", () => {
     const rgb = Color.parse("#ffffff");
-    const ycrcb = Color.RGBtoYCrCb(rgb.r, rgb.g, rgb.b);
-    const gray = Color.RGBtoGray(rgb.r, rgb.g, rgb.b);
+    const ycrcb = Color.RGBtoYCrCb(rgb);
+    const gray = Color.RGBtoGray(rgb);
 
-    expect(gray).toEqual({ r : 255, g : 255, b : 255})
+    expect(gray).toEqual({ r: 255, g: 255, b: 255 })
 
-    const rgb1 = Color.parse("#ffff00");
-    const gray1 = Color.RGBtoGray(rgb1.r, rgb1.g, rgb1.b);
+    const gray1 = Color.RGBtoGray(255, 255, 0);
 
-    expect(gray1).toEqual({ r : 237, g : 237, b : 237})
+    expect(gray1).toEqual({ r: 237, g: 237, b: 237 })
 })
 
 
@@ -150,5 +172,20 @@ test(" mix ", () => {
     const c = Color.mix("red", "blue");
 
     expect(c).toEqual('#800080');
+})
 
+test(" rgb to lab", () => {
+    const c = Color.RGBtoLAB(255, 255, 255);
+
+    expect(c).toEqual({ l: 100, a: 0.00526049995830391, b: -0.010408184525267927 });
+})
+
+test(" lab to rgb", () => {
+    const c = Color.LABtoRGB(100, 0, 0);
+
+    expect(c).toEqual({r : 255, g: 255, b : 255 });
+
+    const c2 = Color.LABtoRGB(50, 0, 0);
+    
+    expect(c2).toEqual({r : 119, g: 119, b : 119 });
 })
