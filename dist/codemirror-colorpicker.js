@@ -1437,8 +1437,26 @@ function gray (rgb) {
     return [r, g, b];
 }
 
+function redgreen (rgb) {
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { scale: 0 };
+
+
+    var lab = color.RGBtoLAB({ r: rgb[0], g: rgb[1], b: rgb[2] });
+
+    lab.a = opt.scale;
+    lab.b = 0;
+
+    var _Color$LABtoRGB = color.LABtoRGB(lab),
+        r = _Color$LABtoRGB.r,
+        g = _Color$LABtoRGB.g,
+        b = _Color$LABtoRGB.b;
+
+    return [r, g, b];
+}
+
 var Filter = {
-    gray: gray
+    gray: gray,
+    redgreen: redgreen
 };
 
 function ImageFilter(buffer) {
@@ -1463,6 +1481,14 @@ ImageFilter.gray = function () {
 
     return function (buffer) {
         return ImageFilter(buffer, { type: 'gray', scale: scale });
+    };
+};
+
+ImageFilter.redgreen = function () {
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
+
+    return function (buffer) {
+        return ImageFilter(buffer, { type: 'redgreen', scale: scale });
     };
 };
 

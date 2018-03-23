@@ -17,5 +17,11 @@ ImageFilter.gray = function (scale = 1.0) {
     }
 }
 
+ImageFilter.redgreen = function (scale = 1.0) {
+    return function (buffer) {
+        return ImageFilter(buffer, { type : 'redgreen', scale })
+    }
+}
+
 
 export default ImageFilter
