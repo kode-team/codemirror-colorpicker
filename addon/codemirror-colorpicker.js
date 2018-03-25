@@ -373,43 +373,7 @@ var possibleConstructorReturn = function (self, call) {
 
 
 
-var slicedToArray = function () {
-  function sliceIterator(arr, i) {
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
 
-    try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
-
-        if (i && _arr.length === i) break;
-      }
-    } catch (err) {
-      _d = true;
-      _e = err;
-    } finally {
-      try {
-        if (!_n && _i["return"]) _i["return"]();
-      } finally {
-        if (_d) throw _e;
-      }
-    }
-
-    return _arr;
-  }
-
-  return function (arr, i) {
-    if (Array.isArray(arr)) {
-      return arr;
-    } else if (Symbol.iterator in Object(arr)) {
-      return sliceIterator(arr, i);
-    } else {
-      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-    }
-  };
-}();
 
 
 
@@ -501,15 +465,23 @@ var ImageLoader = function () {
         }
     }, {
         key: 'toArray',
-        value: function toArray$$1(filter) {
-            var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        value: function toArray$$1(filters) {
+            var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var imagedata = this.context.getImageData(opt.sx || 0, opt.sy || 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+
+            filters = Array.isArray(filters) ? filters : [filters];
 
             var arr = new Uint8ClampedArray(imagedata.data);
-            imagedata.data.set(filter(arr));
 
-            this.context.putImageData(imagedata, 0, 0);
+            for (var i = 0, len = filters.length; i < len; i++) {
+                arr = filters[i](arr, imagedata.width, imagedata.height);
+            }
+            imagedata.data.set(arr);
 
-            return this.canvas.toDataURL('image/png');
+            this.context.putImageData(imagedata, opt.sx || 0, opt.sy || 0, 0, 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+
+            return this.canvas.toDataURL(opt.outputFormat || 'image/png');
         }
     }, {
         key: 'toRGB',
@@ -1341,10 +1313,12 @@ var color = {
         }
     },
     ImageToURL: function ImageToURL(url, filter, callback) {
+        var opt = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
         var img = new ImageLoader(url);
         img.loadImage(function () {
             if (typeof callback == 'function') {
-                callback(img.toArray(filter));
+                callback(img.toArray(filter, opt));
             }
         });
     }
@@ -1416,102 +1390,189 @@ var HueColor = {
     checkHueColor: checkHueColor
 };
 
-function gray (rgb) {
-    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { scale: 1 };
-
-
-    var lab = color.RGBtoLAB({ r: rgb[0], g: rgb[1], b: rgb[2] });
-
-    lab.l = lab.l * opt.scale;
-
-    lab.a = 0;
-    lab.b = 0;
-
-    var _Color$LABtoRGB = color.LABtoRGB(lab),
-        r = _Color$LABtoRGB.r,
-        g = _Color$LABtoRGB.g,
-        b = _Color$LABtoRGB.b;
-
-    return [r, g, b];
+function grayscale (buffer) {
+    var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var v = 0.2126 * buffer[i] + 0.7152 * buffer[i + 1] + 0.0722 * buffer[i + 2];
+    buffer[i] = buffer[i + 1] = buffer[i + 2] = Math.round(v);
 }
 
-function redgreen (rgb) {
-    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { scale: 0 };
+function convolution (src, sw, sh, weights) {
+  var opaque = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
+  var side = Math.round(Math.sqrt(weights.length));
+  var halfSide = Math.floor(side / 2);
 
-    var lab = color.RGBtoLAB({ r: rgb[0], g: rgb[1], b: rgb[2] });
+  var w = sw;
+  var h = sh;
+  var dst = new Uint8ClampedArray(src.length);
+  var alphaFac = opaque ? 1 : 0;
 
-    lab.a = opt.scale;
-    lab.b = 0;
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var sy = y;
+      var sx = x;
+      var dstIndex = (y * w + x) * 4;
 
-    var _Color$LABtoRGB = color.LABtoRGB(lab),
-        r = _Color$LABtoRGB.r,
-        g = _Color$LABtoRGB.g,
-        b = _Color$LABtoRGB.b;
+      var r = 0,
+          g = 0,
+          b = 0,
+          a = 0;
+      for (var cy = 0; cy < side; cy++) {
+        for (var cx = 0; cx < side; cx++) {
 
-    return [r, g, b];
+          var scy = sy + cy - halfSide;
+          var scx = sx + cx - halfSide;
+
+          if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
+            var srcIndex = (scy * sw + scx) * 4;
+            var wt = weights[cy * side + cx];
+            r += src[srcIndex] * wt;
+            g += src[srcIndex + 1] * wt;
+            b += src[srcIndex + 2] * wt;
+            a += src[srcIndex + 3] * wt; // weight 를 곱한 값을 계속 더한다. 
+          }
+        }
+      }
+
+      dst[dstIndex] = r;
+      dst[dstIndex + 1] = g;
+      dst[dstIndex + 2] = b;
+      dst[dstIndex + 3] = a + alphaFac * (255 - a);
+    }
+  }
+
+  return dst;
 }
 
-function light (rgb) {
-    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { scale: 1 };
+function invert (buffer) {
+  var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  buffer[i] = 255 - buffer[i];
+  buffer[i + 1] = 255 - buffer[i + 1];
+  buffer[i + 2] = 255 - buffer[i + 2];
+  buffer[i + 3] = 255;
+}
 
+function sepia (buffer) {
+    var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-    var lab = color.RGBtoLAB({ r: rgb[0], g: rgb[1], b: rgb[2] });
+    var r = buffer[i],
+        g = buffer[i + 1],
+        b = buffer[i + 2];
 
-    lab.l = lab.l * opt.scale;
+    buffer[i] = r * 0.3588 + g * 0.7044 + b * 0.1368;
+    buffer[i + 1] = r * 0.2990 + g * 0.5870 + b * 0.1140;
+    buffer[i + 2] = r * 0.2392 + g * 0.4696 + b * 0.0912;
+}
 
-    var _Color$LABtoRGB = color.LABtoRGB(lab),
-        r = _Color$LABtoRGB.r,
-        g = _Color$LABtoRGB.g,
-        b = _Color$LABtoRGB.b;
+function threshold (buffer) {
+    var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { scale: 1 };
 
-    return [r, g, b];
+    var v = 0.2126 * buffer[i] + 0.7152 * buffer[i + 1] + 0.0722 * buffer[i + 2] >= opt.scale ? 255 : 0;
+    buffer[i] = buffer[i + 1] = buffer[i + 2] = Math.round(v);
 }
 
 var Filter = {
-    gray: gray,
-    redgreen: redgreen,
-    light: light
+    grayscale: grayscale,
+    invert: invert,
+    sepia: sepia,
+    threshold: threshold,
+    convolution: convolution
 };
 
 function ImageFilter(buffer) {
     var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { type: 'gray' };
 
     var len = buffer.length;
+    var FilterFunction = Filter[opt.type];
     for (var i = 0; i < len; i += 4) {
-        var _Filter$opt$type$call = Filter[opt.type].call(Filter, [buffer[i], buffer[i + 1], buffer[i + 2]], opt);
-
-        var _Filter$opt$type$call2 = slicedToArray(_Filter$opt$type$call, 3);
-
-        buffer[i] = _Filter$opt$type$call2[0];
-        buffer[i + 1] = _Filter$opt$type$call2[1];
-        buffer[i + 2] = _Filter$opt$type$call2[2];
+        FilterFunction(buffer, i, opt);
     }
 
     return buffer;
 }
 
-ImageFilter.gray = function () {
-    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
-
+ImageFilter.grayscale = function () {
     return function (buffer) {
-        return ImageFilter(buffer, { type: 'gray', scale: scale });
+        return ImageFilter(buffer, { type: 'grayscale' });
     };
 };
 
-ImageFilter.light = function () {
+ImageFilter.invert = function () {
     var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
 
     return function (buffer) {
-        return ImageFilter(buffer, { type: 'light', scale: scale });
+        return ImageFilter(buffer, { type: 'invert', scale: scale });
     };
 };
 
-ImageFilter.redgreen = function () {
+ImageFilter.sepia = function () {
     var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
 
     return function (buffer) {
-        return ImageFilter(buffer, { type: 'redgreen', scale: scale });
+        return ImageFilter(buffer, { type: 'sepia', scale: scale });
+    };
+};
+
+ImageFilter.brightness = function () {
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
+
+    return function (buffer) {
+        return ImageFilter(buffer, { type: 'brightness', scale: scale });
+    };
+};
+
+ImageFilter.threshold = function () {
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
+
+    return function (buffer) {
+        return ImageFilter(buffer, { type: 'threshold', scale: scale });
+    };
+};
+
+ImageFilter.convolution = function (weights, opaque) {
+    return function (buffer, width, height) {
+        return Filter.convolution(buffer, width, height, weights, opaque);
+    };
+};
+
+ImageFilter.sharpen = function () {
+    return ImageFilter.convolution([0, -1, 0, -1, 5, -1, 0, -1, 0]);
+};
+
+ImageFilter.blur = function () {
+    return ImageFilter.convolution([1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9]);
+};
+
+// sobel filter
+ImageFilter.sobel = function (vWeight, hWeight) {
+    return function (buffer, width, height) {
+        var grayscale = ImageFilter.grayscale()(buffer);
+
+        var vertical = Filter.convolution(grayscale, width, height, vWeight || [-1, 0, 1, -2, 0, 2, -1, 0, 1]);
+        var horizontal = Filter.convolution(grayscale, width, height, hWeight || [-1, -2, -1, 0, 0, 0, 1, 2, 1]);
+
+        var result = new Uint8ClampedArray(grayscale.length);
+
+        for (var i = 0, len = result.length; i < len; i += 4) {
+            var v = Math.abs(vertical[i]);
+            var h = Math.abs(horizontal[i]);
+
+            var graycolor = Math.sqrt(v * v + h * h) >>> 0;
+
+            //result[i] = v;
+            result[i] = graycolor;
+            // make the horizontal gradient green
+
+            //result[i+1] = h;
+            result[i + 1] = graycolor;
+            // and mix in some blue for aesthetics
+            //result[i+2] = (v+h)/4;
+            result[i + 2] = graycolor;
+            result[i + 3] = 255; // opaque alpha
+        }
+
+        return result;
     };
 };
 

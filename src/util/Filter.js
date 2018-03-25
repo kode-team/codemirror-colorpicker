@@ -1,12 +1,16 @@
 import Color from './Color'
-import  gray from './filter/gray'
-import  redgreen from './filter/redgreen'
-import  light from './filter/light'
+import  grayscale from './filter/grayscale'
+import convolution from './filter/convolution'
+import invert from './filter/invert'
+import sepia from './filter/sepia'
+import threshold from './filter/threshold'
 
 const Filter = {
-    gray ,
-    redgreen ,
-    light
+    grayscale ,
+    invert,
+    sepia,
+    threshold,
+    convolution
 }
 
 export default Filter; 

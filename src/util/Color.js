@@ -713,11 +713,11 @@ const color = {
 
     },
 
-    ImageToURL(url, filter, callback) {
+    ImageToURL(url, filter, callback, opt = {}) {
         var img = new ImageLoader(url);
         img.loadImage(() => {
             if (typeof callback == 'function') {
-                callback(img.toArray(filter));
+                callback(img.toArray(filter, opt));
             }
 
         })

@@ -61,15 +61,21 @@ class ImageLoader {
         return [r, g, b, a];
     }
 
-    toArray(filter) {
-        var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    toArray(filters, opt = {}) {
+        var imagedata = this.context.getImageData(opt.sx || 0, opt.sy || 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+
+        filters = (Array.isArray(filters)) ? filters : [filters];
 
         var arr = new Uint8ClampedArray(imagedata.data);
-        imagedata.data.set(filter(arr));
 
-        this.context.putImageData(imagedata, 0, 0);
+        for(var i = 0, len = filters.length; i < len; i++) {
+            arr = filters[i](arr, imagedata.width, imagedata.height)
+        }
+        imagedata.data.set(arr);
 
-        return this.canvas.toDataURL('image/png');
+        this.context.putImageData(imagedata, opt.sx || 0, opt.sy || 0, 0, 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+
+        return this.canvas.toDataURL(opt.outputFormat || 'image/png');
     } 
 
     toRGB () {
