@@ -1,6 +1,6 @@
 import Color from '../Color'
 
-export default function (buffer, i = 0) { 
+export default function (buffer, i = 0, opt = {scale : 1}) { 
     var r = buffer[i], g = buffer[i+1], b = buffer[i+2];
 
     buffer[i] = r * 0.3588 + g * 0.7044 + b * 0.1368;

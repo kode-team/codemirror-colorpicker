@@ -129,13 +129,13 @@
     }
 
     section.colorpalette-area > div:not(.circle) {
-        max-width: 820px;
+        max-width: 920px;
         margin: 0 auto;
         padding-bottom: 100px;
     }
 
     section.colorpalette-area .area-item {
-        width: 400px;
+        width: 300px;
         box-sizing: border-box;
         border:0px;
         margin:0px;
@@ -364,6 +364,10 @@
         color: rgba(252, 201, 34, 0.767);
     }
 
+    .image-select-input > div {
+        padding-bottom: 2px;
+    }
+
     </style>
 </head>
 <body>
@@ -586,8 +590,6 @@ var colorpicker = new ColorPicker({
 
 
 <section class="colorpalette-area">
-<div class="circle white"></div>
-<div class="circle yellow"></div>
 <h1> Image Filter </h1>    
 <div>
     <div class="area-item">
@@ -595,25 +597,66 @@ var colorpicker = new ColorPicker({
                 <input type="file" id="imageforfilter"  />
                 <div>
                     <button type="button" onclick="filter_light()">light</button>
-                    <input type="range" min="0.7" max="1.3" step="0.01" value="1" id="light-value" />
+                    <input type="number" min="0.7" max="1.3" step="0.01" value="1" id="light-value" />
                 </div>                
                 <div>
-                    <button type="button" onclick="filter_gray()">Gray</button>
-                    <input type="range" min="0" max="2" step="0.1" value="1" id="scale-value" />
+                    <button type="button" onclick="filter_image(['grayscale', +document.getElementById('scale-value').value])">Gray</button>
+                    <input type="number" min="0" max="2" step="0.1" value="1" id="scale-value" />
                 </div>
                 <div>
-                    <button type="button" onclick="filter_redgreen()">Red Green</button>
-                    Green <input type="range" min="-127" max="127" step="1" value="0" id="redgreen-value" /> Red
-                </div>        
+                    <button type="button" onclick="filter_image('invert')">invert</button>
+                </div>   
                 <div>
-                    <button type="button" onclick="filter_sobel()">Sobel</button>
-                </div>                                
+                    <button type="button" onclick="filter_image('sharpen')">sharpen</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
+                    <input type="number" min="1" max="100" step="1" value="9" id="blur-value" />
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
+                </div>                   
+                <div>
+                    <button type="button" onclick="filter_image('brightness')">brightness</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image('sepia')">sepia</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['threshold', +document.getElementById('threshold_value').value])">threshold</button>
+                    <input type="number" id="threshold_value" value="100" min="0" max="255" step="1" />
+                </div>                                                                  
+                <div>
+                    <button type="button" onclick="filter_image('sharpen', 'blur', 'sobel')">sobel</button>
+                </div>                                                                                                            
+                <div>
+                    <table class="weights" border="0">
+                        <tr>
+                            <td><input type="number" min="-100" max="100" step="1" value="0" /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
+                        </tr>
+                        <tr>
+                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="5"  /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
+                        </tr>
+                        <tr>
+                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
+                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
+                        </tr>                                                    
+                    </table>
+                    <button type="button" onclick="filter_custom()">custom</button>
+                </div>                                                
             </div>            
-            <div>
-                    <img id="sampled-image">
-            </div>
         
     </div>
+    <div class="area-item">
+        <div class="image-palette">
+            <img id="sampled-image">
+        </div>
+    </div>        
     <div class="area-item">
         <div class="image-palette">
             <img id="filtered-image" />
@@ -768,6 +811,17 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
     }
 
 
+    function filter_image () {
+        var args = Array.prototype.slice.call(arguments);
+        var file = document.getElementById('imageforfilter').files[0];
+        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        Color.ImageToURL(file, ImageFilter.merge(args), function (url) {
+            document.getElementById('filtered-image').src = url;
+        })
+    }       
+
     function filter_sobel () {
         var file = document.getElementById('imageforfilter').files[0];
         var ImageFilter = CodeMirrorColorPicker.ImageFilter;
@@ -776,7 +830,23 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         Color.ImageToURL(file, [ImageFilter.sharpen(), ImageFilter.blur(), ImageFilter.sobel()], function (url) {
             document.getElementById('filtered-image').src = url;
         })
-    }        
+    }       
+    
+    function filter_custom () {
+        var file = document.getElementById('imageforfilter').files[0];
+        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        var items = document.querySelectorAll(".weights input[type=number]");
+        var weights = [];
+        [].forEach.call(items, function (it) {
+            weights.push(+it.value);
+        })
+        
+        Color.ImageToURL(file, ImageFilter.convolution(weights), function (url) {
+            document.getElementById('filtered-image').src = url;
+        })
+    }           
 
     function shuffle(a) {
         var j, x, i;

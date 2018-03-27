@@ -389,6 +389,16 @@ var toArray = function (arr) {
   return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
 var ImageLoader = function () {
     function ImageLoader(url) {
         var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -1454,7 +1464,6 @@ function invert (buffer) {
 
 function sepia (buffer) {
     var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
     var r = buffer[i],
         g = buffer[i + 1],
         b = buffer[i + 2];
@@ -1466,10 +1475,19 @@ function sepia (buffer) {
 
 function threshold (buffer) {
     var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { scale: 1 };
+    var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { scale: 100 };
 
     var v = 0.2126 * buffer[i] + 0.7152 * buffer[i + 1] + 0.0722 * buffer[i + 2] >= opt.scale ? 255 : 0;
     buffer[i] = buffer[i + 1] = buffer[i + 2] = Math.round(v);
+}
+
+function brightness (buffer) {
+  var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { scale: 3 };
+
+  buffer[i] += opt.scale / 3;
+  buffer[i + 1] += opt.scale / 3;
+  buffer[i + 2] += opt.scale / 3;
 }
 
 var Filter = {
@@ -1477,11 +1495,45 @@ var Filter = {
     invert: invert,
     sepia: sepia,
     threshold: threshold,
-    convolution: convolution
+    convolution: convolution,
+    brightness: brightness
 };
 
+// TODO: worker run 
+
+function weight(arr) {
+    var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+    return arr.map(function (i) {
+        return i * num;
+    });
+}
+
+function makeFilter(filter) {
+
+    if (typeof filter == 'function') {
+        return filter;
+    }
+
+    if (typeof filter == 'string') {
+        filter = [filter];
+    }
+
+    var filterName = filter.shift();
+
+    if (typeof filterName == 'function') {
+        return filterName;
+    }
+
+    var params = filter;
+
+    var filterFunction = ImageFilter[filterName];
+
+    return filterFunction.apply(filterFunction, params);
+}
+
 function ImageFilter(buffer) {
-    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { type: 'gray' };
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { type: 'grayscale' };
 
     var len = buffer.length;
     var FilterFunction = Filter[opt.type];
@@ -1523,7 +1575,7 @@ ImageFilter.brightness = function () {
 };
 
 ImageFilter.threshold = function () {
-    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1.0;
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
     return function (buffer) {
         return ImageFilter(buffer, { type: 'threshold', scale: scale });
@@ -1536,43 +1588,138 @@ ImageFilter.convolution = function (weights, opaque) {
     };
 };
 
+ImageFilter.identity = function () {
+    return ImageFilter.convolution([0, 0, 0, 0, 1, 0, 0, 0, 0]);
+};
+
 ImageFilter.sharpen = function () {
-    return ImageFilter.convolution([0, -1, 0, -1, 5, -1, 0, -1, 0]);
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var filter = ImageFilter.convolution([0, -1, 0, -1, 5, -1, 0, -1, 0]);
+
+    return ImageFilter.filterCount(filter, count);
+};
+
+ImageFilter['motion-blur'] = ImageFilter.motionBlur = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var filter = ImageFilter.convolution(weight([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 1 / 9));
+
+    return ImageFilter.filterCount(filter, count);
 };
 
 ImageFilter.blur = function () {
-    return ImageFilter.convolution([1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9]);
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var filter = ImageFilter.convolution(weight([1, 1, 1, 1, 1, 1, 1, 1, 1], 1 / 9));
+
+    return ImageFilter.filterCount(filter, count);
+};
+
+ImageFilter['gaussian-blur'] = ImageFilter.gaussianBlur = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var filter = ImageFilter.convolution(weight([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16));
+
+    return ImageFilter.filterCount(filter, count);
+};
+
+ImageFilter['gaussian-blur-5x'] = ImageFilter.gaussianBlur5x = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var filter = ImageFilter.convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], 1 / 256));
+
+    return ImageFilter.filterCount(filter, count);
+};
+
+ImageFilter['unsharp-masking'] = ImageFilter.unsharpMasking = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    var num = -1 / 256;
+    var filter = ImageFilter.convolution([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1].map(function (i) {
+        return i * num;
+    }));
+
+    return ImageFilter.filterCount(filter, count);
+};
+
+ImageFilter.filterCount = function (filter) {
+    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+    var filters = [];
+
+    for (var i = 0; i < count; i++) {
+        filters.push(filter);
+    }
+
+    return ImageFilter.multi(filters);
 };
 
 // sobel filter
+
 ImageFilter.sobel = function (vWeight, hWeight) {
+    var grayscale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
     return function (buffer, width, height) {
-        var grayscale = ImageFilter.grayscale()(buffer);
+        buffer = grayscale ? ImageFilter.grayscale()(buffer) : buffer;
 
-        var vertical = Filter.convolution(grayscale, width, height, vWeight || [-1, 0, 1, -2, 0, 2, -1, 0, 1]);
-        var horizontal = Filter.convolution(grayscale, width, height, hWeight || [-1, -2, -1, 0, 0, 0, 1, 2, 1]);
+        var vertical = Filter.convolution(buffer, width, height, vWeight || [-1, 0, 1, -2, 0, 2, -1, 0, 1]);
+        var horizontal = Filter.convolution(buffer, width, height, hWeight || [-1, -2, -1, 0, 0, 0, 1, 2, 1]);
 
-        var result = new Uint8ClampedArray(grayscale.length);
+        var result = new Uint8ClampedArray(buffer.length);
 
         for (var i = 0, len = result.length; i < len; i += 4) {
             var v = Math.abs(vertical[i]);
             var h = Math.abs(horizontal[i]);
 
-            var graycolor = Math.sqrt(v * v + h * h) >>> 0;
+            if (grayscale) {
+                var graycolor = Math.floor(Math.sqrt(v * v + h * h));
 
-            //result[i] = v;
-            result[i] = graycolor;
-            // make the horizontal gradient green
+                result[i] = result[i + 1] = result[i + 2] = graycolor;
+            } else {
+                result[i] = v;
+                result[i + 1] = h;
+                result[i + 2] = (v + h) / 4;
+            }
 
-            //result[i+1] = h;
-            result[i + 1] = graycolor;
-            // and mix in some blue for aesthetics
-            //result[i+2] = (v+h)/4;
-            result[i + 2] = graycolor;
             result[i + 3] = 255; // opaque alpha
         }
 
         return result;
+    };
+};
+
+ImageFilter['sobel-grayscale'] = ImageFilter.sobel.grayscale = function (vWeight, hWeight) {
+    return ImageFilter.sobel(vWeight, hWeight, true);
+};
+
+ImageFilter.merge = function (filters) {
+    return ImageFilter.multi.apply(ImageFilter, toConsumableArray(filters));
+};
+
+/** 
+ * 
+ * multiply filter  
+ * filter x filter x filter x ...... 
+ * 
+ * ImageFilter.multi(filterFunction,filterFunction,filterFunction,filterFunction,filterFunction,...
+ * ])
+ * 
+ * ImageFilter.multi('blur', 'grayscale', 'sharpen', ['blur', 3]);
+ * 
+ */
+ImageFilter.multi = function () {
+    for (var _len = arguments.length, filters = Array(_len), _key = 0; _key < _len; _key++) {
+        filters[_key] = arguments[_key];
+    }
+
+    return function (buffer, width, height) {
+
+        filters.forEach(function (filter) {
+            buffer = makeFilter(filter)(buffer, width, height);
+        });
+
+        return buffer;
     };
 };
 
