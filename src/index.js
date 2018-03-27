@@ -4,7 +4,6 @@ import CodeMirror from 'codemirror'
 import Color from './util/Color'
 import HueColor from './util/HueColor'
 import ColorNames from './util/ColorNames'
-import Filter from './util/Filter'
 import ImageFilter from './util/ImageFilter'
 import ColorView from './colorview/index'
 import ColorPicker from './colorpicker/index'
@@ -33,7 +32,6 @@ if (CodeMirror) {
 
 export default {
     Color,
-    Filter,
     ImageFilter,
     ColorNames,
     HueColor,
