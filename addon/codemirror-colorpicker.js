@@ -1820,6 +1820,13 @@ ImageFilter.sobel.grayscale = function () {
     return ImageFilter.multi('grayscale', 'sobel');
 };
 
+// intensity  =  0.0 ~ 4.0 
+ImageFilter.emboss = function () {
+    var intensity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 2;
+
+    return ImageFilter.convolution([intensity * -2.0, -intensity, 0.0, -intensity, 1.0, intensity, 0.0, intensity, intensity * 2.0]);
+};
+
 var counter = 0;
 var cached = [];
 

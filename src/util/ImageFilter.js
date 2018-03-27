@@ -482,5 +482,14 @@ ImageFilter.sobel.grayscale = function () {
     return ImageFilter.multi('grayscale', 'sobel');
 }
 
+// intensity  =  0.0 ~ 4.0 
+ImageFilter.emboss = function (intensity = 2) { 
+    return ImageFilter.convolution([
+        intensity * (-2.0), -intensity, 0.0,
+        -intensity, 1.0, intensity,
+        0.0, intensity, intensity * 2.0,
+    ]);
+}
+
 
 export default ImageFilter
