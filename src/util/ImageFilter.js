@@ -592,11 +592,13 @@ function pow2(num) {
 
 function gaussian (x, y, delta = 1.5) {
     const D = pow2(delta);
+    const X = pow2(x);
+    const Y = pow2(y);
     return (
         1 / (2 * Math.PI * D) 
         *  
         Math.exp(
-            -( pow2(x) + pow2(y) ) / (2 * D)
+            -( X  + Y ) / (2 * D)
         )
     )
 }
