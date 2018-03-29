@@ -61,28 +61,41 @@ class ImageLoader {
         return [r, g, b, a];
     }
 
-    toArray(filters, opt = {}) {
-        var imagedata = this.context.getImageData(opt.sx || 0, opt.sy || 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+    newDrawImage ({ pixels, width, height }) {
+        var tmpCanvas = this.createCanvas();
+        tmpCanvas.width = width; 
+        tmpCanvas.height = height; 
 
-        filters = (Array.isArray(filters)) ? filters : [filters];
+        var tmpContext = tmpCanvas.getContext('2d');
+        var tmpImageData = tmpContext.getImageData(0, 0, width, height);
 
-        var arr = new Uint8ClampedArray(imagedata.data);
+        tmpImageData.data.set(pixels);
 
-        for(var i = 0, len = filters.length; i < len; i++) {
-            arr = filters[i](arr, imagedata.width, imagedata.height)
-        }
-        imagedata.data.set(arr);
+        tmpContext.putImageData(tmpImageData, 0, 0);
 
-        this.context.putImageData(imagedata, opt.sx || 0, opt.sy || 0, 0, 0, opt.width || this.canvas.width, opt.height || this.canvas.height);
+        return tmpCanvas;
+    }
 
-        return this.canvas.toDataURL(opt.outputFormat || 'image/png');
+    toArray(filter, opt = {}) {
+        var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        var width = imagedata.width;
+        var height = imagedata.height; 
+
+        var pixels = new Uint8ClampedArray(imagedata.data);
+
+        let bitmap = {  pixels, width, height }
+        if (filter) {  bitmap = filter(bitmap) }
+
+        var tmpCanvas = this.newDrawImage(bitmap);
+        
+
+        return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');
     } 
 
     toRGB () {
         var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 
-        var filter = this.getRGBA;
-        var rgba = this.toArray() ;
+        var rgba = imagedata.data;
         var results = [];
         for (var i = 0, len = rgba.length; i < len; i += 4){
             results[results.length] = [rgba[i + 0],rgba[i + 1],rgba[i + 2],rgba[i + 3]];
@@ -90,6 +103,7 @@ class ImageLoader {
 
         return results; 
     }
+
 
 }
 
