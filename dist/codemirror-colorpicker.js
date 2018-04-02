@@ -1631,10 +1631,12 @@ F.crop = function () {
         var targetWidth = dw || srcWidth;
         var targetHeight = dh || srcHeight;
 
+        var nextBuffer = context.getImageData(dx, dy, targetWidth, targetHeight);
+
         return {
-            pixels: context.getImageData(dx, dy, targetWidth, targetHeight).data,
-            width: targetWidth,
-            height: targetHeight
+            pixels: nextBuffer.data,
+            width: nextBuffer.width,
+            height: nextBuffer.height
         };
     };
 };

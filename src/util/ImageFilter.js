@@ -205,10 +205,12 @@ F.crop = function (dx = 0, dy = 0, dw, dh) {
         const targetHeight = dh || srcHeight;
 
 
+        let nextBuffer = context.getImageData(dx, dy, targetWidth, targetHeight);
+
         return {
-            pixels: context.getImageData(dx, dy, targetWidth, targetHeight).data,
-            width: targetWidth,
-            height: targetHeight
+            pixels: nextBuffer.data,
+            width: nextBuffer.width,
+            height: nextBuffer.height
         }
     }
 }
