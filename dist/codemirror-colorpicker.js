@@ -1566,14 +1566,12 @@ F.partial = function (area) {
         filters[_key2 - 1] = arguments[_key2];
     }
 
-    console.log(area, filters);
     return function (bitmap) {
-        console.log(bitmap);
         return putBitmap(bitmap, F.multi.apply(F, filters)(getBitmap(bitmap, area)), area);
     };
 };
 
-F.filterCount = function (filter) {
+F.counter = function (filter) {
     var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
     var filters = [];

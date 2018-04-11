@@ -145,15 +145,13 @@ F.merge = function (filters) {
 }
 
 F.partial = function (area, ...filters) {
-    console.log(area, filters);
     return (bitmap) => {
-        console.log(bitmap);
         return putBitmap(bitmap, F.multi(...filters)(getBitmap(bitmap, area)), area);
     }
 }
 
 
-F.filterCount = function (filter, count = 1) {
+F.counter = function (filter, count = 1) {
     var filters = [];
 
     for (var i = 0; i < count; i++) {
