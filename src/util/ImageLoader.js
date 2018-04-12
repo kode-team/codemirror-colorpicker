@@ -1,3 +1,5 @@
+import Canvas from './Canvas'
+
 class ImageLoader {
     constructor(url, opt = {}) {
         this.isLoaded = false; 
@@ -61,21 +63,6 @@ class ImageLoader {
         return [r, g, b, a];
     }
 
-    newDrawImage ({ pixels, width, height }) {
-        var tmpCanvas = this.createCanvas();
-        tmpCanvas.width = width; 
-        tmpCanvas.height = height; 
-
-        var tmpContext = tmpCanvas.getContext('2d');
-        var tmpImageData = tmpContext.getImageData(0, 0, width, height);
-
-        tmpImageData.data.set(pixels);
-
-        tmpContext.putImageData(tmpImageData, 0, 0);
-
-        return tmpCanvas;
-    }
-
     toArray(filter, opt = {}) {
         var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
         var width = imagedata.width;
@@ -86,7 +73,7 @@ class ImageLoader {
         let bitmap = {  pixels, width, height }
         if (filter) {  bitmap = filter(bitmap) }
 
-        var tmpCanvas = this.newDrawImage(bitmap);
+        var tmpCanvas = Canvas.drawPixels(bitmap);
         
 
         return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');

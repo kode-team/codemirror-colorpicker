@@ -253,6 +253,48 @@ function kmeans(points, k, distanceFunction) {
     return centeroids;
 }
 
+var Canvas = {
+    create: function create(width, height) {
+        var canvas = document.createElement('canvas');
+        canvas.width = width || 0;
+        canvas.height = height || 0;
+
+        return canvas;
+    },
+    drawPixels: function drawPixels(bitmap) {
+        var canvas = this.create(bitmap.width, bitmap.height);
+
+        var context = canvas.getContext('2d');
+        var imagedata = context.getImageData(0, 0, canvas.width, canvas.height);
+
+        imagedata.data.set(bitmap.pixels);
+
+        context.putImageData(imagedata, 0, 0);
+
+        return canvas;
+    },
+    getBitmap: function getBitmap(bitmap, area) {
+        var canvas = this.drawPixels(bitmap);
+
+        var context = canvas.getContext('2d');
+        var pixels = context.getImageData(area.x || 0, area.y || 0, area.width || canvas.width, area.height || canvas.height).data;
+
+        return { pixels: pixels, width: area.width, height: area.height };
+    },
+    putBitmap: function putBitmap(bitmap, subBitmap, area) {
+
+        var canvas = this.drawPixels(bitmap);
+        var subCanvas = this.drawPixels(subBitmap);
+
+        var context = canvas.getContext('2d');
+        context.drawImage(subCanvas, area.x, area.y);
+
+        bitmap.pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+
+        return bitmap;
+    }
+};
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -476,26 +518,6 @@ var ImageLoader = function () {
             return [r, g, b, a];
         }
     }, {
-        key: 'newDrawImage',
-        value: function newDrawImage(_ref) {
-            var pixels = _ref.pixels,
-                width = _ref.width,
-                height = _ref.height;
-
-            var tmpCanvas = this.createCanvas();
-            tmpCanvas.width = width;
-            tmpCanvas.height = height;
-
-            var tmpContext = tmpCanvas.getContext('2d');
-            var tmpImageData = tmpContext.getImageData(0, 0, width, height);
-
-            tmpImageData.data.set(pixels);
-
-            tmpContext.putImageData(tmpImageData, 0, 0);
-
-            return tmpCanvas;
-        }
-    }, {
         key: 'toArray',
         value: function toArray$$1(filter) {
             var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -511,7 +533,7 @@ var ImageLoader = function () {
                 bitmap = filter(bitmap);
             }
 
-            var tmpCanvas = this.newDrawImage(bitmap);
+            var tmpCanvas = Canvas.drawPixels(bitmap);
 
             return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');
         }
@@ -1496,41 +1518,12 @@ function createRandomCount() {
     })[0];
 }
 
-function drawPixels(bitmap) {
-    var canvas = document.createElement('canvas');
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-
-    var context = canvas.getContext('2d');
-    var imagedata = context.getImageData(0, 0, canvas.width, canvas.height);
-
-    imagedata.data.set(bitmap.pixels);
-
-    context.putImageData(imagedata, 0, 0);
-
-    return canvas;
-}
-
 function getBitmap(bitmap, area) {
-    var canvas = drawPixels(bitmap);
-
-    var context = canvas.getContext('2d');
-    var pixels = context.getImageData(area.x || 0, area.y || 0, area.width || canvas.width, area.height || canvas.height).data;
-
-    return { pixels: pixels, width: area.width, height: area.height };
+    return Canvas.getBitmap(bitmap, area);
 }
 
 function putBitmap(bitmap, subBitmap, area) {
-
-    var canvas = drawPixels(bitmap);
-    var subCanvas = drawPixels(subBitmap);
-
-    var context = canvas.getContext('2d');
-    context.drawImage(subCanvas, area.x, area.y);
-
-    bitmap.pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
-
-    return bitmap;
+    return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
 var F = {};
@@ -1585,17 +1578,10 @@ F.counter = function (filter) {
 
 // Image manupulate 
 F.resize = function (dstWidth, dstHeight) {
-    return function (pixels, srcWidth, srcHeight) {
-        var c = document.createElement('canvas');
+    return function (bitmap) {
+
+        var c = Canvas.drawPixels(bitmap);
         var context = c.getContext('2d');
-
-        c.width = srcWidth;
-        c.height = srcHeight;
-
-        var imagedata = context.getImageData(0, 0, srcWidth, srcHeight);
-        imagedata.data.set(pixels);
-
-        context.putImageData(imagedata, 0, 0);
 
         c.width = dstWidth;
         c.height = dstHeight;
@@ -1614,28 +1600,17 @@ F.crop = function () {
     var dw = arguments[2];
     var dh = arguments[3];
 
-    return function (pixels, srcWidth, srcHeight) {
-        var c = document.createElement('canvas');
+    return function (bitmap) {
+
+        var c = Canvas.drawPixels(bitmap);
         var context = c.getContext('2d');
-
-        c.width = srcWidth;
-        c.height = srcHeight;
-
-        var imagedata = context.getImageData(0, 0, srcWidth, srcHeight);
-        imagedata.data.set(pixels);
-
-        context.putImageData(imagedata, 0, 0);
 
         var targetWidth = dw || srcWidth;
         var targetHeight = dh || srcHeight;
 
         var nextBuffer = context.getImageData(dx, dy, targetWidth, targetHeight);
 
-        return {
-            pixels: nextBuffer.data,
-            width: nextBuffer.width,
-            height: nextBuffer.height
-        };
+        return nextBuffer;
     };
 };
 
