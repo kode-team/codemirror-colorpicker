@@ -1,6 +1,6 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "description": "colorpicker for codemirror",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
@@ -17,7 +17,10 @@
   "keywords": [
     "codemirror",
     "colorview",
-    "colorpicker"
+    "colorpicker",
+    "imagefilter",
+    "color",
+    "rgb"
   ],
   "author": "easylogic",
   "license": "MIT",
