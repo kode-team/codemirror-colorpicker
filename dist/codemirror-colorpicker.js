@@ -4183,9 +4183,9 @@ var ColorPicker = function (_EventMachin) {
                 v = 0;
             }
 
-            this.state.set('currentH', h);
-            this.state.set('currentS', s);
-            this.state.set('currentV', v);
+            this.currentH = h;
+            this.currentS = s;
+            this.currentV = v;
         }
     }, {
         key: 'setColorUI',
