@@ -146,19 +146,18 @@ export default class ColorPicker extends EventMachin {
         var height = this.$root.height();
 
         // set left position for color picker
-        var elementScreenLeft = opt.left - this.$body.el.scrollLeft;
+        var elementScreenLeft = opt.left - this.$body.scrollLeft();
         if (width + elementScreenLeft > window.innerWidth) {
             elementScreenLeft -= (width + elementScreenLeft) - window.innerWidth;
         }
         if (elementScreenLeft < 0) { elementScreenLeft = 0; }
 
         // set top position for color picker
-        var elementScreenTop = opt.top - this.$body.el.scrollTop;
+        var elementScreenTop = opt.top - this.$body.scrollTop();
         if (height + elementScreenTop > window.innerHeight) {
             elementScreenTop -= (height + elementScreenTop) - window.innerHeight;
         }
         if (elementScreenTop < 0) { elementScreenTop = 0; }
-
 
         // set position
         this.$root.css({

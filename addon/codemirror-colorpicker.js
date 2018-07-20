@@ -2215,8 +2215,8 @@ var Dom = function () {
         value: function offset() {
             var rect = this.el.getBoundingClientRect();
             return {
-                top: rect.top + document.body.scrollTop,
-                left: rect.left + document.body.scrollLeft
+                top: rect.top + document.documentElement.scrollTop,
+                left: rect.left + document.documentElement.scrollLeft
             };
         }
     }, {
@@ -2320,6 +2320,24 @@ var Dom = function () {
             } else {
                 return this.hide();
             }
+        }
+    }, {
+        key: 'scrollTop',
+        value: function scrollTop() {
+            if (this.el === document.body) {
+                return document.documentElement.scrollTop;
+            }
+
+            return this.el.scrollTop;
+        }
+    }, {
+        key: 'scrollLeft',
+        value: function scrollLeft() {
+            if (this.el === document.body) {
+                return document.documentElement.scrollLeft;
+            }
+
+            return this.el.scrollLeft;
         }
     }, {
         key: 'on',
@@ -3996,7 +4014,7 @@ var ColorPicker = function (_EventMachin) {
             var height = this.$root.height();
 
             // set left position for color picker
-            var elementScreenLeft = opt.left - this.$body.el.scrollLeft;
+            var elementScreenLeft = opt.left - this.$body.scrollLeft();
             if (width + elementScreenLeft > window.innerWidth) {
                 elementScreenLeft -= width + elementScreenLeft - window.innerWidth;
             }
@@ -4005,7 +4023,7 @@ var ColorPicker = function (_EventMachin) {
             }
 
             // set top position for color picker
-            var elementScreenTop = opt.top - this.$body.el.scrollTop;
+            var elementScreenTop = opt.top - this.$body.scrollTop();
             if (height + elementScreenTop > window.innerHeight) {
                 elementScreenTop -= height + elementScreenTop - window.innerHeight;
             }

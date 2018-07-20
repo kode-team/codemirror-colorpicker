@@ -576,12 +576,13 @@
     .codemirror-colorpicker.sketch > .information .information-item.hsl {
       display: none !important; }
     .codemirror-colorpicker.sketch > .information .information-item.hex {
-      width: 80px;
+      width: 70px;
       padding-right: 0px;
       padding-left: 5px; }
     .codemirror-colorpicker.sketch > .information .information-item.rgb {
-      width: 140px;
-      padding-left: 0px; }
+      width: 144px;
+      padding-left: 0px;
+      padding-right: 0px; }
     .codemirror-colorpicker.sketch > .colorsets > .menu {
       display: none; }
     .codemirror-colorpicker.sketch > .colorsets > .color-list {

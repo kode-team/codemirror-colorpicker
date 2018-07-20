@@ -166,8 +166,8 @@ export default class Dom {
     offset () {
         var rect = this.el.getBoundingClientRect();
         return {
-            top: rect.top + document.body.scrollTop,
-            left: rect.left + document.body.scrollLeft
+            top: rect.top + document.documentElement.scrollTop,
+            left: rect.left + document.documentElement.scrollLeft
         };
     }
     
@@ -260,6 +260,22 @@ export default class Dom {
         } else {
             return this.hide();
         }
+    }
+
+    scrollTop () {
+        if (this.el === document.body) {
+            return document.documentElement.scrollTop
+        }
+
+        return this.el.scrollTop
+    } 
+
+    scrollLeft () {
+        if (this.el === document.body) {
+            return document.documentElement.scrollLeft
+        }
+
+        return this.el.scrollLeft
     }
 
     on (eventName, callback, opt1, opt2) {
