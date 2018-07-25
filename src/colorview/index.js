@@ -278,7 +278,7 @@ export default class ColorView {
 
     
     match_result(lineHandle) {
-        return Color.matches(lineHandle.text, true /* has color names */);
+        return Color.matches(lineHandle.text);
     }
 
     submatch(lineNo, lineHandle) {

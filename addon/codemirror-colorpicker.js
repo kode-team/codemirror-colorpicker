@@ -557,8 +557,6 @@ var color_split = ',';
 var color = {
 
     matches: function matches(str) {
-        var hasColorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
         var matches = str.match(color_regexp);
         var result = [];
 
@@ -571,13 +569,10 @@ var color = {
             if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
                 result.push({ color: matches[i] });
             } else {
+                var nameColor = ColorNames.getColorByName(matches[i]);
 
-                if (hasColorName) {
-                    var nameColor = ColorNames.getColorByName(matches[i]);
-
-                    if (nameColor) {
-                        result.push({ color: matches[i], nameColor: nameColor });
-                    }
+                if (nameColor) {
+                    result.push({ color: matches[i], nameColor: nameColor });
                 }
             }
         }
@@ -596,9 +591,7 @@ var color = {
     },
 
     convertMatches: function convertMatches(str) {
-        var hasColorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-        var matches = this.matches(str, hasColorName);
+        var matches = this.matches(str);
 
         matches.forEach(function (it, index) {
             str = str.replace(it.color, '@' + index);
@@ -607,12 +600,12 @@ var color = {
         return { str: str, matches: matches };
     },
 
-    convertMatchesArray: function convertMatchesArray(str, hasColorName) {
+    convertMatchesArray: function convertMatchesArray(str) {
         var _this = this;
 
-        var splitStr = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : color_split;
+        var splitStr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : color_split;
 
-        var ret = this.convertMatches(str, hasColorName);
+        var ret = this.convertMatches(str);
         return ret.str.split(splitStr).map(function (it, index) {
             return _this.trim(it).replace('@' + index, ret.matches[index].color);
         });
@@ -1328,7 +1321,7 @@ var color = {
         if (!_scale) return [];
 
         if (typeof _scale === 'string') {
-            _scale = this.convertMatchesArray(_scale, true);
+            _scale = this.convertMatchesArray(_scale);
         }
 
         _scale = _scale || [];
@@ -1346,12 +1339,12 @@ var color = {
         var _this2 = this;
 
         if (typeof colors == 'string') {
-            colors = this.convertMatchesArray(colors, true);
+            colors = this.convertMatchesArray(colors);
         }
 
         colors = colors.map(function (it) {
             if (typeof it == 'string') {
-                var ret = _this2.convertMatches(it, true);
+                var ret = _this2.convertMatches(it);
                 var arr = _this2.trim(ret.str).split(' ');
 
                 if (arr[1]) {
@@ -4803,7 +4796,7 @@ var ColorView = function () {
     }, {
         key: 'match_result',
         value: function match_result(lineHandle) {
-            return color.matches(lineHandle.text, true /* has color names */);
+            return color.matches(lineHandle.text);
         }
     }, {
         key: 'submatch',

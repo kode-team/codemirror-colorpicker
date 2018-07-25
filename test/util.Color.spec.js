@@ -65,7 +65,7 @@ test('Color parse for hsl', () => {
 
 test('Color matches', () => {
     const colorCode = 'hsl(0,0%,69%) #aaa #ccc #ddd #ffffff blue';
-    const result = Color.matches(colorCode, true);
+    const result = Color.matches(colorCode);
 
     expect(result.length).toBe(6);
 
@@ -79,7 +79,7 @@ test('Color matches', () => {
 
 test('Color matches', () => {
     const colorCode = 'box-shadow : 0 0 0 hsl(0,0%,69%),  2 2 2 #aaa, 3 3 3 #ccc, 4 4 4 #ddd, 5 5 5 #ffffff, 0 0 0 blue;';
-    const result = Color.matches(colorCode, true);
+    const result = Color.matches(colorCode);
 
     expect(result.length).toBe(6);
 

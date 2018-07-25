@@ -6,7 +6,7 @@ const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*
 const color_split = ','
 const color = {
 
-    matches: function (str, hasColorName = false) {
+    matches: function (str) {
         const matches = str.match(color_regexp);
         let result = [];
 
@@ -21,15 +21,11 @@ const color = {
             if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
                 result.push({ color: matches[i] });
             } else {
+                var nameColor = ColorNames.getColorByName(matches[i]);
 
-                if (hasColorName) {
-                    var nameColor = ColorNames.getColorByName(matches[i]);
-
-                    if (nameColor) {
-                        result.push({ color: matches[i], nameColor: nameColor });
-                    }
+                if (nameColor) {
+                    result.push({ color: matches[i], nameColor: nameColor });
                 }
-
             }
         }
 
@@ -46,8 +42,8 @@ const color = {
         return result;
     },
 
-    convertMatches: function (str, hasColorName = false) {
-        const matches = this.matches(str, hasColorName);
+    convertMatches: function (str) {
+        const matches = this.matches(str);
 
         matches.forEach((it, index) => {
             str = str.replace(it.color, '@' + index)
@@ -56,8 +52,8 @@ const color = {
         return { str, matches }
     },
 
-    convertMatchesArray: function (str, hasColorName, splitStr = color_split) {
-        const ret = this.convertMatches(str, hasColorName);
+    convertMatchesArray: function (str, splitStr = color_split) {
+        const ret = this.convertMatches(str);
         return ret.str.split(splitStr).map((it, index) => {
             return this.trim(it).replace('@' + index, ret.matches[index].color)
         })
@@ -696,7 +692,7 @@ const color = {
         if (!scale) return [];
 
         if (typeof scale === 'string') {
-            scale = this.convertMatchesArray(scale, true);
+            scale = this.convertMatchesArray(scale);
         }
 
         scale = scale || [];
@@ -714,12 +710,12 @@ const color = {
 
     parseGradient (colors) {
         if (typeof colors == 'string') {
-            colors = this.convertMatchesArray(colors, true);
+            colors = this.convertMatchesArray(colors);
         }
 
         colors = colors.map(it => {
             if (typeof it == 'string') {
-                const ret = this.convertMatches(it, true)
+                const ret = this.convertMatches(it)
                 let arr = this.trim(ret.str).split(' ');
 
                 if (arr[1]) {
