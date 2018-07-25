@@ -3,7 +3,7 @@ import kmeans from './Kmeans'
 import ImageLoader from './ImageLoader'
 
 const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
-
+const color_split = ','
 const color = {
 
     matches: function (str, hasColorName = false) {
@@ -46,11 +46,36 @@ const color = {
         return result;
     },
 
+    convertMatches: function (str, hasColorName = false) {
+        const matches = this.matches(str, hasColorName);
+
+        matches.forEach((it, index) => {
+            str = str.replace(it.color, '@' + index)
+        })
+
+        return { str, matches }
+    },
+
+    convertMatchesArray: function (str, hasColorName, splitStr = color_split) {
+        const ret = this.convertMatches(str, hasColorName);
+        return ret.str.split(splitStr).map((it, index) => {
+            return this.trim(it).replace('@' + index, ret.matches[index].color)
+        })
+    },
+
+    reverseMatches: function (str, matches) {
+        matches.forEach((it, index) => {
+            str = str.replace('@' + index, it.color)
+        })
+
+        return str;
+    },
+
     trim: function (str) {
         return str.replace(/^\s+|\s+$/g, '');
     },
 
-    round: function (n, k) {
+    round: function (n, k = 1) {
         return Math.round(n * k) / k;
     },
 
@@ -79,39 +104,63 @@ const color = {
         }
 
         if (type == 'hex') {
-            var r = obj.r.toString(16);
-            if (obj.r < 16) r = "0" + r;
-
-            var g = obj.g.toString(16);
-            if (obj.g < 16) g = "0" + g;
-
-            var b = obj.b.toString(16);
-            if (obj.b < 16) b = "0" + b;
-
-            return `#${r}${g}${b}`;
+            return this.hex(obj);
         } else if (type == 'rgb') {
-
-            if (typeof obj == 'undefined') {
-                return undefined;
-            }
-
-            if (obj.a == 1 || typeof obj.a == 'undefined') {
-                if (isNaN(obj.r)) {
-                    return defaultColor;
-                }
-                return `rgb(${obj.r},${obj.g},${obj.b})`;
-            } else {
-                return `rgba(${obj.r},${obj.g},${obj.b},${obj.a})`;
-            }
+            return this.rgb(obj, defaultColor);
         } else if (type == 'hsl') {
-            if (obj.a == 1 || typeof obj.a == 'undefined') {
-                return `hsl(${obj.h},${obj.s}%,${obj.l}%)`;
-            } else {
-                return `hsla(${obj.h},${obj.s}%,${obj.l}%,${obj.a})`;
-            }
+            return this.hsl(obj);
         }
 
         return obj;
+    },
+
+    hex(obj) {
+        if (Array.isArray(obj)) {
+            obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] }
+        }
+
+        var r = obj.r.toString(16);
+        if (obj.r < 16) r = "0" + r;
+
+        var g = obj.g.toString(16);
+        if (obj.g < 16) g = "0" + g;
+
+        var b = obj.b.toString(16);
+        if (obj.b < 16) b = "0" + b;
+
+        return `#${r}${g}${b}`;
+    },
+
+    rgb (obj, defaultColor = 'rgba(0, 0, 0, 0)') {
+        if (Array.isArray(obj)) {
+            obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] }
+        }
+
+        if (typeof obj == 'undefined') {
+            return undefined;
+        }
+
+        if (obj.a == 1 || typeof obj.a == 'undefined') {
+            if (isNaN(obj.r)) {
+                return defaultColor;
+            }
+            return `rgb(${obj.r},${obj.g},${obj.b})`;
+        } else {
+            return `rgba(${obj.r},${obj.g},${obj.b},${obj.a})`;
+        }
+    },
+
+    hsl (obj) {
+        if (Array.isArray(obj)) {
+            obj = { r: obj[0], g: obj[1], b: obj[2], a: obj[3] }
+        }
+
+        if (obj.a == 1 || typeof obj.a == 'undefined') {
+            return `hsl(${obj.h},${obj.s}%,${obj.l}%)`;
+        } else {
+            return `hsla(${obj.h},${obj.s}%,${obj.l}%,${obj.a})`;
+        }
+
     },
 
     /**
@@ -281,9 +330,9 @@ const color = {
         else if (300 <= H && H < 360) { temp = [C, 0, X]; }
 
         return {
-            r: Math.round((temp[0] + m) * 255),
-            g: Math.round((temp[1] + m) * 255),
-            b: Math.round((temp[2] + m) * 255)
+            r: this.round((temp[0] + m) * 255),
+            g: this.round((temp[1] + m) * 255),
+            b: this.round((temp[2] + m) * 255)
         };
     },
 
@@ -404,7 +453,7 @@ const color = {
             h /= 6;
         }
 
-        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        return { h: this.round(h * 360), s: this.round(s * 100), l: this.round(l * 100) };
     },
 
     HUEtoRGB(p, q, t) {
@@ -448,7 +497,7 @@ const color = {
             b = this.HUEtoRGB(p, q, h - 1 / 3);
         }
 
-        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        return { r: this.round(r * 255), g: this.round(g * 255), b: this.round(b * 255) };
     },
     c(r, g, b) {
 
@@ -520,9 +569,9 @@ const color = {
         G = this.ReverseRGB(G);
         B = this.ReverseRGB(B);
 
-        const r = Math.round(R * 255);
-        const g = Math.round(G * 255);
-        const b = Math.round(B * 255);
+        const r = this.round(R * 255);
+        const g = this.round(G * 255);
+        const b = this.round(B * 255);
 
         return { r, g, b };
     },
@@ -634,17 +683,21 @@ const color = {
      */
     interpolateRGB(startColor, endColor, t = 0.5, format = 'hex') {
         var obj = {
-            r: Math.round(startColor.r + (endColor.r - startColor.r) * t),
-            g: Math.round(startColor.g + (endColor.g - startColor.g) * t),
-            b: Math.round(startColor.b + (endColor.b - startColor.b) * t),
-            a: Math.round(startColor.a + (endColor.a - startColor.a) * t)
-        };
+            r: this.round(startColor.r + (endColor.r - startColor.r) * t),
+            g: this.round(startColor.g + (endColor.g - startColor.g) * t),
+            b: this.round(startColor.b + (endColor.b - startColor.b) * t),
+            a: this.round(startColor.a + (endColor.a - startColor.a) * t, 100 )
+        };  
 
-        return this.format(obj, format);
+        return this.format(obj, obj.a < 1 ? 'rgb' : format);
 
     },
     scale(scale, count = 5) {
         if (!scale) return [];
+
+        if (typeof scale === 'string') {
+            scale = this.convertMatchesArray(scale, true);
+        }
 
         scale = scale || [];
         var len = scale.length;
@@ -657,6 +710,94 @@ const color = {
 
         }
         return colors;
+    },
+
+    parseGradient (colors) {
+        if (typeof colors == 'string') {
+            colors = this.convertMatchesArray(colors, true);
+        }
+
+        colors = colors.map(it => {
+            if (typeof it == 'string') {
+                const ret = this.convertMatches(it, true)
+                let arr = this.trim(ret.str).split(' ');
+
+                if (arr[1]) {
+                    if (arr[1].includes('%')) {
+                        arr[1] = parseFloat(arr[1].replace(/%/, ''))/100
+                    } else {
+                        arr[1] = parseFloat(arr[1])
+                    }
+
+                } else {
+                    arr[1] = '*'
+                }
+
+                arr[0] = this.reverseMatches(arr[0], ret.matches)
+
+                return arr;
+            } else if (Array.isArray(it)) {
+
+                if (!it[1]) {
+                    it[1] = '*'
+                } else if (typeof it[1] == 'string') {
+                    if (it[1].includes('%')) {
+                        it[1] = parseFloat(it[1].replace(/%/, ''))/100
+                    } else {
+                        it[1] = +it[1]
+                    }
+                }
+
+                return [...it]; 
+            }
+        })
+
+        const count = colors.filter(it => {
+            return it[1] === '*'
+        }).length
+
+        if (count > 0) {
+            const sum = colors.filter(it => {
+                return it[1] != '*' && it[1] != 1
+            }).map(it => it[1]).reduce((total, cur) => {
+                return total + cur
+            } , 0)
+            
+            const dist = (1 - sum) / count  
+            colors.forEach((it, index) => {
+                if (it[1] == '*' && index > 0) {
+                    it[1] = dist 
+                }
+            })
+    
+        }
+
+        return colors; 
+    },
+
+    gradient(colors, count = 10) {
+        colors = this.parseGradient(colors);
+
+        let newColors = [] 
+        let maxCount = count - (colors.length - 1)
+        let allCount = maxCount
+
+        for (var i = 1, len = colors.length; i < len; i++) {
+
+            var startColor = colors[i-1][0]
+            var endColor = colors[i][0]
+
+            // if it is second color
+            var rate = i == 1 ? colors[i][1] : colors[i][1] - colors[i-1][1]
+
+            // if it is last color 
+            var colorCount = (i == colors.length - 1) ? allCount : Math.floor(rate * maxCount)
+
+            newColors = newColors.concat(this.scale([startColor, endColor], colorCount), [endColor])
+
+            allCount -= colorCount
+        }
+        return newColors;
     },
 
     scaleHSV(color, target = 'h', count = 9, format = 'rgb', min = 0, max = 1, dist = 100) {

@@ -636,7 +636,7 @@
           background-color: white;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          border-radius: 3px; }
+          border-radius: 2px; }
           .codemirror-colorpicker.palette > .color-chooser.open .color-chooser-container .colorsets-item-header {
             position: relative;
             left: auto;
