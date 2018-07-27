@@ -101,10 +101,11 @@ let ImageFilter = F
  * 
  */
 F.multi = function (...filters) {
+    filters = filters.map(f => {
+        return makeFilter(f);
+    })
     return function (bitmap) {
-        return filters.map(f => {
-            return makeFilter(f);
-        }).reduce((bitmap, f) => {
+        return filters.reduce((bitmap, f) => {
             return f(bitmap);
         }, bitmap)
     }
@@ -121,7 +122,6 @@ F.partial = function (area, ...filters) {
     }
 }
 
-
 F.counter = function (filter, count = 1) {
     var filters = [];
 
@@ -129,7 +129,7 @@ F.counter = function (filter, count = 1) {
         filters.push(filter);
     }
 
-    return F.multi(filters);
+    return F.multi(...filters);
 }
 
 // Image manupulate 
@@ -167,7 +167,7 @@ F.crop = function (dx = 0, dy = 0, dw, dh) {
 
 // Pixel based 
 
-function pack(callback) {
+F.pack = function pack(callback) {
     return function (bitmap) {
         each(bitmap.pixels.length, (i) => {
             callback(bitmap.pixels, i)

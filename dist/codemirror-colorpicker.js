@@ -1683,10 +1683,11 @@ F.multi = function () {
         filters[_key] = arguments[_key];
     }
 
+    filters = filters.map(function (f) {
+        return makeFilter(f);
+    });
     return function (bitmap) {
-        return filters.map(function (f) {
-            return makeFilter(f);
-        }).reduce(function (bitmap, f) {
+        return filters.reduce(function (bitmap, f) {
             return f(bitmap);
         }, bitmap);
     };
@@ -1715,7 +1716,7 @@ F.counter = function (filter) {
         filters.push(filter);
     }
 
-    return F.multi(filters);
+    return F.multi.apply(F, filters);
 };
 
 // Image manupulate 
@@ -1758,14 +1759,14 @@ F.crop = function () {
 
 // Pixel based 
 
-function pack(callback) {
+F.pack = function pack(callback) {
     return function (bitmap) {
         each(bitmap.pixels.length, function (i) {
             callback(bitmap.pixels, i);
         });
         return bitmap;
     };
-}
+};
 
 F.grayscale = function (amount) {
     var C = amount / 100;
