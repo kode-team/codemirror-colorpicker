@@ -167,7 +167,7 @@ F.crop = function (dx = 0, dy = 0, dw, dh) {
 
 // Pixel based 
 
-F.pack = function pack(callback) {
+const pack = F.pack = function pack(callback) {
     return function (bitmap) {
         each(bitmap.pixels.length, (i) => {
             callback(bitmap.pixels, i)

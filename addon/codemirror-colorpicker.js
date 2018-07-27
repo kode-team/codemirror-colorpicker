@@ -1757,7 +1757,7 @@ F.crop = function () {
 
 // Pixel based 
 
-F.pack = function pack(callback) {
+var pack = F.pack = function pack(callback) {
     return function (bitmap) {
         each(bitmap.pixels.length, function (i) {
             callback(bitmap.pixels, i);
