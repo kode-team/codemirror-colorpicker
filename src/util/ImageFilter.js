@@ -375,7 +375,7 @@ F.saturation = function (amount = 100) {
 /*
  * @param {Number} amount  0..100 
  */
-F.threshold = function (amount = 100) {
+F.threshold = function (scale = 200, amount = 100) {
     const C = amount / 100;
     return pack((pixels, i) => {
         var v = (0.2126 * C * pixels[i] + 0.7152 * C * pixels[i + 1] + 0.0722 * C * pixels[i + 2]) >= scale ? 255 : 0;
