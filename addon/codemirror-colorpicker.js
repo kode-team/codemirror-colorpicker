@@ -1642,7 +1642,7 @@ function stackBlurImage(bitmap, radius, blurAlphaChannel) {
 }
 
 function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
-    if (isNaN(radius) || radius < 1) return;
+    if (isNaN(radius) || radius < 1) return bitmap;
     radius |= 0;
 
     var pixels = bitmap.pixels,
@@ -1864,7 +1864,7 @@ function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
 }
 
 function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
-    if (isNaN(radius) || radius < 1) return;
+    if (isNaN(radius) || radius < 1) return bitmap;
     radius |= 0;
 
     var pixels = bitmap.pixels,
@@ -2384,12 +2384,55 @@ F.sepia = function () {
     return pack(function (pixels, i) {
 
         colorMatrix(pixels, i, [0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1]);
+    });
+};
 
-        // var r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+F.gamma = function () {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-        // pixels[i] = r * C * 0.3588 + g * C * 0.7044 + b * C * 0.1368;
-        // pixels[i + 1] = r * C * 0.2990 + g * C * 0.5870 + b * C * 0.1140;
-        // pixels[i + 2] = r * C * 0.2392 + g * C * 0.4696 + b * C * 0.0912;
+    return pack(function (pixels, i) {
+        pixels[i] = Math.pow(pixels[i] / 255, amount) * 255;
+        pixels[i + 1] = Math.pow(pixels[i + 1] / 255, amount) * 255;
+        pixels[i + 2] = Math.pow(pixels[i + 2] / 255, amount) * 255;
+    });
+};
+
+/**
+ * 
+ * @param {Number} amount 1..100
+ */
+F.noise = function () {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    return pack(function (pixels, i) {
+        var C = Math.abs(amount) * 5;
+        var min = -C;
+        var max = C;
+        var noiseValue = Math.round(min + Math.random() * (max - min));
+        pixels[i] += noiseValue;
+        pixels[i + 1] += noiseValue;
+        pixels[i + 2] += noiseValue;
+    });
+};
+
+/**
+ * 
+ * @param {Number} amount from 0 to 100 
+ */
+F.clip = function () {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+    var C = Math.abs(amount) * 2.55;
+
+    return pack(function (pixels, i) {
+
+        for (var start = i, end = i + 2; start <= end; start++) {
+            if (pixels[start] > 255 - C) {
+                pixels[start] = 255;
+            } else if (pixels[start] < C) {
+                pixels[start] = 0;
+            }
+        }
     });
 };
 
@@ -2539,9 +2582,7 @@ F.sharpen = function () {
 };
 
 F['motion-blur'] = F.motionBlur = function () {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 9;
-
-    return F.convolution(weight([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 1 / amount));
+    return F.convolution(weight([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 1));
 };
 
 F['motion-blur-2'] = F.motionBlur2 = function () {
@@ -2656,6 +2697,14 @@ F.emboss = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
     return F.convolution([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
+};
+
+/**
+ * multi filter 
+ */
+
+F.vintage = function () {
+    return F.multi(['brightness', 15], ['saturation', -20], ['gamma', 1.8]);
 };
 
 var counter = 0;

@@ -694,7 +694,18 @@ var colorpicker = new ColorPicker({
                 </div>                   
                 <div>
                     <button type="button" onclick="filter_image('random')">random filter</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image('vintage')">vintage</button>
+                </div>                                   
+                <div>
+                    <button type="button" onclick="filter_image(['noise', +document.getElementById('noise-value').value])">Noise</button>
+                    <input type="range" min="1" max="100" step="1" value="3" id="noise-value" />
                 </div>                   
+                <div>
+                    <button type="button" onclick="filter_image(['clip', +document.getElementById('clip-value').value])">Clip</button>
+                    <input type="range" min="1" max="100" step="1" value="3" id="clip-value" />
+                </div>                                   
                 <div>
                     <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
                     <input type="range" min="1" max="100" step="1" value="3" id="blur-value" />

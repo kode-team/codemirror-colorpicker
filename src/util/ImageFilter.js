@@ -323,14 +323,51 @@ F.sepia = function (amount = 100) {
             (0.272 - 0.272 * (1 - C)), (0.534 - 0.534 * (1 - C)), (0.131 + 0.869 * (1 - C)), 0,
             0, 0, 0, 1
         ])
-
-        // var r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-
-        // pixels[i] = r * C * 0.3588 + g * C * 0.7044 + b * C * 0.1368;
-        // pixels[i + 1] = r * C * 0.2990 + g * C * 0.5870 + b * C * 0.1140;
-        // pixels[i + 2] = r * C * 0.2392 + g * C * 0.4696 + b * C * 0.0912;
     })
+}
 
+F.gamma = function (amount = 1) {
+    return pack((pixels, i) => {
+        pixels[i] = Math.pow(pixels[i] / 255, amount) * 255
+        pixels[i+1] = Math.pow(pixels[i+1] / 255, amount) * 255
+        pixels[i+2] = Math.pow(pixels[i+2] / 255, amount) * 255
+    })
+}
+
+/**
+ * 
+ * @param {Number} amount 1..100
+ */
+F.noise = function (amount = 1) {
+    return pack((pixels, i) => {
+        const C = Math.abs(amount) * 5
+        const min = -C
+        const max = C 
+        const noiseValue = Math.round(min + (Math.random() * (max - min)))
+        pixels[i] += noiseValue 
+        pixels[i+1] += noiseValue 
+        pixels[i+2] += noiseValue 
+    })
+}
+
+/**
+ * 
+ * @param {Number} amount from 0 to 100 
+ */
+F.clip = function (amount = 0) {
+    const C = Math.abs(amount) * 2.55
+
+    return pack((pixels, i) => {
+
+        for(var start = i, end = i + 2; start <= end; start++) {
+            if (pixels[start] > 255 - C) {
+                pixels[start] = 255 
+            } else if (pixels[start] < C) {
+                pixels[start] = 0 
+            }            
+        }
+
+    })
 }
 
 /*
@@ -488,7 +525,7 @@ F.sharpen = function (amount = 100) {
     ], amount / 100));
 }
 
-F['motion-blur'] = F.motionBlur = function (amount = 9) {
+F['motion-blur'] = F.motionBlur = function () {
     return F.convolution(weight([
         1, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 1, 0, 0, 0, 0, 0, 0, 0,
@@ -499,7 +536,7 @@ F['motion-blur'] = F.motionBlur = function (amount = 9) {
         0, 0, 0, 0, 0, 0, 1, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 1, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 1,
-    ], 1 / amount));
+    ], 1));
 }
 
 F['motion-blur-2'] = F.motionBlur2 = function (amount = 9) {
@@ -688,5 +725,16 @@ F.emboss = function (amount = 4) {
     ]);
 }
 
+/**
+ * multi filter 
+ */
+
+F.vintage = function () {
+    return F.multi(
+        ['brightness', 15], 
+        ['saturation', -20], 
+        ['gamma', 1.8]
+    )
+}
 
 export default ImageFilter
