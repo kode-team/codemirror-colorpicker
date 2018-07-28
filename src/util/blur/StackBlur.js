@@ -97,7 +97,7 @@ function stackBlurImage(bitmap, radius, blurAlphaChannel) {
 
 
 function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
-    if (isNaN(radius) || radius < 1) return;
+    if (isNaN(radius) || radius < 1) return bitmap;
     radius |= 0;
 
     const {pixels, width, height } = bitmap 
@@ -323,7 +323,7 @@ function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
 
 
 function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
-    if (isNaN(radius) || radius < 1) return;
+    if (isNaN(radius) || radius < 1) return bitmap;
     radius |= 0;
 
     const {pixels, width, height } = bitmap
