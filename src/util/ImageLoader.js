@@ -1,5 +1,6 @@
 import Canvas from './Canvas'
 
+
 class ImageLoader {
     constructor(url, opt = {}) {
         this.isLoaded = false; 
@@ -78,6 +79,18 @@ class ImageLoader {
 
         return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');
     } 
+
+    toHistogram (opt) {
+        var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        var width = imagedata.width;
+        var height = imagedata.height; 
+
+        var pixels = new Uint8ClampedArray(imagedata.data);
+
+        let bitmap = { pixels, width, height }        
+
+        return Canvas.getHistogram(bitmap)
+    }
 
     toRGB () {
         var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);

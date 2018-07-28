@@ -258,20 +258,25 @@ F.tint = function (redTint = 1, greenTint = 1, blueTint = 1) {
     })
 
 }
+
+F.clamp = function (num) {
+    if (num < 0) return 0 
+    if (num > 255) return 255 
+    return num 
+}
 /**
  * 
- * @param {*} amount   min = 0, max = 100 
+ * @param {*} amount   min = -128, max = 128 
  */
 F.contrast = function (amount = 0) {
-    const C = Math.pow((100 + amount) / 100, 2);
+    const C = Math.max((128 + amount) / 128, 0);
+
     return pack((pixels, i) => {
-        pixels[i] = ((((pixels[i] / 255) - 0.5) * C) + 0.5) * 255;
-        pixels[i + 1] = ((((pixels[i + 1] / 255) - 0.5) * C) + 0.5) * 255;
-        pixels[i + 2] = ((((pixels[i + 2] / 255) - 0.5) * C) + 0.5) * 255;
+        pixels[i] = F.clamp(pixels[i] * C)
+        pixels[i+1] = F.clamp(pixels[i+1] * C)
+        pixels[i+2] = F.clamp(pixels[i+2] * C)
     })
-
 }
-
 
 F.invert = function (amount = 100) {
     const C = amount / 100; 

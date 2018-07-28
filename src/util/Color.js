@@ -1,6 +1,7 @@
 import ColorNames from './ColorNames'
 import kmeans from './Kmeans'
 import ImageLoader from './ImageLoader'
+import Canvas from './Canvas'
 
 const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 const color_split = ','
@@ -668,6 +669,17 @@ const color = {
     mix(startcolor, endColor, ratio = 0.5, format = 'hex') {
         return this.blend(startcolor, endColor, ratio, format);
     },
+
+    /**
+     * 
+     * @param {Color|String} c 
+     */
+    contrast(c) {
+        c = this.parse(c);
+        var contrast = (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
+
+        return (contrast >= 128) ? 'black' : 'white';
+    },
     /**
      * @deprecated
      * 
@@ -857,6 +869,25 @@ const color = {
                 callback(img.toArray(filter, opt));
             }
 
+        })
+    },
+
+    histogram (url, callback, opt = {}) {
+        var img = new ImageLoader(url);
+        img.loadImage(() => {
+            if (typeof callback == 'function') {
+                callback(img.toHistogram(opt));
+            }
+        })
+    },
+
+    ImageToHistogram(url, callback, opt = { width: 200, height: 100 }) {
+
+        var img = new ImageLoader(url);
+        img.loadImage(() => {
+            Canvas.createHistogram (opt.width || 200, opt.height || 100, img.toHistogram(opt), function (canvas) {
+                if (typeof callback == 'function') callback(canvas.toDataURL('image/png'));
+            }, opt)
         })
     }
 }

@@ -657,14 +657,16 @@ var colorpicker = new ColorPicker({
     <div class="area-item">
             <div class="image-select-input">
                 <input type="file" id="imageforfilter"  />
-
+                <div>
+                    <button type="button" onclick="view_histogram()">Histogram</button>
+                </div>                
                 <div>
                     <button type="button" onclick="filter_image(['grayscale', +document.getElementById('scale-value').value])">Gray</button>
                     <input type="range" min="0" max="200" step="1" value="100" id="scale-value" />
                 </div>
                 <div>
                     <button type="button" onclick="filter_image(['contrast', +document.getElementById('contrast-value').value])">Contrast</button>
-                    <input type="range" min="0" max="100" step="1" value="100" id="contrast-value" />
+                    <input type="range" min="-128" max="128" step="1" value="100" id="contrast-value" />
                 </div>     
                 <div>
                     <button type="button" onclick="filter_image(['saturation', +document.getElementById('saturation-value').value])">Saturation</button>
@@ -935,6 +937,17 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             document.getElementById('image-palette').innerHTML = "";
             document.getElementById('image-palette').appendChild(fragment);
         })
+    }
+
+    function view_histogram () {
+        var args = Array.prototype.slice.call(arguments);
+        var file = document.getElementById('imageforfilter').files[0];
+        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        Color.ImageToHistogram(file, function (url) {
+            document.getElementById('filtered-image').src = url;
+        }, {red: true, green: true})
     }
 
     function filter_image () {

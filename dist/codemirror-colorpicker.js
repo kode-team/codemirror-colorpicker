@@ -253,6 +253,19 @@ function kmeans(points, k, distanceFunction) {
     return centeroids;
 }
 
+function each(len, callback) {
+    for (var i = 0; i < len; i += 4) {
+        callback(i);
+    }
+}
+
+function pack(bitmap, callback) {
+
+    each(bitmap.pixels.length, function (i) {
+        callback(bitmap.pixels, i);
+    });
+}
+
 var Canvas = {
     create: function create(width, height) {
         var canvas = document.createElement('canvas');
@@ -272,6 +285,82 @@ var Canvas = {
         context.putImageData(imagedata, 0, 0);
 
         return canvas;
+    },
+    createHistogram: function createHistogram(width, height, histogram, callback) {
+        var opt = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : { black: true, red: false, green: false, blue: false };
+
+        var canvas = this.create(width, height);
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "white";
+        context.fillRect(0, 0, width, height);
+        context.globalAlpha = 0.7;
+
+        var omit = { black: false };
+        if (opt.black) {
+            omit.black = false;
+        } else {
+            omit.black = true;
+        }
+        if (opt.red) {
+            omit.red = false;
+        } else {
+            omit.red = true;
+        }
+        if (opt.green) {
+            omit.green = false;
+        } else {
+            omit.green = true;
+        }
+        if (opt.blue) {
+            omit.blue = false;
+        } else {
+            omit.blue = true;
+        }
+
+        Object.keys(histogram).forEach(function (color) {
+
+            if (!omit[color]) {
+
+                var array = histogram[color];
+                var ymax = Math.max.apply(Math, array);
+                var unitWith = width / array.length;
+
+                context.fillStyle = color;
+                array.forEach(function (it, index) {
+                    var currentHeight = height * (it / ymax);
+                    var x = index * unitWith;
+
+                    context.fillRect(x, height - currentHeight, unitWith, currentHeight);
+                });
+            }
+        });
+
+        if (typeof callback == 'function') callback(canvas);
+    },
+    getHistogram: function getHistogram(bitmap) {
+        var black = new Array(256);
+        var red = new Array(256);
+        var green = new Array(256);
+        var blue = new Array(256);
+        for (var i = 0; i < 256; i++) {
+            black[i] = 0;
+            red[i] = 0;
+            green[i] = 0;
+            blue[i] = 0;
+        }
+
+        pack(bitmap, function (pixels, i) {
+            // gray scale 
+            var grayIndex = Math.round(pixels[i] * 0.2126 + pixels[i + 1] * 0.7152 + pixels[i + 2] * 0.0722);
+            black[grayIndex]++;
+
+            red[pixels[i]]++;
+            green[pixels[i + 1]]++;
+            blue[pixels[i + 2]]++;
+        });
+
+        return { black: black, red: red, green: green, blue: blue };
     },
     getBitmap: function getBitmap(bitmap, area) {
         var canvas = this.drawPixels(bitmap);
@@ -536,6 +625,19 @@ var ImageLoader = function () {
             var tmpCanvas = Canvas.drawPixels(bitmap);
 
             return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');
+        }
+    }, {
+        key: 'toHistogram',
+        value: function toHistogram(opt) {
+            var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            var width = imagedata.width;
+            var height = imagedata.height;
+
+            var pixels = new Uint8ClampedArray(imagedata.data);
+
+            var bitmap = { pixels: pixels, width: width, height: height };
+
+            return Canvas.getHistogram(bitmap);
         }
     }, {
         key: 'toRGB',
@@ -1295,6 +1397,18 @@ var color = {
         return this.blend(startcolor, endColor, ratio, format);
     },
 
+
+    /**
+     * 
+     * @param {Color|String} c 
+     */
+    contrast: function contrast(c) {
+        c = this.parse(c);
+        var contrast = (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
+
+        return contrast >= 128 ? 'black' : 'white';
+    },
+
     /**
      * @deprecated
      * 
@@ -1515,6 +1629,27 @@ var color = {
             if (typeof callback == 'function') {
                 callback(img.toArray(filter, opt));
             }
+        });
+    },
+    histogram: function histogram(url, callback) {
+        var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var img = new ImageLoader(url);
+        img.loadImage(function () {
+            if (typeof callback == 'function') {
+                callback(img.toHistogram(opt));
+            }
+        });
+    },
+    ImageToHistogram: function ImageToHistogram(url, callback) {
+        var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { width: 200, height: 100 };
+
+
+        var img = new ImageLoader(url);
+        img.loadImage(function () {
+            Canvas.createHistogram(opt.width || 200, opt.height || 100, img.toHistogram(opt), function (canvas) {
+                if (typeof callback == 'function') callback(canvas.toDataURL('image/png'));
+            }, opt);
         });
     }
 };
@@ -2098,7 +2233,7 @@ function makeFilter(filter) {
     return filterFunction.apply(filterFunction, params);
 }
 
-function each(len, callback) {
+function each$1(len, callback) {
     for (var i = 0; i < len; i += 4) {
         callback(i);
     }
@@ -2228,9 +2363,9 @@ F.crop = function () {
 
 // Pixel based 
 
-var pack = F.pack = function pack(callback) {
+var pack$1 = F.pack = function pack(callback) {
     return function (bitmap) {
-        each(bitmap.pixels.length, function (i) {
+        each$1(bitmap.pixels.length, function (i) {
             callback(bitmap.pixels, i);
         });
         return bitmap;
@@ -2242,7 +2377,7 @@ F.grayscale = function (amount) {
 
     if (C > 1) C = 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         colorMatrix(pixels, i, [0.2126 + 0.7874 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 + 0.2848 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 + 0.9278 * (1 - C), 0, 0, 0, 0, 1]);
 
@@ -2259,7 +2394,7 @@ F.grayscale = function (amount) {
 F.hue = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         var r = pixels[i],
             g = pixels[i + 1],
             b = pixels[i + 2];
@@ -2285,7 +2420,7 @@ F.shade = function () {
     var g = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var b = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         pixels[i] *= r;
         pixels[i + 1] *= g;
         pixels[i + 2] *= b;
@@ -2297,7 +2432,7 @@ F.bitonal = function (darkColor, lightColor) {
 
     darkColor = color.parse(darkColor);
     lightColor = color.parse(lightColor);
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         if (pixels[i] + pixels[i + 1] + pixels[i + 2] <= threshold) {
             pixels[i] = darkColor.r;
@@ -2316,24 +2451,31 @@ F.tint = function () {
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var blueTint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         pixels[i] += (255 - pixels[i]) * redTint;
         pixels[i + 1] += (255 - pixels[i + 1]) * greenTint;
         pixels[i + 2] += (255 - pixels[i + 2]) * blueTint;
     });
 };
+
+F.clamp = function (num) {
+    if (num < 0) return 0;
+    if (num > 255) return 255;
+    return num;
+};
 /**
  * 
- * @param {*} amount   min = 0, max = 100 
+ * @param {*} amount   min = -128, max = 128 
  */
 F.contrast = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    var C = Math.pow((100 + amount) / 100, 2);
-    return pack(function (pixels, i) {
-        pixels[i] = ((pixels[i] / 255 - 0.5) * C + 0.5) * 255;
-        pixels[i + 1] = ((pixels[i + 1] / 255 - 0.5) * C + 0.5) * 255;
-        pixels[i + 2] = ((pixels[i + 2] / 255 - 0.5) * C + 0.5) * 255;
+    var C = Math.max((128 + amount) / 128, 0);
+
+    return pack$1(function (pixels, i) {
+        pixels[i] = F.clamp(pixels[i] * C);
+        pixels[i + 1] = F.clamp(pixels[i + 1] * C);
+        pixels[i + 2] = F.clamp(pixels[i + 2] * C);
     });
 };
 
@@ -2342,7 +2484,7 @@ F.invert = function () {
 
     var C = amount / 100;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         pixels[i] = (255 - pixels[i]) * C;
         pixels[i + 1] = (255 - pixels[i + 1]) * C;
@@ -2355,7 +2497,7 @@ F.opacity = function () {
 
     var C = amount / 100;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         pixels[i + 3] *= C;
     });
 };
@@ -2367,7 +2509,7 @@ F.opacity = function () {
  * @param {*} b 
  */
 F.solarize = function (r, g, b) {
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         if (pixels[i] < r) pixels[i] = 255 - pixels[i];
         if (pixels[i + 1] < g) pixels[i + 1] = 255 - pixels[i + 1];
         if (pixels[i + 2] < b) pixels[i + 2] = 255 - pixels[i + 2];
@@ -2383,7 +2525,7 @@ F.sepia = function () {
     var C = amount / 100;
     if (C > 1) C = 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         colorMatrix(pixels, i, [0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1]);
     });
@@ -2392,7 +2534,7 @@ F.sepia = function () {
 F.gamma = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         pixels[i] = Math.pow(pixels[i] / 255, amount) * 255;
         pixels[i + 1] = Math.pow(pixels[i + 1] / 255, amount) * 255;
         pixels[i + 2] = Math.pow(pixels[i + 2] / 255, amount) * 255;
@@ -2406,7 +2548,7 @@ F.gamma = function () {
 F.noise = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         var C = Math.abs(amount) * 5;
         var min = -C;
         var max = C;
@@ -2426,7 +2568,7 @@ F.clip = function () {
 
     var C = Math.abs(amount) * 2.55;
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         for (var start = i, end = i + 2; start <= end; start++) {
             if (pixels[start] > 255 - C) {
@@ -2446,7 +2588,7 @@ F.brightness = function () {
 
     var C = Math.floor(255 * (amount / 100));
 
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         pixels[i] += C;
         pixels[i + 1] += C;
         pixels[i + 2] += C;
@@ -2461,7 +2603,7 @@ F.saturation = function () {
 
     var C = amount / 100;
     var L = 1 - Math.abs(C);
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
 
         colorMatrix(pixels, i, [L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L]);
 
@@ -2482,7 +2624,7 @@ F.threshold = function () {
     var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 
     var C = amount / 100;
-    return pack(function (pixels, i) {
+    return pack$1(function (pixels, i) {
         var v = 0.2126 * C * pixels[i] + 0.7152 * C * pixels[i + 1] + 0.0722 * C * pixels[i + 2] >= scale ? 255 : 0;
         pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v);
     });
@@ -5483,10 +5625,12 @@ if (CodeMirror) {
 
 var index = {
     Color: color,
-    ImageFilter: ImageFilter,
     ColorNames: ColorNames,
+    ColorPicker: ColorPicker,
+    ImageFilter: ImageFilter,
     HueColor: HueColor,
-    ColorPicker: ColorPicker
+    Canvas: Canvas,
+    ImageLoader: ImageLoader
 };
 
 return index;
