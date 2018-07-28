@@ -1,6 +1,7 @@
 // TODO: worker run 
 import Color from './Color'
 import Canvas from './Canvas'
+import StackBlur from './blur/StackBlur'
 
 function weight(arr, num = 1) {
     return arr.map(i => {
@@ -529,13 +530,15 @@ F['motion-blur-3'] = F.motionBlur3 = function (amount = 9) {
     ], 1 / amount));
 }
 
-F.blur = function (amount = 100) {
-    const C = amount / 100; 
-    return F.convolution(weight([
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1
-    ], 1/9 ));
+/**
+ * 
+ * @param {Number} radius   from 1 to 100 
+ */
+F.blur = function (radius = 10, hasAlphaChannel = true) {
+
+    return function (bitmap) {
+        return StackBlur(bitmap, radius, hasAlphaChannel )
+    }
 }
 
 function pow2(num) {

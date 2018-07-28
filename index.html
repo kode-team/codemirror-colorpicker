@@ -697,7 +697,7 @@ var colorpicker = new ColorPicker({
                 </div>                   
                 <div>
                     <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
-                    <input type="range" min="0" max="200" step="1" value="100" id="blur-value" />
+                    <input type="range" min="1" max="100" step="1" value="3" id="blur-value" />
                 </div>   
                 <div>
                     <button type="button" onclick="filter_count(['blur', +document.getElementById('blur-count-value').value])">blur (10)</button>
@@ -943,7 +943,7 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         var ImageFilter = CodeMirrorColorPicker.ImageFilter;
         document.getElementById('sampled-image').src = URL.createObjectURL(file);
 
-        Color.ImageToURL(file, ImageFilter.counter(ImageFilter.merge(args), 10), function (url) {
+        Color.ImageToURL(file, ImageFilter.counter(ImageFilter.merge(args), 100), function (url) {
             document.getElementById('filtered-image').src = url;
         })
     }   
