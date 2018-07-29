@@ -316,15 +316,15 @@ var Canvas = {
             omit.blue = true;
         }
 
-        Object.keys(histogram).forEach(function (color) {
+        Object.keys(histogram).forEach(function (color$$1) {
 
-            if (!omit[color]) {
+            if (!omit[color$$1]) {
 
-                var array = histogram[color];
+                var array = histogram[color$$1];
                 var ymax = Math.max.apply(Math, array);
                 var unitWith = width / array.length;
 
-                context.fillStyle = color;
+                context.fillStyle = color$$1;
                 array.forEach(function (it, index) {
                     var currentHeight = height * (it / ymax);
                     var x = index * unitWith;
@@ -350,7 +350,7 @@ var Canvas = {
 
         pack(bitmap, function (pixels, i) {
             // gray scale 
-            var grayIndex = Math.round(pixels[i] * 0.2126 + pixels[i + 1] * 0.7152 + pixels[i + 2] * 0.0722);
+            var grayIndex = Math.round(color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]));
             black[grayIndex]++;
 
             red[pixels[i]]++;
@@ -1216,6 +1216,9 @@ var color = {
         }
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
+    brightness: function brightness(r, g, b) {
+        return r * 0.2126 + g * 0.7152 + b * 0.0722;
+    },
     RGBtoYCrCb: function RGBtoYCrCb(r, g, b) {
 
         if (arguments.length == 1) {
@@ -1224,7 +1227,7 @@ var color = {
                 g = _arguments$12.g,
                 b = _arguments$12.b;
         }
-        var Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        var Y = this.brightness(r, g, b);
         var Cb = 0.564 * (b - Y);
         var Cr = 0.713 * (r - Y);
 
@@ -2607,13 +2610,6 @@ F.saturation = function () {
     return pack$1(function (pixels, i) {
 
         colorMatrix(pixels, i, [L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L]);
-
-        /*
-        const max = Math.max(pixels[i], pixels[i + 1], pixels[i + 2])
-         if (pixels[i] != max) { pixels[i] += (max - pixels[i]) * C; }
-        if (pixels[i + 1] != max) { pixels[i + 1] += (max - pixels[i + 1]) * C; }
-        if (pixels[i + 2] != max) { pixels[i + 2] += (max - pixels[i + 2]) * C; }
-        */
     });
 };
 
@@ -2624,10 +2620,26 @@ F.threshold = function () {
     var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
     var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 
+    return F.thresholdColor(scale, amount, false);
+};
+
+F['threshold-color'] = F.thresholdColor = function () {
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+    var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+    var hasColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
     var C = amount / 100;
     return pack$1(function (pixels, i) {
-        var v = 0.2126 * C * pixels[i] + 0.7152 * C * pixels[i + 1] + 0.0722 * C * pixels[i + 2] >= scale ? 255 : 0;
-        pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v);
+        var v = C * color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]) >= scale ? 255 : 0;
+
+        if (hasColor) {
+
+            if (v == 0) {
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = 0;
+            }
+        } else {
+            pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v);
+        }
     });
 };
 

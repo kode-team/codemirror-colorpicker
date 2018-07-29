@@ -1,3 +1,4 @@
+import Color from './Color'
 
 function each(len, callback) {
     for (var i = 0; i < len; i += 4) {
@@ -88,7 +89,7 @@ const Canvas = {
 
         pack(bitmap, (pixels, i) => {
             // gray scale 
-            const grayIndex = Math.round(pixels[i] * 0.2126 + pixels[i+1] * 0.7152 + pixels[i+2] * 0.0722)
+            const grayIndex = Math.round(Color.brightness(pixels[i], pixels[i+1], pixels[i+2]))
             black[grayIndex]++
 
             red[pixels[i]]++

@@ -402,14 +402,6 @@ F.saturation = function (amount = 100) {
             0, 0, L, 0,
             0, 0, 0, L
         ]);
-
-        /*
-        const max = Math.max(pixels[i], pixels[i + 1], pixels[i + 2])
-
-        if (pixels[i] != max) { pixels[i] += (max - pixels[i]) * C; }
-        if (pixels[i + 1] != max) { pixels[i + 1] += (max - pixels[i + 1]) * C; }
-        if (pixels[i + 2] != max) { pixels[i + 2] += (max - pixels[i + 2]) * C; }
-        */
     })
 
 }
@@ -419,12 +411,25 @@ F.saturation = function (amount = 100) {
  * @param {Number} amount  0..100 
  */
 F.threshold = function (scale = 200, amount = 100) {
+    return F.thresholdColor(scale, amount, false)
+}
+
+F['threshold-color'] = F.thresholdColor = function (scale = 200, amount = 100, hasColor = true) {
     const C = amount / 100;
     return pack((pixels, i) => {
-        var v = (0.2126 * C * pixels[i] + 0.7152 * C * pixels[i + 1] + 0.0722 * C * pixels[i + 2]) >= scale ? 255 : 0;
-        pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v)
-    })
+        var v = (C * Color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]) ) >= scale ? 255 : 0;
 
+        if (hasColor) {
+
+            if (v == 0) {
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = 0
+            }
+            
+        } else {
+            pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v)
+        }
+        
+    })
 }
 
 // Matrix based 

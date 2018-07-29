@@ -520,12 +520,15 @@ const color = {
         }
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
+    brightness(r, g, b) {
+        return r * 0.2126 + g * 0.7152 + b * 0.0722;
+    },
     RGBtoYCrCb(r, g, b) {
 
         if (arguments.length == 1) {
             var { r, g, b } = arguments[0];
         }
-        const Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        const Y = this.brightness(r, g, b);
         const Cb = 0.564 * (b - Y)
         const Cr = 0.713 * (r - Y)
 
