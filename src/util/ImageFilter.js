@@ -10,11 +10,11 @@ function weight(arr, num = 1) {
 }
 
 function repeat (value, num) {
-    var result = new Array(num);
-    each(num, function () {
-        result.push(value);
-    })
-    return result; 
+    let arr = new Array(num)
+    for(let i = 0; i < num; i++) {
+        arr[i] = value 
+    }
+    return arr; 
 }
 
 function colorMatrix(pixels, i, matrix) {
@@ -577,11 +577,21 @@ F['motion-blur-3'] = F.motionBlur3 = function () {
     ], 1 / 9));
 }
 
+function createBlurMatrix (amount = 3) {
+    const count = Math.pow(amount, 2)
+    const value = 1/count
+    return repeat (value, count)
+}
+
 /**
  * 
- * @param {Number} radius   from 1 to 100 
+ * @param {Number} amount   from 3 to 100 
  */
-F.blur = function (radius = 10, hasAlphaChannel = true) {
+F.blur = function (amount = 3, hasAlphaChannel = true) {
+    return F.convolution(createBlurMatrix(amount))
+}
+
+F['stack-blur'] = F.stackBlur = function (radius = 10, hasAlphaChannel = true) {
 
     return function (bitmap) {
         return StackBlur(bitmap, radius, hasAlphaChannel )

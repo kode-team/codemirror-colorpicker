@@ -2204,6 +2204,14 @@ function weight(arr) {
     });
 }
 
+function repeat(value, num) {
+    var arr = new Array(num);
+    for (var i = 0; i < num; i++) {
+        arr[i] = value;
+    }
+    return arr;
+}
+
 function colorMatrix(pixels, i, matrix) {
     var r = pixels[i],
         g = pixels[i + 1],
@@ -2752,11 +2760,24 @@ F['motion-blur-3'] = F.motionBlur3 = function () {
     return F.convolution(weight([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1], 1 / 9));
 };
 
+function createBlurMatrix() {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
+
+    var count = Math.pow(amount, 2);
+    var value = 1 / count;
+    return repeat(value, count);
+}
+
 /**
  * 
- * @param {Number} radius   from 1 to 100 
+ * @param {Number} amount   from 3 to 100 
  */
 F.blur = function () {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
+    return F.convolution(createBlurMatrix(amount));
+};
+
+F['stack-blur'] = F.stackBlur = function () {
     var radius = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var hasAlphaChannel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
