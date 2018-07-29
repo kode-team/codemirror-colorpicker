@@ -541,10 +541,10 @@ F['motion-blur'] = F.motionBlur = function () {
         0, 0, 0, 0, 0, 0, 1, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 1, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 1,
-    ], 1));
+    ], 1 / 9));
 }
 
-F['motion-blur-2'] = F.motionBlur2 = function (amount = 9) {
+F['motion-blur-2'] = F.motionBlur2 = function () {
     return F.convolution(weight([
         1, 0, 0, 0, 0, 0, 0, 0, 1,
         0, 1, 0, 0, 0, 0, 0, 1, 0,
@@ -555,10 +555,10 @@ F['motion-blur-2'] = F.motionBlur2 = function (amount = 9) {
         0, 0, 1, 0, 0, 0, 1, 0, 0,
         0, 1, 0, 0, 0, 0, 0, 1, 0,
         1, 0, 0, 0, 0, 0, 0, 0, 1,
-    ], 1 / amount));
+    ], 1 / 9));
 }
 
-F['motion-blur-3'] = F.motionBlur3 = function (amount = 9) {
+F['motion-blur-3'] = F.motionBlur3 = function () {
     return F.convolution(weight([
         1, 0, 0, 0, 1, 0, 0, 0, 1,
         0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -569,7 +569,7 @@ F['motion-blur-3'] = F.motionBlur3 = function (amount = 9) {
         0, 0, 1, 0, 1, 0, 1, 0, 0,
         0, 1, 0, 0, 1, 0, 0, 1, 0,
         1, 0, 0, 0, 1, 0, 0, 0, 1,
-    ], 1 / amount));
+    ], 1 / 9));
 }
 
 /**

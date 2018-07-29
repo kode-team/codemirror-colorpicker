@@ -942,7 +942,6 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
     function view_histogram () {
         var args = Array.prototype.slice.call(arguments);
         var file = document.getElementById('imageforfilter').files[0];
-        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
         document.getElementById('sampled-image').src = URL.createObjectURL(file);
 
         Color.ImageToHistogram(file, function (url) {

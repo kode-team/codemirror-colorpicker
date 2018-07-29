@@ -676,10 +676,14 @@ const color = {
      */
     contrast(c) {
         c = this.parse(c);
-        var contrast = (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
-
-        return (contrast >= 128) ? 'black' : 'white';
+        const contrast =  (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
+        return contrast; 
     },
+
+    contrastColor (c) {
+        return this.contrast(c) >= 128 ? 'black' : 'white'
+    },
+
     /**
      * @deprecated
      * 
