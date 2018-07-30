@@ -521,7 +521,7 @@ const color = {
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
     brightness(r, g, b) {
-        return r * 0.2126 + g * 0.7152 + b * 0.0722;
+        return Math.ceil(r * 0.2126 + g * 0.7152 + b * 0.0722);
     },
     RGBtoYCrCb(r, g, b) {
 
@@ -532,7 +532,7 @@ const color = {
         const Cb = 0.564 * (b - Y)
         const Cr = 0.713 * (r - Y)
 
-        return { y: Math.ceil(Y), cr: Cr, cb: Cb };
+        return { y: Y, cr: Cr, cb: Cb };
     },
     YCrCbtoRGB(y, cr, cb, bit) {
 

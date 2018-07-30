@@ -47,6 +47,9 @@ function makeFilter(filter) {
 
     const filterFunction = F[filterName];
 
+    if (!filterFunction) {
+        throw new Error(`${filterName} is not filter. please check filter name.`)
+    }
     return filterFunction.apply(filterFunction, params);
 }
 
@@ -89,10 +92,8 @@ function putBitmap(bitmap, subBitmap, area) {
     return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
-
 let F = {};
 let ImageFilter = F
-
 
 /** 
  * 
@@ -105,6 +106,7 @@ F.multi = function (...filters) {
     filters = filters.map(f => {
         return makeFilter(f);
     })
+
     return function (bitmap) {
         return filters.reduce((bitmap, f) => {
             return f(bitmap);
@@ -247,8 +249,27 @@ F.bitonal = function (darkColor, lightColor, threshold = 100) {
             pixels[i + 2] = lightColor.b;
         }
     })
-
 }
+
+
+F.duotone = function (gradientColor, scale = 256) {
+    let colors = Color.gradient(gradientColor, scale).map(c => {
+        return Color.parse(c)
+    })
+
+    return pack((pixels, i) => {
+        const colorIndex = F.clamp(Color.brightness(pixels[i] , pixels[i + 1] , pixels[i + 2]))
+        const newColorIndex = F.clamp(Math.floor(colorIndex * (scale / 256)))
+        const color = colors[newColorIndex]
+
+        pixels[i] = color.r;
+        pixels[i + 1] = color.g;
+        pixels[i + 2] = color.b;
+        pixels[i + 3] = F.clamp(Math.floor(color.a * 256));
+    })
+}
+
+F.gradient = F.duotone;
 
 F.tint = function (redTint = 1, greenTint = 1, blueTint = 1) {
     return pack((pixels, i) => {
@@ -260,9 +281,7 @@ F.tint = function (redTint = 1, greenTint = 1, blueTint = 1) {
 }
 
 F.clamp = function (num) {
-    if (num < 0) return 0 
-    if (num > 255) return 255 
-    return num 
+    return Math.min(255, num)
 }
 /**
  * 

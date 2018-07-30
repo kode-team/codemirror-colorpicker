@@ -661,6 +661,12 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="view_histogram()">Histogram</button>
                 </div>                
                 <div>
+                        <button type="button" onclick="filter_image(['gradient', 'black, yellow'])">duotone(red, yellow)</button>
+                </div>                
+                <div>
+                    <button type="button" onclick="filter_image(['gradient', 'black, white', 2])">duotone(black, white)</button>
+                </div>                                
+                <div>
                     <button type="button" onclick="filter_image(['grayscale', +document.getElementById('scale-value').value])">Gray</button>
                     <input type="range" min="0" max="200" step="1" value="100" id="scale-value" />
                 </div>
@@ -954,6 +960,8 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         var file = document.getElementById('imageforfilter').files[0];
         var ImageFilter = CodeMirrorColorPicker.ImageFilter;
         document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        console.log(args);
 
         Color.ImageToURL(file, ImageFilter.merge(args), function (url) {
             document.getElementById('filtered-image').src = url;

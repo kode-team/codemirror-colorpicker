@@ -1219,7 +1219,7 @@ var color = {
         return this.gray(this.RGBtoYCrCb(r, g, b).y);
     },
     brightness: function brightness(r, g, b) {
-        return r * 0.2126 + g * 0.7152 + b * 0.0722;
+        return Math.ceil(r * 0.2126 + g * 0.7152 + b * 0.0722);
     },
     RGBtoYCrCb: function RGBtoYCrCb(r, g, b) {
 
@@ -1233,7 +1233,7 @@ var color = {
         var Cb = 0.564 * (b - Y);
         var Cr = 0.713 * (r - Y);
 
-        return { y: Math.ceil(Y), cr: Cr, cb: Cb };
+        return { y: Y, cr: Cr, cb: Cb };
     },
     YCrCbtoRGB: function YCrCbtoRGB(y, cr, cb, bit) {
 
@@ -2244,6 +2244,9 @@ function makeFilter(filter) {
 
     var filterFunction = F[filterName];
 
+    if (!filterFunction) {
+        throw new Error(filterName + ' is not filter. please check filter name.');
+    }
     return filterFunction.apply(filterFunction, params);
 }
 
@@ -2304,6 +2307,7 @@ F.multi = function () {
     filters = filters.map(function (f) {
         return makeFilter(f);
     });
+
     return function (bitmap) {
         return filters.reduce(function (bitmap, f) {
             return f(bitmap);
@@ -2460,6 +2464,27 @@ F.bitonal = function (darkColor, lightColor) {
     });
 };
 
+F.duotone = function (gradientColor) {
+    var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 256;
+
+    var colors = color.gradient(gradientColor, scale).map(function (c) {
+        return color.parse(c);
+    });
+
+    return pack$1(function (pixels, i) {
+        var colorIndex = F.clamp(color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]));
+        var newColorIndex = F.clamp(Math.floor(colorIndex * (scale / 256)));
+        var color$$1 = colors[newColorIndex];
+
+        pixels[i] = color$$1.r;
+        pixels[i + 1] = color$$1.g;
+        pixels[i + 2] = color$$1.b;
+        pixels[i + 3] = F.clamp(Math.floor(color$$1.a * 256));
+    });
+};
+
+F.gradient = F.duotone;
+
 F.tint = function () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -2473,9 +2498,7 @@ F.tint = function () {
 };
 
 F.clamp = function (num) {
-    if (num < 0) return 0;
-    if (num > 255) return 255;
-    return num;
+    return Math.min(255, num);
 };
 /**
  * 
