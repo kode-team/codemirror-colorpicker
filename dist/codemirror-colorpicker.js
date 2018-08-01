@@ -506,7 +506,43 @@ var possibleConstructorReturn = function (self, call) {
 
 
 
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
 
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
 
 
 
@@ -2195,6 +2231,109 @@ function stackBlurCanvasRGBA(bitmap, top_x, top_y, radius) {
     return bitmap;
 }
 
+var CONSTANT = {
+    identity: function identity() {
+        return [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    },
+    stretching: function stretching(k) {
+        return [k, 0, 0, 0, 1, 0, 0, 0, 1];
+    },
+    squeezing: function squeezing(k) {
+        return [k, 0, 0, 0, 1 / k, 0, 0, 0, 1];
+    },
+    scale: function scale() {
+        var sx = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+        var sy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+        sx = sx || sx === 0 ? sx : 1;
+        sy = sy || sy === 0 ? sy : 1;
+        return [sx, 0, 0, 0, sy, 0, 0, 0, 1];
+    },
+    scaleX: function scaleX(sx) {
+        return this.scale(sx);
+    },
+    scaleY: function scaleY(sy) {
+        return this.scale(1, sy);
+    },
+    translate: function translate(tx, ty) {
+        return [1, 0, tx, 0, 1, ty, 0, 0, 1];
+    },
+    rotate: function rotate(angle) {
+        var r = this.radian(angle);
+        return [Math.cos(r), -Math.sin(r), 0, Math.sin(r), Math.cos(r), 0, 0, 0, 1];
+    },
+    rotate90: function rotate90() {
+        return [0, -1, 0, 1, 0, 0, 0, 0, 1];
+    },
+    rotate180: function rotate180() {
+        return [-1, 0, 0, 0, -1, 0, 0, 0, 1];
+    },
+    rotate270: function rotate270() {
+        return [0, 1, 0, -1, 0, 0, 0, 0, 1];
+    },
+    radian: function radian(degree) {
+        return degree * Math.PI / 180;
+    },
+    skew: function skew(degreeX, degreeY) {
+        var radianX = this.radian(degreeX);
+        var radianY = this.radian(degreeY);
+        return [1, Math.tan(radianX), 0, Math.tan(radianY), 1, 0, 0, 0, 1];
+    },
+    skewX: function skewX(degreeX) {
+        var radianX = this.radian(degreeX);
+
+        return [1, Math.tan(radianX), 0, 0, 1, 0, 0, 0, 1];
+    },
+    skewY: function skewY(degreeY) {
+        var radianY = this.radian(degreeY);
+
+        return [1, 0, 0, Math.tan(radianY), 1, 0, 0, 0, 1];
+    },
+    shear1: function shear1(angle) {
+        return [1, -Math.tan(this.radian(angle) / 2), 0, 0, 1, 0, 0, 0, 1];
+    },
+    shear2: function shear2(angle) {
+        return [1, 0, 0, Math.sin(this.radian(angle)), 1, 0, 0, 0, 1];
+    }
+};
+
+var Matrix = {
+    CONSTANT: CONSTANT,
+
+    radian: function radian(angle) {
+        return CONSTANT.radian(angle);
+    },
+    multiply: function multiply(A, C) {
+        // console.log(JSON.stringify(A), JSON.stringify(C))
+        return [A[0] * C[0] + A[1] * C[1] + A[2] * C[2], A[3] * C[0] + A[4] * C[1] + A[5] * C[2], A[6] * C[0] + A[7] * C[1] + A[8] * C[2]];
+    },
+    identity: function identity(B) {
+        return this.multiply(CONSTANT.identity(), B);
+    },
+    translate: function translate(x, y, B) {
+        return this.multiply(CONSTANT.translate(x, y), B);
+    },
+    rotate: function rotate(angle, B) {
+        return this.multiply(CONSTANT.rotate(angle), B);
+    },
+    shear1: function shear1(angle, B) {
+        return this.multiply(CONSTANT.shear1(angle), B);
+    },
+    shear2: function shear2(angle, B) {
+        return this.multiply(CONSTANT.shear2(angle), B);
+    },
+    rotateShear: function rotateShear(angle, B) {
+
+        var arr = B;
+
+        arr = this.shear1(angle, arr);
+        // arr = this.shear2(angle, arr)
+        // arr = this.shear1(angle, arr)
+
+        return arr;
+    }
+};
+
 // TODO: worker run 
 function weight(arr) {
     var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -2251,8 +2390,14 @@ function makeFilter(filter) {
 }
 
 function each$1(len, callback) {
-    for (var i = 0; i < len; i += 4) {
-        callback(i);
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex);
+    }
+}
+
+function eachXY(len, width, callback) {
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex % width, Math.floor(xyIndex / width));
     }
 }
 
@@ -2279,6 +2424,10 @@ function createRandomCount() {
     return [3 * 3, 4 * 4, 5 * 5, 6 * 6, 7 * 7, 8 * 8, 9 * 9, 10 * 10].sort(function (a, b) {
         return 0.5 - Math.random();
     })[0];
+}
+
+function createBitmap(length, width, height) {
+    return { pixels: new Uint8ClampedArray(length), width: width, height: height };
 }
 
 function getBitmap(bitmap, area) {
@@ -2360,22 +2509,176 @@ F.resize = function (dstWidth, dstHeight) {
 };
 
 F.crop = function () {
-    var dx = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var dy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var dw = arguments[2];
-    var dh = arguments[3];
+    var startX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var startY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var width = arguments[2];
+    var height = arguments[3];
+
+
+    var newBitmap = createBitmap(width * height * 4, width, height);
 
     return function (bitmap) {
+        for (var y = startY, realY = 0; y < height; y++, realY++) {
+            for (var x = startX, realX = 0; x < width; x++, realX++) {
+                newBitmap.pixels[realY * width * realX] = bitmap.pixels[y * width * x];
+            }
+        }
 
-        var c = Canvas.drawPixels(bitmap);
-        var context = c.getContext('2d');
+        return newBitmap;
+    };
+};
 
-        var targetWidth = dw || srcWidth;
-        var targetHeight = dh || srcHeight;
+var ColorListIndex = [0, 1, 2, 3];
 
-        var nextBuffer = context.getImageData(dx, dy, targetWidth, targetHeight);
+var swapColor = F.swapColor = function swapColor(pixels, startIndex, endIndex) {
 
-        return nextBuffer;
+    ColorListIndex.forEach(function (i) {
+        var temp = pixels[startIndex + i];
+        pixels[startIndex + i] = pixels[endIndex + i];
+        pixels[endIndex + i] = temp;
+    });
+};
+
+F.flipH = function flipH() {
+    return function (bitmap) {
+
+        var width = bitmap.width;
+        var height = bitmap.height;
+        var isCenter = width % 2 == 1 ? 1 : 0;
+
+        var halfWidth = isCenter ? Math.floor(width / 2) : width / 2;
+
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < halfWidth; x++) {
+
+                var startIndex = (y * width + x) * 4;
+                var endIndex = (y * width + (width - 1 - x)) * 4;
+                swapColor(bitmap.pixels, startIndex, endIndex);
+            }
+        }
+
+        return bitmap;
+    };
+};
+
+F.flipV = function flipV() {
+    return function (bitmap) {
+
+        var width = bitmap.width;
+        var height = bitmap.height;
+        var isCenter = height % 2 == 1 ? 1 : 0;
+
+        var halfHeight = isCenter ? Math.floor(height / 2) : height / 2;
+
+        for (var y = 0; y < halfHeight; y++) {
+            for (var x = 0; x < width; x++) {
+
+                var startIndex = (y * width + x) * 4;
+                var endIndex = ((height - 1 - y) * width + x) * 4;
+                swapColor(bitmap.pixels, startIndex, endIndex);
+            }
+        }
+
+        return bitmap;
+    };
+};
+
+F.radian = function (degree) {
+    return Matrix.CONSTANT.radian(degree);
+};
+
+F['rotate-degree'] = F.rotateDegree = function (angle) {
+    var cx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'center';
+    var cy = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
+
+    // const r = F.radian(angle)
+
+    // console.log(r)
+    return function (bitmap) {
+        var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
+        var width = bitmap.width;
+        var height = bitmap.height;
+
+        if (cx == 'center') {
+            cx = Math.floor(width / 2);
+        }
+
+        if (cy == 'center') {
+            cy = Math.floor(height / 2);
+        }
+
+        var translateMatrix = Matrix.CONSTANT.translate(-cx, -cy);
+        var translateMatrix2 = Matrix.CONSTANT.translate(cx, cy);
+        var shear1Matrix = Matrix.CONSTANT.shear1(angle);
+        var shear2Matrix = Matrix.CONSTANT.shear2(angle);
+
+        return packXY(function (pixels, i, x, y) {
+            // console.log(x, y, i)
+            var arr = Matrix.multiply(translateMatrix, [x, y, 1]);
+
+            arr = Matrix.multiply(shear1Matrix, arr).map(Math.round);
+            arr = Matrix.multiply(shear2Matrix, arr).map(Math.round);
+            arr = Matrix.multiply(shear1Matrix, arr).map(Math.round);
+            arr = Matrix.multiply(translateMatrix2, arr);
+
+            var _arr = arr,
+                _arr2 = slicedToArray(_arr, 2),
+                x1 = _arr2[0],
+                y1 = _arr2[1];
+
+            if (x1 < 0) return;
+            if (y1 < 0) return;
+            if (x1 > width - 1) return;
+            if (y1 > height - 1) return;
+
+            var endIndex = (y1 * width + x1) * 4;
+
+            pixels[endIndex] = bitmap.pixels[i];
+            pixels[endIndex + 1] = bitmap.pixels[i + 1];
+            pixels[endIndex + 2] = bitmap.pixels[i + 2];
+            pixels[endIndex + 3] = bitmap.pixels[i + 3];
+        })(newBitmap);
+    };
+};
+
+F.rotate = function rotate() {
+    var degree = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+    degree = degree % 360;
+    return function (bitmap) {
+
+        if (degree == 0) return bitmap;
+
+        if (degree == 90 || degree == 270) {
+            var newBitmap = createBitmap(bitmap.pixels.length, bitmap.height, bitmap.width);
+        } else if (degree == 180) {
+            var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
+        } else {
+            return F.rotateDegree(degree)(bitmap);
+        }
+
+        var width = bitmap.width;
+        var height = bitmap.height;
+
+        packXY(function (pixels, i, x, y) {
+
+            if (degree == 90) {
+                var endIndex = (x * newBitmap.width + (newBitmap.width - 1 - y)) * 4;
+            } else if (degree == 270) {
+                var endIndex = ((newBitmap.height - 1 - x) * newBitmap.width + y) * 4;
+            } else if (degree == 180) {
+                var endIndex = ((newBitmap.height - 1 - y) * newBitmap.width + (newBitmap.width - 1 - x)) * 4;
+            }
+
+            // console.log(startIndex, endIndex)
+
+            newBitmap.pixels[endIndex] = bitmap.pixels[i];
+            newBitmap.pixels[endIndex + 1] = bitmap.pixels[i + 1];
+            newBitmap.pixels[endIndex + 2] = bitmap.pixels[i + 2];
+            newBitmap.pixels[endIndex + 3] = bitmap.pixels[i + 3];
+        })(bitmap);
+
+        return newBitmap;
     };
 };
 
@@ -2383,8 +2686,17 @@ F.crop = function () {
 
 var pack$1 = F.pack = function pack(callback) {
     return function (bitmap) {
-        each$1(bitmap.pixels.length, function (i) {
-            callback(bitmap.pixels, i);
+        each$1(bitmap.pixels.length, function (i, xyIndex) {
+            callback(bitmap.pixels, i, xyIndex);
+        });
+        return bitmap;
+    };
+};
+
+var packXY = F.packXY = function packXY(callback) {
+    return function (bitmap) {
+        eachXY(bitmap.pixels.length, bitmap.width, function (i, x, y) {
+            callback(bitmap.pixels, i, x, y);
         });
         return bitmap;
     };

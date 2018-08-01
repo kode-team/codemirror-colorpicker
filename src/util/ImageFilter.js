@@ -2,6 +2,7 @@
 import Color from './Color'
 import Canvas from './Canvas'
 import StackBlur from './blur/StackBlur'
+import Matrix from './Matrix'
 
 function weight(arr, num = 1) {
     return arr.map(i => {
@@ -54,8 +55,14 @@ function makeFilter(filter) {
 }
 
 function each(len, callback) {
-    for (var i = 0; i < len; i += 4) {
-        callback(i);
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex);
+    }
+}
+
+function eachXY(len, width, callback) {
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex % width, Math.floor(xyIndex / width) );
     }
 }
 
@@ -82,6 +89,10 @@ function createRandomCount() {
     return [3 * 3, 4 * 4, 5 * 5, 6 * 6, 7 * 7, 8 * 8, 9 * 9, 10 * 10].sort(function (a, b) {
         return 0.5 - Math.random();
     })[0];
+}
+
+function createBitmap(length, width, height) {
+    return { pixels: new Uint8ClampedArray(length), width, height }
 }
 
 function getBitmap(bitmap, area) {
@@ -153,18 +164,169 @@ F.resize = function (dstWidth, dstHeight) {
     }
 }
 
-F.crop = function (dx = 0, dy = 0, dw, dh) {
+F.crop = function (startX = 0, startY = 0, width, height) {
+
+    const newBitmap = createBitmap(width * height * 4, width, height)
+
+    return function (bitmap) {
+        for (var y = startY, realY = 0; y < height; y++, realY++) {
+            for (var x = startX, realX = 0; x < width; x++, realX++) {
+                newBitmap.pixels[realY * width * realX] = bitmap.pixels[y * width * x]
+            }
+        }
+
+        return newBitmap;
+    }
+}
+
+const ColorListIndex = [0, 1, 2, 3]
+
+const swapColor = F.swapColor = function swapColor (pixels, startIndex, endIndex) {
+
+    ColorListIndex.forEach(i => {
+        var temp = pixels[startIndex + i]
+        pixels[startIndex + i] = pixels[endIndex + i]
+        pixels[endIndex + i] = temp
+    })
+}
+
+F.flipH = function flipH () {
     return function (bitmap) {
 
-        var c = Canvas.drawPixels(bitmap);
-        var context = c.getContext('2d');
+        const width = bitmap.width
+        const height = bitmap.height 
+        const isCenter = width % 2 == 1 ? 1 : 0 
 
-        const targetWidth = dw || srcWidth;
-        const targetHeight = dh || srcHeight;
+        const halfWidth = isCenter ? Math.floor(width / 2) : width / 2 ;
 
-        const nextBuffer = context.getImageData(dx, dy, targetWidth, targetHeight);
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < halfWidth; x++) {
 
-        return nextBuffer;
+                var startIndex = (y * width + x) * 4 
+                var endIndex = (y * width +  (width -1 - x) ) * 4 
+                swapColor(bitmap.pixels, startIndex, endIndex)
+
+            }
+        }
+
+        return bitmap;
+    }
+}
+
+F.flipV = function flipV () {
+    return function (bitmap) {
+
+        const width = bitmap.width
+        const height = bitmap.height 
+        const isCenter = height % 2 == 1 ? 1 : 0 
+
+        const halfHeight = isCenter ? Math.floor(height / 2) : height / 2 ;
+
+        for (var y = 0; y < halfHeight; y++) {
+            for (var x = 0; x < width; x++) {
+
+                var startIndex = (y * width + x) * 4 
+                var endIndex = ((height -1 - y) * width + x ) * 4 
+                swapColor(bitmap.pixels, startIndex, endIndex)
+
+            }
+        }
+
+        return bitmap;
+    }
+}
+
+F.radian = function (degree) {
+    return Matrix.CONSTANT.radian(degree)
+}
+
+F['rotate-degree'] = F.rotateDegree = function (angle, cx = 'center', cy = 'center') {
+    // const r = F.radian(angle)
+
+    // console.log(r)
+    return function (bitmap) {
+        var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
+        const width = bitmap.width 
+        const height = bitmap.height 
+
+        if (cx == 'center') {
+            cx = Math.floor(width / 2); 
+        }
+
+        if (cy == 'center') {
+            cy = Math.floor(height/ 2);
+        }
+
+        const translateMatrix = Matrix.CONSTANT.translate(-cx, -cy)
+        const translateMatrix2 = Matrix.CONSTANT.translate(cx, cy)
+        const shear1Matrix = Matrix.CONSTANT.shear1(angle)
+        const shear2Matrix = Matrix.CONSTANT.shear2(angle)
+
+        return packXY((pixels, i, x, y) => {
+            // console.log(x, y, i)
+            let arr = Matrix.multiply(translateMatrix, [x, y, 1])
+            
+            arr = Matrix.multiply(shear1Matrix, arr).map(Math.round)
+            arr = Matrix.multiply(shear2Matrix, arr).map(Math.round)
+            arr = Matrix.multiply(shear1Matrix, arr).map(Math.round)
+            arr = Matrix.multiply(translateMatrix2, arr)
+ 
+            const [x1, y1] = arr
+
+            if (x1 < 0) return;   
+            if (y1 < 0) return; 
+            if (x1 > width-1) return;
+            if (y1 > height-1) return; 
+
+            var endIndex = (y1 * width + x1) * 4 
+
+            pixels[endIndex] = bitmap.pixels[i]
+            pixels[endIndex+1] = bitmap.pixels[i+1]
+            pixels[endIndex+2] = bitmap.pixels[i+2]
+            pixels[endIndex+3] = bitmap.pixels[i+3]
+
+        })(newBitmap)
+    }
+} 
+
+
+F.rotate = function rotate (degree = 0) {
+    degree = degree % 360
+    return function (bitmap) {
+
+        if (degree == 0) return bitmap
+
+        if (degree == 90 || degree == 270) {
+            var newBitmap = createBitmap(bitmap.pixels.length, bitmap.height, bitmap.width)
+        } else if (degree == 180) {
+            var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
+        } else {
+            return F.rotateDegree(degree)(bitmap)
+        }
+
+        const width = bitmap.width 
+        const height = bitmap.height 
+
+        packXY((pixels, i, x, y) => {
+
+            if (degree == 90) {
+                var endIndex = (x * newBitmap.width + (newBitmap.width -1 - y) ) * 4 
+            } else if (degree == 270) {
+                var endIndex = ( (newBitmap.height -1 -x) * newBitmap.width + y ) * 4 
+            } else if (degree == 180) {
+                var endIndex = ((newBitmap.height -1 -y) * newBitmap.width + (newBitmap.width -1 -x)) * 4
+            }
+
+            // console.log(startIndex, endIndex)
+
+            newBitmap.pixels[endIndex] = bitmap.pixels[i]
+            newBitmap.pixels[endIndex+1] = bitmap.pixels[i+1]
+            newBitmap.pixels[endIndex+2] = bitmap.pixels[i+2]
+            newBitmap.pixels[endIndex+3] = bitmap.pixels[i+3]
+
+        })(bitmap)
+
+        return newBitmap
     }
 }
 
@@ -172,14 +334,23 @@ F.crop = function (dx = 0, dy = 0, dw, dh) {
 
 const pack = F.pack = function pack(callback) {
     return function (bitmap) {
-        each(bitmap.pixels.length, (i) => {
-            callback(bitmap.pixels, i)
+        each(bitmap.pixels.length, (i, xyIndex) => {
+            callback(bitmap.pixels, i, xyIndex)
         })
         return bitmap;
     }
 }
 
-F.grayscale = function (amount) {
+const packXY = F.packXY = function packXY(callback) {
+    return function (bitmap) {
+        eachXY(bitmap.pixels.length, bitmap.width, (i, x, y) => {
+            callback(bitmap.pixels, i, x, y)
+        })
+        return bitmap;
+    }
+}
+
+F.grayscale = function (amount) { 
     let C = amount / 100;
 
     if (C > 1) C = 1; 

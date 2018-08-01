@@ -661,6 +661,20 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="view_histogram()">Histogram</button>
                 </div>                
                 <div>
+                    <button type="button" onclick="filter_image(['rotate', 150])">rotate 150</button>
+                    <button type="button" onclick="filter_image(['rotate', 75])">rotate 75</button>
+                    <button type="button" onclick="filter_image(['rotate', 10])">rotate 10</button>
+                    <button type="button" onclick="filter_image(['rotate', 90])">rotate 90</button>
+                    <button type="button" onclick="filter_image(['rotate', 180])">rotate 180</button>
+                    <button type="button" onclick="filter_image(['rotate', 270])">rotate 270</button>
+                </div>                    
+                <div>
+                    <button type="button" onclick="filter_image(['flipH'])">flipH</button>
+                </div>    
+                <div>
+                    <button type="button" onclick="filter_image(['flipV'])">flipV</button>
+                </div>                                  
+                <div>
                         <button type="button" onclick="filter_image(['gradient', 'black, yellow'])">duotone(red, yellow)</button>
                 </div>                
                 <div>
@@ -955,13 +969,11 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         }, {red: true, green: true})
     }
 
-    function filter_image () {
+    function filter_image (A, B, C) {
         var args = Array.prototype.slice.call(arguments);
         var file = document.getElementById('imageforfilter').files[0];
         var ImageFilter = CodeMirrorColorPicker.ImageFilter;
         document.getElementById('sampled-image').src = URL.createObjectURL(file);
-
-        console.log(args);
 
         Color.ImageToURL(file, ImageFilter.merge(args), function (url) {
             document.getElementById('filtered-image').src = url;

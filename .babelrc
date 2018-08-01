@@ -3,7 +3,8 @@
         "test": {
             "presets" : [ ["env"]  ],
             "plugins": [
-                "transform-es2015-modules-commonjs"
+                "transform-es2015-modules-commonjs",
+                "transform-object-rest-spread"
             ]
         },
         "development" : {
@@ -11,7 +12,8 @@
                 [ "env", {"modules" : false } ]
             ],
             "plugins": [    
-                "external-helpers"
+                "external-helpers",
+                "transform-object-rest-spread"
             ]
         },
         "production" : {
@@ -19,7 +21,8 @@
                 [ "env", {"modules" : false } ]
             ],
             "plugins": [    
-                "external-helpers"
+                "external-helpers",
+                "transform-object-rest-spread"
             ]
         }
     }
