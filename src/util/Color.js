@@ -896,6 +896,14 @@ const color = {
                 if (typeof callback == 'function') callback(canvas.toDataURL('image/png'));
             }, opt)
         })
+    },
+
+    createCurve (width, height, points = [], canvasOptions = {}, callback) {
+        const canvas = Canvas.drawCurve(width, height, points, canvasOptions)
+
+        if (typeof callback == 'function') {
+            callback(canvas.toDataURL('image/png'))
+        }
     }
 }
 

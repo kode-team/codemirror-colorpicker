@@ -791,6 +791,7 @@ var colorpicker = new ColorPicker({
     <div class="area-item">
         <div class="image-palette">
             <img id="filtered-image" />
+            <img id="curve-image" />
         </div>
     </div>    
     <pre><code class="javascript"></code></pre>        
@@ -967,6 +968,18 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         Color.ImageToHistogram(file, function (url) {
             document.getElementById('filtered-image').src = url;
         }, {red: true, green: true})
+
+        Color.createCurve(256, 256, [
+            {x: 0, y: 256}, 
+            {x: 50, y: 200},
+            {x: 80, y: 180},
+            {x: 100, y: 150},
+            {x: 170, y: 100},
+            {x: 180, y : 100},
+            {x: 256, y : 0}
+        ], null, function (url) {
+            document.getElementById('curve-image').src = url;
+        }) 
     }
 
     function filter_image (A, B, C) {

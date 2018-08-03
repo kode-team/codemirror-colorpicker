@@ -379,6 +379,213 @@ var Canvas = {
         bitmap.pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
 
         return bitmap;
+    },
+    controlPointsFromPoints: function controlPointsFromPoints(points) {
+        var count = points.length - 1;
+        var firstControlPoints = [];
+        var secondControlPoints = [];
+
+        if (count == 1) {
+            var P0 = points[0];
+            var P3 = points[1];
+
+            var P1x = (2 * P0.x + P3.x) / 3;
+            var P1y = (2 * P0.y + P3.y) / 3;
+
+            firstControlPoints.push({ x: P1x, y: P1y });
+
+            var P2x = 2 * P1x - P0.x;
+            var P2y = 2 * P1y - P0.y;
+
+            secondControlPoints.push({ x: P2x, y: P2y });
+        } else {
+            firstControlPoints = new Array(count);
+
+            var rhsArray = [];
+
+            var a = [];
+            var b = [];
+            var c = [];
+
+            for (var i = 0; i < count; i++) {
+
+                var rhsValueX = 0;
+                var rhsValueY = 0;
+
+                var _P = points[i];
+                var _P2 = points[i + 1];
+
+                if (i == 0) {
+                    a.push(0);
+                    b.push(2);
+                    c.push(1);
+
+                    rhsValueX = _P.x + 2 * _P2.x;
+                    rhsValueY = _P.y + 2 * _P2.y;
+                } else if (i == count - 1) {
+                    a.push(2);
+                    b.push(7);
+                    c.push(0);
+
+                    rhsValueX = 8 * _P.x + _P2.x;
+                    rhsValueY = 8 * _P.y + _P2.y;
+                } else {
+                    a.push(1);
+                    b.push(4);
+                    c.push(1);
+
+                    rhsValueX = 4 * _P.x + _P2.x;
+                    rhsValueY = 4 * _P.y + _P2.y;
+                }
+
+                rhsArray.push({ x: rhsValueX, y: rhsValueY });
+            }
+
+            for (var i = 1; i < count; i++) {
+                var _rhsValueX = rhsArray[i].x;
+                var _rhsValueY = rhsArray[i].y;
+
+                var prevRhsValueX = rhsArray[i - 1].x;
+                var prevRhsValueY = rhsArray[i - 1].y;
+
+                var m = a[i] / b[i - 1];
+
+                var b1 = b[1] - m * c[i - 1];
+                b[i] = b1;
+
+                var r2x = _rhsValueX - m * prevRhsValueX;
+                var r2y = _rhsValueY - m * prevRhsValueY;
+
+                rhsArray[i] = { x: r2x, y: r2y };
+            }
+
+            var lastControlPointX = rhsArray[count - 1].x / b[count - 1];
+            var lastControlPointY = rhsArray[count - 1].y / b[count - 1];
+
+            firstControlPoints[count - 1] = { x: lastControlPointX, y: lastControlPointY };
+
+            for (var i = count - 2; i >= 0; --i) {
+                var nextControlPoint = firstControlPoints[i + 1];
+                if (nextControlPoint) {
+                    var controlPointX = (rhsArray[i].x - c[i] * nextControlPoint.x) / b[i];
+                    var controlPointY = (rhsArray[i].y - c[i] * nextControlPoint.y) / b[i];
+
+                    firstControlPoints[i] = { x: controlPointX, y: controlPointY };
+                }
+            }
+
+            for (var i = 0; i < count; i++) {
+                if (i == count - 1) {
+                    var _P3 = points[i + 1];
+                    var P1 = firstControlPoints[i];
+
+                    if (!P1) {
+                        continue;
+                    }
+
+                    var _controlPointX = (_P3.x + P1.y) / 2;
+                    var _controlPointY = (_P3.y + P1.y) / 2;
+
+                    secondControlPoints.push({ x: _controlPointX, y: _controlPointY });
+                } else {
+                    var _P4 = points[i + 1];
+                    var nextP1 = firstControlPoints[i + 1];
+
+                    if (!nextP1) {
+                        continue;
+                    }
+
+                    var _controlPointX2 = 2 * _P4.x - nextP1.x;
+                    var _controlPointY2 = 2 * _P4.y - nextP1.y;
+
+                    secondControlPoints.push({ x: _controlPointX2, y: _controlPointY2 });
+                }
+            }
+        }
+
+        var controlPoints = [];
+
+        for (var i = 0; i < count; i++) {
+            var firstControlPoint = firstControlPoints[i];
+            var secondControlPoint = secondControlPoints[i];
+
+            if (firstControlPoint && secondControlPoint) {
+                var segment = { controlPoint1: firstControlPoint, controlPoint2: secondControlPoint };
+                controlPoints.push(segment);
+            }
+        }
+
+        return controlPoints;
+    },
+    drawCurve: function drawCurve(width, height) {
+        var points = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+        var canvasOption = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+
+        var canvas = this.create(width, height);
+        var context = canvas.getContext('2d');
+
+        if (!points.length) return canvas;
+
+        var controlPoints = this.controlPointsFromPoints(points);
+        var lines = [];
+        Object.assign(context, {
+            lineWidth: 1,
+            strokeStyle: 'black'
+        }, canvasOption);
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "white";
+        context.fillRect(0, 0, width, height);
+        context.beginPath();
+        for (var i = 0, len = points.length; i < len; i++) {
+            var point = points[i];
+
+            if (i == 0) {
+                context.moveTo(point.x, point.y);
+            } else {
+                var segment = controlPoints[i - 1];
+                context.bezierCurveTo(segment.controlPoint1.x, segment.controlPoint1.y, segment.controlPoint2.x, segment.controlPoint2.y, point.x, point.y);
+
+                lines.push([1, points[i - 1], segment.controlPoint1]);
+                lines.push([2, point, segment.controlPoint2]);
+            }
+        }
+
+        context.stroke();
+
+        return canvas;
+
+        lines.forEach(function (line) {
+            if (line[0] == 1) {
+                // first 
+                context.strokeStyle = 'blue';
+                context.beginPath();
+                context.moveTo(line[1].x, line[1].y);
+                context.lineTo(line[2].x, line[2].y);
+                context.closePath();
+                context.stroke();
+
+                context.beginPath();
+                context.arc(line[2].x, line[2].y, 5, Math.PI * 2, false);
+                context.closePath();
+                context.stroke();
+            } else {
+                // second
+                context.strokeStyle = 'red';
+                context.beginPath();
+                context.moveTo(line[1].x, line[1].y);
+                context.lineTo(line[2].x, line[2].y);
+                context.closePath();
+                context.stroke();
+
+                context.beginPath();
+                context.arc(line[2].x, line[2].y, 5, Math.PI * 2, false);
+                context.closePath();
+                context.stroke();
+            }
+        });
+
+        return canvas;
     }
 };
 
@@ -1691,6 +1898,17 @@ var color = {
                 if (typeof callback == 'function') callback(canvas.toDataURL('image/png'));
             }, opt);
         });
+    },
+    createCurve: function createCurve(width, height) {
+        var points = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+        var canvasOptions = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+        var callback = arguments[4];
+
+        var canvas = Canvas.drawCurve(width, height, points, canvasOptions);
+
+        if (typeof callback == 'function') {
+            callback(canvas.toDataURL('image/png'));
+        }
     }
 };
 
