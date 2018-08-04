@@ -664,10 +664,16 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image(['rotate', 150])">rotate 150</button>
                     <button type="button" onclick="filter_image(['rotate', 75])">rotate 75</button>
                     <button type="button" onclick="filter_image(['rotate', 10])">rotate 10</button>
-                    <button type="button" onclick="filter_image(['rotate', 90])">rotate 90</button>
+                    <button type="button" onclick="filter_image(['rotate', 90])">rotate 90</button> 
                     <button type="button" onclick="filter_image(['rotate', 180])">rotate 180</button>
                     <button type="button" onclick="filter_image(['rotate', 270])">rotate 270</button>
                 </div>                    
+                <div>
+                    <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) sepia(5)'])">parse</button>
+                </div>                    
+                <div>
+                    <button type="button" onclick="filter_image(['filter', 'vintage'])">vintage</button>
+                </div>                                    
                 <div>
                     <button type="button" onclick="filter_image(['flipH'])">flipH</button>
                 </div>    
@@ -678,7 +684,7 @@ var colorpicker = new ColorPicker({
                         <button type="button" onclick="filter_image(['gradient', 'black, yellow'])">duotone(red, yellow)</button>
                 </div>                
                 <div>
-                    <button type="button" onclick="filter_image(['gradient', 'black, white', 2])">duotone(black, white)</button>
+                    <button type="button" onclick="filter_image(['gradient', 'black, white, 20'])">duotone(black, white, 20)</button>
                 </div>                                
                 <div>
                     <button type="button" onclick="filter_image(['grayscale', +document.getElementById('scale-value').value])">Gray</button>
@@ -706,7 +712,7 @@ var colorpicker = new ColorPicker({
                     <input type="range" min="0" max="255" step="1" value="100" id="solarize-b" />
                 </div>                                                
                 <div>
-                    <button type="button" onclick="filter_image(['partial', {x:50,y:50,width:200,height:200}, 'invert', 'sepia','sharpen'])">partial</button>
+                    <button type="button" onclick="filter_image(['partial', {x:50,y:50,width:200,height:200}, 'invert(70) sepia sharpen gradient( white, black)'])">partial</button>
                 </div>                   
                 <div>
                     <button type="button" onclick="filter_image('sharpen')">sharpen</button>

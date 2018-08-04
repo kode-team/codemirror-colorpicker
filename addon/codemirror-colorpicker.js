@@ -745,7 +745,13 @@ var color = {
 
         var ret = this.convertMatches(str);
         return ret.str.split(splitStr).map(function (it, index) {
-            return _this.trim(it).replace('@' + index, ret.matches[index].color);
+            it = _this.trim(it);
+
+            if (ret.matches[index]) {
+                it = it.replace('@' + index, ret.matches[index].color);
+            }
+
+            return it;
         });
     },
 
@@ -1548,7 +1554,11 @@ var color = {
             var dist = (1 - sum) / count;
             colors.forEach(function (it, index) {
                 if (it[1] == '*' && index > 0) {
-                    it[1] = dist;
+                    if (colors.length - 1 == index) {
+                        // it[1] = 1 
+                    } else {
+                        it[1] = dist;
+                    }
                 }
             });
         }
@@ -2436,8 +2446,125 @@ function putBitmap(bitmap, subBitmap, area) {
     return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
+function parseParamNumber(param) {
+    if (typeof param === 'string') {
+        param = param.replace(/deg/, '');
+        param = param.replace(/px/, '');
+    }
+    return +param;
+}
+
 var F = {};
 var ImageFilter = F;
+
+var filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
+var pack$1 = F.pack = function pack(callback) {
+    return function (bitmap) {
+        each$1(bitmap.pixels.length, function (i, xyIndex) {
+            callback(bitmap.pixels, i, xyIndex);
+        });
+        return bitmap;
+    };
+};
+
+var ColorListIndex = [0, 1, 2, 3];
+
+var swapColor = F.swapColor = function swapColor(pixels, startIndex, endIndex) {
+
+    ColorListIndex.forEach(function (i) {
+        var temp = pixels[startIndex + i];
+        pixels[startIndex + i] = pixels[endIndex + i];
+        pixels[endIndex + i] = temp;
+    });
+};
+
+var packXY = F.packXY = function packXY(callback) {
+    return function (bitmap) {
+        eachXY(bitmap.pixels.length, bitmap.width, function (i, x, y) {
+            callback(bitmap.pixels, i, x, y);
+        });
+        return bitmap;
+    };
+};
+
+F.matches = function (str) {
+    var _this = this;
+
+    var ret = color.convertMatches(str);
+    var matches = ret.str.match(filter_regexp);
+    var result = [];
+
+    if (!matches) {
+        return result;
+    }
+
+    result = matches.map(function (it) {
+        return { filter: it, origin: color.reverseMatches(it, ret.matches) };
+    });
+
+    var pos = { next: 0 };
+    result = result.map(function (item) {
+
+        var startIndex = str.indexOf(item.origin, pos.next);
+
+        item.startIndex = startIndex;
+        item.endIndex = startIndex + item.origin.length;
+
+        item.arr = _this.parseFilter(item.origin);
+
+        pos.next = item.endIndex;
+
+        return item;
+    }).filter(function (it) {
+        if (!it.arr.length) return false;
+        return !!F[it.arr[0]];
+    });
+
+    return result;
+};
+
+/**
+ * Filter Parser 
+ * 
+ * F.parseFilter('blur(30)') == ['blue', '30']
+ * F.parseFilter('gradient(white, black, 3)') == ['gradient', 'white', 'black', '3']
+ * 
+ * @param {String} filterString 
+ */
+F.parseFilter = function (filterString) {
+
+    var ret = color.convertMatches(filterString);
+    var matches = ret.str.match(filter_regexp);
+
+    if (!matches[0]) {
+        return [];
+    }
+
+    var arr = matches[0].split('(');
+
+    var filterName = arr.shift();
+    var filterParams = [];
+
+    if (!F[filterName.toLowerCase()]) {
+        return [];
+    }
+
+    if (arr.length) {
+        filterParams = arr.shift().split(')')[0].split(',').map(function (f) {
+            return color.reverseMatches(f, ret.matches);
+        });
+    }
+
+    var result = [filterName].concat(toConsumableArray(filterParams)).map(color.trim);
+
+    return result;
+};
+
+F.filter = function (str) {
+    return F.merge(F.matches(str).map(function (it) {
+        return it.arr;
+    }));
+};
 
 /** 
  * 
@@ -2466,13 +2593,30 @@ F.merge = function (filters) {
     return F.multi.apply(F, toConsumableArray(filters));
 };
 
+/**
+ * apply filter into special area
+ * 
+ * F.partial({x,y,width,height}, filter, filter, filter )
+ * F.partial({x,y,width,height}, 'filter' )
+ * 
+ * @param {{x, y, width, height}} area 
+ * @param {*} filters 
+ */
 F.partial = function (area) {
+    var allFilter = null;
+
     for (var _len2 = arguments.length, filters = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         filters[_key2 - 1] = arguments[_key2];
     }
 
+    if (filters.length == 1 && typeof filters[0] === 'string') {
+        allFilter = F.filter(filters[0]);
+    } else {
+        allFilter = F.merge(filters);
+    }
+
     return function (bitmap) {
-        return putBitmap(bitmap, F.multi.apply(F, filters)(getBitmap(bitmap, area)), area);
+        return putBitmap(bitmap, allFilter(getBitmap(bitmap, area)), area);
     };
 };
 
@@ -2524,17 +2668,6 @@ F.crop = function () {
 
         return newBitmap;
     };
-};
-
-var ColorListIndex = [0, 1, 2, 3];
-
-var swapColor = F.swapColor = function swapColor(pixels, startIndex, endIndex) {
-
-    ColorListIndex.forEach(function (i) {
-        var temp = pixels[startIndex + i];
-        pixels[startIndex + i] = pixels[endIndex + i];
-        pixels[endIndex + i] = temp;
-    });
 };
 
 F.flipH = function flipH() {
@@ -2591,7 +2724,6 @@ F['rotate-degree'] = F.rotateDegree = function (angle) {
 
     // const r = F.radian(angle)
 
-    // console.log(r)
     return function (bitmap) {
         var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
         var width = bitmap.width;
@@ -2642,6 +2774,7 @@ F['rotate-degree'] = F.rotateDegree = function (angle) {
 F.rotate = function rotate() {
     var degree = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
+    degree = parseParamNumber(degree);
     degree = degree % 360;
     return function (bitmap) {
 
@@ -2682,25 +2815,9 @@ F.rotate = function rotate() {
 
 // Pixel based 
 
-var pack$1 = F.pack = function pack(callback) {
-    return function (bitmap) {
-        each$1(bitmap.pixels.length, function (i, xyIndex) {
-            callback(bitmap.pixels, i, xyIndex);
-        });
-        return bitmap;
-    };
-};
-
-var packXY = F.packXY = function packXY(callback) {
-    return function (bitmap) {
-        eachXY(bitmap.pixels.length, bitmap.width, function (i, x, y) {
-            callback(bitmap.pixels, i, x, y);
-        });
-        return bitmap;
-    };
-};
 
 F.grayscale = function (amount) {
+    amount = parseParamNumber(amount);
     var C = amount / 100;
 
     if (C > 1) C = 1;
@@ -2708,20 +2825,16 @@ F.grayscale = function (amount) {
     return pack$1(function (pixels, i) {
 
         colorMatrix(pixels, i, [0.2126 + 0.7874 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 + 0.2848 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 + 0.9278 * (1 - C), 0, 0, 0, 0, 1]);
-
-        /*
-        var v = 0.2126 * C * pixels[i] + 0.7152 * C * pixels[i + 1] + 0.0722 * C * pixels[i + 2];
-        pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v)
-        */
     });
 };
 
 /*
- * @param {Number} amount   0..100  
+ * @param {Number} amount   0..360  
  */
 F.hue = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
+    amount = parseParamNumber(amount);
     return pack$1(function (pixels, i) {
         var r = pixels[i],
             g = pixels[i + 1],
@@ -2748,6 +2861,9 @@ F.shade = function () {
     var g = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var b = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
+    r = parseParamNumber(r);
+    g = parseParamNumber(g);
+    b = parseParamNumber(b);
     return pack$1(function (pixels, i) {
         pixels[i] *= r;
         pixels[i + 1] *= g;
@@ -2774,10 +2890,42 @@ F.bitonal = function (darkColor, lightColor) {
     });
 };
 
-F.duotone = function (gradientColor) {
-    var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 256;
+/**
+ * F.gradient('red', 'blue', 'yellow', 'white', 10)
+ * F.gradient('red, blue, yellow, white, 10')
+ */
+F.duotone = function () {
+    // 전체 매개변수 기준으로 파싱 
+    // 색이 아닌 것 기준으로 scale 변수로 인식 
 
-    var colors = color.gradient(gradientColor, scale).map(function (c) {
+    var params = [].concat(Array.prototype.slice.call(arguments));
+
+    if (params.length === 1 && typeof params[0] === 'string') {
+        params = color.convertMatchesArray(params[0]);
+    }
+
+    params = params.map(function (arg) {
+        var res = color.matches(arg);
+
+        if (!res.length) {
+            return { type: 'scale', value: arg };
+        }
+
+        return { type: 'param', value: arg };
+    });
+
+    var scale = params.filter(function (it) {
+        return it.type == 'scale';
+    })[0];
+    scale = scale ? +scale.value : 256;
+
+    params = params.filter(function (it) {
+        return it.type == 'param';
+    }).map(function (it) {
+        return it.value;
+    }).join(',');
+
+    var colors = color.gradient(params, scale).map(function (c) {
         return color.parse(c);
     });
 
@@ -2800,6 +2948,9 @@ F.tint = function () {
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var blueTint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
+    redTint = parseParamNumber(redTint);
+    greenTint = parseParamNumber(greenTint);
+    blueTint = parseParamNumber(blueTint);
     return pack$1(function (pixels, i) {
         pixels[i] += (255 - pixels[i]) * redTint;
         pixels[i + 1] += (255 - pixels[i + 1]) * greenTint;
@@ -2817,18 +2968,20 @@ F.clamp = function (num) {
 F.contrast = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
+    amount = parseParamNumber(amount);
     var C = Math.max((128 + amount) / 128, 0);
 
     return pack$1(function (pixels, i) {
-        pixels[i] = F.clamp(pixels[i] * C);
-        pixels[i + 1] = F.clamp(pixels[i + 1] * C);
-        pixels[i + 2] = F.clamp(pixels[i + 2] * C);
+        pixels[i] = pixels[i] * C;
+        pixels[i + 1] = pixels[i + 1] * C;
+        pixels[i + 2] = pixels[i + 2] * C;
     });
 };
 
 F.invert = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     var C = amount / 100;
 
     return pack$1(function (pixels, i) {
@@ -2842,6 +2995,7 @@ F.invert = function () {
 F.opacity = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     var C = amount / 100;
 
     return pack$1(function (pixels, i) {
@@ -2856,6 +3010,9 @@ F.opacity = function () {
  * @param {*} b 
  */
 F.solarize = function (r, g, b) {
+    r = parseParamNumber(r);
+    g = parseParamNumber(g);
+    b = parseParamNumber(b);
     return pack$1(function (pixels, i) {
         if (pixels[i] < r) pixels[i] = 255 - pixels[i];
         if (pixels[i + 1] < g) pixels[i + 1] = 255 - pixels[i + 1];
@@ -2869,6 +3026,7 @@ F.solarize = function (r, g, b) {
 F.sepia = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     var C = amount / 100;
     if (C > 1) C = 1;
 
@@ -2881,6 +3039,7 @@ F.sepia = function () {
 F.gamma = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
+    amount = parseParamNumber(amount);
     return pack$1(function (pixels, i) {
         pixels[i] = Math.pow(pixels[i] / 255, amount) * 255;
         pixels[i + 1] = Math.pow(pixels[i + 1] / 255, amount) * 255;
@@ -2895,6 +3054,7 @@ F.gamma = function () {
 F.noise = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
+    amount = parseParamNumber(amount);
     return pack$1(function (pixels, i) {
         var C = Math.abs(amount) * 5;
         var min = -C;
@@ -2913,6 +3073,7 @@ F.noise = function () {
 F.clip = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
+    amount = parseParamNumber(amount);
     var C = Math.abs(amount) * 2.55;
 
     return pack$1(function (pixels, i) {
@@ -2933,6 +3094,7 @@ F.clip = function () {
 F.brightness = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
+    amount = parseParamNumber(amount);
     var C = Math.floor(255 * (amount / 100));
 
     return pack$1(function (pixels, i) {
@@ -2948,6 +3110,7 @@ F.brightness = function () {
 F.saturation = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     var C = amount / 100;
     var L = 1 - Math.abs(C);
     return pack$1(function (pixels, i) {
@@ -2971,6 +3134,8 @@ F['threshold-color'] = F.thresholdColor = function () {
     var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
     var hasColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
+    scale = parseParamNumber(scale);
+    amount = parseParamNumber(amount);
     var C = amount / 100;
     return pack$1(function (pixels, i) {
         var v = C * color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]) >= scale ? 255 : 0;
@@ -3049,8 +3214,10 @@ F.identity = function () {
 };
 
 F.random = function () {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createRandomCount();
 
+    amount = parseParamNumber(amount);
     return function (pixels, width, height) {
         var rand = createRandRange(-1, 5, count);
         return F.convolution(rand)(pixels, width, height);
@@ -3060,24 +3227,28 @@ F.random = function () {
 F.grayscale2 = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     return F.convolution(weight([0.3, 0.3, 0.3, 0, 0, 0.59, 0.59, 0.59, 0, 0, 0.11, 0.11, 0.11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 };
 
 F.sepia2 = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     return F.convolution(weight([0.393, 0.349, 0.272, 0, 0, 0.769, 0.686, 0.534, 0, 0, 0.189, 0.168, 0.131, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 };
 
 F.negative = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     return F.convolution(weight([-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1], amount / 100));
 };
 
 F.sharpen = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
+    amount = parseParamNumber(amount);
     return F.convolution(weight([0, -1, 0, -1, 5, -1, 0, -1, 0], amount / 100));
 };
 
@@ -3107,6 +3278,8 @@ function createBlurMatrix() {
  */
 F.blur = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
+    amount = parseParamNumber(amount);
+
     return F.convolution(createBlurMatrix(amount));
 };
 
@@ -3114,6 +3287,7 @@ F['stack-blur'] = F.stackBlur = function () {
     var radius = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var hasAlphaChannel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
+    radius = parseParamNumber(radius);
 
     return function (bitmap) {
         return stackBlurImage(bitmap, radius, hasAlphaChannel);
@@ -3121,64 +3295,80 @@ F['stack-blur'] = F.stackBlur = function () {
 };
 
 F['gaussian-blur'] = F.gaussianBlur = function () {
-    return F.convolution(weight([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16));
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
+
+    amount = parseParamNumber(amount);
+    var C = amount / 100;
+
+    return F.convolution(weight([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16 * C));
 };
 
 F['gaussian-blur-5x'] = F.gaussianBlur5x = function () {
-    return F.convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], 1 / 256));
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
+
+    amount = parseParamNumber(amount);
+    var C = amount / 100;
+    return F.convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], 1 / 256 * C));
 };
 
 F['unsharp-masking'] = F.unsharpMasking = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 256;
 
+    amount = parseParamNumber(amount);
     return F.convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], -1 / amount));
 };
 
 F.transparency = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-
+    amount = parseParamNumber(amount);
     return F.convolution(weight([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0, 0, 1], amount / 100));
 };
 
 F.laplacian = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-
+    amount = parseParamNumber(amount);
     return F.convolution(weight([-1, -1, -1, -1, 8, -1, -1, -1, -1], amount / 100));
 };
 
 F.laplacian.grayscale = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    return F.multi('grayscale', ['laplacian', amount]);
+    return F.filter('grayscale laplacian(' + amount);
 };
 
 F.laplacian5x = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-
+    amount = parseParamNumber(amount);
     return F.convolution(weight([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 24, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], amount / 100));
 };
 
 F.laplacian5x.grayscale = function () {
-    return F.multi('grayscale', 'laplacian5x');
+    return F.filter('grayscale laplacian5x');
 };
 
 F['kirsch-horizontal'] = F.kirschHorizontal = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    count = parseParamNumber(count);
     return F.convolution([5, 5, 5, -3, 0, -3, -3, -3, -3]);
 };
 
 F['kirsch-vertical'] = F.kirschVertical = function () {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+
+    count = parseParamNumber(count);
     return F.convolution([5, -3, -3, 5, 0, -3, 5, -3, -3]);
 };
 
 F.kirsch = function () {
-    return F.multi('kirsch-horizontal', 'kirsch-vertical');
+    return F.filter('kirsch-horizontal kirsch-vertical');
 };
 
 F.kirsch.grayscale = function () {
-    return F.multi('grayscale', 'kirsch');
+    return F.filter('grayscale kirsch');
 };
 
 F['sobel-horizontal'] = F.sobelHorizontal = function () {
@@ -3190,11 +3380,11 @@ F['sobel-vertical'] = F.sobelVertical = function () {
 };
 
 F.sobel = function () {
-    return F.multi('sobel-horizontal', 'sobel-vertical');
+    return F.filter('sobel-horizontal sobel-vertical');
 };
 
 F.sobel.grayscale = function () {
-    return F.multi('grayscale', 'sobel');
+    return F.filter('grayscale sobel');
 };
 
 /*
@@ -3205,6 +3395,7 @@ F.sobel.grayscale = function () {
 F.emboss = function () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
+    amount = parseParamNumber(amount);
     return F.convolution([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 };
 
@@ -3213,7 +3404,7 @@ F.emboss = function () {
  */
 
 F.vintage = function () {
-    return F.multi(['brightness', 15], ['saturation', -20], ['gamma', 1.8]);
+    return F.filter('brightness(15) saturation(-20) gamma(1.8)');
 };
 
 var counter = 0;

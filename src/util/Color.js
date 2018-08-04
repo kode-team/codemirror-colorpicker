@@ -56,7 +56,13 @@ const color = {
     convertMatchesArray: function (str, splitStr = color_split) {
         const ret = this.convertMatches(str);
         return ret.str.split(splitStr).map((it, index) => {
-            return this.trim(it).replace('@' + index, ret.matches[index].color)
+            it = this.trim(it);
+
+            if (ret.matches[index]) {
+                it = it.replace('@' + index, ret.matches[index].color)
+            }
+
+            return it 
         })
     },
 
@@ -781,7 +787,11 @@ const color = {
             const dist = (1 - sum) / count  
             colors.forEach((it, index) => {
                 if (it[1] == '*' && index > 0) {
-                    it[1] = dist 
+                    if (colors.length - 1 == index) {
+                        // it[1] = 1 
+                    } else {
+                        it[1] = dist 
+                    }
                 }
             })
     
