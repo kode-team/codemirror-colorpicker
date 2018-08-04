@@ -1,5 +1,39 @@
 import Canvas from '../Canvas'
 import Matrix from '../Matrix'
+import ImageFilter from './index' 
+
+const functions = {
+    partial,
+    multi,
+    merge,
+    weight,
+    repeat,
+    colorMatrix,
+    each,
+    eachXY,
+    createRandomCount,
+    createRandRange,
+    createBitmap,
+    createBlurMatrix,
+    pack,
+    packXY,
+    getBitmap,
+    putBitmap,
+    radian,
+    convolution,
+    parseParamNumber,
+    filter,
+    clamp,
+    multi,
+    merge,
+    matches,
+    parseFilter,
+    partial
+}
+
+const LocalFilter = functions
+
+export default functions
 
 export function weight(arr, num = 1) {
     return arr.map(i => {
@@ -25,7 +59,7 @@ export function colorMatrix(pixels, i, matrix) {
 
 }
 
-export function makeFilter(filter, F) {
+export function makeFilter(filter) {
 
     if (typeof filter == 'function') {
         return filter;
@@ -43,7 +77,7 @@ export function makeFilter(filter, F) {
 
     const params = filter;
 
-    const filterFunction = F[filterName];
+    const filterFunction = ImageFilter[filterName] || LocalFilter[filterName] ;
 
     if (!filterFunction) {
         throw new Error(`${filterName} is not filter. please check filter name.`)
@@ -272,3 +306,57 @@ export function parseFilter (filterString) {
 export function clamp (num) {ß
     return Math.min(255, num)
 } 
+
+
+
+export function filter (str) {
+    return merge(matches(str).map(it => {
+        return it.arr 
+    }))
+}
+
+/** 
+ * 
+ * multiply filters
+ * 
+ * ImageFilter.multi('blur', 'grayscale', 'sharpen', ['blur', 3], function (bitmap) {  return bitmap });
+ * 
+ */
+export function multi (...filters) {
+    filters = filters.map(filter => {
+        return makeFilter(filter);
+    })
+
+    return function (bitmap) {
+        return filters.reduce((bitmap, f) => {
+            return f(bitmap);
+        }, bitmap)
+    }
+}
+
+
+export function merge (filters) {
+    return multi(...filters);
+}
+
+/**
+ * apply filter into special area
+ * 
+ * F.partial({x,y,width,height}, filter, filter, filter )
+ * F.partial({x,y,width,height}, 'filter' )
+ * 
+ * @param {{x, y, width, height}} area 
+ * @param {*} filters   
+ */
+export function partial (area, ...filters) {
+    var allFilter = null 
+    if (filters.length == 1 && typeof filters[0] === 'string') {
+        allFilter = filter(filters[0])
+    } else {
+        allFilter = merge(filters)
+    } 
+
+    return (bitmap) => {
+        return putBitmap(bitmap, allFilter(getBitmap(bitmap, area)), area);
+    }
+}

@@ -1889,284 +1889,6 @@ var Matrix = {
     }
 };
 
-function weight(arr) {
-    var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-    return arr.map(function (i) {
-        return i * num;
-    });
-}
-
-function repeat(value, num) {
-    var arr = new Array(num);
-    for (var i = 0; i < num; i++) {
-        arr[i] = value;
-    }
-    return arr;
-}
-
-function colorMatrix(pixels, i, matrix) {
-    var r = pixels[i],
-        g = pixels[i + 1],
-        b = pixels[i + 2],
-        a = pixels[i + 3];
-
-    pixels[i] = matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * a;
-    pixels[i + 1] = matrix[4] * r + matrix[5] * g + matrix[6] * b + matrix[7] * a;
-    pixels[i + 2] = matrix[8] * r + matrix[9] * g + matrix[10] * b + matrix[11] * a;
-    pixels[i + 3] = matrix[12] * r + matrix[13] * g + matrix[14] * b + matrix[15] * a;
-}
-
-function makeFilter(filter, F) {
-
-    if (typeof filter == 'function') {
-        return filter;
-    }
-
-    if (typeof filter == 'string') {
-        filter = [filter];
-    }
-
-    var filterName = filter.shift();
-
-    if (typeof filterName == 'function') {
-        return filterName;
-    }
-
-    var params = filter;
-
-    var filterFunction = F[filterName];
-
-    if (!filterFunction) {
-        throw new Error(filterName + ' is not filter. please check filter name.');
-    }
-    return filterFunction.apply(filterFunction, params);
-}
-
-function each$1(len, callback) {
-    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
-        callback(i, xyIndex);
-    }
-}
-
-function eachXY(len, width, callback) {
-    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
-        callback(i, xyIndex % width, Math.floor(xyIndex / width));
-    }
-}
-
-function createRandRange(min, max, count) {
-    var result = [];
-
-    for (var i = 1; i <= count; i++) {
-        var num = Math.random() * (max - min) + min;
-        var sign = Math.floor(Math.random() * 10) % 2 == 0 ? -1 : 1;
-        result.push(sign * num);
-    }
-
-    result.sort();
-
-    var centerIndex = Math.floor(count / 2);
-    var a = result[centerIndex];
-    result[centerIndex] = result[0];
-    result[0] = a;
-
-    return result;
-}
-
-function createRandomCount() {
-    return [3 * 3, 4 * 4, 5 * 5, 6 * 6, 7 * 7, 8 * 8, 9 * 9, 10 * 10].sort(function (a, b) {
-        return 0.5 - Math.random();
-    })[0];
-}
-
-function createBitmap(length, width, height) {
-    return { pixels: new Uint8ClampedArray(length), width: width, height: height };
-}
-
-function getBitmap(bitmap, area) {
-    return Canvas.getBitmap(bitmap, area);
-}
-
-function putBitmap(bitmap, subBitmap, area) {
-    return Canvas.putBitmap(bitmap, subBitmap, area);
-}
-
-function parseParamNumber(param) {
-    if (typeof param === 'string') {
-        param = param.replace(/deg/, '');
-        param = param.replace(/px/, '');
-    }
-    return +param;
-}
-
-var filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
-function pack$1(callback) {
-    return function (bitmap) {
-        each$1(bitmap.pixels.length, function (i, xyIndex) {
-            callback(bitmap.pixels, i, xyIndex);
-        });
-        return bitmap;
-    };
-}
-
-var ColorListIndex = [0, 1, 2, 3];
-
-function swapColor(pixels, startIndex, endIndex) {
-
-    ColorListIndex.forEach(function (i) {
-        var temp = pixels[startIndex + i];
-        pixels[startIndex + i] = pixels[endIndex + i];
-        pixels[endIndex + i] = temp;
-    });
-}
-
-function packXY(callback) {
-    return function (bitmap) {
-        eachXY(bitmap.pixels.length, bitmap.width, function (i, x, y) {
-            callback(bitmap.pixels, i, x, y);
-        });
-        return bitmap;
-    };
-}
-
-
-
-function createBlurMatrix() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
-
-    var count = Math.pow(amount, 2);
-    var value = 1 / count;
-    return repeat(value, count);
-}
-
-function convolution(weights) {
-    var opaque = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-    return function (_ref) {
-        var pixels = _ref.pixels,
-            width = _ref.width,
-            height = _ref.height;
-
-        var side = Math.round(Math.sqrt(weights.length));
-        var halfSide = Math.floor(side / 2);
-
-        var w = width;
-        var h = height;
-        var sw = w;
-        var sh = h;
-        var dst = new Uint8ClampedArray(pixels.length);
-        var alphaFac = opaque ? 1 : 0;
-
-        for (var y = 0; y < h; y++) {
-            for (var x = 0; x < w; x++) {
-                var sy = y;
-                var sx = x;
-                var dstIndex = (y * w + x) * 4;
-
-                var r = 0,
-                    g = 0,
-                    b = 0,
-                    a = 0;
-                for (var cy = 0; cy < side; cy++) {
-                    for (var cx = 0; cx < side; cx++) {
-
-                        var scy = sy + cy - halfSide;
-                        var scx = sx + cx - halfSide;
-
-                        if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-                            var srcIndex = (scy * sw + scx) * 4;
-                            var wt = weights[cy * side + cx];
-                            r += pixels[srcIndex] * wt;
-                            g += pixels[srcIndex + 1] * wt;
-                            b += pixels[srcIndex + 2] * wt;
-                            a += pixels[srcIndex + 3] * wt; // weight 를 곱한 값을 계속 더한다. 
-                        }
-                    }
-                }
-
-                dst[dstIndex] = r;
-                dst[dstIndex + 1] = g;
-                dst[dstIndex + 2] = b;
-                dst[dstIndex + 3] = a + alphaFac * (255 - a);
-            }
-        }
-
-        return { pixels: dst, width: sw, height: sh };
-    };
-}
-
-function matches(str) {
-    var ret = Color.convertMatches(str);
-    var matches = ret.str.match(filter_regexp);
-    var result = [];
-
-    if (!matches) {
-        return result;
-    }
-
-    result = matches.map(function (it) {
-        return { filter: it, origin: Color.reverseMatches(it, ret.matches) };
-    });
-
-    var pos = { next: 0 };
-    result = result.map(function (item) {
-
-        var startIndex = str.indexOf(item.origin, pos.next);
-
-        item.startIndex = startIndex;
-        item.endIndex = startIndex + item.origin.length;
-
-        item.arr = parseFilter(item.origin);
-
-        pos.next = item.endIndex;
-
-        return item;
-    }).filter(function (it) {
-        if (!it.arr.length) return false;
-        return true;
-    });
-
-    return result;
-}
-
-/**
- * Filter Parser 
- * 
- * F.parseFilter('blur(30)') == ['blue', '30']
- * F.parseFilter('gradient(white, black, 3)') == ['gradient', 'white', 'black', '3']
- * 
- * @param {String} filterString 
- */
-function parseFilter(filterString) {
-
-    var ret = Color.convertMatches(filterString);
-    var matches = ret.str.match(filter_regexp);
-
-    if (!matches[0]) {
-        return [];
-    }
-
-    var arr = matches[0].split('(');
-
-    var filterName = arr.shift();
-    var filterParams = [];
-
-    if (arr.length) {
-        filterParams = arr.shift().split(')')[0].split(',').map(function (f) {
-            return Color.reverseMatches(f, ret.matches);
-        });
-    }
-
-    var result = [filterName].concat(toConsumableArray(filterParams)).map(Color.trim);
-
-    return result;
-}
-
-function clamp(num) {
-    return Math.min(255, num);
-}
-
 function crop() {
     var startX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var startY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -3345,22 +3067,339 @@ var matrix = {
      'unsharp-masking': unsharpMasking
 };
 
-var ImageFilter$1 = _extends({}, image, pixel, matrix);
+function kirsch() {
+    return filter('kirsch-horizontal kirsch-vertical');
+}
 
-// TODO: worker run 
-Object.assign(ImageFilter$1, {
+function sobel() {
+    return filter('sobel-horizontal sobel-vertical');
+}
+
+function vintage() {
+    return filter('brightness(15) saturation(-20) gamma(1.8)');
+}
+
+var multi$1 = {
+    kirsch: kirsch,
+    sobel: sobel,
+    vintage: vintage
+};
+
+var ImageFilter$1 = _extends({}, image, pixel, matrix, multi$1);
+
+var _functions;
+
+var functions = (_functions = {
+    partial: partial,
+    multi: multi,
+    merge: merge,
+    weight: weight,
+    repeat: repeat,
+    colorMatrix: colorMatrix,
+    each: each$1,
+    eachXY: eachXY,
+    createRandomCount: createRandomCount,
+    createRandRange: createRandRange,
+    createBitmap: createBitmap,
+    createBlurMatrix: createBlurMatrix,
     pack: pack$1,
     packXY: packXY,
-    swapColor: swapColor
-});
+    getBitmap: getBitmap,
+    putBitmap: putBitmap,
+    radian: radian,
+    convolution: convolution,
+    parseParamNumber: parseParamNumber,
+    filter: filter,
+    clamp: clamp
+}, defineProperty(_functions, 'multi', multi), defineProperty(_functions, 'merge', merge), defineProperty(_functions, 'matches', matches), defineProperty(_functions, 'parseFilter', parseFilter), defineProperty(_functions, 'partial', partial), _functions);
 
-var F = ImageFilter$1;
+var LocalFilter = functions;
 
-F.filter = function (str) {
-    return F.merge(matches(str).map(function (it) {
+function weight(arr) {
+    var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+    return arr.map(function (i) {
+        return i * num;
+    });
+}
+
+function repeat(value, num) {
+    var arr = new Array(num);
+    for (var i = 0; i < num; i++) {
+        arr[i] = value;
+    }
+    return arr;
+}
+
+function colorMatrix(pixels, i, matrix) {
+    var r = pixels[i],
+        g = pixels[i + 1],
+        b = pixels[i + 2],
+        a = pixels[i + 3];
+
+    pixels[i] = matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * a;
+    pixels[i + 1] = matrix[4] * r + matrix[5] * g + matrix[6] * b + matrix[7] * a;
+    pixels[i + 2] = matrix[8] * r + matrix[9] * g + matrix[10] * b + matrix[11] * a;
+    pixels[i + 3] = matrix[12] * r + matrix[13] * g + matrix[14] * b + matrix[15] * a;
+}
+
+function makeFilter(filter) {
+
+    if (typeof filter == 'function') {
+        return filter;
+    }
+
+    if (typeof filter == 'string') {
+        filter = [filter];
+    }
+
+    var filterName = filter.shift();
+
+    if (typeof filterName == 'function') {
+        return filterName;
+    }
+
+    var params = filter;
+
+    var filterFunction = ImageFilter$1[filterName] || LocalFilter[filterName];
+
+    if (!filterFunction) {
+        throw new Error(filterName + ' is not filter. please check filter name.');
+    }
+    return filterFunction.apply(filterFunction, params);
+}
+
+function each$1(len, callback) {
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex);
+    }
+}
+
+function eachXY(len, width, callback) {
+    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
+        callback(i, xyIndex % width, Math.floor(xyIndex / width));
+    }
+}
+
+function createRandRange(min, max, count) {
+    var result = [];
+
+    for (var i = 1; i <= count; i++) {
+        var num = Math.random() * (max - min) + min;
+        var sign = Math.floor(Math.random() * 10) % 2 == 0 ? -1 : 1;
+        result.push(sign * num);
+    }
+
+    result.sort();
+
+    var centerIndex = Math.floor(count / 2);
+    var a = result[centerIndex];
+    result[centerIndex] = result[0];
+    result[0] = a;
+
+    return result;
+}
+
+function createRandomCount() {
+    return [3 * 3, 4 * 4, 5 * 5, 6 * 6, 7 * 7, 8 * 8, 9 * 9, 10 * 10].sort(function (a, b) {
+        return 0.5 - Math.random();
+    })[0];
+}
+
+function createBitmap(length, width, height) {
+    return { pixels: new Uint8ClampedArray(length), width: width, height: height };
+}
+
+function getBitmap(bitmap, area) {
+    return Canvas.getBitmap(bitmap, area);
+}
+
+function putBitmap(bitmap, subBitmap, area) {
+    return Canvas.putBitmap(bitmap, subBitmap, area);
+}
+
+function parseParamNumber(param) {
+    if (typeof param === 'string') {
+        param = param.replace(/deg/, '');
+        param = param.replace(/px/, '');
+    }
+    return +param;
+}
+
+var filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
+function pack$1(callback) {
+    return function (bitmap) {
+        each$1(bitmap.pixels.length, function (i, xyIndex) {
+            callback(bitmap.pixels, i, xyIndex);
+        });
+        return bitmap;
+    };
+}
+
+var ColorListIndex = [0, 1, 2, 3];
+
+function swapColor(pixels, startIndex, endIndex) {
+
+    ColorListIndex.forEach(function (i) {
+        var temp = pixels[startIndex + i];
+        pixels[startIndex + i] = pixels[endIndex + i];
+        pixels[endIndex + i] = temp;
+    });
+}
+
+function packXY(callback) {
+    return function (bitmap) {
+        eachXY(bitmap.pixels.length, bitmap.width, function (i, x, y) {
+            callback(bitmap.pixels, i, x, y);
+        });
+        return bitmap;
+    };
+}
+
+function radian(degree) {
+    return Matrix.CONSTANT.radian(degree);
+}
+
+function createBlurMatrix() {
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
+
+    var count = Math.pow(amount, 2);
+    var value = 1 / count;
+    return repeat(value, count);
+}
+
+function convolution(weights) {
+    var opaque = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    return function (_ref) {
+        var pixels = _ref.pixels,
+            width = _ref.width,
+            height = _ref.height;
+
+        var side = Math.round(Math.sqrt(weights.length));
+        var halfSide = Math.floor(side / 2);
+
+        var w = width;
+        var h = height;
+        var sw = w;
+        var sh = h;
+        var dst = new Uint8ClampedArray(pixels.length);
+        var alphaFac = opaque ? 1 : 0;
+
+        for (var y = 0; y < h; y++) {
+            for (var x = 0; x < w; x++) {
+                var sy = y;
+                var sx = x;
+                var dstIndex = (y * w + x) * 4;
+
+                var r = 0,
+                    g = 0,
+                    b = 0,
+                    a = 0;
+                for (var cy = 0; cy < side; cy++) {
+                    for (var cx = 0; cx < side; cx++) {
+
+                        var scy = sy + cy - halfSide;
+                        var scx = sx + cx - halfSide;
+
+                        if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
+                            var srcIndex = (scy * sw + scx) * 4;
+                            var wt = weights[cy * side + cx];
+                            r += pixels[srcIndex] * wt;
+                            g += pixels[srcIndex + 1] * wt;
+                            b += pixels[srcIndex + 2] * wt;
+                            a += pixels[srcIndex + 3] * wt; // weight 를 곱한 값을 계속 더한다. 
+                        }
+                    }
+                }
+
+                dst[dstIndex] = r;
+                dst[dstIndex + 1] = g;
+                dst[dstIndex + 2] = b;
+                dst[dstIndex + 3] = a + alphaFac * (255 - a);
+            }
+        }
+
+        return { pixels: dst, width: sw, height: sh };
+    };
+}
+
+function matches(str) {
+    var ret = Color.convertMatches(str);
+    var matches = ret.str.match(filter_regexp);
+    var result = [];
+
+    if (!matches) {
+        return result;
+    }
+
+    result = matches.map(function (it) {
+        return { filter: it, origin: Color.reverseMatches(it, ret.matches) };
+    });
+
+    var pos = { next: 0 };
+    result = result.map(function (item) {
+
+        var startIndex = str.indexOf(item.origin, pos.next);
+
+        item.startIndex = startIndex;
+        item.endIndex = startIndex + item.origin.length;
+
+        item.arr = parseFilter(item.origin);
+
+        pos.next = item.endIndex;
+
+        return item;
+    }).filter(function (it) {
+        if (!it.arr.length) return false;
+        return true;
+    });
+
+    return result;
+}
+
+/**
+ * Filter Parser 
+ * 
+ * F.parseFilter('blur(30)') == ['blue', '30']
+ * F.parseFilter('gradient(white, black, 3)') == ['gradient', 'white', 'black', '3']
+ * 
+ * @param {String} filterString 
+ */
+function parseFilter(filterString) {
+
+    var ret = Color.convertMatches(filterString);
+    var matches = ret.str.match(filter_regexp);
+
+    if (!matches[0]) {
+        return [];
+    }
+
+    var arr = matches[0].split('(');
+
+    var filterName = arr.shift();
+    var filterParams = [];
+
+    if (arr.length) {
+        filterParams = arr.shift().split(')')[0].split(',').map(function (f) {
+            return Color.reverseMatches(f, ret.matches);
+        });
+    }
+
+    var result = [filterName].concat(toConsumableArray(filterParams)).map(Color.trim);
+
+    return result;
+}
+
+function clamp(num) {
+    return Math.min(255, num);
+}
+
+function filter(str) {
+    return merge(matches(str).map(function (it) {
         return it.arr;
     }));
-};
+}
 
 /** 
  * 
@@ -3369,13 +3408,13 @@ F.filter = function (str) {
  * ImageFilter.multi('blur', 'grayscale', 'sharpen', ['blur', 3], function (bitmap) {  return bitmap });
  * 
  */
-F.multi = function () {
+function multi() {
     for (var _len = arguments.length, filters = Array(_len), _key = 0; _key < _len; _key++) {
         filters[_key] = arguments[_key];
     }
 
     filters = filters.map(function (filter) {
-        return makeFilter(filter, F);
+        return makeFilter(filter);
     });
 
     return function (bitmap) {
@@ -3383,11 +3422,11 @@ F.multi = function () {
             return f(bitmap);
         }, bitmap);
     };
-};
+}
 
-F.merge = function (filters) {
-    return F.multi.apply(F, toConsumableArray(filters));
-};
+function merge(filters) {
+    return multi.apply(undefined, toConsumableArray(filters));
+}
 
 /**
  * apply filter into special area
@@ -3398,7 +3437,7 @@ F.merge = function (filters) {
  * @param {{x, y, width, height}} area 
  * @param {*} filters   
  */
-F.partial = function (area) {
+function partial(area) {
     var allFilter = null;
 
     for (var _len2 = arguments.length, filters = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -3406,61 +3445,18 @@ F.partial = function (area) {
     }
 
     if (filters.length == 1 && typeof filters[0] === 'string') {
-        allFilter = F.filter(filters[0]);
+        allFilter = filter(filters[0]);
     } else {
-        allFilter = F.merge(filters);
+        allFilter = merge(filters);
     }
 
     return function (bitmap) {
         return putBitmap(bitmap, allFilter(getBitmap(bitmap, area)), area);
     };
-};
+}
 
-F.counter = function (filter) {
-    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-    var filters = [];
-
-    for (var i = 0; i < count; i++) {
-        filters.push(filter);
-    }
-
-    return F.multi.apply(F, filters);
-};
-
-/**
- * multi filter 
- */
-
-F.laplacian.grayscale = function () {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    return F.filter('grayscale laplacian(' + amount);
-};
-
-F.laplacian5x.grayscale = function () {
-    return F.filter('grayscale laplacian5x');
-};
-
-F.kirsch = function () {
-    return F.filter('kirsch-horizontal kirsch-vertical');
-};
-
-F.kirsch.grayscale = function () {
-    return F.filter('grayscale kirsch');
-};
-
-F.sobel = function () {
-    return F.filter('sobel-horizontal sobel-vertical');
-};
-
-F.sobel.grayscale = function () {
-    return F.filter('grayscale sobel');
-};
-
-F.vintage = function () {
-    return F.filter('brightness(15) saturation(-20) gamma(1.8)');
-};
+// TODO: worker run 
+var ImageFilter = Object.assign({}, ImageFilter$1, functions);
 
 var counter = 0;
 var cached = [];
@@ -6238,7 +6234,7 @@ var index = {
     Color: color,
     ColorNames: ColorNames,
     ColorPicker: ColorPicker,
-    ImageFilter: ImageFilter$1,
+    ImageFilter: ImageFilter,
     HueColor: HueColor,
     Canvas: Canvas,
     ImageLoader: ImageLoader

@@ -2,7 +2,7 @@ import {
     parseParamNumber
 } from '../functions'
 
-import StackBlur from '../../blur/StackBlur'
+import StackBlur from '../StackBlur'
 
 export default function (radius = 10, hasAlphaChannel = true) {
     radius = parseParamNumber(radius)

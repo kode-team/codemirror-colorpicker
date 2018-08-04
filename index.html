@@ -672,8 +672,11 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) sepia(5)'])">parse</button>
                 </div>                    
                 <div>
-                    <button type="button" onclick="filter_image(['filter', 'vintage'])">vintage</button>
-                </div>                                    
+                    <button type="button" onclick="filter_image(['vintage'])">vintage</button>
+                </div>          
+                <div>
+                    <button type="button" onclick="filter_image(['stack-blur', '10px'])">stack-blur(5px)</button>
+                </div>                                                    
                 <div>
                     <button type="button" onclick="filter_image(['flipH'])">flipH</button>
                 </div>    
@@ -737,11 +740,7 @@ var colorpicker = new ColorPicker({
                 <div>
                     <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
                     <input type="range" min="1" max="100" step="1" value="3" id="blur-value" />
-                </div>   
-                <div>
-                    <button type="button" onclick="filter_count(['blur', +document.getElementById('blur-count-value').value])">blur (10)</button>
-                    <input type="range" min="0" max="200" step="1" value="100" id="blur-count-value" />
-                </div>                   
+                </div>                     
                 <div>
                     <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
                 </div>                   
@@ -766,26 +765,7 @@ var colorpicker = new ColorPicker({
                 <div>
                     <button type="button" onclick="filter_image('sharpen', 'blur', 'sobel')">sobel</button>
                 </div>                                                                                                            
-                <div>
-                    <table class="weights" border="0">
-                        <tr>
-                            <td><input type="number" min="-100" max="100" step="1" value="0" /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
-                        </tr>
-                        <tr>
-                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="5"  /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
-                        </tr>
-                        <tr>
-                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="-1"  /></td>
-                            <td><input type="number" min="-100" max="100" step="1" value="0"  /></td>
-                        </tr>                                                    
-                    </table>
-                    <button type="button" onclick="filter_custom()">custom</button>
-                </div>                                                
+                                             
             </div>            
         
     </div>
@@ -985,34 +965,8 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             document.getElementById('filtered-image').src = url;
         })
     }  
+
     
-    function filter_count () {
-        var args = Array.prototype.slice.call(arguments);
-        var file = document.getElementById('imageforfilter').files[0];
-        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
-        document.getElementById('sampled-image').src = URL.createObjectURL(file);
-
-        Color.ImageToURL(file, ImageFilter.counter(ImageFilter.merge(args), 100), function (url) {
-            document.getElementById('filtered-image').src = url;
-        })
-    }   
-    
-    function filter_custom () {
-        var file = document.getElementById('imageforfilter').files[0];
-        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
-        document.getElementById('sampled-image').src = URL.createObjectURL(file);
-
-        var items = document.querySelectorAll(".weights input[type=number]");
-        var weights = [];
-        [].forEach.call(items, function (it) {
-            weights.push(+it.value);
-        })
-        
-        Color.ImageToURL(file, ImageFilter.convolution(weights), function (url) {
-            document.getElementById('filtered-image').src = url;
-        })
-    }           
-
     function shuffle(a) {
         var j, x, i;
         for (i = a.length - 1; i > 0; i--) {
