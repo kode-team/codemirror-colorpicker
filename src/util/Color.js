@@ -879,13 +879,14 @@ const color = {
 
     },
 
-    ImageToURL(url, filter, callback, opt = {}) {
+    ImageToURL(url, filter, callback, opt = { frameTimer : 'setTimeout'}) {
         var img = new ImageLoader(url);
         img.loadImage(() => {
-            if (typeof callback == 'function') {
-                callback(img.toArray(filter, opt));
-            }
-
+            img.toArray(filter, function (datauri) {
+                if (typeof callback == 'function') {
+                    callback(datauri)
+                }                
+            }, opt);
         })
     },
 

@@ -9,7 +9,7 @@ import rotateDegree from './rotateDegree'
 export default function rotate (degree = 0) {
     degree = parseParamNumber(degree)     
     degree = degree % 360
-    return function (bitmap) {
+    return function (bitmap, done, opt = {}) {
 
         if (degree == 0) return bitmap
 
@@ -18,12 +18,8 @@ export default function rotate (degree = 0) {
         } else if (degree == 180) {
             var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
         } else {
-            return rotateDegree(degree)(bitmap)
+            return rotateDegree(degree)(bitmap, done, opt)
         }
-
-        const width = bitmap.width 
-        const height = bitmap.height 
-
         packXY((pixels, i, x, y) => {
 
             if (degree == 90) {
@@ -39,8 +35,8 @@ export default function rotate (degree = 0) {
             newBitmap.pixels[endIndex+2] = bitmap.pixels[i+2]
             newBitmap.pixels[endIndex+3] = bitmap.pixels[i+3]
 
-        })(bitmap)
-
-        return newBitmap
+        })(bitmap, function () {
+            done(newBitmap)
+        }, opt)
     }
 }

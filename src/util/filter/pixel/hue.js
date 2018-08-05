@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 /*
@@ -21,9 +22,9 @@ export default function hue (amount = 360) {
 
         var rgb = Color.HSVtoRGB(hsv);
 
-        pixels[i] = rgb.r;
-        pixels[i + 1] = rgb.g;
-        pixels[i + 2] = rgb.b;
+        rgb.a = pixels[i+3]
+        
+        fillColor(pixels, i, rgb)
 
     })
 }

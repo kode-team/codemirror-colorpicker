@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 /**
  * 
@@ -11,8 +12,6 @@ export default function contrast(amount = 0) {
     const C = Math.max((128 + amount) / 128, 0);
 
     return pack((pixels, i) => {
-        pixels[i] = pixels[i] * C
-        pixels[i+1] = pixels[i+1] * C
-        pixels[i+2] = pixels[i+2] * C
+        fillColor(pixels, i, pixels[i] * C, pixels[i+1] * C, pixels[i+2] * C)
     })
 }

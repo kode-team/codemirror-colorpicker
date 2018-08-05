@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 
@@ -9,6 +10,13 @@ export default function opacity (amount = 100) {
     const C = amount / 100; 
 
     return pack((pixels, i) => {
-        pixels[i + 3] *= C;
+        fillColor(
+            pixels,
+            i,
+            null,
+            null,
+            null,
+            pixels[i+3] * C,   
+        )
     })
 }

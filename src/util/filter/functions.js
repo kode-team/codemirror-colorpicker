@@ -24,6 +24,7 @@ const functions = {
     parseParamNumber,
     filter,
     clamp,
+    fillColor,
     multi,
     merge,
     matches,
@@ -85,16 +86,72 @@ export function makeFilter(filter) {
     return filterFunction.apply(filterFunction, params);
 }
 
-export function each(len, callback) {
-    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
-        callback(i, xyIndex);
+export function forLoop (max, index = 0, step = 1, callback, done, functionDumpCount = 10000, frameTimer = 'full') {
+    let runIndex = index 
+    let timer = (callback) => { 
+        setTimeout(callback, 0) 
     }
+    
+    if (frameTimer == 'requestAnimationFrame')  {
+        timer = requestAnimationFrame
+        functionDumpCount = 1000
+    }
+
+    if (frameTimer == 'full') { /* only for loop  */
+        timer = nextCallback 
+        functionDumpCount = max 
+    }
+
+    function runCallback () {
+
+        let currentRunIndex = runIndex 
+        for(var i = 0; i < functionDumpCount; i++) {
+            currentRunIndex = runIndex + i * step
+            
+            if (currentRunIndex >= max) {
+                break; 
+            }
+            callback(currentRunIndex)             
+        }
+
+        nextCallback(currentRunIndex)
+    }
+
+    function nextCallback (currentRunIndex) {
+        if (currentRunIndex) {
+            runIndex = currentRunIndex
+        } else {
+            runIndex += step 
+        }
+
+        if (runIndex >= max) {
+            done()
+            return;  
+        }
+
+        timer(runCallback)
+    }
+
+    runCallback()
 }
 
-export function eachXY(len, width, callback) {
-    for (var i = 0, xyIndex = 0; i < len; i += 4, xyIndex++) {
-        callback(i, xyIndex % width, Math.floor(xyIndex / width) );
-    }
+export function each(len, callback, done, opt = {}) {
+
+    forLoop(len, 0, 4, function (i) {
+        callback(i, i/4 /* xyIndex */);
+    }, function () {
+        done()
+    }, opt.functionDumpCount, opt.frameTimer)
+}
+
+export function eachXY(len, width, callback, done, opt = {}) {
+
+    forLoop(len, 0, 4, function (i) {
+        var xyIndex = i / 4 
+        callback(i, xyIndex % width, Math.floor(xyIndex / width));
+    }, function () {
+        done()
+    }, opt.functionDumpCount, opt.frameTimer)
 }
 
 export function createRandRange(min, max, count) {
@@ -148,11 +205,12 @@ const filter_split = ' '
 export { filter_regexp, filter_split }
 
 export function pack(callback) {
-    return function (bitmap) {
+    return function (bitmap, done) {
         each(bitmap.pixels.length, (i, xyIndex) => {
             callback(bitmap.pixels, i, xyIndex)
+        }, function () {
+            done(bitmap);
         })
-        return bitmap;
     }
 }
 
@@ -169,11 +227,13 @@ export function swapColor (pixels, startIndex, endIndex) {
 }
 
 export function packXY(callback) {
-    return function (bitmap) {
+    return function (bitmap, done, opt = {}) {
         eachXY(bitmap.pixels.length, bitmap.width, (i, x, y) => {
             callback(bitmap.pixels, i, x, y)
-        })
-        return bitmap;
+        }, function () {
+            done(bitmap);
+        }, opt)
+
     }
 }
 
@@ -188,50 +248,59 @@ export function createBlurMatrix (amount = 3) {
     return repeat (value, count)
 }
 
+export function fillColor(pixels, i, r, g, b, a) {
+    if (arguments.length == 3) {      
+        var {r, g, b, a} = arguments[2]
+    }
+
+    if (typeof r == 'number') {pixels[i] = r; }
+    if (typeof g == 'number') {pixels[i + 1] = g; }
+    if (typeof b == 'number') {pixels[i + 2] = b; }
+    if (typeof a == 'number') {pixels[i + 3] = a; }
+
+}
+
 export function convolution(weights, opaque = true) {
-    return function ({ pixels, width, height }) {
+    return function (bitmap, done, opt = {}) {
         const side = Math.round(Math.sqrt(weights.length));
         const halfSide = Math.floor(side / 2);
 
-        var w = width;
-        var h = height;
+        var w = bitmap.width;
+        var h = bitmap.height;
         var sw = w;
         var sh = h;
-        let dst = new Uint8ClampedArray(pixels.length);
+        let newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
         const alphaFac = opaque ? 1 : 0;
 
-        for (var y = 0; y < h; y++) {
-            for (var x = 0; x < w; x++) {
-                const sy = y;
-                const sx = x;
-                const dstIndex = (y * w + x) * 4;
+        packXY((pixels, dstIndex, x, y) => {
+            const sy = y;
+            const sx = x;
+            // const dstIndex = (y * w + x) * 4;
 
-                var r = 0, g = 0, b = 0, a = 0;
-                for (var cy = 0; cy < side; cy++) {
-                    for (var cx = 0; cx < side; cx++) {
+            var r = 0, g = 0, b = 0, a = 0;
+            for (var cy = 0; cy < side; cy++) {
+                for (var cx = 0; cx < side; cx++) {
 
-                        const scy = sy + cy - halfSide;
-                        const scx = sx + cx - halfSide;
+                    const scy = sy + cy - halfSide;
+                    const scx = sx + cx - halfSide;
 
-                        if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-                            var srcIndex = (scy * sw + scx) * 4;
-                            var wt = weights[cy * side + cx];
-                            r += pixels[srcIndex] * wt;
-                            g += pixels[srcIndex + 1] * wt;
-                            b += pixels[srcIndex + 2] * wt;
-                            a += pixels[srcIndex + 3] * wt;   // weight 를 곱한 값을 계속 더한다. 
-                        }
+                    if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
+                        var srcIndex = (scy * sw + scx) * 4;
+                        var wt = weights[cy * side + cx];
+                        r += pixels[srcIndex] * wt;
+                        g += pixels[srcIndex + 1] * wt;
+                        b += pixels[srcIndex + 2] * wt;
+                        a += pixels[srcIndex + 3] * wt;   // weight 를 곱한 값을 계속 더한다. 
                     }
                 }
-
-                dst[dstIndex] = r;
-                dst[dstIndex + 1] = g;
-                dst[dstIndex + 2] = b;
-                dst[dstIndex + 3] = a + alphaFac * (255 - a);
             }
-        }
 
-        return { pixels: dst, width: sw, height: sh };
+            fillColor(newBitmap.pixels, dstIndex, r, g, b, a)
+
+        })(bitmap, function () {
+            done(newBitmap)
+        }, opt)
+
     }
 }
 
@@ -327,10 +396,33 @@ export function multi (...filters) {
         return makeFilter(filter);
     })
 
-    return function (bitmap) {
-        return filters.reduce((bitmap, f) => {
-            return f(bitmap);
-        }, bitmap)
+    var max = filters.length 
+
+    return function (bitmap, done, opt = {}) {
+
+        var currentBitmap = bitmap 
+        var index = 0 
+
+        function runFilter () {
+            filters[index].call(null, currentBitmap, function (nextBitmap) {
+                currentBitmap = nextBitmap  
+    
+                nextFilter()
+            }, opt)
+        }
+
+        function nextFilter () {
+            index++ 
+
+            if (index >= max) {
+                done(currentBitmap)
+                return;  
+            }
+
+            runFilter()
+        }
+
+        runFilter()
     }
 }
 
@@ -356,7 +448,9 @@ export function partial (area, ...filters) {
         allFilter = merge(filters)
     } 
 
-    return (bitmap) => {
-        return putBitmap(bitmap, allFilter(getBitmap(bitmap, area)), area);
+    return (bitmap, done, opt = {}) => {
+        allFilter(getBitmap(bitmap, area), function (newBitmap) {
+            done(putBitmap(bitmap, newBitmap, area))
+        }, opt)
     }
 }

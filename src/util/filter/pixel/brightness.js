@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 /*
@@ -11,8 +12,6 @@ export default function brightness (amount = 1) {
     const C = Math.floor(255 * (amount / 100));
 
     return pack((pixels, i) => {
-        pixels[i] += C;
-        pixels[i + 1] += C;
-        pixels[i + 2] += C;
+        fillColor(pixels, i, pixels[i] + C, pixels[i+1] + C, pixels[i+2] + C)        
     })
 }

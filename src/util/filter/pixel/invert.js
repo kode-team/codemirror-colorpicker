@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 export default function invert (amount = 100) {
     amount = parseParamNumber(amount)    
@@ -8,9 +9,11 @@ export default function invert (amount = 100) {
 
     return pack((pixels, i) => {
 
-        pixels[i] = (255 - pixels[i]) * C ;
-        pixels[i + 1] = (255 - pixels[i + 1]) * C;
-        pixels[i + 2] = (255 - pixels[i + 2]) * C;
-
+        fillColor(
+            pixels, i, 
+            (255 - pixels[i]) * C,
+            (255 - pixels[i + 1]) * C,
+            (255 - pixels[i + 2]) * C
+        )
     })
 }

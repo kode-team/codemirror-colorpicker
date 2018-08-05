@@ -7,7 +7,7 @@ import {
 export default function rotateDegree(angle, cx = 'center', cy = 'center') {
     // const r = F.radian(angle)
 
-    return function (bitmap) {
+    return function (bitmap, done, opt = {}) {
         var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
         const width = bitmap.width 
         const height = bitmap.height 
@@ -25,7 +25,7 @@ export default function rotateDegree(angle, cx = 'center', cy = 'center') {
         const shear1Matrix = Matrix.CONSTANT.shear1(angle)
         const shear2Matrix = Matrix.CONSTANT.shear2(angle)
 
-        return packXY((pixels, i, x, y) => {
+        packXY((pixels, i, x, y) => {
             // console.log(x, y, i)
             let arr = Matrix.multiply(translateMatrix, [x, y, 1])
             
@@ -48,6 +48,8 @@ export default function rotateDegree(angle, cx = 'center', cy = 'center') {
             pixels[endIndex+2] = bitmap.pixels[i+2]
             pixels[endIndex+3] = bitmap.pixels[i+3]
 
-        })(newBitmap)
+        })(newBitmap, function () {
+            done(newBitmap)
+        }, opt)
     }
 } 

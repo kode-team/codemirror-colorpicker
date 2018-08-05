@@ -64,7 +64,7 @@ class ImageLoader {
         return [r, g, b, a];
     }
 
-    toArray(filter, opt = {}) {
+    toArray(filter, callback, opt = {}) {
         var imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
         var width = imagedata.width;
         var height = imagedata.height; 
@@ -72,12 +72,20 @@ class ImageLoader {
         var pixels = new Uint8ClampedArray(imagedata.data);
 
         let bitmap = {  pixels, width, height }
-        if (filter) {  bitmap = filter(bitmap) }
 
-        var tmpCanvas = Canvas.drawPixels(bitmap);
-        
+        if (!filter) {
+            filter = (function () {
+                return (bitmap, done) => {
+                    done(bitmap)
+                }
+            })()
+        }
 
-        return tmpCanvas.toDataURL(opt.outputFormat || 'image/png');
+        filter(bitmap, function (newBitmap) {
+            var tmpCanvas = Canvas.drawPixels(newBitmap);
+
+            callback(tmpCanvas.toDataURL(opt.outputFormat || 'image/png'))
+        }, opt)
     } 
 
     toHistogram (opt) {

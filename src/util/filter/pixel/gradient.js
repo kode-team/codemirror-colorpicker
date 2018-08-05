@@ -1,7 +1,8 @@
 import Color from '../../Color'
 import {
     clamp,
-    pack  
+    pack,  
+    fillColor
 } from '../functions'
 /**
  * F.gradient('red', 'blue', 'yellow', 'white', 10)
@@ -41,9 +42,9 @@ export default function gradient () {
         const newColorIndex = clamp(Math.floor(colorIndex * (scale / 256)))
         const color = colors[newColorIndex]
 
-        pixels[i] = color.r;
-        pixels[i + 1] = color.g;
-        pixels[i + 2] = color.b;
-        pixels[i + 3] = clamp(Math.floor(color.a * 256));
+        color.a = clamp(Math.floor(color.a * 256))
+
+        fillColor( pixels, i, color )
+
     })
 }

@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 /**
@@ -14,8 +15,14 @@ export default function noise (amount = 1) {
         const min = -C
         const max = C 
         const noiseValue = Math.round(min + (Math.random() * (max - min)))
-        pixels[i] += noiseValue 
-        pixels[i+1] += noiseValue 
-        pixels[i+2] += noiseValue 
+
+        fillColor(
+            pixels,
+            i,
+            pixels[i] + noiseValue,
+            pixels[i+1] + noiseValue,
+            pixels[i+2] + noiseValue 
+        )
+        
     })
 }

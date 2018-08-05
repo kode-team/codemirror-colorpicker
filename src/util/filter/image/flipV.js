@@ -2,7 +2,7 @@ import {
     swapColor
 } from '../functions'  
 export default function flipV () {
-    return function (bitmap) {
+    return function (bitmap, done, opt = {}) {
 
         const width = bitmap.width
         const height = bitmap.height 
@@ -20,6 +20,6 @@ export default function flipV () {
             }
         }
 
-        return bitmap;
+        done(bitmap);
     }
 }

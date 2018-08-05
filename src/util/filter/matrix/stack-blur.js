@@ -7,7 +7,9 @@ import StackBlur from '../StackBlur'
 export default function (radius = 10, hasAlphaChannel = true) {
     radius = parseParamNumber(radius)
 
-    return function (bitmap) {
-        return StackBlur(bitmap, radius, hasAlphaChannel )
+    return function (bitmap, done, opt = {}) {
+        let newBitmap = StackBlur(bitmap, radius, hasAlphaChannel )
+
+        done(newBitmap);
     }
 }
