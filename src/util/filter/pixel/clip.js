@@ -1,6 +1,7 @@
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 /**
@@ -11,15 +12,15 @@ export default function clip (amount = 0) {
     amount = parseParamNumber(amount)    
     const C = Math.abs(amount) * 2.55
 
-    return pack((pixels, i) => {
+    return pack((pixels, i, xyIndex, r, g, b, a) => {
 
-        for(var start = i, end = i + 2; start <= end; start++) {
-            if (pixels[start] > 255 - C) {
-                pixels[start] = 255 
-            } else if (pixels[start] < C) {
-                pixels[start] = 0 
-            }            
-        }
+        fillColor(
+            pixels, 
+            i, 
+            (r > 255 - C) ? 255 : 0, 
+            (g > 255 - C) ? 255 : 0, 
+            (b > 255 - C) ? 255 : 0
+        )
 
     })
 }

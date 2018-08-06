@@ -4,18 +4,12 @@ import {
     fillColor
 } from '../functions'
 
-export default function shade(r = 1, g = 1, b = 1) {
-    r = parseParamNumber(r)        
-    g = parseParamNumber(g)        
-    b = parseParamNumber(b)        
-    return pack((pixels, i) => {
-        fillColor(
-           pixels,
-           i,
-           pixels[i] * r,
-           pixels[i + 1] * g,
-           pixels[i + 2] * b   
-        )
+export default function shade(redValue = 1, greenValue = 1, blueValue = 1) {
+    redValue = parseParamNumber(redValue)        
+    greenValue = parseParamNumber(greenValue)        
+    blueValue = parseParamNumber(blueValue)        
+    return pack((pixels, i, xyIndex, r, g, b, a) => {
+        fillColor( pixels, i, r * redValue, g * greenValue, b * blueValue)
     })
 
 }

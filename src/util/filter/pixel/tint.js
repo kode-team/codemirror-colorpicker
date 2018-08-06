@@ -5,13 +5,13 @@ F.tint = function (redTint = 1, greenTint = 1, blueTint = 1) {
     redTint = parseParamNumber(redTint)       
     greenTint = parseParamNumber(greenTint)       
     blueTint = parseParamNumber(blueTint)       
-    return pack((pixels, i) => {
+    return pack((pixels, i, xyIndex, r, g, b, a) => {
         fillColor(
             pixels,
             i,
-            pixels[i] + (255 - pixels[i]) * redTint,
-            pixels[i + 1] + (255 - pixels[i + 1]) * greenTint,
-            pixels[i + 2] + (255 - pixels[i + 2]) * blueTint           
+            r + (255 - r) * redTint,
+            g + (255 - g) * greenTint,
+            b + (255 - b) * blueTint 
         )
     })
 

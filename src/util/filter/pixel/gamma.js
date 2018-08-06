@@ -6,13 +6,13 @@ import {
 
 export default function gamma (amount = 1) {
     amount = parseParamNumber(amount)    
-    return pack((pixels, i) => {
+    return pack((pixels, i, xyIndex, r, g, b) => {
         fillColor(
             pixels, 
             i, 
-            Math.pow(pixels[i] / 255, amount) * 255,
-            Math.pow(pixels[i+1] / 255, amount) * 255,
-            Math.pow(pixels[i+2] / 255, amount) * 255,
+            Math.pow(r / 255, amount) * 255,
+            Math.pow(g / 255, amount) * 255,
+            Math.pow(b / 255, amount) * 255,
         )        
         
     })

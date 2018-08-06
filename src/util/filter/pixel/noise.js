@@ -10,7 +10,7 @@ import {
  */
 export default function noise (amount = 1) {
     amount = parseParamNumber(amount)    
-    return pack((pixels, i) => {
+    return pack((pixels, i, xyIndex, r, g, b, a) => {
         const C = Math.abs(amount) * 5
         const min = -C
         const max = C 
@@ -19,9 +19,9 @@ export default function noise (amount = 1) {
         fillColor(
             pixels,
             i,
-            pixels[i] + noiseValue,
-            pixels[i+1] + noiseValue,
-            pixels[i+2] + noiseValue 
+            r + noiseValue,
+            g + noiseValue,
+            b + noiseValue 
         )
         
     })

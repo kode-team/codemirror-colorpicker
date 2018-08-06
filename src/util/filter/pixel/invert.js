@@ -7,13 +7,13 @@ export default function invert (amount = 100) {
     amount = parseParamNumber(amount)    
     const C = amount / 100; 
 
-    return pack((pixels, i) => {
+    return pack((pixels, i, xyIndex, r, g, b) => {
 
         fillColor(
             pixels, i, 
-            (255 - pixels[i]) * C,
-            (255 - pixels[i + 1]) * C,
-            (255 - pixels[i + 2]) * C
+            (255 - r) * C,
+            (255 - g) * C,
+            (255 - b) * C
         )
     })
 }

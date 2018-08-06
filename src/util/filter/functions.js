@@ -25,6 +25,7 @@ const functions = {
     filter,
     clamp,
     fillColor,
+    fillPixelColor,
     multi,
     merge,
     matches,
@@ -53,11 +54,14 @@ export function repeat (value, num) {
 export function colorMatrix(pixels, i, matrix) {
     var r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
 
-    pixels[i] = matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * a;
-    pixels[i+1] = matrix[4] * r + matrix[5] * g + matrix[6] * b + matrix[7] * a;
-    pixels[i+2] = matrix[8] * r + matrix[9] * g + matrix[10] * b + matrix[11] * a;
-    pixels[i+3] = matrix[12] * r + matrix[13] * g + matrix[14] * b + matrix[15] * a;
-
+    fillColor(
+        pixels, 
+        i, 
+        matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * a,
+        matrix[4] * r + matrix[5] * g + matrix[6] * b + matrix[7] * a,
+        matrix[8] * r + matrix[9] * g + matrix[10] * b + matrix[11] * a,
+        matrix[12] * r + matrix[13] * g + matrix[14] * b + matrix[15] * a,
+    )
 }
 
 export function makeFilter(filter) {
@@ -207,7 +211,7 @@ export { filter_regexp, filter_split }
 export function pack(callback) {
     return function (bitmap, done) {
         each(bitmap.pixels.length, (i, xyIndex) => {
-            callback(bitmap.pixels, i, xyIndex)
+            callback(bitmap.pixels, i, xyIndex, bitmap.pixels[i], bitmap.pixels[i+1], bitmap.pixels[i+2], bitmap.pixels[i+3])
         }, function () {
             done(bitmap);
         })
@@ -257,7 +261,17 @@ export function fillColor(pixels, i, r, g, b, a) {
     if (typeof g == 'number') {pixels[i + 1] = g; }
     if (typeof b == 'number') {pixels[i + 2] = b; }
     if (typeof a == 'number') {pixels[i + 3] = a; }
+}
 
+export function fillPixelColor (targetPixels, targetIndex,  sourcePixels, sourceIndex) {
+    fillColor(
+        targetPixels, 
+        targetIndex,
+        sourcePixels[sourceIndex],
+        sourcePixels[sourceIndex+1],
+        sourcePixels[sourceIndex+2],
+        sourcePixels[sourceIndex+3]
+    )
 }
 
 export function convolution(weights, opaque = true) {

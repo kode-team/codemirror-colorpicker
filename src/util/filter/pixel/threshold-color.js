@@ -2,7 +2,8 @@ import Color from '../../Color'
 
 import {
     parseParamNumber,
-    pack
+    pack,
+    fillColor
 } from '../functions'
 
 
@@ -10,17 +11,18 @@ export default function thresholdColor (scale = 200, amount = 100, hasColor = tr
     scale = parseParamNumber(scale)    
     amount = parseParamNumber(amount)    
     const C = amount / 100;
-    return pack((pixels, i) => {
-        var v = (C * Color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]) ) >= scale ? 255 : 0;
+    return pack((pixels, i, xyIndex, r, g, b, a) => {
+        var v = (C * Color.brightness(r, g, b) ) >= scale ? 255 : 0;
 
         if (hasColor) {
 
             if (v == 0) {
-                pixels[i] = pixels[i + 1] = pixels[i + 2] = 0
+                fillColor(pixels, i, 0, 0, 0)
             }
             
         } else {
-            pixels[i] = pixels[i + 1] = pixels[i + 2] = Math.round(v)
+            const value = Math.round(v)
+            fillColor(pixels, i, value, value, value)
         }
         
     })

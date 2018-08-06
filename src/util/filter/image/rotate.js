@@ -1,7 +1,8 @@
 import {
     parseParamNumber,
     packXY,
-    createBitmap
+    createBitmap,
+    fillPixelColor
 } from '../functions'
 
 import rotateDegree from './rotateDegree'
@@ -30,11 +31,7 @@ export default function rotate (degree = 0) {
                 var endIndex = ((newBitmap.height -1 -y) * newBitmap.width + (newBitmap.width -1 -x)) * 4
             }
 
-            newBitmap.pixels[endIndex] = bitmap.pixels[i]
-            newBitmap.pixels[endIndex+1] = bitmap.pixels[i+1]
-            newBitmap.pixels[endIndex+2] = bitmap.pixels[i+2]
-            newBitmap.pixels[endIndex+3] = bitmap.pixels[i+3]
-
+            fillPixelColor(newBitmap.pixels, endIndex, bitmap.pixels, i)
         })(bitmap, function () {
             done(newBitmap)
         }, opt)

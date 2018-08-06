@@ -1,7 +1,8 @@
 import Matrix from '../../Matrix'
 import {
     createBitmap,
-    packXY
+    packXY,
+    fillPixelColor
 } from '../functions'
 
 export default function rotateDegree(angle, cx = 'center', cy = 'center') {
@@ -43,10 +44,7 @@ export default function rotateDegree(angle, cx = 'center', cy = 'center') {
 
             var endIndex = (y1 * width + x1) * 4 
 
-            pixels[endIndex] = bitmap.pixels[i]
-            pixels[endIndex+1] = bitmap.pixels[i+1]
-            pixels[endIndex+2] = bitmap.pixels[i+2]
-            pixels[endIndex+3] = bitmap.pixels[i+3]
+            fillPixelColor(pixels, endIndex, bitmap.pixels, i)
 
         })(newBitmap, function () {
             done(newBitmap)
