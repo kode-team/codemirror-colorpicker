@@ -680,7 +680,11 @@ var ImageLoader = function () {
             filter(bitmap, function (newBitmap) {
                 var tmpCanvas = Canvas.drawPixels(newBitmap);
 
-                callback(tmpCanvas.toDataURL(opt.outputFormat || 'image/png'));
+                if (opt.returnTo == 'canvas') {
+                    callback(tmpCanvas);
+                } else {
+                    callback(tmpCanvas.toDataURL(opt.outputFormat || 'image/png'));
+                }
             }, opt);
         }
     }, {
@@ -1694,8 +1698,22 @@ var color = {
             });
         }
     },
+    ImageToCanvas: function ImageToCanvas(url, filter, callback) {
+        var opt = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : { frameTimer: 'full' };
+
+        var img = new ImageLoader(url);
+        img.loadImage(function () {
+            img.toArray(filter, function (canvas) {
+                if (typeof callback == 'function') {
+                    callback(canvas);
+                }
+            }, Object.assign({
+                returnTo: 'canvas'
+            }, opt));
+        });
+    },
     ImageToURL: function ImageToURL(url, filter, callback) {
-        var opt = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : { frameTimer: 'setTimeout' };
+        var opt = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : { frameTimer: 'full' };
 
         var img = new ImageLoader(url);
         img.loadImage(function () {
@@ -1946,8 +1964,8 @@ function flipV() {
         for (var y = 0; y < halfHeight; y++) {
             for (var x = 0; x < width; x++) {
 
-                var startIndex = (y * width + x) * 4;
-                var endIndex = ((height - 1 - y) * width + x) * 4;
+                var startIndex = y * width + x << 2;
+                var endIndex = (height - 1 - y) * width + x << 2;
                 swapColor(bitmap.pixels, startIndex, endIndex);
             }
         }
@@ -1967,8 +1985,8 @@ function flipH() {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < halfWidth; x++) {
 
-                var startIndex = (y * width + x) * 4;
-                var endIndex = (y * width + (width - 1 - x)) * 4;
+                var startIndex = y * width + x << 2;
+                var endIndex = y * width + (width - 1 - x) << 2;
                 swapColor(bitmap.pixels, startIndex, endIndex);
             }
         }
@@ -2022,7 +2040,7 @@ function rotateDegree(angle) {
             if (x1 > width - 1) return;
             if (y1 > height - 1) return;
 
-            var endIndex = (y1 * width + x1) * 4;
+            var endIndex = y1 * width + x1 << 2; //  bit 2 shift is  * 4  
 
             fillPixelColor(pixels, endIndex, bitmap.pixels, i);
         })(newBitmap, function () {
@@ -2034,7 +2052,7 @@ function rotateDegree(angle) {
 function rotate() {
     var degree = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    degree = parseParamNumber(degree);
+    degree = parseParamNumber$1(degree);
     degree = degree % 360;
     return function (bitmap, done) {
         var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2052,11 +2070,11 @@ function rotate() {
         packXY(function (pixels, i, x, y) {
 
             if (degree == 90) {
-                var endIndex = (x * newBitmap.width + (newBitmap.width - 1 - y)) * 4;
+                var endIndex = x * newBitmap.width + (newBitmap.width - 1 - y) << 2; //  << 2 is equals to (multiply)* 4 
             } else if (degree == 270) {
-                var endIndex = ((newBitmap.height - 1 - x) * newBitmap.width + y) * 4;
+                var endIndex = (newBitmap.height - 1 - x) * newBitmap.width + y << 2;
             } else if (degree == 180) {
-                var endIndex = ((newBitmap.height - 1 - y) * newBitmap.width + (newBitmap.width - 1 - x)) * 4;
+                var endIndex = (newBitmap.height - 1 - y) * newBitmap.width + (newBitmap.width - 1 - x) << 2;
             }
 
             fillPixelColor(newBitmap.pixels, endIndex, bitmap.pixels, i);
@@ -2079,15 +2097,20 @@ var image = {
 function bitonal(darkColor, lightColor) {
     var threshold = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
 
-    darkColor = color.parse(darkColor);
-    lightColor = color.parse(lightColor);
-    return pack$1(function (pixels, i, xyIndex, r, g, b) {
+    var $darkColor = color.parse(darkColor);
+    var $lightColor = color.parse(lightColor);
+    var $threshold = threshold;
 
-        if (r + g + b <= threshold) {
-            fillColor(pixels, i, darkColor);
-        } else {
-            fillColor(pixels, i, lightColor);
-        }
+    return pixel(function () {
+        var thresholdColor = $r + $g + $b <= $threshold ? $darkColor : $lightColor;
+
+        $r = thresholdColor.r;
+        $g = thresholdColor.g;
+        $b = thresholdColor.b;
+    }, {
+        $darkColor: $darkColor,
+        $lightColor: $lightColor,
+        $threshold: $threshold
     });
 }
 
@@ -2097,12 +2120,14 @@ function bitonal(darkColor, lightColor) {
 function brightness() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    amount = parseParamNumber(amount);
-    var C = Math.floor(255 * (amount / 100));
+    amount = parseParamNumber$1(amount);
+    var $C = Math.floor(255 * (amount / 100));
 
-    return pack$1(function (pixels, i, xyIndex, r, g, b) {
-        fillColor(pixels, i, r + C, g + C, b + C);
-    });
+    return pixel(function () {
+        $r += $C;
+        $g += $C;
+        $b += $C;
+    }, { $C: $C });
 }
 
 /**
@@ -2112,13 +2137,15 @@ function brightness() {
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    amount = parseParamNumber(amount);
-    var C = Math.abs(amount) * 2.55;
+    amount = parseParamNumber$1(amount);
+    var $C = Math.abs(amount) * 2.55;
 
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
+    return pixel(function () {
 
-        fillColor(pixels, i, r > 255 - C ? 255 : 0, g > 255 - C ? 255 : 0, b > 255 - C ? 255 : 0);
-    });
+        $r = $r > 255 - $C ? 255 : 0;
+        $g = $g > 255 - $C ? 255 : 0;
+        $b = $b > 255 - $C ? 255 : 0;
+    }, { $C: $C });
 }
 
 /**
@@ -2128,21 +2155,25 @@ function clip() {
 function contrast() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    amount = parseParamNumber(amount);
-    var C = Math.max((128 + amount) / 128, 0);
+    amount = parseParamNumber$1(amount);
+    var $C = Math.max((128 + amount) / 128, 0);
 
-    return pack$1(function (pixels, i, xyIndex, r, g, b) {
-        fillColor(pixels, i, r * C, g * C, b * C);
-    });
+    return pixel(function () {
+        $r *= $C;
+        $g *= $C;
+        $b *= $C;
+    }, { $C: $C });
 }
 
 function gamma() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    amount = parseParamNumber(amount);
-    return pack$1(function (pixels, i, xyIndex, r, g, b) {
-        fillColor(pixels, i, Math.pow(r / 255, amount) * 255, Math.pow(g / 255, amount) * 255, Math.pow(b / 255, amount) * 255);
-    });
+    var $C = parseParamNumber$1(amount);
+    return pixel(function () {
+        $r = Math.pow($r / 255, $C) * 255;
+        $g = Math.pow($g / 255, $C) * 255;
+        $b = Math.pow($b / 255, $C) * 255;
+    }, { $C: $C });
 }
 
 /**
@@ -2169,10 +2200,10 @@ function gradient() {
         return { type: 'param', value: arg };
     });
 
-    var scale = params.filter(function (it) {
+    var $scale = params.filter(function (it) {
         return it.type == 'scale';
     })[0];
-    scale = scale ? +scale.value : 256;
+    $scale = $scale ? +$scale.value : 256;
 
     params = params.filter(function (it) {
         return it.type == 'param';
@@ -2180,31 +2211,40 @@ function gradient() {
         return it.value;
     }).join(',');
 
-    var colors = color.gradient(params, scale).map(function (c) {
+    var $colors = color.gradient(params, $scale).map(function (c) {
         return color.parse(c);
     });
 
-    return pack$1(function (pixels, i) {
-        var colorIndex = clamp(color.brightness(pixels[i], pixels[i + 1], pixels[i + 2]));
-        var newColorIndex = clamp(Math.floor(colorIndex * (scale / 256)));
-        var color$$1 = colors[newColorIndex];
+    return pixel(function () {
+        var colorIndex = $clamp($Color.brightness($r, $g, $b));
+        var newColorIndex = $clamp(Math.floor(colorIndex * ($scale / 256)));
+        var color$$1 = $colors[newColorIndex];
 
-        color$$1.a = clamp(Math.floor(color$$1.a * 256));
-
-        fillColor(pixels, i, color$$1);
+        $r = color$$1.r;
+        $g = color$$1.g;
+        $b = color$$1.b;
+        $a = $clamp(Math.floor(color$$1.a * 256));
+    }, {
+        $colors: $colors,
+        $scale: $scale
     });
 }
 
 function grayscale(amount) {
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     var C = amount / 100;
 
     if (C > 1) C = 1;
 
-    var matrix = [0.2126 + 0.7874 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 + 0.2848 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 + 0.9278 * (1 - C), 0, 0, 0, 0, 1];
+    var $matrix = [0.2126 + 0.7874 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 + 0.2848 * (1 - C), 0.0722 - 0.0722 * (1 - C), 0, 0.2126 - 0.2126 * (1 - C), 0.7152 - 0.7152 * (1 - C), 0.0722 + 0.9278 * (1 - C), 0, 0, 0, 0, 1];
 
-    return pack$1(function (pixels, i) {
-        colorMatrix(pixels, i, matrix);
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
     });
 }
 
@@ -2214,37 +2254,38 @@ function grayscale(amount) {
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
-    amount = parseParamNumber(amount);
-    return pack$1(function (pixels, i) {
-        var r = pixels[i],
-            g = pixels[i + 1],
-            b = pixels[i + 2];
-
-        var hsv = Color.RGBtoHSV(r, g, b);
+    var $C = parseParamNumber$1(amount);
+    return pixel(function () {
+        var hsv = Color.RGBtoHSV($r, $g, $b);
 
         // 0 ~ 360 
         var h = hsv.h;
-        h += Math.abs(amount);
+        h += Math.abs($amount);
         h = h % 360;
         hsv.h = h;
 
         var rgb = Color.HSVtoRGB(hsv);
 
-        rgb.a = pixels[i + 3];
-
-        fillColor(pixels, i, rgb);
+        $r = rgb.r;
+        $g = rgb.g;
+        $b = rgb.b;
+    }, {
+        $C: $C
     });
 }
 
 function invert() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
-    var C = amount / 100;
+    amount = parseParamNumber$1(amount);
+    var $C = amount / 100;
 
-    return pack$1(function (pixels, i, xyIndex, r, g, b) {
-
-        fillColor(pixels, i, (255 - r) * C, (255 - g) * C, (255 - b) * C);
+    return pixel(function () {
+        $r = (255 - $r) * $C;
+        $g = (255 - $g) * $C;
+        $b = (255 - $b) * $C;
+    }, {
+        $C: $C
     });
 }
 
@@ -2255,26 +2296,30 @@ function invert() {
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    amount = parseParamNumber(amount);
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
-        var C = Math.abs(amount) * 5;
+    var $C = parseParamNumber$1(amount);
+    return pixel(function () {
+        var C = Math.abs($C) * 5;
         var min = -C;
         var max = C;
         var noiseValue = Math.round(min + Math.random() * (max - min));
 
-        fillColor(pixels, i, r + noiseValue, g + noiseValue, b + noiseValue);
+        $r += noiseValue;
+        $g += noiseValue;
+        $b += noiseValue;
+    }, {
+        $C: $C
     });
 }
 
 function opacity() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
-    var C = amount / 100;
+    amount = parseParamNumber$1(amount);
+    var $C = amount / 100;
 
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
-        fillColor(pixels, i, null, null, null, a * C);
-    });
+    return pixel(function () {
+        $a *= $C;
+    }, { $C: $C });
 }
 
 /*
@@ -2283,14 +2328,19 @@ function opacity() {
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     var C = amount / 100;
     var L = 1 - Math.abs(C);
 
-    var matrix = [L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L];
+    var $matrix = [L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L];
 
-    return pack$1(function (pixels, i) {
-        colorMatrix(pixels, i, matrix);
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
     });
 }
 
@@ -2300,14 +2350,19 @@ function saturation() {
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     var C = amount / 100;
     if (C > 1) C = 1;
 
-    var matrix = [0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1];
+    var $matrix = [0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1];
 
-    return pack$1(function (pixels, i) {
-        colorMatrix(pixels, i, matrix);
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
     });
 }
 
@@ -2316,11 +2371,18 @@ function shade() {
     var greenValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var blueValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    redValue = parseParamNumber(redValue);
-    greenValue = parseParamNumber(greenValue);
-    blueValue = parseParamNumber(blueValue);
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
-        fillColor(pixels, i, r * redValue, g * greenValue, b * blueValue);
+    var $redValue = parseParamNumber$1(redValue);
+    var $greenValue = parseParamNumber$1(greenValue);
+    var $blueValue = parseParamNumber$1(blueValue);
+
+    return pixel(function () {
+        $r *= $redValue;
+        $g *= $greenValue;
+        $b *= $blueValue;
+    }, {
+        $redValue: $redValue,
+        $greenValue: $greenValue,
+        $blueValue: $blueValue
     });
 }
 
@@ -2331,12 +2393,15 @@ function shade() {
  * @param {*} b 
  */
 function solarize(redValue, greenValue, blueValue) {
-    redValue = parseParamNumber(redValue);
-    greenValue = parseParamNumber(greenValue);
-    blueValue = parseParamNumber(blueValue);
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
-
-        fillColor(pixels, i, r < redValue ? 255 - r : r, g < greenValue ? 255 - g : g, b < blueValue ? 255 - b : b);
+    var $redValue = parseParamNumber$1(redValue);
+    var $greenValue = parseParamNumber$1(greenValue);
+    var $blueValue = parseParamNumber$1(blueValue);
+    return pixel(function () {
+        $r = $r < $redValue ? 255 - $r : $r;
+        $g = $g < $greenValue ? 255 - $g : $g;
+        $b = $b < $blueValue ? 255 - $b : $b;
+    }, {
+        $redValue: $redValue, $greenValue: $greenValue, $blueValue: $blueValue
     });
 }
 
@@ -2345,21 +2410,29 @@ function thresholdColor() {
     var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
     var hasColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
-    scale = parseParamNumber(scale);
-    amount = parseParamNumber(amount);
-    var C = amount / 100;
-    return pack$1(function (pixels, i, xyIndex, r, g, b, a) {
-        var v = C * color.brightness(r, g, b) >= scale ? 255 : 0;
+    var $scale = parseParamNumber$1(scale);
+    amount = parseParamNumber$1(amount);
+    var $C = amount / 100;
+    var $hasColor = hasColor;
 
-        if (hasColor) {
+    return pixel(function () {
+        var v = $C * color.brightness($r, $g, $b) >= $scale ? 255 : 0;
+
+        if ($hasColor) {
 
             if (v == 0) {
-                fillColor(pixels, i, 0, 0, 0);
+                $r = 0;
+                $g = 0;
+                $b = 0;
             }
         } else {
             var value = Math.round(v);
-            fillColor(pixels, i, value, value, value);
+            $r = value;
+            $g = value;
+            $b = value;
         }
+    }, {
+        $C: $C, $scale: $scale, $hasColor: $hasColor
     });
 }
 
@@ -2373,7 +2446,27 @@ function threshold() {
   return thresholdColor(scale, amount, false);
 }
 
-var pixel = {
+function tint () {
+    var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+    var blueTint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+    var $redTint = parseParamNumber(redTint);
+    var $greenTint = parseParamNumber(greenTint);
+    var $blueTint = parseParamNumber(blueTint);
+    return pixel(function () {
+
+        $r += (255 - $r) * $redTint;
+        $g += (255 - $g) * $greenTint;
+        $b += (255 - $b) * $blueTint;
+    }, {
+        $redTint: $redTint,
+        $greenTint: $greenTint,
+        $blueTint: $blueTint
+    });
+}
+
+var pixel$1 = {
     bitonal: bitonal,
     brightness: brightness,
     clip: clip,
@@ -2390,12 +2483,13 @@ var pixel = {
     shade: shade,
     solarize: solarize,
     threshold: threshold,
-    'threshold-color': thresholdColor
+    'threshold-color': thresholdColor,
+    tint: tint
 };
 
 function blur () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
 
     return convolution(createBlurMatrix(amount));
 }
@@ -2408,14 +2502,14 @@ function blur () {
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
 function gaussianBlur() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     var C = amount / 100;
 
     return convolution(weight([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16 * C));
@@ -2424,7 +2518,7 @@ function gaussianBlur() {
 function gaussianBlur5x() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     var C = amount / 100;
     return convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], 1 / 256 * C));
 }
@@ -2432,7 +2526,7 @@ function gaussianBlur5x() {
 function grayscale2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([0.3, 0.3, 0.3, 0, 0, 0.59, 0.59, 0.59, 0, 0, 0.11, 0.11, 0.11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 }
 
@@ -2443,28 +2537,28 @@ function identity() {
 function kirschHorizontal() {
     var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    count = parseParamNumber(count);
+    count = parseParamNumber$1(count);
     return convolution([5, 5, 5, -3, 0, -3, -3, -3, -3]);
 }
 
 function kirschVertical() {
     var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    count = parseParamNumber(count);
+    count = parseParamNumber$1(count);
     return convolution([5, -3, -3, 5, 0, -3, 5, -3, -3]);
 }
 
 function laplacian() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([-1, -1, -1, -1, 8, -1, -1, -1, -1], amount / 100));
 }
 
 function laplacian5x() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 24, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], amount / 100));
 }
 
@@ -2483,7 +2577,7 @@ function motionBlur3() {
 function negative() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1], amount / 100));
 }
 
@@ -2491,7 +2585,7 @@ function random() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createRandomCount();
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return function (pixels, width, height) {
         var rand = createRandRange(-1, 5, count);
         return convolution(rand)(pixels, width, height);
@@ -2501,14 +2595,14 @@ function random() {
 function sepia2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([0.393, 0.349, 0.272, 0, 0, 0.769, 0.686, 0.534, 0, 0, 0.189, 0.168, 0.131, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 }
 
 function sharpen() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([0, -1, 0, -1, 5, -1, 0, -1, 0], amount / 100));
 }
 
@@ -2993,7 +3087,7 @@ function stackBlur () {
     var radius = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var hasAlphaChannel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-    radius = parseParamNumber(radius);
+    radius = parseParamNumber$1(radius);
 
     return function (bitmap, done) {
         var newBitmap = stackBlurImage(bitmap, radius, hasAlphaChannel);
@@ -3005,14 +3099,14 @@ function stackBlur () {
 function transparency() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0, 0, 1], amount / 100));
 }
 
 function unsharpMasking() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 256;
 
-    amount = parseParamNumber(amount);
+    amount = parseParamNumber$1(amount);
     return convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], -1 / amount));
 }
 
@@ -3071,9 +3165,11 @@ var multi$1 = {
     vintage: vintage
 };
 
-var ImageFilter$1 = _extends({}, image, pixel, matrix, multi$1);
+var ImageFilter$1 = _extends({}, image, pixel$1, matrix, multi$1);
 
 var _functions;
+
+var makeId = 0;
 
 var functions = (_functions = {
     partial: partial,
@@ -3090,11 +3186,12 @@ var functions = (_functions = {
     createBlurMatrix: createBlurMatrix,
     pack: pack$1,
     packXY: packXY,
+    pixel: pixel,
     getBitmap: getBitmap,
     putBitmap: putBitmap,
     radian: radian,
     convolution: convolution,
-    parseParamNumber: parseParamNumber,
+    parseParamNumber: parseParamNumber$1,
     filter: filter,
     clamp: clamp,
     fillColor: fillColor,
@@ -3161,6 +3258,7 @@ function forLoop(max) {
     var done = arguments[4];
     var functionDumpCount = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 10000;
     var frameTimer = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 'full';
+    var loopCount = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 50;
 
     var runIndex = index;
     var timer = function timer(callback) {
@@ -3174,20 +3272,43 @@ function forLoop(max) {
 
     if (frameTimer == 'full') {
         /* only for loop  */
-        timer = nextCallback;
+        timer = null;
         functionDumpCount = max;
+    }
+
+    function makeFunction() {
+        var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 20;
+
+        var arr = [].concat(toConsumableArray(Array(count)));
+
+        var functionStrings = arr.map(function (countIndex) {
+            var str = '\n                currentRunIndex = runIndex + i * step\n                if (currentRunIndex >= max) return {currentRunIndex: currentRunIndex, i: null};\n                callback(currentRunIndex); i++;\n            ';
+
+            return str;
+        }).join('\n\n');
+
+        var smallLoopFunction = new Function('runIndex', 'i', 'step', 'max', 'callback', '\n            let currentRunIndex = runIndex;\n            \n            ' + functionStrings + '\n            \n            return {currentRunIndex: currentRunIndex, i: i} \n        ');
+
+        return smallLoopFunction;
     }
 
     function runCallback() {
 
-        var currentRunIndex = runIndex;
-        for (var i = 0; i < functionDumpCount; i++) {
-            currentRunIndex = runIndex + i * step;
+        var smallLoopFunction = makeFunction(loopCount); // loop is call  20 callbacks at once 
 
-            if (currentRunIndex >= max) {
+        var currentRunIndex = runIndex;
+        var ret = {};
+        var i = 0;
+        while (i < functionDumpCount) {
+            ret = smallLoopFunction(runIndex, i, step, max, callback);
+
+            if (ret.i == null) {
+                currentRunIndex = ret.currentRunIndex;
                 break;
             }
-            callback(currentRunIndex);
+
+            i = ret.i;
+            currentRunIndex = ret.currentRunIndex;
         }
 
         nextCallback(currentRunIndex);
@@ -3205,7 +3326,7 @@ function forLoop(max) {
             return;
         }
 
-        timer(runCallback);
+        if (timer) timer(runCallback);else runCallback();
     }
 
     runCallback();
@@ -3216,7 +3337,7 @@ function each$1(len, callback, done) {
 
 
     forLoop(len, 0, 4, function (i) {
-        callback(i, i / 4 /* xyIndex */);
+        callback(i, i >> 2 /* xyIndex */);
     }, function () {
         done();
     }, opt.functionDumpCount, opt.frameTimer);
@@ -3227,7 +3348,7 @@ function eachXY(len, width, callback, done) {
 
 
     forLoop(len, 0, 4, function (i) {
-        var xyIndex = i / 4;
+        var xyIndex = i >> 2;
         callback(i, xyIndex % width, Math.floor(xyIndex / width));
     }, function () {
         done();
@@ -3245,7 +3366,7 @@ function createRandRange(min, max, count) {
 
     result.sort();
 
-    var centerIndex = Math.floor(count / 2);
+    var centerIndex = Math.floor(count >> 1);
     var a = result[centerIndex];
     result[centerIndex] = result[0];
     result[0] = a;
@@ -3271,7 +3392,7 @@ function putBitmap(bitmap, subBitmap, area) {
     return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
-function parseParamNumber(param) {
+function parseParamNumber$1(param) {
     if (typeof param === 'string') {
         param = param.replace(/deg/, '');
         param = param.replace(/px/, '');
@@ -3288,6 +3409,84 @@ function pack$1(callback) {
             done(bitmap);
         });
     };
+}
+
+function makePrebuildUserFilterList(arr) {
+
+    var codeString = arr.map(function (it) {
+        return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a)\n        ';
+    }).join('\n\n');
+    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + codeString + '\n    \n    $pixels[$pixelIndex] = $r; $pixels[$pixelIndex+1] = $g; $pixels[$pixelIndex+2] = $b; $pixels[$pixelIndex+3] = $a;\n    ';
+
+    console.log(FunctionCode);
+
+    var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
+
+    return userFunction;
+}
+
+function makeUserFilterFunctionList(arr) {
+    var list = arr.map(function (it) {
+        var newKeys = [];
+
+        Object.keys(it.context).forEach(function (key, i) {
+            newKeys[key] = 'n$' + makeId++ + key + '$';
+        });
+
+        var preContext = Object.keys(it.context).map(function (key, i) {
+            return [newKeys[key], JSON.stringify(it.context[key])].join(' = ');
+        });
+
+        var preCallbackString = it.callback.toString().split("{");
+
+        preCallbackString.shift();
+        preCallbackString = preCallbackString.join("{");
+        preCallbackString = preCallbackString.split("}");
+        preCallbackString.pop();
+        preCallbackString = preCallbackString.join("}");
+
+        Object.keys(newKeys).forEach(function (key) {
+            var newKey = newKeys[key];
+            preCallbackString = preCallbackString.replace(new RegExp("\\" + key, "g"), newKey);
+        });
+
+        return { preCallbackString: preCallbackString, preContext: preContext };
+    });
+
+    list.forEach(function (it, i) {
+        it.strPreContext = 'const ' + it.preContext;
+    });
+
+    var preContext = list.map(function (it, i) {
+        return it.strPreContext;
+    }).join('\n\n');
+
+    var preCallbackString = list.map(function (it) {
+        return it.preCallbackString;
+    }).join('\n\n');
+
+    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + preContext + '\n\n    ' + preCallbackString + '\n    \n    $pixels[$pixelIndex] = $r \n    $pixels[$pixelIndex+1] = $g \n    $pixels[$pixelIndex+2] = $b   \n    $pixels[$pixelIndex+3] = $a   \n    ';
+
+    var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
+
+    userFunction.$preCallbackString = preCallbackString;
+    userFunction.$preContext = preContext;
+
+    return userFunction;
+}
+
+function makeUserFilterFunction(callback, context) {
+    return makeUserFilterFunctionList([{ callback: callback, context: context }]);
+}
+
+function pixel(callback, context) {
+    var userFunction = makeUserFilterFunction(callback, context);
+
+    var returnCallback = function returnCallback(bitmap, done) {};
+
+    returnCallback.userFunction = userFunction;
+
+    return returnCallback;
 }
 
 var ColorListIndex = [0, 1, 2, 3];
@@ -3474,6 +3673,48 @@ function filter(str) {
     }));
 }
 
+function makeGroupedFilter() {
+    var filters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+    var groupedFilter = [];
+    var group = [];
+    for (var i = 0, len = filters.length; i < len; i++) {
+        var f = filters[i];
+
+        if (f.userFunction) {
+            group.push(f);
+        } else {
+            if (group.length) {
+                groupedFilter.push([].concat(toConsumableArray(group)));
+            }
+            groupedFilter.push(f);
+            group = [];
+        }
+    }
+
+    if (group.length) {
+        groupedFilter.push([].concat(toConsumableArray(group)));
+    }
+
+    groupedFilter.forEach(function (filter, index) {
+        if (Array.isArray(filter)) {
+            groupedFilter[index] = function () {
+                var userFunction = makePrebuildUserFilterList(filter);
+                // console.log(userFunction)
+                return function (bitmap, done) {
+                    forLoop(bitmap.pixels.length, 0, 4, function (i) {
+                        userFunction(bitmap.pixels, i, clamp, Color);
+                    }, function () {
+                        done(bitmap);
+                    });
+                };
+            }();
+        }
+    });
+
+    return groupedFilter;
+}
+
 /** 
  * 
  * multiply filters
@@ -3488,7 +3729,11 @@ function multi() {
 
     filters = filters.map(function (filter) {
         return makeFilter(filter);
+    }).filter(function (f) {
+        return f;
     });
+
+    filters = makeGroupedFilter(filters);
 
     var max = filters.length;
 
@@ -3558,7 +3803,7 @@ function partial(area) {
 }
 
 // TODO: worker run 
-var ImageFilter = Object.assign({}, ImageFilter$1, functions);
+var ImageFilter = _extends({}, ImageFilter$1, functions);
 
 var counter = 0;
 var cached = [];

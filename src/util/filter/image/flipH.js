@@ -11,8 +11,8 @@ export default function flipH () {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < halfWidth; x++) {
 
-                var startIndex = (y * width + x) * 4 
-                var endIndex = (y * width +  (width -1 - x) ) * 4 
+                var startIndex = (y * width + x) << 2 
+                var endIndex = (y * width +  (width -1 - x) ) << 2
                 swapColor(bitmap.pixels, startIndex, endIndex)
 
             }

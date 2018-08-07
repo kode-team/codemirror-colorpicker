@@ -16,6 +16,7 @@ import shade from './shade'
 import solarize from './solarize'
 import threshold from './threshold'
 import thresholdColor from './threshold-color'
+import tint from './tint'
 
 export default {
     bitonal, 
@@ -35,4 +36,5 @@ export default {
     solarize,
     threshold,
     'threshold-color': thresholdColor,
-}
+    tint
+} 

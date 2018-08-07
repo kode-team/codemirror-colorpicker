@@ -1,8 +1,7 @@
 import Color from '../../Color'
 import {
     clamp,
-    pack,  
-    fillColor
+    pixel
 } from '../functions'
 /**
  * F.gradient('red', 'blue', 'yellow', 'white', 10)
@@ -28,23 +27,26 @@ export default function gradient () {
         return { type: 'param', value : arg }
     })
 
-    let scale = params.filter(it => { return it.type == 'scale' })[0]
-    scale = scale ? +scale.value : 256
+    let $scale = params.filter(it => { return it.type == 'scale' })[0]
+    $scale = $scale ? +$scale.value : 256
 
     params = params.filter(it => { return it.type == 'param' }).map( it => {
         return it.value 
     }).join(',')
 
-    let colors = Color.gradient(params, scale).map(c => { return Color.parse(c) })
+    let $colors = Color.gradient(params, $scale).map(c => { return Color.parse(c) })
 
-    return pack((pixels, i) => {
-        const colorIndex = clamp(Color.brightness(pixels[i] , pixels[i + 1] , pixels[i + 2]))
-        const newColorIndex = clamp(Math.floor(colorIndex * (scale / 256)))
-        const color = colors[newColorIndex]
+    return pixel(() => {
+        const colorIndex = $clamp($Color.brightness($r , $g , $b))
+        const newColorIndex = $clamp(Math.floor(colorIndex * ($scale / 256)))
+        const color = $colors[newColorIndex]
 
-        color.a = clamp(Math.floor(color.a * 256))
-
-        fillColor( pixels, i, color )
-
+        $r = color.r 
+        $g = color.g 
+        $b = color.b 
+        $a = $clamp(Math.floor(color.a * 256))
+    }, {
+        $colors,
+        $scale
     })
 }

@@ -1,7 +1,6 @@
 import {
     parseParamNumber,
-    pack,
-    fillColor
+    pixel
 } from '../functions'
 /**
  * 
@@ -9,9 +8,11 @@ import {
  */
 export default function contrast(amount = 0) {
     amount = parseParamNumber(amount)       
-    const C = Math.max((128 + amount) / 128, 0);
+    const $C = Math.max((128 + amount) / 128, 0);
 
-    return pack((pixels, i, xyIndex, r, g, b) => {
-        fillColor(pixels, i, r * C, g * C, b * C)
-    })
+    return pixel(() => {
+        $r *= $C
+        $g *= $C
+        $b *= $C
+    }, { $C })
 }

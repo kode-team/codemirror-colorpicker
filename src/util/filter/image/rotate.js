@@ -24,11 +24,11 @@ export default function rotate (degree = 0) {
         packXY((pixels, i, x, y) => {
 
             if (degree == 90) {
-                var endIndex = (x * newBitmap.width + (newBitmap.width -1 - y) ) * 4 
+                var endIndex = (x * newBitmap.width + (newBitmap.width -1 - y) ) << 2  //  << 2 is equals to (multiply)* 4 
             } else if (degree == 270) {
-                var endIndex = ( (newBitmap.height -1 -x) * newBitmap.width + y ) * 4 
+                var endIndex = ( (newBitmap.height -1 -x) * newBitmap.width + y ) << 2
             } else if (degree == 180) {
-                var endIndex = ((newBitmap.height -1 -y) * newBitmap.width + (newBitmap.width -1 -x)) * 4
+                var endIndex = ((newBitmap.height -1 -y) * newBitmap.width + (newBitmap.width -1 -x)) << 2
             }
 
             fillPixelColor(newBitmap.pixels, endIndex, bitmap.pixels, i)

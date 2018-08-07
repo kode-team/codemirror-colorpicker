@@ -42,7 +42,7 @@ export default function rotateDegree(angle, cx = 'center', cy = 'center') {
             if (x1 > width-1) return;
             if (y1 > height-1) return; 
 
-            var endIndex = (y1 * width + x1) * 4 
+            var endIndex = (y1 * width + x1) << 2   //  bit 2 shift is  * 4  
 
             fillPixelColor(pixels, endIndex, bitmap.pixels, i)
 

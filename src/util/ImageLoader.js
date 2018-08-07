@@ -84,7 +84,12 @@ class ImageLoader {
         filter(bitmap, function (newBitmap) {
             var tmpCanvas = Canvas.drawPixels(newBitmap);
 
-            callback(tmpCanvas.toDataURL(opt.outputFormat || 'image/png'))
+            if (opt.returnTo == 'canvas') {
+                callback(tmpCanvas)
+            } else {
+                callback(tmpCanvas.toDataURL(opt.outputFormat || 'image/png'))
+            }
+
         }, opt)
     } 
 

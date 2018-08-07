@@ -92,19 +92,6 @@
         z-index: 0;
     }
 
-    
-
-    section.colorpalette-area:before {
-        position: absolute;
-        content: "";
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        border: 1px solid rgb(246, 107, 107);
-        right: 50px;
-        top: 100px;        
-        z-index: 0;
-    }    
 
     section.colorpalette-area:after {
         position: absolute;
@@ -430,6 +417,10 @@
         padding-bottom: 2px;
     }
 
+    #canvas-image canvas {
+        max-width: 300px;
+    }
+
     </style>
 </head>
 <body>
@@ -669,7 +660,7 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image(['rotate', 270])">rotate 270</button>
                 </div>                    
                 <div>
-                    <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) sepia(5)'])">parse</button>
+                    <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) invert(5)'])">parse</button>
                 </div>                    
                 <div>
                     <button type="button" onclick="filter_image(['vintage'])">vintage</button>
@@ -775,7 +766,7 @@ var colorpicker = new ColorPicker({
         </div>
     </div>        
     <div class="area-item">
-        <div class="image-palette">
+        <div class="image-palette" id="canvas-image">
             <img id="filtered-image" />
         </div>
     </div>    
@@ -961,8 +952,9 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         var ImageFilter = CodeMirrorColorPicker.ImageFilter;
         document.getElementById('sampled-image').src = URL.createObjectURL(file);
 
-        Color.ImageToURL(file, ImageFilter.merge(args), function (url) {
-            document.getElementById('filtered-image').src = url;
+        Color.ImageToCanvas(file, ImageFilter.merge(args), function (canvas) {
+            document.getElementById("canvas-image").innerHTML = "" 
+            document.getElementById('canvas-image').appendChild(canvas)
         })
     }  
 

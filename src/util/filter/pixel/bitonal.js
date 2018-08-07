@@ -1,16 +1,23 @@
 import Color from '../../Color'
-import { pack, fillColor  } from '../functions'
+import { pixel  } from '../functions'
 
 
 export default function bitonal(darkColor, lightColor, threshold = 100) {
-    darkColor = Color.parse(darkColor);
-    lightColor = Color.parse(lightColor);
-    return pack((pixels, i, xyIndex, r, g, b) => {
+    let $darkColor = Color.parse(darkColor);
+    let $lightColor = Color.parse(lightColor);
+    let $threshold = threshold
 
-        if (r + g + b <= threshold) {
-            fillColor(pixels, i, darkColor);
-        } else {
-            fillColor(pixels, i, lightColor);            
-        }
+    return pixel(() => {
+        const thresholdColor = ( $r + $g + $b ) <= $threshold ? $darkColor : $lightColor
+
+        $r = thresholdColor.r
+        $g = thresholdColor.g 
+        $b = thresholdColor.b 
+    }, {
+        $darkColor,
+        $lightColor,
+        $threshold
     })
 }
+
+

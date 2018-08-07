@@ -879,7 +879,20 @@ const color = {
 
     },
 
-    ImageToURL(url, filter, callback, opt = { frameTimer : 'setTimeout'}) {
+    ImageToCanvas (url, filter, callback, opt = { frameTimer: 'full' }) {
+        var img = new ImageLoader(url);
+        img.loadImage(() => {
+            img.toArray(filter, function (canvas) {
+                if (typeof callback == 'function') {
+                    callback(canvas)
+                }                
+            }, Object.assign({
+                returnTo: 'canvas'
+            }, opt));
+        })
+    },
+
+    ImageToURL(url, filter, callback, opt = { frameTimer : 'full'}) {
         var img = new ImageLoader(url);
         img.loadImage(() => {
             img.toArray(filter, function (datauri) {

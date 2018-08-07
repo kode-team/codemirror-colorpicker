@@ -13,8 +13,8 @@ export default function flipV () {
         for (var y = 0; y < halfHeight; y++) {
             for (var x = 0; x < width; x++) {
 
-                var startIndex = (y * width + x) * 4 
-                var endIndex = ((height -1 - y) * width + x ) * 4 
+                var startIndex = (y * width + x) << 2 
+                var endIndex = ((height -1 - y) * width + x ) << 2
                 swapColor(bitmap.pixels, startIndex, endIndex)
 
             }

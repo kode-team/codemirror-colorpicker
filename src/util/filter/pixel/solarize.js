@@ -1,7 +1,6 @@
 import {
     parseParamNumber,
-    pack,
-    fillColor
+    pixel
 } from '../functions'
 /**
  * change the relative darkness of (a part of an image) by overexposure to light.
@@ -10,18 +9,15 @@ import {
  * @param {*} b 
  */
 export default function solarize (redValue, greenValue, blueValue) {
-    redValue = parseParamNumber(redValue)    
-    greenValue = parseParamNumber(greenValue)    
-    blueValue = parseParamNumber(blueValue)    
-    return pack((pixels, i, xyIndex, r, g, b ,a) => {
-
-        fillColor(
-            pixels,
-            i,
-            (r < redValue) ? 255 - r: r,
-            (g < greenValue) ? 255 - g: g,
-            (b < blueValue) ? 255 - b: b
-        )
+    const $redValue = parseParamNumber(redValue)    
+    const $greenValue = parseParamNumber(greenValue)    
+    const $blueValue = parseParamNumber(blueValue)    
+    return pixel(() => {
+        $r = ($r < $redValue) ? 255 - $r: $r
+        $g = ($g < $greenValue) ? 255 - $g: $g
+        $b = ($b < $blueValue) ? 255 - $b: $b
+    }, {
+        $redValue, $greenValue, $blueValue
     })
 
 }

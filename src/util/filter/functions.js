@@ -2,6 +2,8 @@ import Canvas from '../Canvas'
 import Matrix from '../Matrix'
 import ImageFilter from './index' 
 
+let makeId = 0 
+
 const functions = {
     partial,
     multi,
@@ -17,6 +19,7 @@ const functions = {
     createBlurMatrix,
     pack,
     packXY,
+    pixel,
     getBitmap,
     putBitmap,
     radian,
@@ -90,7 +93,7 @@ export function makeFilter(filter) {
     return filterFunction.apply(filterFunction, params);
 }
 
-export function forLoop (max, index = 0, step = 1, callback, done, functionDumpCount = 10000, frameTimer = 'full') {
+export function forLoop (max, index = 0, step = 1, callback, done, functionDumpCount = 10000, frameTimer = 'full', loopCount = 50) {
     let runIndex = index 
     let timer = (callback) => { 
         setTimeout(callback, 0) 
@@ -102,20 +105,51 @@ export function forLoop (max, index = 0, step = 1, callback, done, functionDumpC
     }
 
     if (frameTimer == 'full') { /* only for loop  */
-        timer = nextCallback 
+        timer = null
         functionDumpCount = max 
+    }
+
+    function makeFunction (count = 20) {
+        const arr = [...Array(count)];
+        
+        const functionStrings = arr.map(countIndex => {
+            const str = `
+                currentRunIndex = runIndex + i * step
+                if (currentRunIndex >= max) return {currentRunIndex: currentRunIndex, i: null};
+                callback(currentRunIndex); i++;
+            `
+
+            return str; 
+        }).join('\n\n')
+
+        const smallLoopFunction = new Function ('runIndex', 'i', 'step', 'max', 'callback', `
+            let currentRunIndex = runIndex;
+            
+            ${functionStrings}
+            
+            return {currentRunIndex: currentRunIndex, i: i} 
+        `)        
+
+        return smallLoopFunction
     }
 
     function runCallback () {
 
+        const smallLoopFunction = makeFunction(loopCount) // loop is call  20 callbacks at once 
+
         let currentRunIndex = runIndex 
-        for(var i = 0; i < functionDumpCount; i++) {
-            currentRunIndex = runIndex + i * step
-            
-            if (currentRunIndex >= max) {
+        let ret = {}; 
+        let i = 0 
+        while(i < functionDumpCount) {
+            ret = smallLoopFunction(runIndex, i, step, max, callback)
+
+            if (ret.i == null) {
+                currentRunIndex = ret.currentRunIndex
                 break; 
             }
-            callback(currentRunIndex)             
+
+            i = ret.i
+            currentRunIndex = ret.currentRunIndex
         }
 
         nextCallback(currentRunIndex)
@@ -133,7 +167,8 @@ export function forLoop (max, index = 0, step = 1, callback, done, functionDumpC
             return;  
         }
 
-        timer(runCallback)
+        if (timer) timer(runCallback)
+        else runCallback()
     }
 
     runCallback()
@@ -142,7 +177,7 @@ export function forLoop (max, index = 0, step = 1, callback, done, functionDumpC
 export function each(len, callback, done, opt = {}) {
 
     forLoop(len, 0, 4, function (i) {
-        callback(i, i/4 /* xyIndex */);
+        callback(i, i >> 2 /* xyIndex */);
     }, function () {
         done()
     }, opt.functionDumpCount, opt.frameTimer)
@@ -151,7 +186,7 @@ export function each(len, callback, done, opt = {}) {
 export function eachXY(len, width, callback, done, opt = {}) {
 
     forLoop(len, 0, 4, function (i) {
-        var xyIndex = i / 4 
+        var xyIndex = i >> 2 
         callback(i, xyIndex % width, Math.floor(xyIndex / width));
     }, function () {
         done()
@@ -169,7 +204,7 @@ export function createRandRange(min, max, count) {
 
     result.sort();
 
-    const centerIndex = Math.floor(count / 2);
+    const centerIndex = Math.floor(count >> 1);
     var a = result[centerIndex];
     result[centerIndex] = result[0];
     result[0] = a;
@@ -216,6 +251,110 @@ export function pack(callback) {
             done(bitmap);
         })
     }
+}
+
+export function makePrebuildUserFilterList (arr) {
+
+    const codeString = arr.map(it => {
+        return ` 
+            ${it.userFunction.$preContext}
+
+            ${it.userFunction.$preCallbackString}
+
+            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a)
+        `
+     }).join('\n\n')
+    let FunctionCode = ` 
+    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];
+    
+    ${codeString}
+    
+    $pixels[$pixelIndex] = $r; $pixels[$pixelIndex+1] = $g; $pixels[$pixelIndex+2] = $b; $pixels[$pixelIndex+3] = $a;
+    `
+
+    console.log(FunctionCode)
+
+    const userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode)
+
+    return userFunction
+}
+
+export function makeUserFilterFunctionList (arr) {
+    const list = arr.map(it => {
+        let newKeys = []
+        
+        Object.keys(it.context).forEach((key, i) => {
+            newKeys[key] = `n$${makeId++}${key}$` 
+        })
+
+        let preContext = Object.keys(it.context).map((key, i) => {
+            return [newKeys[key], JSON.stringify(it.context[key])].join(' = ')
+        })
+    
+        let preCallbackString = it.callback.toString().split("{");
+        
+        preCallbackString.shift()
+        preCallbackString = preCallbackString.join("{")
+        preCallbackString = preCallbackString.split("}")
+        preCallbackString.pop()
+        preCallbackString = preCallbackString.join("}")  
+
+        Object.keys(newKeys).forEach(key => {
+            var newKey = newKeys[key]
+            preCallbackString = preCallbackString.replace(new RegExp("\\"+key, "g"), newKey)
+        })
+
+        return { preCallbackString, preContext }
+    })
+
+    list.forEach((it, i) => {
+        it.strPreContext = `const ${it.preContext}`
+    })
+
+    const preContext = list.map((it, i) => {
+        return it.strPreContext
+    }).join('\n\n')
+
+    const preCallbackString = list.map(it => {
+        return it.preCallbackString
+    }).join('\n\n')
+
+
+    let FunctionCode = ` 
+    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];
+    
+    ${preContext}
+
+    ${preCallbackString}
+    
+    $pixels[$pixelIndex] = $r 
+    $pixels[$pixelIndex+1] = $g 
+    $pixels[$pixelIndex+2] = $b   
+    $pixels[$pixelIndex+3] = $a   
+    `
+
+    const userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode)
+
+    userFunction.$preCallbackString = preCallbackString
+    userFunction.$preContext = preContext
+
+    return userFunction
+}
+
+export function makeUserFilterFunction (callback, context) {
+    return makeUserFilterFunctionList([{ callback, context }])
+}
+
+export function pixel(callback, context) {
+    const userFunction = makeUserFilterFunction(callback, context)    
+
+    const returnCallback = function (bitmap, done) {
+       
+    }
+
+    returnCallback.userFunction = userFunction
+
+    return returnCallback
 }
 
 
@@ -398,6 +537,46 @@ export function filter (str) {
     }))
 }
 
+export function makeGroupedFilter(filters = []) {
+    var groupedFilter = [] 
+    var group = []
+    for (var i = 0, len = filters.length; i < len; i++) {
+        var f = filters[i]
+
+        if (f.userFunction) {
+            group.push(f)
+        } else {
+            if (group.length) {
+                groupedFilter.push([...group])
+            }
+            groupedFilter.push(f)
+            group = [] 
+        }
+    }
+
+    if (group.length) {
+        groupedFilter.push([...group])
+    }
+
+    groupedFilter.forEach((filter, index) => {
+        if (Array.isArray(filter)) {
+            groupedFilter[index] = (function () {
+                const userFunction = makePrebuildUserFilterList(filter)
+                // console.log(userFunction)
+                return function (bitmap, done) {
+                    forLoop(bitmap.pixels.length, 0, 4, function (i) {
+                        userFunction(bitmap.pixels, i, clamp, Color)
+                    }, function () {
+                        done(bitmap)
+                    })
+                }
+            })()
+        }
+    })
+
+    return groupedFilter
+}
+
 /** 
  * 
  * multiply filters
@@ -408,7 +587,9 @@ export function filter (str) {
 export function multi (...filters) {
     filters = filters.map(filter => {
         return makeFilter(filter);
-    })
+    }).filter(f => f)
+
+    filters = makeGroupedFilter(filters)
 
     var max = filters.length 
 
