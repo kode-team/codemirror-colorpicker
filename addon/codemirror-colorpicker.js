@@ -3369,11 +3369,9 @@ function pack$1(callback) {
 function makePrebuildUserFilterList(arr) {
 
     var codeString = arr.map(function (it) {
-        return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a)\n        ';
+        return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a);\n        ';
     }).join('\n\n');
     var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + codeString + '\n    \n    $pixels[$pixelIndex] = $r; $pixels[$pixelIndex+1] = $g; $pixels[$pixelIndex+2] = $b; $pixels[$pixelIndex+3] = $a;\n    ';
-
-    console.log(FunctionCode);
 
     var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
 
@@ -3388,7 +3386,17 @@ function makeUserFilterFunctionList(arr) {
             newKeys[key] = 'n$' + makeId++ + key + '$';
         });
 
-        var preContext = Object.keys(it.context).map(function (key, i) {
+        var preContext = Object.keys(it.context).filter(function (key) {
+            if (typeof it.context[key] === 'number' || typeof it.context[key] === 'string') {
+                return false;
+            } else if (Array.isArray(it.context[key])) {
+                if (typeof it.context[key][0] == 'number' || typeof it.context[key][0] == 'string') {
+                    return false;
+                }
+            }
+
+            return true;
+        }).map(function (key, i) {
             return [newKeys[key], JSON.stringify(it.context[key])].join(' = ');
         });
 
@@ -3402,14 +3410,27 @@ function makeUserFilterFunctionList(arr) {
 
         Object.keys(newKeys).forEach(function (key) {
             var newKey = newKeys[key];
-            preCallbackString = preCallbackString.replace(new RegExp("\\" + key, "g"), newKey);
+
+            if (typeof it.context[key] === 'number' || typeof it.context[key] === 'string') {
+                preCallbackString = preCallbackString.replace(new RegExp("\\" + key, "g"), it.context[key]);
+            } else if (Array.isArray(it.context[key])) {
+                if (typeof it.context[key][0] == 'number' || typeof it.context[key][0] == 'string') {
+                    it.context[key].forEach(function (item, index) {
+                        preCallbackString = preCallbackString.replace(new RegExp("\\" + key + '\\[' + index + '\\]', "g"), item);
+                    });
+                } else {
+                    preCallbackString = preCallbackString.replace(new RegExp("\\" + key, "g"), newKey);
+                }
+            } else {
+                preCallbackString = preCallbackString.replace(new RegExp("\\" + key, "g"), newKey);
+            }
         });
 
         return { preCallbackString: preCallbackString, preContext: preContext };
     });
 
     list.forEach(function (it, i) {
-        it.strPreContext = 'const ' + it.preContext;
+        it.strPreContext = it.preContext.length ? 'const ' + it.preContext + ';' : "";
     });
 
     var preContext = list.map(function (it, i) {
@@ -3420,7 +3441,7 @@ function makeUserFilterFunctionList(arr) {
         return it.preCallbackString;
     }).join('\n\n');
 
-    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + preContext + '\n\n    ' + preCallbackString + '\n    \n    $pixels[$pixelIndex] = $r \n    $pixels[$pixelIndex+1] = $g \n    $pixels[$pixelIndex+2] = $b   \n    $pixels[$pixelIndex+3] = $a   \n    ';
+    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + preContext + '\n\n    ' + preCallbackString + '\n    \n    $pixels[$pixelIndex] = $r\n    $pixels[$pixelIndex+1] = $g \n    $pixels[$pixelIndex+2] = $b   \n    $pixels[$pixelIndex+3] = $a   \n    ';
 
     var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
 

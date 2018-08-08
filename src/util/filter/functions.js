@@ -261,7 +261,7 @@ export function makePrebuildUserFilterList (arr) {
 
             ${it.userFunction.$preCallbackString}
 
-            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a)
+            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a);
         `
      }).join('\n\n')
     let FunctionCode = ` 
@@ -271,8 +271,6 @@ export function makePrebuildUserFilterList (arr) {
     
     $pixels[$pixelIndex] = $r; $pixels[$pixelIndex+1] = $g; $pixels[$pixelIndex+2] = $b; $pixels[$pixelIndex+3] = $a;
     `
-
-    console.log(FunctionCode)
 
     const userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode)
 
@@ -287,7 +285,17 @@ export function makeUserFilterFunctionList (arr) {
             newKeys[key] = `n$${makeId++}${key}$` 
         })
 
-        let preContext = Object.keys(it.context).map((key, i) => {
+        let preContext = Object.keys(it.context).filter(key => {
+            if (typeof it.context[key] === 'number' || typeof it.context[key] === 'string') {
+                return false 
+            } else if (Array.isArray(it.context[key])) {
+                if (typeof it.context[key][0] == 'number' || typeof it.context[key][0] == 'string') {
+                    return false 
+                }
+            }
+
+            return true 
+        }).map((key, i) => {
             return [newKeys[key], JSON.stringify(it.context[key])].join(' = ')
         })
     
@@ -301,14 +309,27 @@ export function makeUserFilterFunctionList (arr) {
 
         Object.keys(newKeys).forEach(key => {
             var newKey = newKeys[key]
-            preCallbackString = preCallbackString.replace(new RegExp("\\"+key, "g"), newKey)
+
+            if (typeof it.context[key] === 'number' || typeof it.context[key] === 'string') {
+                preCallbackString = preCallbackString.replace(new RegExp("\\"+key, "g"), it.context[key])
+            } else if (Array.isArray(it.context[key])) {
+                if (typeof it.context[key][0] == 'number' || typeof it.context[key][0] == 'string') {
+                    it.context[key].forEach((item, index) => {
+                        preCallbackString = preCallbackString.replace(new RegExp("\\"+key+'\\[' + index + '\\]', "g"), item)
+                    })
+                } else {
+                    preCallbackString = preCallbackString.replace(new RegExp("\\"+key, "g"), newKey)
+                }
+            } else {
+                preCallbackString = preCallbackString.replace(new RegExp("\\"+key, "g"), newKey)
+            }
         })
 
         return { preCallbackString, preContext }
     })
 
     list.forEach((it, i) => {
-        it.strPreContext = `const ${it.preContext}`
+        it.strPreContext = it.preContext.length ? `const ${it.preContext};` : "";
     })
 
     const preContext = list.map((it, i) => {
@@ -327,7 +348,7 @@ export function makeUserFilterFunctionList (arr) {
 
     ${preCallbackString}
     
-    $pixels[$pixelIndex] = $r 
+    $pixels[$pixelIndex] = $r
     $pixels[$pixelIndex+1] = $g 
     $pixels[$pixelIndex+2] = $b   
     $pixels[$pixelIndex+3] = $a   
@@ -356,7 +377,6 @@ export function pixel(callback, context) {
 
     return returnCallback
 }
-
 
 const ColorListIndex = [0, 1, 2, 3]
 
