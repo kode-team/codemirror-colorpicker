@@ -34,7 +34,10 @@ export default function gradient () {
         return it.value 
     }).join(',')
 
-    let $colors = Color.gradient(params, $scale).map(c => { return Color.parse(c) })
+    let $colors = Color.gradient(params, $scale).map(c => { 
+        const { r, g, b, a } = Color.parse(c)
+        return  {r, g, b, a} 
+    })
 
     return pixel(() => {
         const colorIndex = $clamp($Color.brightness($r , $g , $b))

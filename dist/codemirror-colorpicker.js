@@ -2212,7 +2212,13 @@ function gradient() {
     }).join(',');
 
     var $colors = color.gradient(params, $scale).map(function (c) {
-        return color.parse(c);
+        var _Color$parse = color.parse(c),
+            r = _Color$parse.r,
+            g = _Color$parse.g,
+            b = _Color$parse.b,
+            a = _Color$parse.a;
+
+        return { r: r, g: g, b: b, a: a };
     });
 
     return pixel(function () {
@@ -2416,7 +2422,8 @@ function thresholdColor() {
     var $hasColor = hasColor;
 
     return pixel(function () {
-        var v = $C * color.brightness($r, $g, $b) >= $scale ? 255 : 0;
+        // refer to Color.brightness 
+        var v = $C * Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722) >= $scale ? 255 : 0;
 
         if ($hasColor) {
 
@@ -2579,17 +2586,6 @@ function negative() {
 
     amount = parseParamNumber$1(amount);
     return convolution(weight([-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1], amount / 100));
-}
-
-function random() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
-    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createRandomCount();
-
-    amount = parseParamNumber$1(amount);
-    return function (pixels, width, height) {
-        var rand = createRandRange(-1, 5, count);
-        return convolution(rand)(pixels, width, height);
-    };
 }
 
 function sepia2() {
@@ -3133,7 +3129,6 @@ var matrix = {
      motionBlur3: motionBlur3,
      'motion-blur-3': motionBlur3,
      negative: negative,
-     random: random,
      sepia2: sepia2,
      sharpen: sharpen,
      sobelHorizontal: sobelHorizontal,
@@ -3572,46 +3567,44 @@ function fillPixelColor(targetPixels, targetIndex, sourcePixels, sourceIndex) {
     fillColor(targetPixels, targetIndex, sourcePixels[sourceIndex], sourcePixels[sourceIndex + 1], sourcePixels[sourceIndex + 2], sourcePixels[sourceIndex + 3]);
 }
 
+
+
+function createSubPixelWeightFunction(weights, width, height, opaque) {
+    var side = Math.round(Math.sqrt(weights.length));
+    var halfSide = Math.floor(side / 2);
+    var alphaFac = opaque ? 1 : 0;
+
+    var FunctionCode = 'let r = 0, g = 0, b = 0, a = 0, scy = 0, scx =0, si = 0; ';
+
+    weights.forEach(function (wt, index) {
+        var cy = Math.floor(index / side);
+        var cx = index % side;
+        var distY = cy - halfSide;
+        var distX = cx - halfSide;
+
+        FunctionCode += 'scy = $sy + (' + distY + '); scx = $sx + (' + distX + ');  if (scy >= 0 && scy  < ' + height + ' && scx >= 0 && scx < ' + width + ') { si = (scy * ' + width + ' + scx) << 2;  r += $sp[si] * (' + wt + '); g += $sp[si + 1] * (' + wt + '); b += $sp[si + 2] * (' + wt + '); a += $sp[si + 3] * (' + wt + ');  }\n        ';
+    });
+
+    FunctionCode += '$dp[$di] = r; $dp[$di+1] = g;$dp[$di+2] = b;$dp[$di+3] = a + (' + alphaFac + ')*(255-a); ';
+
+    var subPixelFunction = new Function('$dp', '$sp', '$di', '$sx', '$sy', FunctionCode);
+
+    return subPixelFunction;
+}
+
 function convolution(weights) {
+    var opaque = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
     return function (bitmap, done) {
         var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-        var side = Math.round(Math.sqrt(weights.length));
-        var halfSide = Math.floor(side / 2);
-
-        var w = bitmap.width;
-        var h = bitmap.height;
-        var sw = w;
-        var sh = h;
         var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
-        packXY(function (pixels, dstIndex, x, y) {
-            var sy = y;
-            var sx = x;
-            // const dstIndex = (y * w + x) * 4;
 
-            var r = 0,
-                g = 0,
-                b = 0,
-                a = 0;
-            for (var cy = 0; cy < side; cy++) {
-                for (var cx = 0; cx < side; cx++) {
+        var subPixelWeightFunction = createSubPixelWeightFunction(weights, bitmap.width, bitmap.height, opaque);
 
-                    var scy = sy + cy - halfSide;
-                    var scx = sx + cx - halfSide;
-
-                    if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-                        var srcIndex = (scy * sw + scx) * 4;
-                        var wt = weights[cy * side + cx];
-                        r += pixels[srcIndex] * wt;
-                        g += pixels[srcIndex + 1] * wt;
-                        b += pixels[srcIndex + 2] * wt;
-                        a += pixels[srcIndex + 3] * wt; // weight 를 곱한 값을 계속 더한다. 
-                    }
-                }
-            }
-
-            fillColor(newBitmap.pixels, dstIndex, r, g, b, a);
-        })(bitmap, function () {
+        packXY(function (pixels, i, x, y) {
+            subPixelWeightFunction(pixels, bitmap.pixels, i, x, y);
+        })(newBitmap, function () {
             done(newBitmap);
         }, opt);
     };

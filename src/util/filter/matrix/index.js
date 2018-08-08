@@ -12,7 +12,6 @@ import motionBlur from './motion-blur'
 import motionBlur2 from './motion-blur-2'
 import motionBlur3 from './motion-blur-3'
 import negative from './negative'
-import random from './random'
 import sepia2 from './sepia2'
 import sharpen from './sharpen'
 import sobelHorizontal from './sobel-horizontal'
@@ -45,7 +44,6 @@ export default {
      motionBlur3,
      'motion-blur-3': motionBlur3,
      negative,
-     random,
      sepia2,
      sharpen,
      sobelHorizontal,

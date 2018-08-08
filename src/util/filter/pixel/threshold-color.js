@@ -1,5 +1,3 @@
-import Color from '../../Color'
-
 import {
     parseParamNumber,
     pixel
@@ -13,7 +11,8 @@ export default function thresholdColor (scale = 200, amount = 100, hasColor = tr
     const $hasColor = hasColor
 
     return pixel(() => {
-        const v = ($C * Color.brightness($r, $g, $b) ) >= $scale ? 255 : 0;
+        // refer to Color.brightness 
+        const v = ($C * Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722) ) >= $scale ? 255 : 0;
 
         if ($hasColor) {
 

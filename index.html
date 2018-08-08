@@ -652,6 +652,30 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="view_histogram()">Histogram</button>
                 </div>                
                 <div>
+                    <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
+                </div>                   
+                <div>
+                    <button type="button" onclick="filter_image('motionBlur2')">motion blur 2</button>
+                </div>                     
+                <div>
+                    <button type="button" onclick="filter_image('motionBlur3')">motion blur 3</button>
+                </div>                                                   
+                <div>
+                    <button type="button" onclick="filter_image(['brightness', +document.getElementById('brightness_value').value])">brightness</button>
+                    <input type="range" id="brightness_value" value="10" min="-100" max="100" step="1" />
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['sepia', +document.getElementById('sepia_value').value])">sepia</button>
+                    <input type="range" id="sepia_value" value="10" min="-100" max="100" step="1" />
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['threshold', +document.getElementById('threshold_value').value])">threshold</button>
+                    <input type="number" id="threshold_value" value="100" min="0" max="255" step="1" />
+                </div>                                                                  
+                <div>
+                    <button type="button" onclick="filter_image('sobel')">sobel</button>
+                </div>                       
+                <div>
                     <button type="button" onclick="filter_image(['rotate', 150])">rotate 150</button>
                     <button type="button" onclick="filter_image(['rotate', 75])">rotate 75</button>
                     <button type="button" onclick="filter_image(['rotate', 10])">rotate 10</button>
@@ -666,7 +690,7 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image(['vintage'])">vintage</button>
                 </div>          
                 <div>
-                    <button type="button" onclick="filter_image(['stack-blur', '10px'])">stack-blur(5px)</button>
+                    <button type="button" onclick="filter_image(['stack-blur', '100px'])">stack-blur(100px)</button>
                 </div>                                                    
                 <div>
                     <button type="button" onclick="filter_image(['flipH'])">flipH</button>
@@ -715,9 +739,6 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image('emboss')">emboss</button>
                 </div>                   
                 <div>
-                    <button type="button" onclick="filter_image('random')">random filter</button>
-                </div>   
-                <div>
                     <button type="button" onclick="filter_image('vintage')">vintage</button>
                 </div>                                   
                 <div>
@@ -732,30 +753,7 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
                     <input type="range" min="1" max="100" step="1" value="3" id="blur-value" />
                 </div>                     
-                <div>
-                    <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
-                </div>                   
-                <div>
-                    <button type="button" onclick="filter_image('motionBlur2')">motion blur 2</button>
-                </div>                     
-                <div>
-                    <button type="button" onclick="filter_image('motionBlur3')">motion blur 3</button>
-                </div>                                                   
-                <div>
-                    <button type="button" onclick="filter_image(['brightness', +document.getElementById('brightness_value').value])">brightness</button>
-                    <input type="range" id="brightness_value" value="10" min="-100" max="100" step="1" />
-                </div>   
-                <div>
-                    <button type="button" onclick="filter_image(['sepia', +document.getElementById('sepia_value').value])">sepia</button>
-                    <input type="range" id="sepia_value" value="10" min="-100" max="100" step="1" />
-                </div>   
-                <div>
-                    <button type="button" onclick="filter_image(['threshold', +document.getElementById('threshold_value').value])">threshold</button>
-                    <input type="number" id="threshold_value" value="100" min="0" max="255" step="1" />
-                </div>                                                                  
-                <div>
-                    <button type="button" onclick="filter_image('sharpen', 'blur', 'sobel')">sobel</button>
-                </div>                                                                                                            
+                                                                                                                     
                                              
             </div>            
         

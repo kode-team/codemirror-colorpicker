@@ -433,47 +433,64 @@ export function fillPixelColor (targetPixels, targetIndex,  sourcePixels, source
     )
 }
 
+export function subPixelWeight  (dstPixels, pixels, dstIndex, sx, sy, sw, sh, halfSide, side, weights) {
+    var r = 0, g = 0, b = 0, a = 0, len = side ** 2 ;
+
+    for (var i = 0; i < len; i++) {
+        const cy = Math.floor(i / side)
+        const cx = i % side 
+
+        const scy = sy + cy - halfSide;
+        const scx = sx + cx - halfSide;
+
+        if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
+            var srcIndex = (scy * sw + scx) * 4; 
+            var wt = weights[cy * side + cx];
+            r += pixels[srcIndex] * wt;
+            g += pixels[srcIndex + 1] * wt;
+            b += pixels[srcIndex + 2] * wt;
+            a += pixels[srcIndex + 3] * wt;   // weight 를 곱한 값을 계속 더한다. 
+        }                
+    }
+
+    fillColor(dstPixels, dstIndex, r, g, b, a)
+}
+
+export function createSubPixelWeightFunction(weights, width, height, opaque) {
+    const side = Math.round(Math.sqrt(weights.length));
+    const halfSide = Math.floor(side / 2);
+    const alphaFac = opaque ? 1 : 0;
+
+    let FunctionCode = `let r = 0, g = 0, b = 0, a = 0, scy = 0, scx =0, si = 0; `
+
+    weights.forEach((wt, index) => {
+        const cy = Math.floor(index / side)
+        const cx = index % side
+        const distY = cy - halfSide
+        const distX = cx - halfSide
+
+        FunctionCode += `scy = $sy + (${distY}); scx = $sx + (${distX});  if (scy >= 0 && scy  < ${height} && scx >= 0 && scx < ${width}) { si = (scy * ${width} + scx) << 2;  r += $sp[si] * (${wt}); g += $sp[si + 1] * (${wt}); b += $sp[si + 2] * (${wt}); a += $sp[si + 3] * (${wt});  }
+        `
+    })
+
+    FunctionCode += `$dp[$di] = r; $dp[$di+1] = g;$dp[$di+2] = b;$dp[$di+3] = a + (${alphaFac})*(255-a); `
+
+    const subPixelFunction = new Function ('$dp', '$sp', '$di', '$sx', '$sy', FunctionCode )
+
+    return subPixelFunction 
+}
+
 export function convolution(weights, opaque = true) {
     return function (bitmap, done, opt = {}) {
-        const side = Math.round(Math.sqrt(weights.length));
-        const halfSide = Math.floor(side / 2);
-
-        var w = bitmap.width;
-        var h = bitmap.height;
-        var sw = w;
-        var sh = h;
         let newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height)
-        const alphaFac = opaque ? 1 : 0;
 
-        packXY((pixels, dstIndex, x, y) => {
-            const sy = y;
-            const sx = x;
-            // const dstIndex = (y * w + x) * 4;
-
-            var r = 0, g = 0, b = 0, a = 0;
-            for (var cy = 0; cy < side; cy++) {
-                for (var cx = 0; cx < side; cx++) {
-
-                    const scy = sy + cy - halfSide;
-                    const scx = sx + cx - halfSide;
-
-                    if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-                        var srcIndex = (scy * sw + scx) * 4;
-                        var wt = weights[cy * side + cx];
-                        r += pixels[srcIndex] * wt;
-                        g += pixels[srcIndex + 1] * wt;
-                        b += pixels[srcIndex + 2] * wt;
-                        a += pixels[srcIndex + 3] * wt;   // weight 를 곱한 값을 계속 더한다. 
-                    }
-                }
-            }
-
-            fillColor(newBitmap.pixels, dstIndex, r, g, b, a)
-
-        })(bitmap, function () {
+        const subPixelWeightFunction = createSubPixelWeightFunction(weights, bitmap.width, bitmap.height, opaque)
+        
+        packXY((pixels, i, x, y) => { 
+            subPixelWeightFunction (pixels, bitmap.pixels, i, x, y)
+        })(newBitmap, function () {
             done(newBitmap)
         }, opt)
-
     }
 }
 
@@ -545,11 +562,9 @@ export function parseFilter (filterString) {
     return result 
 }
 
-export function clamp (num) {ß
+export function clamp (num) {
     return Math.min(255, num)
 } 
-
-
 
 export function filter (str) {
     return merge(matches(str).map(it => {
