@@ -2204,18 +2204,15 @@ function gradient() {
     });
 
     return pixel(function () {
-        var colorIndex = $clamp($Color.brightness($r, $g, $b));
-        var newColorIndex = $clamp(Math.floor(colorIndex * ($scale / 256)));
+        var colorIndex = clamp(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
+        var newColorIndex = clamp(Math.floor(colorIndex * ($scale / 256)));
         var color$$1 = $colors[newColorIndex];
 
         $r = color$$1.r;
         $g = color$$1.g;
         $b = color$$1.b;
-        $a = $clamp(Math.floor(color$$1.a * 256));
-    }, {
-        $colors: $colors,
-        $scale: $scale
-    });
+        $a = clamp(Math.floor(color$$1.a * 256));
+    }, {}, { $colors: $colors, $scale: $scale });
 }
 
 function grayscale(amount) {
@@ -3227,17 +3224,15 @@ function forLoop(max) {
     }
 
     function makeFunction() {
-        var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 20;
+        var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 50;
 
         var arr = [].concat(toConsumableArray(Array(count)));
 
         var functionStrings = arr.map(function (countIndex) {
-            var str = '\n                currentRunIndex = runIndex + i * step\n                if (currentRunIndex >= max) return {currentRunIndex: currentRunIndex, i: null};\n                callback(currentRunIndex); i++;\n            ';
+            return 'cri = ri + i * s; if (cri >= mx) return {currentRunIndex: cri, i: null}; c(cri); i++;';
+        }).join('\n');
 
-            return str;
-        }).join('\n\n');
-
-        var smallLoopFunction = new Function('runIndex', 'i', 'step', 'max', 'callback', '\n            let currentRunIndex = runIndex;\n            \n            ' + functionStrings + '\n            \n            return {currentRunIndex: currentRunIndex, i: i} \n        ');
+        var smallLoopFunction = new Function('ri', 'i', 's', 'mx', 'c', '\n            let cri = ri;\n            \n            ' + functionStrings + '\n            \n            return {currentRunIndex: cri, i: i} \n        ');
 
         return smallLoopFunction;
     }
@@ -3290,7 +3285,7 @@ function each$1(len, callback, done) {
         callback(i, i >> 2 /* xyIndex */);
     }, function () {
         done();
-    }, opt.functionDumpCount, opt.frameTimer);
+    }, opt.functionDumpCount, opt.frameTimer, opt.loopCount);
 }
 
 function eachXY(len, width, callback, done) {
@@ -3302,7 +3297,7 @@ function eachXY(len, width, callback, done) {
         callback(i, xyIndex % width, Math.floor(xyIndex / width));
     }, function () {
         done();
-    }, opt.functionDumpCount, opt.frameTimer);
+    }, opt.functionDumpCount, opt.frameTimer, opt.loopCount);
 }
 
 function createRandRange(min, max, count) {
@@ -3332,6 +3327,74 @@ function createRandomCount() {
 
 function createBitmap(length, width, height) {
     return { pixels: new Uint8ClampedArray(length), width: width, height: height };
+}
+
+function putPixel(dstBitmap, srcBitmap, startX, startY) {
+
+    var len = srcBitmap.pixels.length / 4;
+    var dstX = 0,
+        dstY = 0,
+        x = 0,
+        y = 0,
+        srcIndex = 0,
+        dstIndex = 0;
+    for (var i = 0; i < len; i++) {
+        x = i % srcBitmap.width, y = Math.floor(i / srcBitmap.width);
+
+        dstX = startX + x;
+        dstY = startY + y;
+
+        if (dstX > dstBitmap.width) continue;
+        if (dstY > dstBitmap.height) continue;
+
+        srcIndex = y * srcBitmap.width + x << 2;
+        dstIndex = dstY * dstBitmap.width + dstX << 2;
+
+        dstBitmap.pixels[dstIndex] = srcBitmap.pixels[srcIndex];
+        dstBitmap.pixels[dstIndex + 1] = srcBitmap.pixels[srcIndex + 1];
+        dstBitmap.pixels[dstIndex + 2] = srcBitmap.pixels[srcIndex + 2];
+        dstBitmap.pixels[dstIndex + 3] = srcBitmap.pixels[srcIndex + 3];
+    }
+}
+
+function getPixel(srcBitmap, dstBitmap, startX, startY) {
+    var len = dstBitmap.pixels.length >> 2;
+    var srcX = 0,
+        srcY = 0,
+        x = 0,
+        y = 0,
+        srcIndex = 0,
+        dstIndex = 0;
+    for (var i = 0; i < len; i++) {
+        var x = i % dstBitmap.width,
+            y = Math.floor(i / dstBitmap.width);
+
+        srcX = startX + x;
+        srcY = startY + y;
+
+        if (srcX > srcBitmap.width) continue;
+        if (srcY > srcBitmap.height) continue;
+
+        srcIndex = srcY * srcBitmap.width + srcX << 2;
+        dstIndex = y * dstBitmap.width + x << 2;
+
+        dstBitmap.pixels[dstIndex] = srcBitmap.pixels[srcIndex];
+        dstBitmap.pixels[dstIndex + 1] = srcBitmap.pixels[srcIndex + 1];
+        dstBitmap.pixels[dstIndex + 2] = srcBitmap.pixels[srcIndex + 2];
+        dstBitmap.pixels[dstIndex + 3] = srcBitmap.pixels[srcIndex + 3];
+    }
+}
+
+function cloneBitmap(bitmap) {
+    var padding = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+
+    var width = bitmap.width + padding;
+    var height = bitmap.height + padding;
+
+    var newBitmap = { pixels: new Uint8ClampedArray(width * height * 4), width: width, height: height };
+
+    return newBitmap;
 }
 
 function getBitmap(bitmap, area) {
@@ -3364,21 +3427,40 @@ function pack$1(callback) {
 function makePrebuildUserFilterList(arr) {
 
     var codeString = arr.map(function (it) {
-        return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = $clamp($r); $g = $clamp($g); $b = $clamp($b); $a = $clamp($a);\n        ';
+        return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = clamp($r); $g = clamp($g); $b = clamp($b); $a = clamp($a);\n        ';
     }).join('\n\n');
-    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + codeString + '\n    \n    $pixels[$pixelIndex] = $r; $pixels[$pixelIndex+1] = $g; $pixels[$pixelIndex+2] = $b; $pixels[$pixelIndex+3] = $a;\n    ';
 
-    var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
+    var rootContextObject = { clamp: clamp, Color: color };
+    arr.forEach(function (it) {
+        Object.assign(rootContextObject, it.userFunction.rootContextObject);
+    });
 
-    return userFunction;
+    var rootContextDefine = 'const ' + Object.keys(rootContextObject).map(function (key) {
+        return ' ' + key + ' = $rc.' + key + ' ';
+    }).join(',');
+
+    var FunctionCode = ' \n    let $r = $p[$pi], $g = $p[$pi+1], $b = $p[$pi+2], $a = $p[$pi+3];\n    \n    ' + rootContextDefine + '\n\n    ' + codeString + '\n    \n    $p[$pi] = $r; $p[$pi+1] = $g; $p[$pi+2] = $b; $p[$pi+3] = $a;\n    ';
+
+    var userFunction = new Function('$p', '$pi', '$rc', FunctionCode);
+
+    return function ($pixels, $pixelIndex) {
+        userFunction($pixels, $pixelIndex, rootContextObject);
+    };
 }
 
 function makeUserFilterFunctionList(arr) {
+    var rootContextObject = {};
     var list = arr.map(function (it) {
         var newKeys = [];
 
         Object.keys(it.context).forEach(function (key, i) {
             newKeys[key] = 'n$' + makeId++ + key + '$';
+        });
+
+        Object.keys(it.rootContext).forEach(function (key, i) {
+            newKeys[key] = 'r$' + makeId++ + key + '$';
+
+            rootContextObject[newKeys[key]] = it.rootContext[key];
         });
 
         var preContext = Object.keys(it.context).filter(function (key) {
@@ -3424,34 +3506,37 @@ function makeUserFilterFunctionList(arr) {
         return { preCallbackString: preCallbackString, preContext: preContext };
     });
 
-    list.forEach(function (it, i) {
-        it.strPreContext = it.preContext.length ? 'const ' + it.preContext + ';' : "";
-    });
-
     var preContext = list.map(function (it, i) {
-        return it.strPreContext;
+        return it.preContext.length ? 'const ' + it.preContext + ';' : "";
     }).join('\n\n');
 
     var preCallbackString = list.map(function (it) {
         return it.preCallbackString;
     }).join('\n\n');
 
-    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n    \n    ' + preContext + '\n\n    ' + preCallbackString + '\n    \n    $pixels[$pixelIndex] = $r\n    $pixels[$pixelIndex+1] = $g \n    $pixels[$pixelIndex+2] = $b   \n    $pixels[$pixelIndex+3] = $a   \n    ';
+    var FunctionCode = ' \n    let $r = $pixels[$pixelIndex], $g = $pixels[$pixelIndex+1], $b = $pixels[$pixelIndex+2], $a = $pixels[$pixelIndex+3];\n\n    ' + preContext + '\n\n    ' + preCallbackString + '\n    \n    $pixels[$pixelIndex] = $r\n    $pixels[$pixelIndex+1] = $g \n    $pixels[$pixelIndex+2] = $b   \n    $pixels[$pixelIndex+3] = $a   \n    ';
 
     var userFunction = new Function('$pixels', '$pixelIndex', '$clamp', '$Color', FunctionCode);
 
     userFunction.$preCallbackString = preCallbackString;
     userFunction.$preContext = preContext;
+    userFunction.rootContextObject = rootContextObject;
 
     return userFunction;
 }
 
-function makeUserFilterFunction(callback, context) {
-    return makeUserFilterFunctionList([{ callback: callback, context: context }]);
+function makeUserFilterFunction(callback) {
+    var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var rootContext = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    return makeUserFilterFunctionList([{ callback: callback, context: context, rootContext: rootContext }]);
 }
 
-function pixel(callback, context) {
-    var userFunction = makeUserFilterFunction(callback, context);
+function pixel(callback) {
+    var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var rootContext = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var userFunction = makeUserFilterFunction(callback, context, rootContext);
 
     var returnCallback = function returnCallback(bitmap, done) {};
 
@@ -3524,49 +3609,107 @@ function fillPixelColor(targetPixels, targetIndex, sourcePixels, sourceIndex) {
 
 
 
-function createSubPixelWeightFunction(weights, width, height, opaque) {
+function createWeightTable(weights) {
+    var min = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var max = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 255;
+
+    var weightTable = [];
+
+    weightTable = weights.map(function (w, i) {
+        return [];
+    });
+
+    weights.forEach(function (w, i) {
+
+        if (w != 0) {
+            var data = weightTable[i];
+
+            for (var i = min; i <= max; i++) {
+                data[i] = w * i;
+            }
+        }
+    });
+
+    return weightTable;
+}
+
+function createSubPixelWeightFunction(weights, weightTable, width, height, opaque) {
+
     var side = Math.round(Math.sqrt(weights.length));
     var halfSide = Math.floor(side / 2);
     var alphaFac = opaque ? 1 : 0;
 
     var FunctionCode = 'let r = 0, g = 0, b = 0, a = 0, scy = 0, scx =0, si = 0; ';
-
+    var R = [];
+    var G = [];
+    var B = [];
+    var A = [];
     weights.forEach(function (wt, index) {
         var cy = Math.floor(index / side);
         var cx = index % side;
         var distY = cy - halfSide;
         var distX = cx - halfSide;
 
-        FunctionCode += 'scy = $sy + (' + distY + '); scx = $sx + (' + distX + ');  if (scy >= 0 && scy  < ' + height + ' && scx >= 0 && scx < ' + width + ') { si = (scy * ' + width + ' + scx) << 2;  r += $sp[si] * (' + wt + '); g += $sp[si + 1] * (' + wt + '); b += $sp[si + 2] * (' + wt + '); a += $sp[si + 3] * (' + wt + ');  }\n        ';
+        if (wt == 0) {
+            return;
+        }
+
+        R.push('$t[' + index + '][$sp[(($sy + (' + distY + ')) * ' + width + ' + ($sx + (' + distX + '))) * 4]]');
+        G.push('$t[' + index + '][$sp[(($sy + (' + distY + ')) * ' + width + ' + ($sx + (' + distX + '))) * 4 + 1]]');
+        B.push('$t[' + index + '][$sp[(($sy + (' + distY + ')) * ' + width + ' + ($sx + (' + distX + '))) * 4 + 2]]');
+        A.push('$t[' + index + '][$sp[(($sy + (' + distY + ')) * ' + width + ' + ($sx + (' + distX + '))) * 4 + 3]]');
     });
 
+    FunctionCode += 'r = ' + R.join(' + ') + '; g = ' + G.join(' + ') + '; b = ' + B.join(' + ') + '; a = ' + A.join(' + ') + ';';
     FunctionCode += '$dp[$di] = r; $dp[$di+1] = g;$dp[$di+2] = b;$dp[$di+3] = a + (' + alphaFac + ')*(255-a); ';
 
-    var subPixelFunction = new Function('$dp', '$sp', '$di', '$sx', '$sy', FunctionCode);
+    // console.log(FunctionCode)
 
-    return subPixelFunction;
+    var subPixelFunction = new Function('$dp', '$sp', '$di', '$sx', '$sy', '$t', FunctionCode);
+
+    return function ($dp, $sp, $di, $sx, $sy) {
+        subPixelFunction($dp, $sp, $di, $sx, $sy, weightTable);
+    };
 }
 
 function convolution(weights) {
     var opaque = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
+    var weightTable = createWeightTable(weights);
     return function (bitmap, done) {
-        var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var side = Math.round(Math.sqrt(weights.length));
+        var padding = side * 2;
 
-        var newBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
+        // 원본 크기를 늘림 
+        var sourceBitmap = cloneBitmap(bitmap, padding);
 
-        var subPixelWeightFunction = createSubPixelWeightFunction(weights, bitmap.width, bitmap.height, opaque);
+        // 원본 데이타 복사 
+        putPixel(sourceBitmap, bitmap, side, side);
 
-        packXY(function (pixels, i, x, y) {
-            subPixelWeightFunction(pixels, bitmap.pixels, i, x, y);
-        })(newBitmap, function () {
-            done(newBitmap);
-        }, opt);
+        // 최종 아웃풋 
+        var newBitmap = createBitmap(sourceBitmap.pixels.length, sourceBitmap.width, sourceBitmap.height);
+
+        // 마지막 원본 아웃풋 
+        var returnBitmap = createBitmap(bitmap.pixels.length, bitmap.width, bitmap.height);
+
+        var subPixelWeightFunction = createSubPixelWeightFunction(weights, weightTable, sourceBitmap.width, sourceBitmap.height, opaque);
+
+        var len = bitmap.pixels.length / 4;
+        for (var i = 0; i < len; i++) {
+            var xyIndex = i,
+                x = xyIndex % bitmap.width + side,
+                y = Math.floor(xyIndex / bitmap.width) + side;
+
+            subPixelWeightFunction(newBitmap.pixels, sourceBitmap.pixels, (y * sourceBitmap.width + x) * 4, x, y);
+        }
+
+        getPixel(newBitmap, returnBitmap, side, side);
+        done(returnBitmap);
     };
 }
 
 function matches(str) {
-    var ret = Color.convertMatches(str);
+    var ret = color.convertMatches(str);
     var matches = ret.str.match(filter_regexp);
     var result = [];
 
@@ -3575,7 +3718,7 @@ function matches(str) {
     }
 
     result = matches.map(function (it) {
-        return { filter: it, origin: Color.reverseMatches(it, ret.matches) };
+        return { filter: it, origin: color.reverseMatches(it, ret.matches) };
     });
 
     var pos = { next: 0 };
@@ -3609,7 +3752,7 @@ function matches(str) {
  */
 function parseFilter(filterString) {
 
-    var ret = Color.convertMatches(filterString);
+    var ret = color.convertMatches(filterString);
     var matches = ret.str.match(filter_regexp);
 
     if (!matches[0]) {
@@ -3623,11 +3766,11 @@ function parseFilter(filterString) {
 
     if (arr.length) {
         filterParams = arr.shift().split(')')[0].split(',').map(function (f) {
-            return Color.reverseMatches(f, ret.matches);
+            return color.reverseMatches(f, ret.matches);
         });
     }
 
-    var result = [filterName].concat(toConsumableArray(filterParams)).map(Color.trim);
+    var result = [filterName].concat(toConsumableArray(filterParams)).map(color.trim);
 
     return result;
 }
@@ -3671,11 +3814,17 @@ function makeGroupedFilter() {
                 var userFunction = makePrebuildUserFilterList(filter);
                 // console.log(userFunction)
                 return function (bitmap, done) {
-                    forLoop(bitmap.pixels.length, 0, 4, function (i) {
-                        userFunction(bitmap.pixels, i, clamp, Color);
-                    }, function () {
-                        done(bitmap);
-                    });
+
+                    for (var i = 0, len = bitmap.pixels.length; i < len; i += 4) {
+                        userFunction(bitmap.pixels, i);
+                    }
+
+                    done(bitmap);
+                    // forLoop(bitmap.pixels.length, 0, 4, function (i) {
+                    //     userFunction(bitmap.pixels, i)
+                    // }, function () {
+                    //     done(bitmap)
+                    // })
                 };
             }();
         }

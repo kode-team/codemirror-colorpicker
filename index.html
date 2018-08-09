@@ -655,7 +655,7 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
                 </div>                   
                 <div>
-                    <button type="button" onclick="filter_image('motionBlur2')">motion blur 2</button>
+                    <button type="button" onclick="filter_image('gaussian-blur-5x')">gaussian-blur 5x</button>
                 </div>                     
                 <div>
                     <button type="button" onclick="filter_image('motionBlur3')">motion blur 3</button>
@@ -685,7 +685,13 @@ var colorpicker = new ColorPicker({
                 </div>                    
                 <div>
                     <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) invert(5)'])">parse</button>
-                </div>                    
+                </div>             
+                <div>
+                    <button type="button" onclick="filter_image('sharpen')">sharpen</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image('emboss')">emboss</button>
+                </div>                                          
                 <div>
                     <button type="button" onclick="filter_image(['vintage'])">vintage</button>
                 </div>          
@@ -732,15 +738,7 @@ var colorpicker = new ColorPicker({
                 <div>
                     <button type="button" onclick="filter_image(['partial', {x:50,y:50,width:200,height:200}, 'invert(70) sepia sharpen gradient( white, black)'])">partial</button>
                 </div>                   
-                <div>
-                    <button type="button" onclick="filter_image('sharpen')">sharpen</button>
-                </div>   
-                <div>
-                    <button type="button" onclick="filter_image('emboss')">emboss</button>
-                </div>                   
-                <div>
-                    <button type="button" onclick="filter_image('vintage')">vintage</button>
-                </div>                                   
+
                 <div>
                     <button type="button" onclick="filter_image(['noise', +document.getElementById('noise-value').value])">Noise</button>
                     <input type="range" min="1" max="100" step="1" value="3" id="noise-value" />
@@ -764,8 +762,9 @@ var colorpicker = new ColorPicker({
         </div>
     </div>        
     <div class="area-item">
-        <div class="image-palette" id="canvas-image">
+        <div class="image-palette">
             <img id="filtered-image" />
+            <div id="canvas-image"></div>
         </div>
     </div>    
     <pre><code class="javascript"></code></pre>        
