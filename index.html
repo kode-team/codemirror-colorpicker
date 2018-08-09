@@ -652,8 +652,32 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="view_histogram()">Histogram</button>
                 </div>                
                 <div>
+                    <button type="button" onclick="filter_image('brownie')">brownie</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image(['histogram', 'gray', [ [50, 90],  [ 100, 200] , [220, 240] ]])">histogram</button>
+                </div>                               
+                <div>
+                    <button type="button" onclick="filter_image('kodachrome')">kodachrome</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('polaroid')">polaroid</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('technicolor')">technicolor</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('shift')">shift</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image(['matrix',  1.1285582396593525,-0.3967382283601348,-0.03992559172921793,0,
+                    -0.16404339962244616,1.0835251566291304,-0.05498805115633132,0,
+                    -0.16786010706155763,-0.5603416277695248,0.6014850761964943,0,
+                    0,0,0,1])">matrix</button>
+                </div>                                                                                               
+                <div>
                     <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
-                </div>                   
+                </div>                                   
                 <div>
                     <button type="button" onclick="filter_image('gaussian-blur-5x')">gaussian-blur 5x</button>
                 </div>                     

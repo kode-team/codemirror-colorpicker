@@ -14,9 +14,10 @@ export default function bitonal(darkColor, lightColor, threshold = 100) {
         $g = thresholdColor.g 
         $b = thresholdColor.b 
     }, {
-        $darkColor,
-        $lightColor,
         $threshold
+    }, {
+        $darkColor,
+        $lightColor
     })
 }
 

@@ -2084,6 +2084,60 @@ function rotate() {
     };
 }
 
+function histogram() {
+    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'gray';
+    var points = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+
+    var $realPoints = [];
+
+    points.unshift([0, 0]);
+    points.push([255, 255]);
+
+    for (var i = 0; i < points.length - 1; i++) {
+        var sp = points[i];
+        var ep = points[i + 1];
+
+        var distX = ep[0] - sp[0];
+        var distY = ep[1] - sp[1];
+
+        var rate = distY / distX;
+
+        for (var realIndex = 0, start = sp[0]; realIndex < distX; realIndex++, start++) {
+            $realPoints[start] = sp[1] + realIndex * rate;
+        }
+    }
+
+    $realPoints[255] = 255;
+
+    if (type === 'red') {
+        return pixel(function () {
+            $r = $realPoints[$r];
+        }, {}, { $realPoints: $realPoints });
+    } else if (type === 'green') {
+        return pixel(function () {
+            $g = $realPoints[$g];
+        }, {}, { $realPoints: $realPoints });
+    } else if (type === 'blue') {
+        return pixel(function () {
+            $b = $realPoints[$b];
+        }, {}, { $realPoints: $realPoints });
+    } else {
+        return pixel(function () {
+
+            var l = Color.RGBtoYCrCb($r, $g, $b);
+            // console.log(l.y, $realPoints[l.y])
+            // console.log(clamp($realPoints[clamp(l.y)]), l.cr, l.cb)
+            var c = Color.YCrCbtoRGB(clamp($realPoints[clamp(l.y)]), l.cr, l.cb, 0);
+            $r = c.r;
+            $g = c.g;
+            $b = c.b;
+
+            // console.log($r, $g, $b)
+        }, {}, { $realPoints: $realPoints });
+    }
+}
+
 var image = {
     crop: crop,
     resize: resize,
@@ -2091,6 +2145,7 @@ var image = {
     flipV: flipV,
     rotate: rotate,
     rotateDegree: rotateDegree,
+    histogram: histogram,
     'rotate-degree': rotateDegree
 };
 
@@ -2108,9 +2163,10 @@ function bitonal(darkColor, lightColor) {
         $g = thresholdColor.g;
         $b = thresholdColor.b;
     }, {
-        $darkColor: $darkColor,
-        $lightColor: $lightColor,
         $threshold: $threshold
+    }, {
+        $darkColor: $darkColor,
+        $lightColor: $lightColor
     });
 }
 
@@ -2128,6 +2184,20 @@ function brightness() {
         $g += $C;
         $b += $C;
     }, { $C: $C });
+}
+
+function brownie() {
+
+    var $matrix = [0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
+    });
 }
 
 /**
@@ -2222,14 +2292,14 @@ function gradient() {
     });
 
     return pixel(function () {
-        var colorIndex = clamp(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
-        var newColorIndex = clamp(Math.floor(colorIndex * ($scale / 256)));
+        var colorIndex = clamp$1(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
+        var newColorIndex = clamp$1(Math.floor(colorIndex * ($scale / 256)));
         var color$$1 = $colors[newColorIndex];
 
         $r = color$$1.r;
         $g = color$$1.g;
         $b = color$$1.b;
-        $a = clamp(Math.floor(color$$1.a * 256));
+        $a = clamp$1(Math.floor(color$$1.a * 256));
     }, {}, { $colors: $colors, $scale: $scale });
 }
 
@@ -2292,6 +2362,51 @@ function invert() {
     });
 }
 
+function kodachrome() {
+
+    var $matrix = [1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
+    });
+}
+
+function matrix() {
+    var $a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var $b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var $c = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var $d = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+    var $e = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+    var $f = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+    var $g = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+    var $h = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+    var $i = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
+    var $j = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
+    var $k = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : 0;
+    var $l = arguments.length > 11 && arguments[11] !== undefined ? arguments[11] : 0;
+    var $m = arguments.length > 12 && arguments[12] !== undefined ? arguments[12] : 0;
+    var $n = arguments.length > 13 && arguments[13] !== undefined ? arguments[13] : 0;
+    var $o = arguments.length > 14 && arguments[14] !== undefined ? arguments[14] : 0;
+    var $p = arguments.length > 15 && arguments[15] !== undefined ? arguments[15] : 0;
+
+
+    var $matrix = [$a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n, $o, $p];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
+    });
+}
+
 /**
  * 
  * @param {Number} amount 1..100
@@ -2323,6 +2438,20 @@ function opacity() {
     return pixel(function () {
         $a *= $C;
     }, { $C: $C });
+}
+
+function polaroid() {
+
+    var $matrix = [1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
+    });
 }
 
 /*
@@ -2389,6 +2518,20 @@ function shade() {
     });
 }
 
+function shift() {
+
+    var $matrix = [1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
+    });
+}
+
 /**
  * change the relative darkness of (a part of an image) by overexposure to light.
  * @param {*} r 
@@ -2405,6 +2548,20 @@ function solarize(redValue, greenValue, blueValue) {
         $b = $b < $blueValue ? 255 - $b : $b;
     }, {
         $redValue: $redValue, $greenValue: $greenValue, $blueValue: $blueValue
+    });
+}
+
+function technicolor() {
+
+    var $matrix = [1.9125277891456083, -0.8545344976951645, -0.09155508482755585, 0, -0.3087833385928097, 1.7658908555458428, -0.10601743074722245, 0, -0.231103377548616, -0.7501899197440212, 1.847597816108189, 0, 0, 0, 0, 1];
+
+    return pixel(function () {
+        $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a;
+        $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a;
+        $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a;
+        $a = $matrix[12] * $r + $matrix[13] * $g + $matrix[14] * $b + $matrix[15] * $a;
+    }, {
+        $matrix: $matrix
     });
 }
 
@@ -2473,6 +2630,7 @@ function tint () {
 var pixel$1 = {
     bitonal: bitonal,
     brightness: brightness,
+    brownie: brownie,
     clip: clip,
     contrast: contrast,
     gamma: gamma,
@@ -2480,12 +2638,17 @@ var pixel$1 = {
     grayscale: grayscale,
     hue: hue,
     invert: invert,
+    kodachrome: kodachrome,
+    matrix: matrix,
     noise: noise,
     opacity: opacity,
+    polaroid: polaroid,
     saturation: saturation,
     sepia: sepia,
     shade: shade,
+    shift: shift,
     solarize: solarize,
+    technicolor: technicolor,
     threshold: threshold,
     'threshold-color': thresholdColor,
     tint: tint
@@ -3103,7 +3266,7 @@ function unsharpMasking() {
     return convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], -1 / amount));
 }
 
-var matrix = {
+var matrix$1 = {
      blur: blur,
      emboss: emboss,
      gaussianBlur: gaussianBlur,
@@ -3157,7 +3320,7 @@ var multi$1 = {
     vintage: vintage
 };
 
-var ImageFilter$1 = _extends({}, image, pixel$1, matrix, multi$1);
+var ImageFilter$1 = _extends({}, image, pixel$1, matrix$1, multi$1);
 
 var _functions;
 
@@ -3185,7 +3348,7 @@ var functions = (_functions = {
     convolution: convolution,
     parseParamNumber: parseParamNumber$1,
     filter: filter,
-    clamp: clamp,
+    clamp: clamp$1,
     fillColor: fillColor,
     fillPixelColor: fillPixelColor
 }, defineProperty(_functions, 'multi', multi), defineProperty(_functions, 'merge', merge), defineProperty(_functions, 'matches', matches), defineProperty(_functions, 'parseFilter', parseFilter), defineProperty(_functions, 'partial', partial), _functions);
@@ -3475,7 +3638,7 @@ function makePrebuildUserFilterList(arr) {
         return ' \n            ' + it.userFunction.$preContext + '\n\n            ' + it.userFunction.$preCallbackString + '\n\n            $r = clamp($r); $g = clamp($g); $b = clamp($b); $a = clamp($a);\n        ';
     }).join('\n\n');
 
-    var rootContextObject = { clamp: clamp, Color: color };
+    var rootContextObject = { clamp: clamp$1, Color: color };
     arr.forEach(function (it) {
         Object.assign(rootContextObject, it.userFunction.rootContextObject);
     });
@@ -3820,7 +3983,7 @@ function parseFilter(filterString) {
     return result;
 }
 
-function clamp(num) {
+function clamp$1(num) {
     return Math.min(255, num);
 }
 

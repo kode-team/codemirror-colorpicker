@@ -1,5 +1,4 @@
 import Color from '../util/Color'
-import ColorNames from '../util/ColorNames'
 import ColorPicker from '../colorpicker/index';
 
 const colorpicker_class = 'codemirror-colorview';
