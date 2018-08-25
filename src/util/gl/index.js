@@ -466,7 +466,7 @@ class GLCanvas {
         this.vertexShader = this.createVertexShader (vertexSource) 
         this.fragmentShader = this.createFragmentShader(fragmentSource) 
 
-        console.log(fragmentSource)      
+        // console.log(fragmentSource)      
 
 
         gl.attachShader(program, this.vertexShader )

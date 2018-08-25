@@ -6,16 +6,16 @@ import clip from './clip'
 import chaos from './chaos'
 import contrast from './contrast'
 import gamma from './gamma'
-// import gradient from './gradient'
+import gradient from './gradient'
 import grayscale from './grayscale'
 import hue from './hue'
-import invert from './invert'
+import invert from './invert' 
 import kodachrome from './kodachrome'
 import matrix from './matrix'
 import noise from './noise' 
 import opacity from './opacity' 
 import polaroid from './polaroid'
-import saturation from './saturation'
+import saturation from './saturation' 
 import sepia from './sepia'
 import shade from './shade'
 import shift from './shift'
@@ -33,7 +33,7 @@ export default {
     chaos,
     contrast,
     gamma,
-    // gradient,
+    gradient,
     grayscale,
     hue, 
     invert,

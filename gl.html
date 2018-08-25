@@ -45,7 +45,7 @@
 
     function show_gl() {
 
-        Color.GLToCanvas ('./resources/image/grapes.jpg', 'chaos(4)', function (newImage) {
+        Color.GLToCanvas ('./resources/image/grapes.jpg', 'gradient(black, red)', function (newImage) {
             //document.getElementById('gl').innerHTML = "";
             document.getElementById('gl').appendChild(newImage.canvas)
         })

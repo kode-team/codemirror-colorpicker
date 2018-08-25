@@ -3394,6 +3394,57 @@ function gamma$1() {
 }
 
 /**
+ * F.gradient('red', 'blue', 'yellow', 'white', 10)
+ * F.gradient('red, blue, yellow, white, 10')
+ */
+function gradient$1() {
+    // 전체 매개변수 기준으로 파싱 
+    // 색이 아닌 것 기준으로 scale 변수로 인식 
+
+    var params = [].concat(Array.prototype.slice.call(arguments));
+
+    if (params.length === 1 && typeof params[0] === 'string') {
+        params = color.convertMatchesArray(params[0]);
+    }
+
+    params = params.map(function (arg) {
+        return arg;
+    }).join(', ');
+
+    var colors = color.parseGradient(params);
+
+    colors[0][1] = 0;
+    colors[colors.length - 1][1] = 1;
+
+    colors = colors.map(function (c) {
+        var _Color$parse = color.parse(c[0]),
+            r = _Color$parse.r,
+            g = _Color$parse.g,
+            b = _Color$parse.b,
+            a = _Color$parse.a;
+
+        return [{ r: r, g: g, b: b, a: a }, c[1]];
+    });
+
+    var temp = [];
+
+    for (var i = 0, len = colors.length; i < len - 1; i++) {
+        var start = colors[i];
+        var end = colors[i + 1];
+
+        var startColor = colorToVec4(start[0]);
+        var endColor = colorToVec4(end[0]);
+
+        var startRate = toFloatString(start[1]);
+        var endRate = toFloatString(end[1]);
+
+        temp.push('\n            if (' + startRate + ' <= rate && rate < ' + endRate + ') {\n                outColor = mix(' + startColor + ', ' + endColor + ', (rate - ' + startRate + ')/(' + endRate + ' - ' + startRate + '));\n            }\n        ');
+    }
+
+    return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
+}
+
+/**
  * 
  * @param {Number} amount 0..1
  */
@@ -3517,9 +3568,9 @@ function technicolor$1() {
 }
 
 function thresholdColor$1() {
-    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+    var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    scale = parseParamNumber$2(scale) / 255;
+    scale = toFloatString(parseParamNumber$2(scale));
 
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
@@ -3552,7 +3603,6 @@ function tint$1 () {
     return shader('\n        outColor = vec4(\n            pixelColor.r += (1 - pixelColor.r) * ' + r + ',\n            pixelColor.g += (1 - pixelColor.g) * ' + g + ',\n            pixelColor.b += (1 - pixelColor.b) * ' + b + ',\n            pixelColor.a\n        );\n    ');
 }
 
-// import gradient from './gradient'
 var pixel$2 = {
     bitonal: bitonal$1,
     brightness: brightness$1,
@@ -3561,7 +3611,7 @@ var pixel$2 = {
     chaos: chaos,
     contrast: contrast$1,
     gamma: gamma$1,
-    // gradient,
+    gradient: gradient$1,
     grayscale: grayscale$1,
     hue: hue$1,
     invert: invert$1,
@@ -4159,7 +4209,8 @@ var GLCanvas = function () {
             this.vertexShader = this.createVertexShader(vertexSource);
             this.fragmentShader = this.createFragmentShader(fragmentSource);
 
-            console.log(fragmentSource);
+            // console.log(fragmentSource)      
+
 
             gl.attachShader(program, this.vertexShader);
             gl.attachShader(program, this.fragmentShader);
