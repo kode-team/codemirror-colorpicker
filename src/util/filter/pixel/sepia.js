@@ -4,11 +4,10 @@ import {
 } from '../functions'
 
 /*
- * @param {Number} amount  0..100 
+ * @param {Number} amount  0..1 
  */
-export default function sepia (amount = 100) {
-    amount = parseParamNumber(amount)    
-    let C = amount / 100;
+export default function sepia (amount = 1) {
+    let C = parseParamNumber(amount);
     if (C > 1) C = 1; 
 
     const $matrix = [

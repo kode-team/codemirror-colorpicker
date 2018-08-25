@@ -1,6 +1,6 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.9.4",
+  "version": "1.9.10",
   "description": "colorpicker for codemirror",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
@@ -49,6 +49,7 @@
     "rollup": "^0.52.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-css-only": "^0.2.0",
+    "rollup-plugin-glslify": "^1.0.5",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-livereload": "^0.6.0",
     "rollup-plugin-minify": "^1.0.3",

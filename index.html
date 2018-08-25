@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116150958-1"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-116150958-1');
-    </script>
-    
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
         
@@ -655,7 +645,7 @@ var colorpicker = new ColorPicker({
                     <button type="button" onclick="filter_image('brownie')">brownie</button>
                 </div>               
                 <div>
-                    <button type="button" onclick="filter_image(['histogram', 'gray', [ [50, 90],  [ 100, 200] , [220, 240] ]])">histogram</button>
+                    <button type="button" onclick="filter_image(['histogram', 'gray', [ [0, 0], [50, 90],  [ 100, 200] , [220, 240], [255, 255] ]])">histogram</button>
                 </div>                               
                 <div>
                     <button type="button" onclick="filter_image('kodachrome')">kodachrome</button>

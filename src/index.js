@@ -5,10 +5,12 @@ import Color from './util/Color'
 import HueColor from './util/HueColor'
 import ColorNames from './util/ColorNames'
 import ImageFilter from './util/ImageFilter'
+import GL from './util/GL'
 import Canvas from './util/Canvas'
 import ImageLoader from './util/ImageLoader'
 import ColorView from './colorview/index'
 import ColorPicker from './colorpicker/index'
+
 
 if (CodeMirror) {
 
@@ -36,6 +38,7 @@ export default {
     ColorNames,    
     ColorPicker,    
     ImageFilter,
+    GL,
     HueColor,
     Canvas,
     ImageLoader

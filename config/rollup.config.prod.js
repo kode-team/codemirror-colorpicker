@@ -3,6 +3,7 @@ import postcss from 'rollup-plugin-postcss'
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
 import autoprefixer from 'autoprefixer'
+import glslify from 'rollup-plugin-glslify';
 
 // rollup.config.js
 export default [{
@@ -17,6 +18,7 @@ export default [{
   },
   name: 'CodeMirrorColorPicker',  
   plugins : [
+    glslify({ basedir: 'src/util/glsl/source' }),
     //scss({output : 'dist/' + packageJSON.name + '.css'}),
     postcss({
       extract: 'dist/' + packageJSON.name + '.css',
@@ -26,7 +28,7 @@ export default [{
       extensions: ['.scss']
     }),     
     babel({
-      exclude: 'node_modules/**'
+      exclude: ['node_modules/**', 'src/util/glsl/source/**']
     }),
     uglify()
   ]

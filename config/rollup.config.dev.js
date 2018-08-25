@@ -4,6 +4,7 @@ import babel from 'rollup-plugin-babel';
 import serve from 'rollup-plugin-serve'
 import livereload from 'rollup-plugin-livereload'
 import autoprefixer from 'autoprefixer'
+import glslify from 'rollup-plugin-glslify';
 
 
 // rollup.config.js
@@ -21,6 +22,7 @@ export default {
   plugins : [
     serve(),
     livereload({watch: 'addon'}),
+    glslify({ basedir: 'src/util/glsl/source' }),
     //scss({output : 'addon/' + packageJSON.name + '.css'}),
     postcss({
       extract: 'addon/' + packageJSON.name + '.css',
@@ -30,7 +32,7 @@ export default {
       extensions: ['.scss']
     }), 
     babel({
-      exclude: 'node_modules/**',
+      exclude: ['node_modules/**', 'src/util/glsl/source/**'],
       presets: [
         [ 'es2015', { modules : false } ] 
       ]

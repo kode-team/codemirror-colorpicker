@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.css" />
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.js" ></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/css/css.js" ></script>
+    <link rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
+    <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
+    <meta property="og:title" content="ColorPicker for CodeMirror Addon" />
+    <meta property="og:description" content="Very Simple ColorPicker for CodeMirror" />
+    <meta property="og:url" content="https://easylogic.github.io/codemirror-colorpicker/" />
+    <meta property="og:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="https://easylogic.github.io/codemirror-colorpicker/">
+    <meta name="twitter:creator" content="@easylogic">
+    <meta name="twitter:title" content="ColorPicker for CodeMirror Addon">
+    <meta name="twitter:description" content="Very Simple ColorPicker for CodeMirror">
+    <meta name="twitter:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png">
+
+    <style>
+        #gl canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <img src="./resources/image/grapes.jpg" id="sample_image" />
+    <div id="gl">
+
+    </div>
+    <button type="button" onclick="show_gl()">Filter</button>
+
+    <script type="text/javascript">
+    var Color = CodeMirrorColorPicker.Color
+
+    function show_gl() {
+
+        Color.GLToCanvas ('./resources/image/grapes.jpg', 'chaos(4)', function (newImage) {
+            //document.getElementById('gl').innerHTML = "";
+            document.getElementById('gl').appendChild(newImage.canvas)
+        })
+    }
+    </script>
+</body>
+
+</html>

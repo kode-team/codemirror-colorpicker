@@ -24,7 +24,8 @@ class ImageLoader {
 
     loadImage (callback) {
         var ctx = this.context; 
-        var img = new Image();
+        this.newImage = new Image();
+        const img = this.newImage
         img.onload = () => {
             var ratio = img.height / img.width;
 
@@ -37,6 +38,19 @@ class ImageLoader {
             }
 
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.canvas.width, this.canvas.height);
+            this.isLoaded = true; 
+            callback && callback();
+        };
+
+        this.getImageUrl(function (url) {
+            img.src = url;
+        });
+    }
+
+    load (callback) {
+        this.newImage = new Image();
+        const img = this.newImage
+        img.onload = () => {
             this.isLoaded = true; 
             callback && callback();
         };

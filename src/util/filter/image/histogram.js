@@ -1,11 +1,7 @@
 import { pixel } from '../functions'
 
 export default function histogram (type = 'gray', points = []) {
-
     var $realPoints = [] 
-
-    points.unshift([0, 0])
-    points.push([255, 255])
     
     for(var i = 0; i < points.length - 1; i++) {
         var sp = points[i] 
@@ -39,14 +35,10 @@ export default function histogram (type = 'gray', points = []) {
         return pixel(() => {
 
             const l = Color.RGBtoYCrCb($r, $g, $b);
-            // console.log(l.y, $realPoints[l.y])
-            // console.log(clamp($realPoints[clamp(l.y)]), l.cr, l.cb)
             const c = Color.YCrCbtoRGB(clamp($realPoints[clamp(l.y)]), l.cr, l.cb, 0)
             $r = c.r
             $g = c.g 
             $b = c.b 
-
-            // console.log($r, $g, $b)
 
         }, { }, { $realPoints })
     }

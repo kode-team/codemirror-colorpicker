@@ -1,9 +1,9 @@
 import blur from './blur'
+import normal from './normal'
 import emboss from './emboss'
 import gaussianBlur from './gaussian-blur'
 import gaussianBlur5x from './gaussian-blur-5x'
 import grayscale2 from './grayscale2'
-import normal from './normal'
 import kirschHorizontal from './kirsch-horizontal'
 import kirschVertical from './kirsch-vertical'
 import laplacian from './laplacian'
@@ -16,20 +16,19 @@ import sepia2 from './sepia2'
 import sharpen from './sharpen'
 import sobelHorizontal from './sobel-horizontal'
 import sobelVertical from './sobel-vertical'
-import stackBlur from './stack-blur'
 import transparency from './transparency'
 import unsharpMasking from './unsharp-masking'
 
 
 export default {
      blur,
+     normal,
      emboss,
      gaussianBlur,
      'gaussian-blur': gaussianBlur,
      gaussianBlur5x,
      'gaussian-blur-5x': gaussianBlur5x,
      grayscale2,
-     normal,
      kirschHorizontal,
      'kirsch-horizontal': kirschHorizontal,
      kirschVertical,
@@ -50,8 +49,6 @@ export default {
      'sobel-horizontal': sobelHorizontal,
      sobelVertical,
      'sobel-vertical': sobelVertical,
-     stackBlur,
-     'stack-blur': stackBlur,
      transparency,
      unsharpMasking,
      'unsharp-masking': unsharpMasking
