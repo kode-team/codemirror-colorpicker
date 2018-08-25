@@ -1,10 +1,8 @@
 import {
-    parseParamNumber,
     convolution
 } from '../util'
 
-export default function transparency (amount = 100) {
-    amount = parseParamNumber(amount)
+export default function transparency () {
     return convolution([
         1, 0, 0, 0, 0,
         0, 1, 0, 0, 0,

@@ -4,9 +4,7 @@ import {
     weight
 } from '../util'
 
-export default function gaussianBlur5x (amount = 100) {
-    amount = parseParamNumber(amount)    
-    const C = amount / 100;
+export default function gaussianBlur5x () {
     return convolution([
         1, 4, 6, 4, 1,
         4, 16, 24, 16, 4,

@@ -1,10 +1,8 @@
 import {
-    parseParamNumber,
     convolution
 } from '../util'
 
-export default function kirschHorizontal (count = 1) {
-    count = parseParamNumber(count)    
+export default function kirschHorizontal () {
     return convolution([
         5, 5, 5,
         -3, 0, -3,

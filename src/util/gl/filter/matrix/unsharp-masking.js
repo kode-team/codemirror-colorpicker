@@ -1,11 +1,9 @@
 import {
-    parseParamNumber,
     convolution,
     weight
 } from '../util'
 
-export default function unsharpMasking (amount = 256) {
-    amount = parseParamNumber(amount)
+export default function unsharpMasking () {
     return convolution(weight([
         1, 4, 6, 4, 1,
         4, 16, 24, 16, 4,

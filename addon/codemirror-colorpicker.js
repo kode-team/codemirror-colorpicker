@@ -3113,53 +3113,34 @@ function emboss$1() {
 }
 
 function gaussianBlur$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
+    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    amount = parseParamNumber$2(amount);
-    var C = amount / 100;
+    var C = parseParamNumber$2(amount) * (1 / 16);
 
-    return convolution$1(weight$1([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16 * C));
+    return convolution$1(weight$1([1, 2, 1, 2, 4, 2, 1, 2, 1], C));
 }
 
 function gaussianBlur5x$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1]);
 }
 
 function grayscale2$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([0.3, 0.3, 0.3, 0, 0, 0.59, 0.59, 0.59, 0, 0, 0.11, 0.11, 0.11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 }
 
 function kirschHorizontal$1() {
-    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-
-    count = parseParamNumber$2(count);
     return convolution$1([5, 5, 5, -3, 0, -3, -3, -3, -3]);
 }
 
 function kirschVertical$1() {
-    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-
-    count = parseParamNumber$2(count);
     return convolution$1([5, -3, -3, 5, 0, -3, 5, -3, -3]);
 }
 
 function laplacian$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([-1, -1, -1, -1, 8, -1, -1, -1, -1]);
 }
 
 function laplacian5x$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 24, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
 }
 
@@ -3176,23 +3157,14 @@ function motionBlur3$1() {
 }
 
 function negative$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1]);
 }
 
 function sepia2$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([0.393, 0.349, 0.272, 0, 0, 0.769, 0.686, 0.534, 0, 0, 0.189, 0.168, 0.131, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 }
 
 function sharpen$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([0, -1, 0, -1, 5, -1, 0, -1, 0]);
 }
 
@@ -3205,16 +3177,10 @@ function sobelVertical$1() {
 }
 
 function transparency$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0, 0, 1]);
 }
 
 function unsharpMasking$1() {
-    var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 256;
-
-    amount = parseParamNumber$2(amount);
     return convolution$1(weight$1([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], -1 / 256));
 }
 
@@ -3331,10 +3297,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 

@@ -1,10 +1,8 @@
 import {
-    parseParamNumber,
     convolution
 } from '../util'
 
-export default function laplacian5x (amount = 100) {
-    amount = parseParamNumber(amount)
+export default function laplacian5x () {
     return convolution([
         -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1,

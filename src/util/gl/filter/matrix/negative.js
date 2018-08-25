@@ -1,10 +1,8 @@
 import {
-    parseParamNumber,
     convolution
 } from '../util'
 
-export default function negative (amount = 100) {
-    amount = parseParamNumber(amount)    
+export default function negative () {
     return convolution([
         -1, 0, 0, 0, 0,
         0, -1, 0, 0, 0,
