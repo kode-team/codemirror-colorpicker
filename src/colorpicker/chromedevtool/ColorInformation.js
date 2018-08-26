@@ -1,7 +1,7 @@
-import Color from '../util/Color'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
+import Color from '../../util/Color'
+import Dom from '../../util/Dom'
+import Event from '../../util/Event'
+import EventMachin from '../../util/EventMachin'
 
 export default class ColorInformation extends EventMachin {
 
@@ -14,77 +14,60 @@ export default class ColorInformation extends EventMachin {
     }
 
     initialize () {
-        this.$el = new Dom('div', 'information hex' );
 
-        this.$informationChange = this.$el.createChild('div', 'information-change');
-
-        this.$formatChangeButton = this.$informationChange.createChild('button', 'format-change-button arrow-button', { type : 'button'});
- 
-        this.$el.append(this.makeInputFieldHex());
-        this.$el.append(this.makeInputFieldRgb());
-        this.$el.append(this.makeInputFieldHsl());
+        this.template(`
+            <div class="information hex">
+                <div ref="$informationChange" class="information-change">
+                    <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>
+                </div>
+                <div class="information-item hex">
+                    <div class="input-field hex">
+                        <input ref="$hexCode" class="input" type="text" />
+                        <div class="title">HEX</div>
+                    </div>
+                </div>
+                <div class="information-item rgb">
+                    <div class="input-field rgb-r">
+                        <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />
+                        <div class="title">R</div>
+                    </div>
+                    <div class="input-field rgb-g">
+                        <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />
+                        <div class="title">G</div>
+                    </div>
+                    <div class="input-field rgb-b">
+                        <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />
+                        <div class="title">B</div>
+                    </div>          
+                    <div class="input-field rgb-a">
+                        <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />
+                        <div class="title">A</div>
+                    </div>                                                            
+                </div>
+                <div class="information-item hsl">
+                    <div class="input-field hsl-h">
+                        <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />
+                        <div class="title">H</div>
+                    </div>
+                    <div class="input-field hsl-s">
+                        <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />
+                        <div class="postfix">%</div>
+                        <div class="title">H</div>
+                    </div>
+                    <div class="input-field hsl-l">
+                        <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />
+                        <div class="postfix">%</div>                        
+                        <div class="title">L</div>
+                    </div>
+                    <div class="input-field hsl-a">
+                        <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />
+                        <div class="title">A</div>
+                    </div>
+                </div>
+            </div>
+        `)
 
         this.format = 'hex'; 
-    }
-
-
-    makeInputFieldHex () {
-        var item = new Dom('div', 'information-item hex');
-        var field = item.createChild('div', 'input-field hex');
-
-        this.$hexCode = field.createChild('input', 'input', { type : 'text' });
-
-        field.createChild('div', 'title').html('HEX');
-    
-        return item; 
-    }
-
-    makeInputFieldRgb () {
-        var item = new Dom('div', 'information-item rgb');        
-
-        var field = item.createChild('div', 'input-field rgb-r');
-        this.$rgb_r = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
-        field.createChild('div', 'title').html('R');
-
-        field = item.createChild('div', 'input-field rgb-g');
-        this.$rgb_g = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
-        field.createChild('div', 'title').html('G');
-
-        field = item.createChild('div', 'input-field rgb-b');
-        this.$rgb_b = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 255 });
-        field.createChild('div', 'title').html('B');
-
-        // rgba
-        field = item.createChild('div', 'input-field rgb-a');
-        this.$rgb_a = field.createChild('input', 'input', { type : 'number', step : 0.01, min : 0, max : 1 });
-        field.createChild('div', 'title').html('A');
-
-        return item; 
-    }
-
-    makeInputFieldHsl () {
-        var item = new Dom('div', 'information-item hsl');
-        
-        var field = item.createChild('div', 'input-field hsl-h');
-        this.$hsl_h = field.createChild('input', 'input', { type : 'number', step : 1, min : 0, max : 360 });
-        field.createChild('div', 'title').html('H');
-
-        field = item.createChild('div', 'input-field hsl-s');
-        this.$hsl_s = field.createChild('input', 'input', { type : 'number', step: 1, min: 0, max : 100 });
-        field.createChild('div', 'postfix').html('%');
-        field.createChild('div', 'title').html('S');
-
-        field = item.createChild('div', 'input-field hsl-l');
-        this.$hsl_l = field.createChild('input', 'input', { type : 'number', step: 1, min: 0, max : 100 });
-        field.createChild('div', 'postfix').html('%');        
-        field.createChild('div', 'title').html('L');
-
-        // rgba
-        field = item.createChild('div', 'input-field hsl-a');
-        this.$hsl_a = field.createChild('input', 'input', { type : 'number', step : 0.01, min : 0, max : 1 });
-        field.createChild('div', 'title').html('A');
-
-        return item;
     }
 
     currentFormat () {
@@ -140,42 +123,42 @@ export default class ColorInformation extends EventMachin {
 
 
     setRGBInput(r, g, b) {
-        this.$rgb_r.val(r);
-        this.$rgb_g.val(g);
-        this.$rgb_b.val(b);
-        this.$rgb_a.val(this.colorpicker.currentA);
+        this.refs.$rgb_r.val(r);
+        this.refs.$rgb_g.val(g);
+        this.refs.$rgb_b.val(b);
+        this.refs.$rgb_a.val(this.colorpicker.currentA);
     }
     
     setHSLInput(h, s, l) {
-        this.$hsl_h.val(h);
-        this.$hsl_s.val(s);
-        this.$hsl_l.val(l);
-        this.$hsl_a.val(this.colorpicker.currentA);
+        this.refs.$hsl_h.val(h);
+        this.refs.$hsl_s.val(s);
+        this.refs.$hsl_l.val(l);
+        this.refs.$hsl_a.val(this.colorpicker.currentA);
     }
     
     getHexFormat() {
         return Color.format({
-            r : this.$rgb_r.int(),
-            g : this.$rgb_g.int(),
-            b : this.$rgb_b.int()
+            r : this.refs.$rgb_r.int(),
+            g : this.refs.$rgb_g.int(),
+            b : this.refs.$rgb_b.int()
         }, 'hex', this.colorpicker.opt.color);
     }
 
     getRgbFormat() {
         return Color.format({
-            r : this.$rgb_r.int(),
-            g : this.$rgb_g.int(),
-            b : this.$rgb_b.int(),
-            a : this.$rgb_a.float()
+            r : this.refs.$rgb_r.int(),
+            g : this.refs.$rgb_g.int(),
+            b : this.refs.$rgb_b.int(),
+            a : this.refs.$rgb_a.float()
         }, 'rgb', this.colorpicker.opt.color);
     }    
 
     getHslFormat() {
         return Color.format({
-            h : this.$hsl_h.val(),
-            s : this.$hsl_s.val(),
-            l : this.$hsl_l.val(),
-            a : this.$hsl_a.float()
+            h : this.refs.$hsl_h.val(),
+            s : this.refs.$hsl_s.val(),
+            l : this.refs.$hsl_l.val(),
+            a : this.refs.$hsl_a.float()
         }, 'hsl', this.colorpicker.opt.color);
     }        
     
@@ -195,7 +178,7 @@ export default class ColorInformation extends EventMachin {
     getFormattedColor (format, fixed = false) {
         format = format || this.getFormat();
         if (format == 'hex') {
-            return this.$hexCode.val();
+            return this.refs.$hexCode.val();
         } else if (format == 'rgb') {
             return this.getRgbFormat(fixed);
         } else if (format == 'hsl') {
@@ -212,13 +195,13 @@ export default class ColorInformation extends EventMachin {
 
         var rgb = null;
         if (format == 'hex') {
-            this.$hexCode.val(this.convertHEX());
+            this.refs.$hexCode.val(this.convertHEX());
             var rgb = this.convertRGB();
             this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);            
         } else if (format == 'rgb') {
             var rgb = this.convertRGB();
             this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
-            this.$hexCode.val(this.convertHEX());
+            this.refs.$hexCode.val(this.convertHEX());
         } else if (format == 'hsl') {
             var hsl = this.convertHSL();
             this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
@@ -233,14 +216,6 @@ export default class ColorInformation extends EventMachin {
     checkNotNumberKey(e) {
         return !Event.checkNumberKey(e);
     }        
-
-    //'keydown.checkNotNumberKey $rgb_r' (e) {  e.preventDefault(); }
-    //'keydown.checkNotNumberKey $rgb_g' (e) {  e.preventDefault(); }
-    //'keydown.checkNotNumberKey $rgb_b' (e) {  e.preventDefault(); }
-
-    //'keydown.checkNumberKey $rgb_r' (e) { this.setRGBtoHexColor(e); }
-    //'keydown.checkNumberKey $rgb_g' (e) { this.setRGBtoHexColor(e); }
-    //'keydown.checkNumberKey $rgb_b' (e) { this.setRGBtoHexColor(e); }
 
     changeRgbColor () {
         this.colorpicker.changeInformationColor(this.getRgbFormat());
@@ -267,7 +242,7 @@ export default class ColorInformation extends EventMachin {
     }
     
     'keyup $hexCode' (e) {
-        var code = this.$hexCode.val();
+        var code = this.refs.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
             this.colorpicker.changeInformationColor(code);

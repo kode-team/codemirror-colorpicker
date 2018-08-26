@@ -10,6 +10,16 @@ export default class EventMachin {
 
   constructor() { 
     this.state = new State(this);
+    this.refs = {} 
+  }
+
+  template (html) {
+    this.$el = new Dom("div").html(html).firstChild()
+    const refs = this.$el.findAll("[ref]");
+    [...refs].forEach(node => {
+      this.refs[node.getAttribute("ref")] = new Dom(node);
+    })
+    this.refs.$el = this.$el 
   }
 
   initializeEvent () {
@@ -18,6 +28,7 @@ export default class EventMachin {
 
   destroy() {
     this.destroyEventMachin();
+    // this.refs = {} 
   }
 
   destroyEventMachin () {
@@ -44,7 +55,7 @@ export default class EventMachin {
     let el; 
 
     if (dom) {
-      el = this[dom] || window[dom]; 
+      el = this.refs[dom] || this[dom] || window[dom]; 
     } else {
       el = this.el || this.$el || this.$root; 
     }

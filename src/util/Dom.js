@@ -63,6 +63,8 @@ export default class Dom {
     
     removeClass (cls) {
         this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
+
+        return this; 
     }
     
     hasClass (cls) {
@@ -79,6 +81,8 @@ export default class Dom {
         if (!this.hasClass(cls)) {
             this.el.className = `${this.el.className} ${cls}`;
         }
+
+        return this; 
     
     }
 
@@ -100,6 +104,15 @@ export default class Dom {
 
         return this;
     }
+
+    find (selector) {
+        return this.el.querySelector(selector)
+    } 
+
+    findAll (selector) { 
+        return this.el.querySelectorAll(selector)
+    } 
+
     
     empty () {
         return this.html('');
@@ -301,6 +314,10 @@ export default class Dom {
         this.append($element);
 
         return $element;
+    }
+
+    firstChild () {
+        return new Dom(this.el.firstElementChild);
     }
 }
 

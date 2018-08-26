@@ -16,8 +16,6 @@ const color = {
             return result;
         }
 
-
-        var obj = { next: 0 };
         for (var i = 0, len = matches.length; i < len; i++) {
 
             if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
@@ -686,8 +684,7 @@ const color = {
      */
     contrast(c) {
         c = this.parse(c);
-        const contrast =  (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
-        return contrast; 
+        return (Math.round(c.r * 299) + Math.round(c.g * 587) + Math.round(c.b * 114)) / 1000;
     },
 
     contrastColor (c) {

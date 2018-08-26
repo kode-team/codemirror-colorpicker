@@ -1,7 +1,6 @@
-import Color from '../util/Color'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
+
+import Dom from '../../util/Dom'
+import EventMachin from '../../util/EventMachin'
 
 export default class ColorPallet extends EventMachin {
     constructor (colorpicker) {
@@ -12,10 +11,16 @@ export default class ColorPallet extends EventMachin {
     } 
     
     initialize () {
-        this.$el = new Dom('div', 'color');
-        this.$saturation = this.$el.createChild('div', 'saturation' );    
-        this.$value = this.$saturation.createChild('div', 'value' );
-        this.$drag_pointer = this.$value.createChild('div', 'drag-pointer' );
+
+        this.template(`
+            <div class="color">
+                <div ref="$saturation" class="saturation">
+                    <div ref="$value" class="value">
+                        <div ref="$drag_pointer" class="drag-pointer"></div>
+                    </div>
+                </div>        
+            </div>
+        `)
     }
 
     setBackgroundColor (color) {
@@ -41,7 +46,7 @@ export default class ColorPallet extends EventMachin {
     setColorUI() {
         var  x = this.state.get('$el.width') * this.colorpicker.currentS, y = this.state.get('$el.height') * ( 1 - this.colorpicker.currentV );
     
-        this.$drag_pointer.css({
+        this.refs.$drag_pointer.css({
             left : (x - 5) + "px",
             top : (y - 5) + "px"
         });
@@ -65,7 +70,7 @@ export default class ColorPallet extends EventMachin {
         if (y < 0) y = 0;
         else if (y > h) y = h;
     
-        this.$drag_pointer.css({
+        this.refs.$drag_pointer.css({
             left: (x - 5) + 'px',
             top: (y - 5) + 'px'
         });

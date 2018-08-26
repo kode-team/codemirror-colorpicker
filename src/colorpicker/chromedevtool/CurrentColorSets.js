@@ -1,7 +1,5 @@
-import Color from '../util/Color'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
+import Dom from '../../util/Dom'
+import EventMachin from '../../util/EventMachin'
 
 export default class CurrentColorSets extends EventMachin {
     constructor (colorpicker) {
@@ -43,23 +41,21 @@ export default class CurrentColorSets extends EventMachin {
     }    
 
     initialize () {
-        // make colorsets view 
-        this.$el = new Dom('div', 'colorsets' );
 
-        const $colorSetsMenu = this.$el.createChild('div', 'menu', {
-            title: 'Open Color Pallets'
-        });
-        this.$colorSetsColorList = this.$el.createChild('div', 'color-list' );
-
-        this.$colorSetsChooseButton = $colorSetsMenu.createChild('button', 'color-sets-choose-btn arrow-button', {
-            type : 'button'
-        });
+        this.template(`
+            <div class="colorsets">
+                <div class="menu" title="Open Color Palettes">
+                    <button ref="$colorSetsChooseButton" type="button" class="color-sets-choose-btn arrow-button"></button>
+                </div>
+                <div ref="$colorSetsColorList" class="color-list"></div>
+            </div>
+        `)
     
         this.refresh();
     }
 
     refresh () {
-        this.$colorSetsColorList.html(this.makeCurrentColorSets())    
+        this.refs.$colorSetsColorList.html(this.makeCurrentColorSets())    
     }
 
     refreshAll () {

@@ -96,7 +96,7 @@ export default class ColorView {
         if (this.opt.colorpicker) {
             this.colorpicker = this.opt.colorpicker(this.opt);
         } else {
-            this.colorpicker = new ColorPicker(this.opt);
+            this.colorpicker = ColorPicker.create(this.opt);
         }
 
         this.init_event();

@@ -1,10 +1,9 @@
 
-import Color from '../util/Color'
-import HueColor from '../util/HueColor'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
-
+import Color from '../../util/Color'
+import HueColor from '../../util/HueColor'
+import Dom from '../../util/Dom'
+import Event from '../../util/Event'
+import EventMachin from '../../util/EventMachin'
 
 export default class ColorControl extends EventMachin {
     constructor (colorpicker) {
@@ -14,40 +13,34 @@ export default class ColorControl extends EventMachin {
     } 
     
     initialize () {
-        this.$el = new Dom('div', 'control' );
-        this.$hue = this.$el.createChild('div', 'hue' );        
-        this.$opacity = this.$el.createChild('div', 'opacity' );        
-        this.$controlPattern = this.$el.createChild('div', 'empty' );
-        this.$controlColor = this.$el.createChild('div', 'color' );
+        this.template(`
+            <div class="control">
+                <div ref="$hue" class="hue">
+                    <div ref="$hueContainer" class="hue-container">
+                        <div ref="$drag_bar" class="drag-bar"></div>
+                    </div>
+                </div>
+                <div ref="$opacity" class="opacity">
+                    <div ref="$opacityContainer" class="opacity-container">
+                        <div ref="$opacityColorBar" class="color-bar"></div>
+                        <div ref="$opacity_drag_bar" class="drag-bar2"></div>
+                    </div>
+                </div>
+                <div ref="$controlPattern" class="empty"></div>
+                <div ref="$controlColor" class="color"></div>
+            </div>
+        `)
 
-        this.$hueContainer = this.$hue.createChild('div', 'hue-container' );
-        this.$drag_bar = this.$hueContainer.createChild('div', 'drag-bar');
         this.drag_bar_pos = {}
-
-        this.$opacityContainer = this.$opacity.createChild('div', 'opacity-container' );
-        this.$opacityColorBar = this.$opacityContainer.createChild('div', 'color-bar' );
-    
-        this.$opacity_drag_bar = this.$opacityContainer.createChild('div', 'drag-bar2' );  
         this.opacity_drag_bar_pos = {}      
     }
 
     setBackgroundColor (color) {
-        this.$controlColor.css("background-color", color);
+        this.refs.$controlColor.css("background-color", color);
     }
 
     refresh () {
         this.setColorUI();
-    }
-
-    setColorUI() {
-
-        var  x = this.state.get('$el.width') * this.colorpicker.currentS, 
-             y = this.state.get('$el.height') * ( 1 - this.colorpicker.currentV );
-    
-        this.$drag_pointer.css({
-            left : (x) + "px",
-            top : (y) + "px"
-        });
     }
 
     setOpacityColorBar(hueColor) {
@@ -60,27 +53,32 @@ export default class ColorControl extends EventMachin {
         var end = Color.format(rgb, 'rgb');
     
         var prefix = cssPrefix;
-        this.$opacityColorBar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
+        this.refs.$opacityColorBar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
     }
     
     setOpacity(e) {
-        var min = this.$opacityContainer.offset().left;
+        var min = this.refs.$opacityContainer.offset().left;
         var max = min + this.state.get('$opacityContainer.width');
         var current = Event.pos(e).clientX;
         var dist;
     
+        var dist;
         if (current < min) {
             dist = 0;
+            this.refs.$opacity_drag_bar.addClass('first').removeClass('last')
         } else if (current > max) {
             dist = 100;
+            this.refs.$opacity_drag_bar.addClass('last').removeClass('first')
         } else {
             dist = (current - min) / (max - min) * 100;
-        }
+            this.refs.$opacity_drag_bar.removeClass('first').removeClass('last')
+        }  
     
         var x = (this.state.get('$opacityContainer.width') * (dist/100));
     
-        this.$opacity_drag_bar.css({
-            left: (x -Math.ceil(this.state.get('$opacity_drag_bar.width')/2)) + 'px'
+        this.refs.$opacity_drag_bar.css({
+            // left: (x -Math.ceil(this.state.get('$opacity_drag_bar.width')/2)) + 'px'
+            left: (x) + 'px'            
         });
     
         this.opacity_drag_bar_pos = { x };
@@ -100,18 +98,20 @@ export default class ColorControl extends EventMachin {
 
     setColorUI() {
     
-        var hueX = this.state.get('$hueContainer.width') * (this.colorpicker.currentH / 360);
-    
-        this.$drag_bar.css({
-            left : (hueX - 7.5) + 'px'
+        var hueX = this.state.get('$hueContainer.width') * (this.colorpicker.currentH / 360);      
+
+        this.refs.$drag_bar.css({
+            // left : (hueX - 7.5) + 'px'
+            left : (hueX) + 'px'
         });
     
         this.drag_bar_pos = { x : hueX };
     
         var opacityX = this.state.get('$opacityContainer.width') * (this.colorpicker.currentA || 0);
     
-        this.$opacity_drag_bar.css({
-            left : (opacityX - 7.5) + 'px'
+        this.refs.$opacity_drag_bar.css({
+            // left : (opacityX - 7.5) + 'px'
+            left : (opacityX) + 'px'
         });
     
         this.opacity_drag_bar_pos = { x : opacityX };
@@ -151,28 +151,32 @@ export default class ColorControl extends EventMachin {
     }
 
     setControlColor (color) {
-        this.$controlColor.css('background-color', color);
+        this.refs.$controlColor.css('background-color', color);
     }
         
 
-    setHueColor(e) {
-        var min = this.$hueContainer.offset().left;
+    setHueColor(e, isOnlyHue) {
+        var min = this.refs.$hueContainer.offset().left;
         var max = min + this.state.get('$hueContainer.width');
         var current = e ? Event.pos(e).clientX : min + (max - min) * (this.colorpicker.currentH / 360);
     
         var dist;
         if (current < min) {
             dist = 0;
+            this.refs.$drag_bar.addClass('first').removeClass('last')
         } else if (current > max) {
             dist = 100;
+            this.refs.$drag_bar.addClass('last').removeClass('first')
         } else {
             dist = (current - min) / (max - min) * 100;
+            this.refs.$drag_bar.removeClass('first').removeClass('last')
         }
     
         var x = (this.state.get('$hueContainer.width') * (dist/100));
     
-        this.$drag_bar.css({
-            left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
+        this.refs.$drag_bar.css({
+            // left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
+            left: (x) + 'px'
         });
     
         this.drag_bar_pos = { x };
@@ -181,34 +185,15 @@ export default class ColorControl extends EventMachin {
     
         this.colorpicker.setBackgroundColor(hueColor);
         this.colorpicker.setCurrentH((dist/100) * 360);
-        this.colorpicker.setInputColor();
+
+        if (!isOnlyHue) {
+            this.colorpicker.setInputColor();
+        }
+
     }    
 
     setOnlyHueColor() {
-        var min = this.$hueContainer.offset().left;
-        var max = min + this.state.get('$hueContainer.width');
-        var current = min + (max - min) * (this.colorpicker.currentH / 360);
-    
-        var dist;
-        if (current < min) {
-            dist = 0;
-        } else if (current > max) {
-            dist = 100;
-        } else {
-            dist = (current - min) / (max - min) * 100;
-        }
-    
-        var x = (this.state.get('$hueContainer.width') * (dist/100));
-    
-        this.$drag_bar.css({
-            left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
-        });
-    
-        this.drag_bar_pos = { x };
-    
-        var hueColor = HueColor.checkHueColor(dist/100);
-        this.colorpicker.setBackgroundColor(hueColor);        
-        this.colorpicker.setCurrentH((dist/100) * 360);
+        this.setHueColor(null, true)
     }       
 
     'mousedown $drag_bar' (e) {

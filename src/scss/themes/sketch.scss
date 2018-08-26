@@ -47,13 +47,22 @@
 
         .drag-bar, .drag-bar2 {
             border-radius: 0px;
-            top: 0px !important;
-            left: -2px;
-            margin-top: 1px !important;
+            top: 50%;
+            left: 0px;
             width: 2px;
-            height: auto;
+            height: 50%;
+            transform: translateX(-50%) translateY(-50%);
             border-radius: 1px;
             bottom: 1px !important;
+
+            &.first {
+                left: 0px;
+                transform: translateX(50%) translateY(-50%) !important;
+            }
+
+            &.last {
+                transform: translateX(-150%) translateY(-50%) !important;
+            }            
         }
     }
 

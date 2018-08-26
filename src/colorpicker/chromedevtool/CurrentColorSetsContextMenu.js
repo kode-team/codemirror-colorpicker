@@ -1,7 +1,6 @@
-import Color from '../util/Color'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
+import Dom from '../../util/Dom'
+import Event from '../../util/Event'
+import EventMachin from '../../util/EventMachin'
 
 export default class CurrentColorSetsContextMenu extends EventMachin {
     constructor (colorpicker) {
@@ -14,21 +13,14 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
     } 
 
     initialize () {
-        // make colorsets view 
-        this.$el = new Dom('ul', 'colorsets-contextmenu' );
 
-        this.$el.createChild('li', 'menu-item small-hide', {
-            'data-type' : 'remove-color'
-        }).html('Remove color') 
-
-        this.$el.createChild('li', 'menu-item small-hide', {
-            'data-type' : 'remove-all-to-the-right'
-        }).html('Remove all to the right')
-
-        this.$el.createChild('li', 'menu-item', {
-            'data-type' : 'clear-palette'
-        }).html('Clear palette')
-
+        this.template(`
+            <ul class="colorsets-contextmenu">
+                <li class="menu-item small-hide" data-type="remove-color">Remove color</li>
+                <li class="menu-item small-hide" data-type="remove-all-to-the-right">Remove all to the right</li>
+                <li class="menu-item" data-type="clear-palette">Clear palette</li>
+            </ul>
+        `)
     }
 
     show (e, index) {

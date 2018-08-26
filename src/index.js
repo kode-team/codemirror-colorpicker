@@ -36,7 +36,7 @@ if (CodeMirror) {
 export default {
     Color,
     ColorNames,    
-    ColorPicker,    
+    ...ColorPicker,    
     ImageFilter,
     GL,
     HueColor,

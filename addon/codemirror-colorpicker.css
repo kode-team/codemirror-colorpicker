@@ -171,8 +171,9 @@
       position: absolute;
       cursor: pointer;
       top: 50% !important;
-      margin-top: -7px !important;
-      left: -3px;
+      left: 0px;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
       width: 12px;
       height: 12px;
       border-radius: 50px; }
@@ -550,13 +551,21 @@
           border-radius: 0px; }
       .codemirror-colorpicker.sketch > .control .drag-bar, .codemirror-colorpicker.sketch > .control .drag-bar2 {
         border-radius: 0px;
-        top: 0px !important;
-        left: -2px;
-        margin-top: 1px !important;
+        top: 50%;
+        left: 0px;
         width: 2px;
-        height: auto;
+        height: 50%;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+                transform: translateX(-50%) translateY(-50%);
         border-radius: 1px;
         bottom: 1px !important; }
+        .codemirror-colorpicker.sketch > .control .drag-bar.first, .codemirror-colorpicker.sketch > .control .drag-bar2.first {
+          left: 0px;
+          -webkit-transform: translateX(50%) translateY(-50%) !important;
+                  transform: translateX(50%) translateY(-50%) !important; }
+        .codemirror-colorpicker.sketch > .control .drag-bar.last, .codemirror-colorpicker.sketch > .control .drag-bar2.last {
+          -webkit-transform: translateX(-150%) translateY(-50%) !important;
+                  transform: translateX(-150%) translateY(-50%) !important; }
     .codemirror-colorpicker.sketch > .information .information-change {
       display: none; }
     .codemirror-colorpicker.sketch > .information.rgb .information-item.rgb {

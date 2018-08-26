@@ -1,7 +1,5 @@
-import Color from '../util/Color'
-import Dom from '../util/Dom'
-import Event from '../util/Event'
-import EventMachin from '../util/EventMachin'
+import Dom from '../../util/Dom'
+import EventMachin from '../../util/EventMachin'
 
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
@@ -15,27 +13,28 @@ export default class ColorSetsChooser extends EventMachin {
     } 
 
     initialize () {
-        // make colorset-chooser 
-        this.$el = new Dom('div', 'color-chooser' );
 
-        const $container = this.$el.createChild('div', 'color-chooser-container');
-
-        const $header = $container.createChild('div', 'colorsets-item colorsets-item-header');
-        
-        $header.createChild('h1', 'title').html('Color Paletts')
-
-        this.$toggleButton = $header.createChild('span', 'items').html('&times;');
-                
-        this.$colorsetsList = $container.createChild('div', 'colorsets-list' );
+        this.template(`
+            <div class="color-chooser">
+                <div class="color-chooser-container">
+                    <div class="colorsets-item colorsets-item-header">
+                        <h1 class="title">Color Paletts</h1>
+                        <span ref="$toggleButton" class="items">&times;</span>
+                    </div>
+                    <div ref="$colorsetsList" class="colorsets-list"></div>
+                </div>
+            </div>
+        `)
 
         this.refresh();
     }
 
     refresh () {
-        this.$colorsetsList.html(this.makeColorSetsList());
+        this.refs.$colorsetsList.html(this.makeColorSetsList());
     }
 
     makeColorItemList (colors, maxCount = 5) {
+
         var $list = new Dom('div');
     
         for(var i = 0; i < maxCount; i++) {

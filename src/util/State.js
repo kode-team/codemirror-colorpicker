@@ -17,7 +17,7 @@ export default class State {
 
       const arr = key.split(DELEGATE_SPLIT);
 
-      const obj = this.masterObj[arr[0]] || this.masterObj;
+      const obj = this.masterObj.refs[arr[0]] || this.masterObj[arr[0]] || this.masterObj;
       const method = arr.pop();
 
       if (obj[method]) {
