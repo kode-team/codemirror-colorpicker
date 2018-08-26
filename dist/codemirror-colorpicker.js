@@ -4053,8 +4053,6 @@ var GLCanvas = function () {
             this.u("u_kernel81[0]");
             this.u("u_kernel81Weight");
 
-            this.u("u_colors[0]");
-
             this.bindVA();
 
             // 단순 변수를 초기화 하고 
@@ -4143,16 +4141,6 @@ var GLCanvas = function () {
                 this.uniform1fv('u_kernel' + filterFunction.length + '[0]', filterFunction.content);
                 this.uniform1f('u_kernel' + filterFunction.length + 'Weight', this.computeKernelWeight(filterFunction.content));
             } else {
-
-                var options = filterFunction.options || {};
-
-                if (options.u_colors) {
-                    // color 비트맵 설정 
-                    this.bindColorTexture("u_colors", options.u_colors);
-
-                    this.activeTexture(1);
-                    this.uniform1i("u_colors", 1);
-                }
 
                 this.uniform1f("u_kernelSelect", -1.0);
                 this.uniform1f("u_filterIndex", filterFunction.index);
