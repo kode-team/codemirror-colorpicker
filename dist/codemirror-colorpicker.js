@@ -5936,19 +5936,48 @@ var EventMachin = function () {
 
     this.state = new State(this);
     this.refs = {};
+
+    this.$el = this.parseTemplate(this.template());
+    this.refs.$el = this.$el;
   }
 
   createClass(EventMachin, [{
-    key: 'template',
-    value: function template(html) {
+    key: 'parseTemplate',
+    value: function parseTemplate(html) {
       var _this = this;
 
-      this.$el = new Dom("div").html(html).firstChild();
-      var refs = this.$el.findAll("[ref]");
+      var $el = new Dom("div").html(html).firstChild();
+      var refs = $el.findAll("[ref]");
       [].concat(toConsumableArray(refs)).forEach(function (node) {
-        _this.refs[node.getAttribute("ref")] = new Dom(node);
+        var name = node.getAttribute("ref");
+        _this.refs[name] = new Dom(node);
+
+        var callbackName = 'load ' + name;
+
+        if (_this[callbackName]) {
+          _this.refs[name].load = function () {
+            new Dom(node).html(_this.parseTemplate(_this[callbackName].call(_this)));
+          };
+        }
       });
-      this.refs.$el = this.$el;
+
+      return $el;
+    }
+  }, {
+    key: 'load',
+    value: function load() {
+      var _this2 = this;
+
+      Object.keys(this.refs).forEach(function (key) {
+        if (_this2.refs[key].load) {
+          _this2.refs[key].load();
+        }
+      });
+    }
+  }, {
+    key: 'template',
+    value: function template() {
+      return '<div></div>';
     }
   }, {
     key: 'initializeEvent',
@@ -6005,7 +6034,7 @@ var EventMachin = function () {
   }, {
     key: 'getDefaultEventObject',
     value: function getDefaultEventObject(eventName) {
-      var _this2 = this;
+      var _this3 = this;
 
       var arr = eventName.split('.');
       var realEventName = arr.shift();
@@ -6020,7 +6049,7 @@ var EventMachin = function () {
       });
 
       var checkMethodList = arr.filter(function (code) {
-        return !!_this2[code];
+        return !!_this3[code];
       });
 
       arr = arr.filter(function (code) {
@@ -6089,7 +6118,7 @@ var EventMachin = function () {
   }, {
     key: 'checkEventType',
     value: function checkEventType(e, eventObject) {
-      var _this3 = this;
+      var _this4 = this;
 
       var onlyControl = e.ctrlKey ? eventObject.isControl : true;
       var onlyShift = e.shiftKey ? eventObject.isShift : true;
@@ -6105,7 +6134,7 @@ var EventMachin = function () {
       if (eventObject.checkMethodList.length) {
         // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
         isAllCheck = eventObject.checkMethodList.every(function (method) {
-          return _this3[method].call(_this3, e);
+          return _this4[method].call(_this4, e);
         });
       }
 
@@ -6114,13 +6143,13 @@ var EventMachin = function () {
   }, {
     key: 'makeCallback',
     value: function makeCallback(eventObject, callback) {
-      var _this4 = this;
+      var _this5 = this;
 
       if (eventObject.delegate) {
         return function (e) {
 
-          if (_this4.checkEventType(e, eventObject)) {
-            var delegateTarget = _this4.matchPath(e.target || e.srcElement, eventObject.delegate);
+          if (_this5.checkEventType(e, eventObject)) {
+            var delegateTarget = _this5.matchPath(e.target || e.srcElement, eventObject.delegate);
 
             if (delegateTarget) {
               // delegate target 이 있는 경우만 callback 실행 
@@ -6132,7 +6161,7 @@ var EventMachin = function () {
         };
       } else {
         return function (e) {
-          if (_this4.checkEventType(e, eventObject)) {
+          if (_this5.checkEventType(e, eventObject)) {
             return callback(e);
           }
         };
@@ -6148,10 +6177,10 @@ var EventMachin = function () {
   }, {
     key: 'removeEventAll',
     value: function removeEventAll() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.getBindings().forEach(function (obj) {
-        _this5.removeEvent(obj);
+        _this6.removeEvent(obj);
       });
       this.initBindings();
     }
@@ -6649,9 +6678,13 @@ var ColorControl = function (_EventMachin) {
     }
 
     createClass(ColorControl, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="control">\n            <div ref="$hue" class="hue">\n                <div ref="$hueContainer" class="hue-container">\n                    <div ref="$drag_bar" class="drag-bar"></div>\n                </div>\n            </div>\n            <div ref="$opacity" class="opacity">\n                <div ref="$opacityContainer" class="opacity-container">\n                    <div ref="$opacityColorBar" class="color-bar"></div>\n                    <div ref="$opacity_drag_bar" class="drag-bar2"></div>\n                </div>\n            </div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
-            this.template('\n            <div class="control">\n                <div ref="$hue" class="hue">\n                    <div ref="$hueContainer" class="hue-container">\n                        <div ref="$drag_bar" class="drag-bar"></div>\n                    </div>\n                </div>\n                <div ref="$opacity" class="opacity">\n                    <div ref="$opacityContainer" class="opacity-container">\n                        <div ref="$opacityColorBar" class="color-bar"></div>\n                        <div ref="$opacity_drag_bar" class="drag-bar2"></div>\n                    </div>\n                </div>\n                <div ref="$controlPattern" class="empty"></div>\n                <div ref="$controlColor" class="color"></div>\n            </div>\n        ');
 
             this.drag_bar_pos = {};
             this.opacity_drag_bar_pos = {};
@@ -6825,6 +6858,19 @@ var ColorControl = function (_EventMachin) {
         value: function setOnlyHueColor() {
             this.setHueColor(null, true);
         }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.EventDocumentMouseUp(e);
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            this.EventDocumentMouseMove(e);
+        }
     }, {
         key: 'mousedown $drag_bar',
         value: function mousedown$drag_bar(e) {
@@ -6868,10 +6914,13 @@ var ColorInformation = function (_EventMachin) {
     }
 
     createClass(ColorInformation, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        ';
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
-
-            this.template('\n            <div class="information hex">\n                <div ref="$informationChange" class="information-change">\n                    <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n                </div>\n                <div class="information-item hex">\n                    <div class="input-field hex">\n                        <input ref="$hexCode" class="input" type="text" />\n                        <div class="title">HEX</div>\n                    </div>\n                </div>\n                <div class="information-item rgb">\n                    <div class="input-field rgb-r">\n                        <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                        <div class="title">R</div>\n                    </div>\n                    <div class="input-field rgb-g">\n                        <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                        <div class="title">G</div>\n                    </div>\n                    <div class="input-field rgb-b">\n                        <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                        <div class="title">B</div>\n                    </div>          \n                    <div class="input-field rgb-a">\n                        <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                        <div class="title">A</div>\n                    </div>                                                            \n                </div>\n                <div class="information-item hsl">\n                    <div class="input-field hsl-h">\n                        <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                        <div class="title">H</div>\n                    </div>\n                    <div class="input-field hsl-s">\n                        <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                        <div class="postfix">%</div>\n                        <div class="title">H</div>\n                    </div>\n                    <div class="input-field hsl-l">\n                        <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                        <div class="postfix">%</div>                        \n                        <div class="title">L</div>\n                    </div>\n                    <div class="input-field hsl-a">\n                        <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                        <div class="title">A</div>\n                    </div>\n                </div>\n            </div>\n        ');
 
             this.format = 'hex';
         }
@@ -7130,11 +7179,13 @@ var ColorPallet = function (_EventMachin) {
     }
 
     createClass(ColorPallet, [{
-        key: 'initialize',
-        value: function initialize() {
-
-            this.template('\n            <div class="color">\n                <div ref="$saturation" class="saturation">\n                    <div ref="$value" class="value">\n                        <div ref="$drag_pointer" class="drag-pointer"></div>\n                    </div>\n                </div>        \n            </div>\n        ');
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="color">\n            <div ref="$saturation" class="saturation">\n                <div ref="$value" class="value">\n                    <div ref="$drag_pointer" class="drag-pointer"></div>\n                </div>\n            </div>        \n        </div>        \n        ';
         }
+    }, {
+        key: 'initialize',
+        value: function initialize() {}
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor(color) {
@@ -7209,6 +7260,16 @@ var ColorPallet = function (_EventMachin) {
             }
         }
     }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.EventDocumentMouseUp(e);
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            this.EventDocumentMouseMove(e);
+        }
+    }, {
         key: 'mousedown',
         value: function mousedown(e) {
             this.isDown = true;
@@ -7240,61 +7301,33 @@ var ColorSetsChooser = function (_EventMachin) {
     }
 
     createClass(ColorSetsChooser, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="color-chooser">\n                <div class="color-chooser-container">\n                    <div class="colorsets-item colorsets-item-header">\n                        <h1 class="title">Color Palettes</h1>\n                        <span ref="$toggleButton" class="items">&times;</span>\n                    </div>\n                    <div ref="$colorsetsList" class="colorsets-list"></div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
 
-            this.template('\n            <div class="color-chooser">\n                <div class="color-chooser-container">\n                    <div class="colorsets-item colorsets-item-header">\n                        <h1 class="title">Color Paletts</h1>\n                        <span ref="$toggleButton" class="items">&times;</span>\n                    </div>\n                    <div ref="$colorsetsList" class="colorsets-list"></div>\n                </div>\n            </div>\n        ');
-
-            this.refresh();
+            this.load();
         }
+
+        // loadable 
+
     }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.refs.$colorsetsList.html(this.makeColorSetsList());
-        }
-    }, {
-        key: 'makeColorItemList',
-        value: function makeColorItemList(colors) {
-            var maxCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
-
-
-            var $list = new Dom('div');
-
-            for (var i = 0; i < maxCount; i++) {
-                var color = colors[i] || 'rgba(255, 255, 255, 1)';
-                var $item = $list.createChild('div', 'color-item', {
-                    title: color
-                });
-
-                $item.createChild('div', 'color-view', null, {
-                    'background-color': color
-                });
-            }
-
-            return $list;
-        }
-    }, {
-        key: 'makeColorSetsList',
-        value: function makeColorSetsList() {
-            var _this2 = this;
-
-            var $div = new Dom('div');
-
+        key: 'load $colorsetsList',
+        value: function load$colorsetsList() {
             // colorsets 
             var colorSets = this.colorpicker.getColorSetsList();
-            colorSets.forEach(function (element, index) {
-                if (_this2.colorpicker.isPaletteType() && element.edit) {
-                    // NOOP
-                } else {
-                    var $item = $div.createChild('div', 'colorsets-item', defineProperty({}, DATA_COLORSETS_INDEX, index));
 
-                    $item.createChild('h1', 'title').html(element.name);
-
-                    $item.createChild('div', 'items').append(_this2.makeColorItemList(element.colors, 5));
-                }
-            });
-
-            return $div;
+            return '\n            <div>\n                ' + colorSets.map(function (element, index) {
+                return '\n                        <div class="colorsets-item" data-colorsets-index="' + index + '" >\n                            <h1 class="title">' + element.name + '</h1>\n                            <div class="items">\n                                <div>\n                                    ' + element.colors.filter(function (color, i) {
+                    return i < 5;
+                }).map(function (color) {
+                    color = color || 'rgba(255, 255, 255, 1)';
+                    return '<div class="color-item" title="' + color + '">\n                                                <div class="color-view" style="background-color: ' + color + '"></div>\n                                            </div>';
+                }).join('') + '\n                                </div>\n                            </div>\n                        </div>';
+            }).join('') + '\n            </div>\n        ';
         }
     }, {
         key: 'show',
@@ -7356,49 +7389,29 @@ var CurrentColorSets = function (_EventMachin) {
     }
 
     createClass(CurrentColorSets, [{
-        key: 'makeCurrentColorSets',
-        value: function makeCurrentColorSets() {
-            var list = new Dom('div', 'current-color-sets');
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="colorsets">\n                <div class="menu" title="Open Color Palettes">\n                    <button ref="$colorSetsChooseButton" type="button" class="color-sets-choose-btn arrow-button"></button>\n                </div>\n                <div ref="$colorSetsColorList" class="color-list"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $colorSetsColorList',
+        value: function load$colorSetsColorList() {
             var currentColorSets = this.colorSetsList.getCurrentColorSets();
             var colors = this.colorSetsList.getCurrentColors();
 
-            for (var i = 0, len = colors.length; i < len; i++) {
-                var color = colors[i];
-                var item = list.createChild('div', 'color-item', {
-                    'title': color,
-                    'data-index': i,
-                    'data-color': color
-                });
-
-                item.createChild('div', 'empty');
-                item.createChild('div', 'color-view', null, {
-                    'background-color': color
-                });
-            }
-
-            if (currentColorSets.edit) {
-                list.createChild('div', 'add-color-item').html('+');
-            }
-
-            return list;
+            return '\n            <div class="current-color-sets">\n            ' + colors.map(function (color, i) {
+                return '<div class="color-item" title="' + color + '" data-index="' + i + '" data-color="' + color + '">\n                    <div class="empty"></div>\n                    <div class="color-view" style="background-color: ' + color + '"></div>\n                </div>';
+            }).join('') + '   \n            ' + (currentColorSets.edit ? '<div class="add-color-item">+</div>' : '') + '         \n            </div>\n        ';
         }
     }, {
         key: 'initialize',
         value: function initialize() {
-
-            this.template('\n            <div class="colorsets">\n                <div class="menu" title="Open Color Palettes">\n                    <button ref="$colorSetsChooseButton" type="button" class="color-sets-choose-btn arrow-button"></button>\n                </div>\n                <div ref="$colorSetsColorList" class="color-list"></div>\n            </div>\n        ');
-
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.refs.$colorSetsColorList.html(this.makeCurrentColorSets());
+            this.load();
         }
     }, {
         key: 'refreshAll',
         value: function refreshAll() {
-            this.refresh();
+            this.load();
             this.colorpicker.refreshColorSetsChooser();
         }
     }, {
@@ -7485,11 +7498,13 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
     }
 
     createClass(CurrentColorSetsContextMenu, [{
-        key: 'initialize',
-        value: function initialize() {
-
-            this.template('\n            <ul class="colorsets-contextmenu">\n                <li class="menu-item small-hide" data-type="remove-color">Remove color</li>\n                <li class="menu-item small-hide" data-type="remove-all-to-the-right">Remove all to the right</li>\n                <li class="menu-item" data-type="clear-palette">Clear palette</li>\n            </ul>\n        ');
+        key: 'template',
+        value: function template() {
+            return '\n            <ul class="colorsets-contextmenu">\n                <li class="menu-item small-hide" data-type="remove-color">Remove color</li>\n                <li class="menu-item small-hide" data-type="remove-all-to-the-right">Remove all to the right</li>\n                <li class="menu-item" data-type="clear-palette">Clear palette</li>\n            </ul>\n        ';
         }
+    }, {
+        key: 'initialize',
+        value: function initialize() {}
     }, {
         key: 'show',
         value: function show(e, index) {
@@ -7897,28 +7912,6 @@ var ColorPicker$1 = function (_BaseColorPicker) {
         value: function setHueColor() {
             this.control.setOnlyHueColor();
         }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-            this.palette.EventDocumentMouseUp(e);
-            this.control.EventDocumentMouseUp(e);
-
-            // when color picker clicked in outside
-            if (this.checkInHtml(e.target)) {
-                //this.setHideDelay(hideDelay);
-            } else if (this.checkColorPickerClass(e.target) == false) {
-                this.hide();
-            }
-        }
-    }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
-            this.palette.EventDocumentMouseMove(e);
-            this.control.EventDocumentMouseMove(e);
-        }
     }, {
         key: 'initializeEvent',
         value: function initializeEvent() {
@@ -7945,7 +7938,7 @@ var ColorPicker$1 = function (_BaseColorPicker) {
     }, {
         key: 'refreshColorSetsChooser',
         value: function refreshColorSetsChooser() {
-            this.colorSetsChooser.refresh();
+            this.colorSetsChooser.load();
         }
     }, {
         key: 'getColorSetsList',
@@ -7956,7 +7949,7 @@ var ColorPicker$1 = function (_BaseColorPicker) {
         key: 'setCurrentColorSets',
         value: function setCurrentColorSets(nameOrIndex) {
             this.colorSetsList.setCurrentColorSets(nameOrIndex);
-            this.currentColorSets.refresh();
+            this.currentColorSets.load();
         }
     }, {
         key: 'setColorSets',
@@ -7975,6 +7968,20 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             this.colorSetsList.destroy();
             this.currentColorSets.destroy();
             this.contextMenu.destroy();
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+
+            // when color picker clicked in outside
+            if (this.checkInHtml(e.target)) {
+                //this.setHideDelay(hideDelay);
+            } else if (this.checkColorPickerClass(e.target) == false) {
+                this.hide();
+            }
         }
     }]);
     return ColorPicker;

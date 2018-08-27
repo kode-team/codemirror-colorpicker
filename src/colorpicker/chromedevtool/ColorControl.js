@@ -11,25 +11,28 @@ export default class ColorControl extends EventMachin {
         this.colorpicker = colorpicker; 
         this.initialize();
     } 
+
+    template () {
+        return `
+        <div class="control">
+            <div ref="$hue" class="hue">
+                <div ref="$hueContainer" class="hue-container">
+                    <div ref="$drag_bar" class="drag-bar"></div>
+                </div>
+            </div>
+            <div ref="$opacity" class="opacity">
+                <div ref="$opacityContainer" class="opacity-container">
+                    <div ref="$opacityColorBar" class="color-bar"></div>
+                    <div ref="$opacity_drag_bar" class="drag-bar2"></div>
+                </div>
+            </div>
+            <div ref="$controlPattern" class="empty"></div>
+            <div ref="$controlColor" class="color"></div>
+        </div>
+        `
+    }
     
     initialize () {
-        this.template(`
-            <div class="control">
-                <div ref="$hue" class="hue">
-                    <div ref="$hueContainer" class="hue-container">
-                        <div ref="$drag_bar" class="drag-bar"></div>
-                    </div>
-                </div>
-                <div ref="$opacity" class="opacity">
-                    <div ref="$opacityContainer" class="opacity-container">
-                        <div ref="$opacityColorBar" class="color-bar"></div>
-                        <div ref="$opacity_drag_bar" class="drag-bar2"></div>
-                    </div>
-                </div>
-                <div ref="$controlPattern" class="empty"></div>
-                <div ref="$controlColor" class="color"></div>
-            </div>
-        `)
 
         this.drag_bar_pos = {}
         this.opacity_drag_bar_pos = {}      
@@ -195,6 +198,15 @@ export default class ColorControl extends EventMachin {
     setOnlyHueColor() {
         this.setHueColor(null, true)
     }       
+
+    // Event Bindings 
+    'mouseup document' (e) {
+        this.EventDocumentMouseUp(e);
+    }
+
+    'mousemove document' (e) {
+        this.EventDocumentMouseMove(e);
+    }
 
     'mousedown $drag_bar' (e) {
         e.preventDefault();

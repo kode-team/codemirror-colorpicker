@@ -441,7 +441,9 @@
           padding-left: 14px;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap; }
+          white-space: nowrap;
+          color: #000;
+          text-align: left; }
         .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-item-header .items {
           -webkit-box-flex: 1;
               -ms-flex: 1;
@@ -450,7 +452,7 @@
           padding-right: 10px;
           display: block;
           height: 100%;
-          line-height: 1.6;
+          line-height: 2;
           cursor: pointer; }
       .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list {
         position: absolute;
@@ -485,7 +487,9 @@
             font-size: 13px;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap; }
+            white-space: nowrap;
+            color: #000;
+            text-align: left; }
           .codemirror-colorpicker > .color-chooser .color-chooser-container .colorsets-list .colorsets-item .items {
             -webkit-box-flex: 3;
                 -ms-flex: 3;

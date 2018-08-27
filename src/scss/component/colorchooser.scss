@@ -45,7 +45,9 @@
                 padding-left:14px;                
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap;                           
+                white-space: nowrap;     
+                color:#000;
+                text-align: left;               
             }
 
             .items {
@@ -54,7 +56,7 @@
                 padding-right: 10px;
                 display:block;
                 height: 100%;
-                line-height: 1.6;    
+                line-height: 2;    
                 cursor:pointer;                   
             }
         }
@@ -89,7 +91,8 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
-                    
+                    color:#000;
+                    text-align: left;
                 }
     
                 .items {

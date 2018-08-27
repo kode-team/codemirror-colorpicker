@@ -13,59 +13,61 @@ export default class ColorInformation extends EventMachin {
 
     }
 
-    initialize () {
-
-        this.template(`
-            <div class="information hex">
-                <div ref="$informationChange" class="information-change">
-                    <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>
-                </div>
-                <div class="information-item hex">
-                    <div class="input-field hex">
-                        <input ref="$hexCode" class="input" type="text" />
-                        <div class="title">HEX</div>
-                    </div>
-                </div>
-                <div class="information-item rgb">
-                    <div class="input-field rgb-r">
-                        <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />
-                        <div class="title">R</div>
-                    </div>
-                    <div class="input-field rgb-g">
-                        <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />
-                        <div class="title">G</div>
-                    </div>
-                    <div class="input-field rgb-b">
-                        <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />
-                        <div class="title">B</div>
-                    </div>          
-                    <div class="input-field rgb-a">
-                        <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />
-                        <div class="title">A</div>
-                    </div>                                                            
-                </div>
-                <div class="information-item hsl">
-                    <div class="input-field hsl-h">
-                        <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />
-                        <div class="title">H</div>
-                    </div>
-                    <div class="input-field hsl-s">
-                        <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />
-                        <div class="postfix">%</div>
-                        <div class="title">H</div>
-                    </div>
-                    <div class="input-field hsl-l">
-                        <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />
-                        <div class="postfix">%</div>                        
-                        <div class="title">L</div>
-                    </div>
-                    <div class="input-field hsl-a">
-                        <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />
-                        <div class="title">A</div>
-                    </div>
+    template () {
+        return `
+        <div class="information hex">
+            <div ref="$informationChange" class="information-change">
+                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>
+            </div>
+            <div class="information-item hex">
+                <div class="input-field hex">
+                    <input ref="$hexCode" class="input" type="text" />
+                    <div class="title">HEX</div>
                 </div>
             </div>
-        `)
+            <div class="information-item rgb">
+                <div class="input-field rgb-r">
+                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />
+                    <div class="title">R</div>
+                </div>
+                <div class="input-field rgb-g">
+                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />
+                    <div class="title">G</div>
+                </div>
+                <div class="input-field rgb-b">
+                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />
+                    <div class="title">B</div>
+                </div>          
+                <div class="input-field rgb-a">
+                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />
+                    <div class="title">A</div>
+                </div>                                                            
+            </div>
+            <div class="information-item hsl">
+                <div class="input-field hsl-h">
+                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />
+                    <div class="title">H</div>
+                </div>
+                <div class="input-field hsl-s">
+                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />
+                    <div class="postfix">%</div>
+                    <div class="title">H</div>
+                </div>
+                <div class="input-field hsl-l">
+                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />
+                    <div class="postfix">%</div>                        
+                    <div class="title">L</div>
+                </div>
+                <div class="input-field hsl-a">
+                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />
+                    <div class="title">A</div>
+                </div>
+            </div>
+        </div>
+        `
+    }
+
+    initialize () {
 
         this.format = 'hex'; 
     }

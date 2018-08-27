@@ -9,18 +9,21 @@ export default class ColorPallet extends EventMachin {
         this.colorpicker = colorpicker; 
         this.initialize();
     } 
+
+    template () {
+        return `
+        <div class="color">
+            <div ref="$saturation" class="saturation">
+                <div ref="$value" class="value">
+                    <div ref="$drag_pointer" class="drag-pointer"></div>
+                </div>
+            </div>        
+        </div>        
+        `
+    }
     
     initialize () {
 
-        this.template(`
-            <div class="color">
-                <div ref="$saturation" class="saturation">
-                    <div ref="$value" class="value">
-                        <div ref="$drag_pointer" class="drag-pointer"></div>
-                    </div>
-                </div>        
-            </div>
-        `)
     }
 
     setBackgroundColor (color) {
@@ -92,6 +95,13 @@ export default class ColorPallet extends EventMachin {
         }
     } 
 
+    'mouseup document' (e) {
+        this.EventDocumentMouseUp(e);
+    }    
+
+    'mousemove document' (e) {
+        this.EventDocumentMouseMove(e);
+    }
 
     mousedown (e) {
         this.isDown = true; 

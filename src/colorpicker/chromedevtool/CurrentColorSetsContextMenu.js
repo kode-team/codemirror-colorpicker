@@ -12,15 +12,18 @@ export default class CurrentColorSetsContextMenu extends EventMachin {
         this.initialize();
     } 
 
-    initialize () {
-
-        this.template(`
+    template () {
+        return `
             <ul class="colorsets-contextmenu">
                 <li class="menu-item small-hide" data-type="remove-color">Remove color</li>
                 <li class="menu-item small-hide" data-type="remove-all-to-the-right">Remove all to the right</li>
                 <li class="menu-item" data-type="clear-palette">Clear palette</li>
             </ul>
-        `)
+        `
+    }
+
+    initialize () {
+
     }
 
     show (e, index) {

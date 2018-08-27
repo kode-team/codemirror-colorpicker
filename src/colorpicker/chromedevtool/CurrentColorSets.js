@@ -11,55 +11,41 @@ export default class CurrentColorSets extends EventMachin {
 
         this.initialize();
     } 
-    
-    makeCurrentColorSets () {
-        var list = new Dom('div', 'current-color-sets');
-        const currentColorSets  = this.colorSetsList.getCurrentColorSets()
-        const colors  = this.colorSetsList.getCurrentColors()
-        
-    
-        for(var i = 0, len = colors.length; i < len; i++) {
-            var color = colors[i];
-            var item = list.createChild('div', 'color-item', { 
-                'title' : color,  
-                'data-index' : i,
-                'data-color' : color
-            });
 
-            item.createChild('div', 'empty');
-            item.createChild('div', 'color-view', null, { 
-                'background-color': color 
-            })
-        }
-
-        
-        if (currentColorSets.edit) {
-            list.createChild('div', 'add-color-item').html('+'); 
-        }
-    
-        return list; 
-    }    
-
-    initialize () {
-
-        this.template(`
+    template() {
+        return `
             <div class="colorsets">
                 <div class="menu" title="Open Color Palettes">
                     <button ref="$colorSetsChooseButton" type="button" class="color-sets-choose-btn arrow-button"></button>
                 </div>
                 <div ref="$colorSetsColorList" class="color-list"></div>
             </div>
-        `)
+        `
+    }    
     
-        this.refresh();
-    }
+    'load $colorSetsColorList' () {
+        const currentColorSets  = this.colorSetsList.getCurrentColorSets()
+        const colors  = this.colorSetsList.getCurrentColors()
 
-    refresh () {
-        this.refs.$colorSetsColorList.html(this.makeCurrentColorSets())    
+        return `
+            <div class="current-color-sets">
+            ${colors.map( (color, i) => {
+                return `<div class="color-item" title="${color}" data-index="${i}" data-color="${color}">
+                    <div class="empty"></div>
+                    <div class="color-view" style="background-color: ${color}"></div>
+                </div>`
+            }).join('')}   
+            ${currentColorSets.edit ? `<div class="add-color-item">+</div>` : ''}         
+            </div>
+        `
+    }    
+
+    initialize () {
+        this.load()
     }
 
     refreshAll () {
-        this.refresh();
+        this.load();
         this.colorpicker.refreshColorSetsChooser();        
     }
 

@@ -11,18 +11,43 @@ export default class EventMachin {
   constructor() { 
     this.state = new State(this);
     this.refs = {} 
+
+    this.$el = this.parseTemplate(this.template())
+    this.refs.$el = this.$el; 
   }
 
-  template (html) {
-    this.$el = new Dom("div").html(html).firstChild()
-    const refs = this.$el.findAll("[ref]");
+  parseTemplate (html) {
+    const $el = new Dom("div").html(html).firstChild()
+    const refs = $el.findAll("[ref]");
     [...refs].forEach(node => {
-      this.refs[node.getAttribute("ref")] = new Dom(node);
+      const name = node.getAttribute("ref");
+      this.refs[name] = new Dom(node);
+
+      const callbackName = `load ${name}`
+
+      if (this[callbackName]) {
+        this.refs[name].load = () => {
+          new Dom(node).html(this.parseTemplate(this[callbackName].call(this)))
+        }  
+      }
     })
-    this.refs.$el = this.$el 
+
+    return $el;
   }
 
-  initializeEvent () {
+  load () {
+    Object.keys(this.refs).forEach(key => {
+      if (this.refs[key].load) {
+        this.refs[key].load()
+      }
+    })
+  }
+
+  template () {
+    return '<div></div>';
+  }
+
+  initializeEvent () { 
     this.initializeEventMachin();
   }
 

@@ -338,24 +338,7 @@ export default class ColorPicker extends BaseColorPicker {
         this.control.setOnlyHueColor();
     }
 
-    // Event Bindings 
-    'mouseup document' (e) {
-        this.palette.EventDocumentMouseUp(e);
-        this.control.EventDocumentMouseUp(e);
-
-        // when color picker clicked in outside
-        if (this.checkInHtml(e.target)) {
-            //this.setHideDelay(hideDelay);
-        } else if (this.checkColorPickerClass(e.target) == false) {
-            this.hide();
-        }
-    }
-
-    'mousemove document' (e) {
-        this.palette.EventDocumentMouseMove(e);
-        this.control.EventDocumentMouseMove(e);
-    }
-
+   
     initializeEvent() {
 
         this.initializeEventMachin();
@@ -378,7 +361,7 @@ export default class ColorPicker extends BaseColorPicker {
     }
 
     refreshColorSetsChooser() {
-        this.colorSetsChooser.refresh();
+        this.colorSetsChooser.load();
     }
 
     getColorSetsList() {
@@ -387,7 +370,7 @@ export default class ColorPicker extends BaseColorPicker {
 
     setCurrentColorSets(nameOrIndex) {
         this.colorSetsList.setCurrentColorSets(nameOrIndex);
-        this.currentColorSets.refresh();
+        this.currentColorSets.load();
     }
 
     setColorSets(list) {
@@ -405,4 +388,16 @@ export default class ColorPicker extends BaseColorPicker {
         this.currentColorSets.destroy();
         this.contextMenu.destroy();
     }
+
+     // Event Bindings 
+     'mouseup document' (e) {
+
+        // when color picker clicked in outside
+        if (this.checkInHtml(e.target)) {
+            //this.setHideDelay(hideDelay);
+        } else if (this.checkColorPickerClass(e.target) == false) {
+            this.hide();
+        }
+    }
+
 }
