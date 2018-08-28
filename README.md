@@ -1,6 +1,5 @@
-# CodeMirror Colorpicker Addon 
+# Colorpicker With CodeMirror
 
-CodeMirror ColorPicker Addon like Chrome devtool style
 
 This project was created to implement a color picker. It implemented basic functions for color and implemented image filters.
 
