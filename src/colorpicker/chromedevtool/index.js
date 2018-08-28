@@ -14,31 +14,54 @@ export default class ColorPicker extends BaseColorPicker {
     constructor(opt) {
         super(opt);
         
-        this.control = new ColorControl(this);
-        this.palette = new ColorPalette(this);
-        this.information = new ColorInformation(this);
-        this.colorSetsChooser = new ColorSetsChooser(this);
-        this.currentColorSets = new CurrentColorSets(this);
-        this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
+        // this.control = new ColorControl(this);
+        // this.palette = new ColorPalette(this);
+        // this.information = new ColorInformation(this);
+        // this.colorSetsChooser = new ColorSetsChooser(this);
+        // this.currentColorSets = new CurrentColorSets(this);
+        // this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
 
         this.initialize();
     }
 
+    template () {
+        return `
+            <div class='colorpicker-body'>
+                <div target="palette"></div>
+                <div target="control"></div>
+                <div target="information"></div>
+                <div target="currentColorSets"></div>
+                <div target="colorSetsChooser"></div>
+                <div target="contextMenu"></div>
+            </div>
+        `
+    }
+
+    components() {
+        return { 
+            palette: ColorPalette,  
+            control: ColorControl,
+            information: ColorInformation,
+            currentColorSets: CurrentColorSets,
+            colorSetsChooser: ColorSetsChooser,
+            contextMenu: CurrentColorSetsContextMenu
+        }
+    }
+
     initialize() {
+
+        // root 만들기 
         super.initialize()
 
-        this.$root.append(this.palette.$el);
-        this.$root.append(this.control.$el);
-        this.$root.append(this.information.$el);
-        this.$root.append(this.currentColorSets.$el);
-        this.$root.append(this.colorSetsChooser.$el);
-        this.$root.append(this.contextMenu.$el);
+        this.render()
+
+        this.$root.append(this.$el)
 
         this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
         this.initColor(this.opt.color);
 
-        // register all events 
+        // 이벤트 연결 
         this.initializeEvent();        
     }
 

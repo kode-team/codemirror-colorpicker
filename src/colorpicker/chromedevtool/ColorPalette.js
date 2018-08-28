@@ -1,13 +1,11 @@
 
-import Dom from '../../util/Dom'
 import EventMachin from '../../util/EventMachin'
 
-export default class ColorPallet extends EventMachin {
+export default class ColorPalette extends EventMachin {
     constructor (colorpicker) {
         super();
 
         this.colorpicker = colorpicker; 
-        this.initialize();
     } 
 
     template () {
@@ -20,10 +18,6 @@ export default class ColorPallet extends EventMachin {
             </div>        
         </div>        
         `
-    }
-    
-    initialize () {
-
     }
 
     setBackgroundColor (color) {
@@ -84,23 +78,14 @@ export default class ColorPallet extends EventMachin {
         this.colorpicker.setInputColor();
     }    
 
-
-    EventDocumentMouseUp (e) {
-        this.isDown = false; 
-    }
-
-    EventDocumentMouseMove(e) {
-        if (this.isDown) {
-            this.setMainColor(e);
-        }
-    } 
-
     'mouseup document' (e) {
-        this.EventDocumentMouseUp(e);
+        this.isDown = false; 
     }    
 
     'mousemove document' (e) {
-        this.EventDocumentMouseMove(e);
+        if (this.isDown) {
+            this.setMainColor(e);
+        }
     }
 
     mousedown (e) {

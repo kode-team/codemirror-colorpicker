@@ -5746,6 +5746,13 @@ var Dom = function () {
         value: function firstChild() {
             return new Dom(this.el.firstElementChild);
         }
+    }, {
+        key: 'replace',
+        value: function replace(oldElement, newElement) {
+            this.el.replaceChild(newElement, oldElement);
+
+            return this;
+        }
     }]);
     return Dom;
 }();
@@ -5837,26 +5844,56 @@ var EventMachin = function () {
     this.state = new State(this);
     this.refs = {};
 
-    this.$el = this.parseTemplate(this.template());
-    this.refs.$el = this.$el;
+    this.childComponents = this.components();
   }
 
   createClass(EventMachin, [{
+    key: 'render',
+    value: function render() {
+      var _this = this;
+
+      var childKeys = Object.keys(this.childComponents);
+      childKeys.forEach(function (key) {
+        var Component = _this.childComponents[key];
+
+        _this[key] = new Component(_this);
+      });
+
+      this.$el = this.parseTemplate(this.template());
+      this.refs.$el = this.$el;
+
+      childKeys.forEach(function (key) {
+        _this[key].render();
+      });
+
+      this.parseTarget();
+      childKeys.forEach(function (key) {
+        _this[key].parseTarget();
+      });
+
+      this.load();
+    }
+  }, {
+    key: 'components',
+    value: function components() {
+      return {};
+    }
+  }, {
     key: 'parseTemplate',
     value: function parseTemplate(html) {
-      var _this = this;
+      var _this2 = this;
 
       var $el = new Dom("div").html(html).firstChild();
       var refs = $el.findAll("[ref]");
       [].concat(toConsumableArray(refs)).forEach(function (node) {
         var name = node.getAttribute("ref");
-        _this.refs[name] = new Dom(node);
+        _this2.refs[name] = new Dom(node);
 
         var callbackName = 'load ' + name;
 
-        if (_this[callbackName]) {
-          _this.refs[name].load = function () {
-            new Dom(node).html(_this.parseTemplate(_this[callbackName].call(_this)));
+        if (_this2[callbackName]) {
+          _this2.refs[name].load = function () {
+            new Dom(node).html(_this2.parseTemplate(_this2[callbackName].call(_this2)));
           };
         }
       });
@@ -5864,13 +5901,29 @@ var EventMachin = function () {
       return $el;
     }
   }, {
+    key: 'parseTarget',
+    value: function parseTarget() {
+      var _this3 = this;
+
+      var $el = this.$el;
+      var targets = $el.findAll('[target]');
+
+      [].concat(toConsumableArray(targets)).forEach(function (node) {
+        var targetComponentName = node.getAttribute('target');
+
+        if (_this3[targetComponentName]) {
+          $el.replace(node, _this3[targetComponentName].$el.el);
+        }
+      });
+    }
+  }, {
     key: 'load',
     value: function load() {
-      var _this2 = this;
+      var _this4 = this;
 
       Object.keys(this.refs).forEach(function (key) {
-        if (_this2.refs[key].load) {
-          _this2.refs[key].load();
+        if (_this4.refs[key].load) {
+          _this4.refs[key].load();
         }
       });
     }
@@ -5882,13 +5935,25 @@ var EventMachin = function () {
   }, {
     key: 'initializeEvent',
     value: function initializeEvent() {
+      var _this5 = this;
+
       this.initializeEventMachin();
+
+      Object.keys(this.childComponents).forEach(function (key) {
+        if (_this5[key]) _this5[key].initializeEvent();
+      });
     }
   }, {
     key: 'destroy',
     value: function destroy() {
+      var _this6 = this;
+
       this.destroyEventMachin();
       // this.refs = {} 
+
+      Object.keys(this.childComponents).forEach(function (key) {
+        if (_this6[key]) _this6[key].destroy();
+      });
     }
   }, {
     key: 'destroyEventMachin',
@@ -5934,7 +5999,7 @@ var EventMachin = function () {
   }, {
     key: 'getDefaultEventObject',
     value: function getDefaultEventObject(eventName) {
-      var _this3 = this;
+      var _this7 = this;
 
       var arr = eventName.split('.');
       var realEventName = arr.shift();
@@ -5949,7 +6014,7 @@ var EventMachin = function () {
       });
 
       var checkMethodList = arr.filter(function (code) {
-        return !!_this3[code];
+        return !!_this7[code];
       });
 
       arr = arr.filter(function (code) {
@@ -6018,7 +6083,7 @@ var EventMachin = function () {
   }, {
     key: 'checkEventType',
     value: function checkEventType(e, eventObject) {
-      var _this4 = this;
+      var _this8 = this;
 
       var onlyControl = e.ctrlKey ? eventObject.isControl : true;
       var onlyShift = e.shiftKey ? eventObject.isShift : true;
@@ -6034,7 +6099,7 @@ var EventMachin = function () {
       if (eventObject.checkMethodList.length) {
         // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
         isAllCheck = eventObject.checkMethodList.every(function (method) {
-          return _this4[method].call(_this4, e);
+          return _this8[method].call(_this8, e);
         });
       }
 
@@ -6043,13 +6108,13 @@ var EventMachin = function () {
   }, {
     key: 'makeCallback',
     value: function makeCallback(eventObject, callback) {
-      var _this5 = this;
+      var _this9 = this;
 
       if (eventObject.delegate) {
         return function (e) {
 
-          if (_this5.checkEventType(e, eventObject)) {
-            var delegateTarget = _this5.matchPath(e.target || e.srcElement, eventObject.delegate);
+          if (_this9.checkEventType(e, eventObject)) {
+            var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
 
             if (delegateTarget) {
               // delegate target 이 있는 경우만 callback 실행 
@@ -6061,7 +6126,7 @@ var EventMachin = function () {
         };
       } else {
         return function (e) {
-          if (_this5.checkEventType(e, eventObject)) {
+          if (_this9.checkEventType(e, eventObject)) {
             return callback(e);
           }
         };
@@ -6077,10 +6142,10 @@ var EventMachin = function () {
   }, {
     key: 'removeEventAll',
     value: function removeEventAll() {
-      var _this6 = this;
+      var _this10 = this;
 
       this.getBindings().forEach(function (obj) {
-        _this6.removeEvent(obj);
+        _this10.removeEvent(obj);
       });
       this.initBindings();
     }
@@ -6564,35 +6629,155 @@ var BaseColorPicker = function (_EventMachin) {
     return BaseColorPicker;
 }(EventMachin);
 
-var ColorControl = function (_EventMachin) {
-    inherits(ColorControl, _EventMachin);
+var Hue = function (_EventMachin) {
+    inherits(Hue, _EventMachin);
 
-    function ColorControl(colorpicker) {
-        classCallCheck(this, ColorControl);
+    function Hue(parent) {
+        classCallCheck(this, Hue);
 
-        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this));
+        var _this = possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).call(this));
 
-        _this.colorpicker = colorpicker;
+        _this.parent = parent;
         _this.initialize();
         return _this;
     }
 
-    createClass(ColorControl, [{
+    createClass(Hue, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div ref="$hue" class="hue">\n                <div ref="$hueContainer" class="hue-container">\n                    <div ref="$drag_bar" class="drag-bar"></div>\n                </div>\n            </div>\n            <div ref="$opacity" class="opacity">\n                <div ref="$opacityContainer" class="opacity-container">\n                    <div ref="$opacityColorBar" class="color-bar"></div>\n                    <div ref="$opacity_drag_bar" class="drag-bar2"></div>\n                </div>\n            </div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+            return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'initialize',
         value: function initialize() {
 
-            this.drag_bar_pos = {};
-            this.opacity_drag_bar_pos = {};
+            this.pos = {};
         }
     }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.refs.$controlColor.css("background-color", color$$1);
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+
+            var hueX = this.state.get('$container.width') * (this.parent.colorpicker.currentH / 360);
+
+            this.refs.$bar.css({
+                left: hueX + 'px'
+            });
+
+            this.pos = { x: hueX };
+        }
+    }, {
+        key: 'caculateH',
+        value: function caculateH() {
+
+            var huePos = this.pos || { x: 0 };
+
+            var h = huePos.x / this.state.get('$container.width') * 360;
+
+            return { h: h };
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor(e, isOnlyHue) {
+
+            if (!this.state.get('$container.width')) return;
+
+            var min = this.refs.$container.offset().left;
+            var max = min + this.state.get('$container.width');
+            var current = e ? Event.pos(e).clientX : min + (max - min) * (this.parent.colorpicker.currentH / 360);
+
+            var dist;
+            if (current < min) {
+                dist = 0;
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (current > max) {
+                dist = 100;
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                dist = (current - min) / (max - min) * 100;
+                this.refs.$bar.removeClass('first').removeClass('last');
+            }
+
+            var x = this.state.get('$container.width') * (dist / 100);
+
+            this.refs.$bar.css({
+                // left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
+                left: x + 'px'
+            });
+
+            this.pos = { x: x };
+
+            var hueColor = HueColor.checkHueColor(dist / 100);
+
+            this.parent.colorpicker.setBackgroundColor(hueColor);
+            this.parent.colorpicker.setCurrentH(dist / 100 * 360);
+
+            if (!isOnlyHue) {
+                this.parent.colorpicker.setInputColor();
+            }
+        }
+    }, {
+        key: 'setOnlyHueColor',
+        value: function setOnlyHueColor() {
+            this.setHueColor(null, true);
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setHueColor(e);
+            }
+        }
+    }, {
+        key: 'mousedown $bar',
+        value: function mousedown$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $container',
+        value: function mousedown$container(e) {
+            this.isDown = true;
+            this.setHueColor(e);
+        }
+    }]);
+    return Hue;
+}(EventMachin);
+
+var Opacity = function (_EventMachin) {
+    inherits(Opacity, _EventMachin);
+
+    function Opacity(parent) {
+        classCallCheck(this, Opacity);
+
+        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this));
+
+        _this.parent = parent;
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(Opacity, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            this.pos = {};
         }
     }, {
         key: 'refresh',
@@ -6610,40 +6795,127 @@ var ColorControl = function (_EventMachin) {
             rgb.a = 1;
             var end = color.format(rgb, 'rgb');
 
-            this.refs.$opacityColorBar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
+            this.refs.$colorbar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
         }
     }, {
         key: 'setOpacity',
         value: function setOpacity(e) {
-            var min = this.refs.$opacityContainer.offset().left;
-            var max = min + this.state.get('$opacityContainer.width');
+            var min = this.refs.$container.offset().left;
+            var max = min + this.state.get('$container.width');
             var current = Event.pos(e).clientX;
             var dist;
 
             var dist;
             if (current < min) {
                 dist = 0;
-                this.refs.$opacity_drag_bar.addClass('first').removeClass('last');
+                this.refs.$bar.addClass('first').removeClass('last');
             } else if (current > max) {
                 dist = 100;
-                this.refs.$opacity_drag_bar.addClass('last').removeClass('first');
+                this.refs.$bar.addClass('last').removeClass('first');
             } else {
                 dist = (current - min) / (max - min) * 100;
-                this.refs.$opacity_drag_bar.removeClass('first').removeClass('last');
+                this.refs.$bar.removeClass('first').removeClass('last');
             }
 
-            var x = this.state.get('$opacityContainer.width') * (dist / 100);
+            var x = this.state.get('$container.width') * (dist / 100);
 
-            this.refs.$opacity_drag_bar.css({
+            this.refs.$bar.css({
                 // left: (x -Math.ceil(this.state.get('$opacity_drag_bar.width')/2)) + 'px'
                 left: x + 'px'
             });
 
-            this.opacity_drag_bar_pos = { x: x };
+            this.pos = { x: x };
 
-            this.colorpicker.setCurrentA(this.caculateOpacity());
-            this.colorpicker.currentFormat();
-            this.colorpicker.setInputColor();
+            this.parent.colorpicker.setCurrentA(this.caculateOpacity());
+            this.parent.colorpicker.currentFormat();
+            this.parent.colorpicker.setInputColor();
+        }
+    }, {
+        key: 'setInputColor',
+        value: function setInputColor() {
+            this.setBackgroundColor(this.parent.colorpicker.getFormattedColor('rgb'));
+
+            var rgb = this.parent.colorpicker.convertRGB();
+            var colorString = color.format(rgb, 'rgb');
+            this.setOpacityColorBar(colorString);
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            var x = this.state.get('$container.width') * (this.parent.colorpicker.currentA || 0);
+            this.refs.$bar.css({ left: x + 'px' });
+            this.pos = { x: x };
+        }
+    }, {
+        key: 'caculateOpacity',
+        value: function caculateOpacity() {
+            var opacityPos = this.pos || { x: 0 };
+            var a = Math.round(opacityPos.x / this.state.get('$container.width') * 100) / 100;
+
+            return isNaN(a) ? 1 : a;
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setOpacity(e);
+            }
+        }
+    }, {
+        key: 'mousedown $bar',
+        value: function mousedown$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $container',
+        value: function mousedown$container(e) {
+            this.isDown = true;
+            this.setOpacity(e);
+        }
+    }]);
+    return Opacity;
+}(EventMachin);
+
+var ColorControl = function (_EventMachin) {
+    inherits(ColorControl, _EventMachin);
+
+    function ColorControl(colorpicker) {
+        classCallCheck(this, ColorControl);
+
+        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this));
+
+        _this.colorpicker = colorpicker;
+        return _this;
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: Hue, Opacity: Opacity };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor(color$$1) {
+            this.refs.$controlColor.css("background-color", color$$1);
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
         }
     }, {
         key: 'setInputColor',
@@ -6652,64 +6924,19 @@ var ColorControl = function (_EventMachin) {
 
             var rgb = this.colorpicker.convertRGB();
             var colorString = color.format(rgb, 'rgb');
-            this.setOpacityColorBar(colorString);
+            this.Opacity.setOpacityColorBar(colorString);
         }
     }, {
         key: 'setColorUI',
         value: function setColorUI() {
 
-            var hueX = this.state.get('$hueContainer.width') * (this.colorpicker.currentH / 360);
-
-            this.refs.$drag_bar.css({
-                // left : (hueX - 7.5) + 'px'
-                left: hueX + 'px'
-            });
-
-            this.drag_bar_pos = { x: hueX };
-
-            var opacityX = this.state.get('$opacityContainer.width') * (this.colorpicker.currentA || 0);
-
-            this.refs.$opacity_drag_bar.css({
-                // left : (opacityX - 7.5) + 'px'
-                left: opacityX + 'px'
-            });
-
-            this.opacity_drag_bar_pos = { x: opacityX };
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
         }
     }, {
         key: 'caculateH',
         value: function caculateH() {
-
-            var huePos = this.drag_bar_pos || { x: 0 };
-
-            var h = huePos.x / this.state.get('$hueContainer.width') * 360;
-
-            return { h: h };
-        }
-    }, {
-        key: 'caculateOpacity',
-        value: function caculateOpacity() {
-            var opacityPos = this.opacity_drag_bar_pos || { x: 0 };
-            var a = Math.round(opacityPos.x / this.state.get('$opacityContainer.width') * 100) / 100;
-
-            return isNaN(a) ? 1 : a;
-        }
-    }, {
-        key: 'EventDocumentMouseMove',
-        value: function EventDocumentMouseMove(e) {
-            if (this.isHueDown) {
-                this.setHueColor(e);
-            }
-
-            if (this.isOpacityDown) {
-                this.setOpacity(e);
-            }
-        }
-    }, {
-        key: 'EventDocumentMouseUp',
-        value: function EventDocumentMouseUp(e) {
-            this.isHueDown = false;
-            this.isOpacityDown = false;
+            return this.Hue.caculateH();
         }
     }, {
         key: 'setControlColor',
@@ -6717,83 +6944,9 @@ var ColorControl = function (_EventMachin) {
             this.refs.$controlColor.css('background-color', color$$1);
         }
     }, {
-        key: 'setHueColor',
-        value: function setHueColor(e, isOnlyHue) {
-            var min = this.refs.$hueContainer.offset().left;
-            var max = min + this.state.get('$hueContainer.width');
-            var current = e ? Event.pos(e).clientX : min + (max - min) * (this.colorpicker.currentH / 360);
-
-            var dist;
-            if (current < min) {
-                dist = 0;
-                this.refs.$drag_bar.addClass('first').removeClass('last');
-            } else if (current > max) {
-                dist = 100;
-                this.refs.$drag_bar.addClass('last').removeClass('first');
-            } else {
-                dist = (current - min) / (max - min) * 100;
-                this.refs.$drag_bar.removeClass('first').removeClass('last');
-            }
-
-            var x = this.state.get('$hueContainer.width') * (dist / 100);
-
-            this.refs.$drag_bar.css({
-                // left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
-                left: x + 'px'
-            });
-
-            this.drag_bar_pos = { x: x };
-
-            var hueColor = HueColor.checkHueColor(dist / 100);
-
-            this.colorpicker.setBackgroundColor(hueColor);
-            this.colorpicker.setCurrentH(dist / 100 * 360);
-
-            if (!isOnlyHue) {
-                this.colorpicker.setInputColor();
-            }
-        }
-    }, {
         key: 'setOnlyHueColor',
         value: function setOnlyHueColor() {
-            this.setHueColor(null, true);
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-            this.EventDocumentMouseUp(e);
-        }
-    }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
-            this.EventDocumentMouseMove(e);
-        }
-    }, {
-        key: 'mousedown $drag_bar',
-        value: function mousedown$drag_bar(e) {
-            e.preventDefault();
-            this.isHueDown = true;
-        }
-    }, {
-        key: 'mousedown $opacity_drag_bar',
-        value: function mousedown$opacity_drag_bar(e) {
-            e.preventDefault();
-            this.isOpacityDown = true;
-        }
-    }, {
-        key: 'mousedown $hueContainer',
-        value: function mousedown$hueContainer(e) {
-            this.isHueDown = true;
-            this.setHueColor(e);
-        }
-    }, {
-        key: 'mousedown $opacityContainer',
-        value: function mousedown$opacityContainer(e) {
-            this.isOpacityDown = true;
-            this.setOpacity(e);
+            this.Hue.setOnlyHueColor();
         }
     }]);
     return ColorControl;
@@ -7065,27 +7218,23 @@ var ColorInformation = function (_EventMachin) {
     return ColorInformation;
 }(EventMachin);
 
-var ColorPallet = function (_EventMachin) {
-    inherits(ColorPallet, _EventMachin);
+var ColorPalette = function (_EventMachin) {
+    inherits(ColorPalette, _EventMachin);
 
-    function ColorPallet(colorpicker) {
-        classCallCheck(this, ColorPallet);
+    function ColorPalette(colorpicker) {
+        classCallCheck(this, ColorPalette);
 
-        var _this = possibleConstructorReturn(this, (ColorPallet.__proto__ || Object.getPrototypeOf(ColorPallet)).call(this));
+        var _this = possibleConstructorReturn(this, (ColorPalette.__proto__ || Object.getPrototypeOf(ColorPalette)).call(this));
 
         _this.colorpicker = colorpicker;
-        _this.initialize();
         return _this;
     }
 
-    createClass(ColorPallet, [{
+    createClass(ColorPalette, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="color">\n            <div ref="$saturation" class="saturation">\n                <div ref="$value" class="value">\n                    <div ref="$drag_pointer" class="drag-pointer"></div>\n                </div>\n            </div>        \n        </div>        \n        ';
         }
-    }, {
-        key: 'initialize',
-        value: function initialize() {}
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor(color) {
@@ -7148,26 +7297,16 @@ var ColorPallet = function (_EventMachin) {
             this.colorpicker.setInputColor();
         }
     }, {
-        key: 'EventDocumentMouseUp',
-        value: function EventDocumentMouseUp(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'EventDocumentMouseMove',
-        value: function EventDocumentMouseMove(e) {
-            if (this.isDown) {
-                this.setMainColor(e);
-            }
-        }
-    }, {
         key: 'mouseup document',
         value: function mouseupDocument(e) {
-            this.EventDocumentMouseUp(e);
+            this.isDown = false;
         }
     }, {
         key: 'mousemove document',
         value: function mousemoveDocument(e) {
-            this.EventDocumentMouseMove(e);
+            if (this.isDown) {
+                this.setMainColor(e);
+            }
         }
     }, {
         key: 'mousedown',
@@ -7181,7 +7320,7 @@ var ColorPallet = function (_EventMachin) {
             this.isDown = false;
         }
     }]);
-    return ColorPallet;
+    return ColorPalette;
 }(EventMachin);
 
 var DATA_COLORSETS_INDEX = 'data-colorsets-index';
@@ -7275,16 +7414,12 @@ var ColorSetsChooser = function (_EventMachin) {
 var CurrentColorSets = function (_EventMachin) {
     inherits(CurrentColorSets, _EventMachin);
 
-    function CurrentColorSets(colorpicker) {
+    function CurrentColorSets(parent) {
         classCallCheck(this, CurrentColorSets);
 
         var _this = possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).call(this));
 
-        _this.colorpicker = colorpicker;
-
-        _this.colorSetsList = _this.colorpicker.colorSetsList;
-
-        _this.initialize();
+        _this.parent = parent;
         return _this;
     }
 
@@ -7304,9 +7439,11 @@ var CurrentColorSets = function (_EventMachin) {
             }).join('') + '   \n            ' + (currentColorSets.edit ? '<div class="add-color-item">+</div>' : '') + '         \n            </div>\n        ';
         }
     }, {
-        key: 'initialize',
-        value: function initialize() {
-            this.load();
+        key: 'render',
+        value: function render() {
+            this.colorpicker = this.parent;
+            this.colorSetsList = this.colorpicker.colorSetsList;
+            get(CurrentColorSets.prototype.__proto__ || Object.getPrototypeOf(CurrentColorSets.prototype), 'render', this).call(this);
         }
     }, {
         key: 'refreshAll',
@@ -7461,36 +7598,52 @@ var ColorPicker$1 = function (_BaseColorPicker) {
     function ColorPicker(opt) {
         classCallCheck(this, ColorPicker);
 
-        var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
+        // this.control = new ColorControl(this);
+        // this.palette = new ColorPalette(this);
+        // this.information = new ColorInformation(this);
+        // this.colorSetsChooser = new ColorSetsChooser(this);
+        // this.currentColorSets = new CurrentColorSets(this);
+        // this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
 
-        _this.control = new ColorControl(_this);
-        _this.palette = new ColorPallet(_this);
-        _this.information = new ColorInformation(_this);
-        _this.colorSetsChooser = new ColorSetsChooser(_this);
-        _this.currentColorSets = new CurrentColorSets(_this);
-        _this.contextMenu = new CurrentColorSetsContextMenu(_this, _this.currentColorSets);
+        var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
 
         _this.initialize();
         return _this;
     }
 
     createClass(ColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div>\n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                palette: ColorPalette,
+                control: ColorControl,
+                information: ColorInformation,
+                currentColorSets: CurrentColorSets,
+                colorSetsChooser: ColorSetsChooser,
+                contextMenu: CurrentColorSetsContextMenu
+            };
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
+
+            // root 만들기 
             get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'initialize', this).call(this);
 
-            this.$root.append(this.palette.$el);
-            this.$root.append(this.control.$el);
-            this.$root.append(this.information.$el);
-            this.$root.append(this.currentColorSets.$el);
-            this.$root.append(this.colorSetsChooser.$el);
-            this.$root.append(this.contextMenu.$el);
+            this.render();
+
+            this.$root.append(this.$el);
 
             this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
             this.initColor(this.opt.color);
 
-            // register all events 
+            // 이벤트 연결 
             this.initializeEvent();
         }
     }, {

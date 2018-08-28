@@ -12,8 +12,30 @@ export default class EventMachin {
     this.state = new State(this);
     this.refs = {} 
 
+    this.childComponents = this.components()
+  }
+
+  render () {
+    const childKeys = Object.keys(this.childComponents)
+    childKeys.forEach(key => {
+      const Component = this.childComponents[key]
+
+      this[key] = new Component(this);
+    })
+
     this.$el = this.parseTemplate(this.template())
     this.refs.$el = this.$el; 
+
+    childKeys.forEach(key => { this[key].render(); })    
+
+    this.parseTarget()
+    childKeys.forEach(key => { this[key].parseTarget(); })    
+
+    this.load()
+  }
+ 
+  components () {
+    return {} 
   }
 
   parseTemplate (html) {
@@ -32,7 +54,21 @@ export default class EventMachin {
       }
     })
 
-    return $el;
+    return $el; 
+
+  }
+
+  parseTarget () {
+    const $el = this.$el; 
+    const targets = $el.findAll('[target]');
+
+    [...targets].forEach(node => {
+      const targetComponentName = node.getAttribute('target')
+
+      if (this[targetComponentName]) {
+        $el.replace(node, this[targetComponentName].$el.el)
+      }
+    })
   }
 
   load () {
@@ -49,11 +85,21 @@ export default class EventMachin {
 
   initializeEvent () { 
     this.initializeEventMachin();
+
+    Object.keys(this.childComponents).forEach(key => {
+      if (this[key]) this[key].initializeEvent()
+    })
+
   }
 
   destroy() {
     this.destroyEventMachin();
     // this.refs = {} 
+
+    Object.keys(this.childComponents).forEach(key => {
+      if (this[key]) this[key].destroy()
+    })
+
   }
 
   destroyEventMachin () {

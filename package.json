@@ -1,7 +1,7 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.9.12",
-  "description": "colorpicker for codemirror",
+  "version": "1.9.20",
+  "description": "simple colorpicker used anywhere",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {
     "pub": "npm run build && npm publish",
@@ -20,14 +20,15 @@
     "colorpicker",
     "imagefilter",
     "color",
-    "rgb"
+    "rgb",
+    "webgl"
   ],
   "author": "easylogic",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/easylogic/codemirror-colorpicker/issues"
   },
-  "homepage": "https://github.com/easylogic/codemirror-colorpicker#readme",
+  "homepage": "https://easylogic.github.io/codemirror-colorpicker/",
   "devDependencies": {
     "autoprefixer": "^7.2.5",
     "babel-cli": "^6.26.0",

@@ -2,14 +2,10 @@ import Dom from '../../util/Dom'
 import EventMachin from '../../util/EventMachin'
 
 export default class CurrentColorSets extends EventMachin {
-    constructor (colorpicker) {
+    constructor (parent) {
         super();
 
-        this.colorpicker = colorpicker; 
-
-        this.colorSetsList = this.colorpicker.colorSetsList;
-
-        this.initialize();
+        this.parent = parent; 
     } 
 
     template() {
@@ -40,8 +36,11 @@ export default class CurrentColorSets extends EventMachin {
         `
     }    
 
-    initialize () {
-        this.load()
+    render () {
+        this.colorpicker = this.parent; 
+        this.colorSetsList = this.colorpicker.colorSetsList;        
+        super.render();
+
     }
 
     refreshAll () {

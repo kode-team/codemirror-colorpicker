@@ -37,13 +37,15 @@
     }   
   }
 
-
-  @import './component/button';
-  @import './component/palette';
-  @import './component/control';
-  @import './component/information';
-  @import './component/colorsets'; 
-  @import './component/colorchooser'; 
+  .colorpicker-body {
+    @import './component/button';
+    @import './component/palette';
+    @import './component/control';
+    @import './component/information';
+    @import './component/colorsets'; 
+    @import './component/colorchooser'; 
+  
+  }
 
   &.chromedevtool {
 

@@ -319,5 +319,11 @@ export default class Dom {
     firstChild () {
         return new Dom(this.el.firstElementChild);
     }
+
+    replace (oldElement, newElement) {
+        this.el.replaceChild(newElement, oldElement);
+
+        return this; 
+    }
 }
 
