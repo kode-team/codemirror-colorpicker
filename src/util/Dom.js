@@ -196,9 +196,13 @@ export default class Dom {
         }
 
     }
+
+    size () {
+        return [this.width(), this.height()]
+    }
     
     width () {
-        return this.el.offsetWidth;
+        return this.el.offsetWidth || this.el.getBoundingClientRect().width;
     }
 
     contentWidth() {
@@ -206,7 +210,7 @@ export default class Dom {
     }
     
     height () {
-        return this.el.offsetHeight;
+        return this.el.offsetHeight || this.el.getBoundingClientRect().height;
     }
 
 

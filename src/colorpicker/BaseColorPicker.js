@@ -23,7 +23,7 @@ export default class BaseColorPicker extends EventMachin {
 
         this.isColorPickerShow = false;
         this.isShortCut = false;
-        this.hideDelay = this.opt.hideDeplay || 2000;
+        this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
         this.timerCloseColorPicker;
         this.autoHide = this.opt.autoHide || true;
 
@@ -149,15 +149,17 @@ export default class BaseColorPicker extends EventMachin {
         this.colorpickerCallback = callback;
 
         // define hide delay
-        this.hideDelay = opt.hideDelay || 2000;
-        if (this.hideDelay > 0) {
+        this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
+        // if (this.hideDelay > 0) {
             this.setHideDelay(this.hideDelay);
-        }
+        // }
 
     }
 
     setHideDelay(delayTime) {
         delayTime = delayTime || 0;
+
+        const hideCallback = this.hide.bind(this);
 
         this.$root.off('mouseenter');
         this.$root.off('mouseleave');
@@ -168,11 +170,11 @@ export default class BaseColorPicker extends EventMachin {
 
         this.$root.on('mouseleave', () => {
             clearTimeout(this.timerCloseColorPicker);
-            this.timerCloseColorPicker = setTimeout(this.hide.bind(this), delayTime);
+            this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
         });
 
         clearTimeout(this.timerCloseColorPicker);
-        this.timerCloseColorPicker = setTimeout(this.hide.bind(this), delayTime);
+        // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
     }
 
     hide() {

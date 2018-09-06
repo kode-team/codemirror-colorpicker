@@ -618,6 +618,10 @@ var colorpicker = new ColorPicker({
         <div class="colorpicker-style" data-type="sketch"></div>
     </div>
     <div class="colorpicker-type">
+        <h3>MacOS Style</h3>
+        <div class="colorpicker-style" data-type="macos"></div>
+    </div>    
+    <div class="colorpicker-type">
         <h3>Only Palette Style</h3>
         <div class="colorpicker-style" data-type="palette"></div>
     </div>    
@@ -907,7 +911,7 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
 </section>
 
 
-<section style="display: none">
+<section>
 <h1 class="title">Default Html Sample </h1>
 
 <div>
@@ -989,7 +993,8 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
           }
         },
         colorpicker : {
-            mode : 'edit'
+            mode : 'edit',
+            hideDelay: 0
         }
     });
 
@@ -1006,8 +1011,9 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
 
         colorpicker.show({
             left : (target.offsetWidth + target.offsetLeft),
-            top : event.clientY 
-        }, color, function (newColor) {
+            top : event.clientY,
+            hideDelay: 0
+        }, 'hsla(0,100%,54%,0.67)', function (newColor) {
 
             var temp = Color.parse(newColor);
             
@@ -1016,8 +1022,6 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             target.style.backgroundColor = newColor;
             target.style.color = textColor;
             target.textContent = newColor;
-            //console.log(color, newColor);
-
 
             var rgb = Color.RGBtoGray(temp);
 
@@ -1114,7 +1118,7 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         var type = item.getAttribute('data-type');
 
         for(var j = 0; j < 1; j++) {
-            var picker = new CodeMirrorColorPicker.ColorPicker({
+            var picker = new CodeMirrorColorPicker.create({
                 position: 'inline',
                 container: item,
                 type: type,

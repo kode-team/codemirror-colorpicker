@@ -7,7 +7,7 @@ import EventMachin from '../../../util/EventMachin'
 export default class Hue extends EventMachin {
     constructor (parent) {
         super();
-        this.parent = parent; 
+        this.parent = parent ; 
         this.initialize();
     } 
 

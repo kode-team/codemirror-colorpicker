@@ -4659,7 +4659,7 @@ var color = {
         var S = s;
         var V = v;
 
-        if (H == 360) {
+        if (H >= 360) {
             H = 0;
         }
 
@@ -4842,7 +4842,7 @@ var color = {
             var _arguments$7 = arguments[0],
                 h = _arguments$7.h,
                 s = _arguments$7.s,
-                v = _arguments$7.v;
+                l = _arguments$7.l;
         }
         var rgb = this.HSLtoRGB(h, s, l);
 
@@ -5702,9 +5702,14 @@ var Dom = function () {
             }
         }
     }, {
+        key: 'size',
+        value: function size() {
+            return [this.width(), this.height()];
+        }
+    }, {
         key: 'width',
         value: function width() {
-            return this.el.offsetWidth;
+            return this.el.offsetWidth || this.el.getBoundingClientRect().width;
         }
     }, {
         key: 'contentWidth',
@@ -5714,7 +5719,7 @@ var Dom = function () {
     }, {
         key: 'height',
         value: function height() {
-            return this.el.offsetHeight;
+            return this.el.offsetHeight || this.el.getBoundingClientRect().height;
         }
     }, {
         key: 'contentHeight',
@@ -5952,7 +5957,8 @@ var EventMachin = function () {
     value: function render() {
       var _this = this;
 
-      Object.keys(this.childComponents).forEach(function (key) {
+      var childKeys = Object.keys(this.childComponents);
+      childKeys.forEach(function (key) {
         var Component = _this.childComponents[key];
 
         _this[key] = new Component(_this);
@@ -5961,12 +5967,12 @@ var EventMachin = function () {
       this.$el = this.parseTemplate(this.template());
       this.refs.$el = this.$el;
 
-      Object.keys(this.childComponents).forEach(function (key) {
+      childKeys.forEach(function (key) {
         _this[key].render();
       });
 
       this.parseTarget();
-      Object.keys(this.childComponents).forEach(function (key) {
+      childKeys.forEach(function (key) {
         _this[key].parseTarget();
       });
 
@@ -6422,7 +6428,7 @@ var BaseColorPicker = function (_EventMachin) {
 
         _this.isColorPickerShow = false;
         _this.isShortCut = false;
-        _this.hideDelay = _this.opt.hideDeplay || 2000;
+        _this.hideDelay = +(typeof _this.opt.hideDeplay == 'undefined' ? 2000 : _this.opt.hideDelay);
         _this.timerCloseColorPicker;
         _this.autoHide = _this.opt.autoHide || true;
 
@@ -6567,10 +6573,10 @@ var BaseColorPicker = function (_EventMachin) {
             this.colorpickerCallback = callback;
 
             // define hide delay
-            this.hideDelay = opt.hideDelay || 2000;
-            if (this.hideDelay > 0) {
-                this.setHideDelay(this.hideDelay);
-            }
+            this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay);
+            // if (this.hideDelay > 0) {
+            this.setHideDelay(this.hideDelay);
+            // }
         }
     }, {
         key: 'setHideDelay',
@@ -6578,6 +6584,8 @@ var BaseColorPicker = function (_EventMachin) {
             var _this2 = this;
 
             delayTime = delayTime || 0;
+
+            var hideCallback = this.hide.bind(this);
 
             this.$root.off('mouseenter');
             this.$root.off('mouseleave');
@@ -6588,11 +6596,11 @@ var BaseColorPicker = function (_EventMachin) {
 
             this.$root.on('mouseleave', function () {
                 clearTimeout(_this2.timerCloseColorPicker);
-                _this2.timerCloseColorPicker = setTimeout(_this2.hide.bind(_this2), delayTime);
+                _this2.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
             });
 
             clearTimeout(this.timerCloseColorPicker);
-            this.timerCloseColorPicker = setTimeout(this.hide.bind(this), delayTime);
+            // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
         }
     }, {
         key: 'hide',
@@ -6727,6 +6735,268 @@ var BaseColorPicker = function (_EventMachin) {
     }]);
     return BaseColorPicker;
 }(EventMachin);
+
+var ColorPicker$1 = function (_BaseColorPicker) {
+    inherits(ColorPicker, _BaseColorPicker);
+
+    function ColorPicker(opt) {
+        classCallCheck(this, ColorPicker);
+
+        var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(ColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div class="colorwheel" style="padding:10px;">\n                    <canvas ref="$colorwheel" width="204px" height="204px"></canvas>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {};
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+
+            // root 만들기 
+            get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'initialize', this).call(this);
+
+            this.render();
+
+            this.$root.append(this.$el);
+
+            // this.initColor(this.opt.color);
+
+
+            // 이벤트 연결 
+            this.initializeEvent();
+
+            this.renderCanvas();
+        }
+    }, {
+        key: 'renderCanvas',
+        value: function renderCanvas() {
+
+            var $canvas = this.refs.$colorwheel;
+            // console.log($canvas);
+            var context = $canvas.el.getContext('2d');
+
+            var _$canvas$size = $canvas.size(),
+                _$canvas$size2 = slicedToArray(_$canvas$size, 2),
+                width = _$canvas$size2[0],
+                height = _$canvas$size2[1];
+
+            // console.log(width, height);
+
+
+            var img = context.getImageData(0, 0, width, height);
+            var pixels = img.data;
+            var half_width = Math.floor(width / 2);
+            var half_height = Math.floor(height / 2);
+
+            var radius = width > height ? half_height : half_width;
+            var cx = half_width;
+            var cy = half_height;
+
+            for (var y = 0; y < height; y++) {
+                for (var x = 0; x < width; x++) {
+                    var rx = x - cx + 1,
+                        ry = y - cy + 1,
+                        d = rx * rx + ry * ry,
+                        hue = Math.atan2(ry, rx) * 180 / Math.PI;
+
+                    if (hue < 0) {
+                        // 각도가 0보다 작으면 360 에서 반전시킨다. 
+                        hue = 360 - Math.abs(hue);
+                    }
+                    var rgb = color.HSVtoRGB(hue, // 0~360 hue 
+                    Math.min(Math.sqrt(d) / radius, 1), // 0..1 Saturation 
+                    1 //  0..1 Value
+                    );
+
+                    var index = (y * width + x) * 4;
+                    pixels[index + 0] = rgb.r;
+                    pixels[index + 1] = rgb.g;
+                    pixels[index + 2] = rgb.b;
+                    pixels[index + 3] = 255;
+                }
+            }
+
+            context.putImageData(img, 0, 0);
+        }
+    }, {
+        key: 'setColor',
+        value: function setColor(value) {
+            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+
+            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
+                if (!value.r || !value.g || !value.b) return;
+
+                if (isDirect) {
+                    this.callbackColorValue(color.format(value, "hex"));
+                } else {
+                    this.initColor(color.format(value, "hex"));
+                }
+            } else if (typeof value == "string") {
+
+                if (isDirect) {
+                    this.callbackColorValue(value);
+                } else {
+                    this.initColor(value);
+                }
+            }
+        }
+    }, {
+        key: 'getColor',
+        value: function getColor(type) {
+            this.caculateHSV();
+            var rgb = this.convertRGB();
+
+            if (type) {
+                return color.format(rgb, type);
+            }
+
+            return rgb;
+        }
+    }, {
+        key: 'convertRGB',
+        value: function convertRGB() {
+            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
+        }
+    }, {
+        key: 'convertHEX',
+        value: function convertHEX() {
+            return color.format(this.convertRGB(), 'hex');
+        }
+    }, {
+        key: 'convertHSL',
+        value: function convertHSL() {
+            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
+        }
+    }, {
+        key: 'getFormattedColor',
+        value: function getFormattedColor(format) {
+            format = format || 'hex';
+
+            if (format == 'rgb') {
+                var rgb = this.convertRGB();
+                rgb.a = this.currentA;
+                return color.format(rgb, 'rgb');
+            } else if (format == 'hsl') {
+                var hsl = this.convertHSL();
+                hsl.a = this.currentA;
+                return color.format(hsl, 'hsl');
+            } else {
+                var rgb = this.convertRGB();
+                return color.format(rgb, 'hex');
+            }
+        }
+    }, {
+        key: 'setInputColor',
+        value: function setInputColor(isNoInputColor) {
+            // this.information.setInputColor(isNoInputColor);
+            // this.control.setInputColor(isNoInputColor);
+
+            this.callbackColorValue();
+        }
+    }, {
+        key: 'changeInputColorAfterNextFormat',
+        value: function changeInputColorAfterNextFormat() {
+            // this.control.setInputColor();
+
+            this.callbackColorValue();
+        }
+    }, {
+        key: 'callbackColorValue',
+        value: function callbackColorValue(color$$1) {
+
+            color$$1 = color$$1 || this.getCurrentColor();
+
+            if (!isNaN(this.currentA)) {
+                if (typeof this.opt.onChange == 'function') {
+                    this.opt.onChange.call(this, color$$1);
+                }
+
+                if (typeof this.colorpickerCallback == 'function') {
+                    this.colorpickerCallback(color$$1);
+                }
+            }
+        }
+    }, {
+        key: 'setCurrentHSV',
+        value: function setCurrentHSV(h, s, v, a) {
+            this.currentA = a;
+            this.currentH = h;
+            this.currentS = s;
+            this.currentV = v;
+        }
+    }, {
+        key: 'setCurrentH',
+        value: function setCurrentH(h) {
+            this.currentH = h;
+        }
+    }, {
+        key: 'setCurrentA',
+        value: function setCurrentA(a) {
+            this.currentA = a;
+        }
+    }, {
+        key: 'getHSV',
+        value: function getHSV(colorObj) {
+            if (colorObj.type == 'hsl') {
+                return color.HSLtoHSV(colorObj);
+            } else {
+                return color.RGBtoHSV(colorObj);
+            }
+        }
+    }, {
+        key: 'initColor',
+        value: function initColor(newColor, format) {
+            var c = newColor || "#FF0000",
+                colorObj = color.parse(c);
+            format = format || colorObj.type;
+
+            var hsv = this.getHSV(colorObj);
+            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+        }
+    }, {
+        key: 'getColorSetsList',
+        value: function getColorSetsList() {
+            return this.colorSetsList.getColorSetsList();
+        }
+    }, {
+        key: 'setCurrentColorSets',
+        value: function setCurrentColorSets(nameOrIndex) {
+            this.colorSetsList.setCurrentColorSets(nameOrIndex);
+            // this.currentColorSets.load();
+        }
+    }, {
+        key: 'setColorSets',
+        value: function setColorSets(list) {
+            this.colorSetsList.setUserList(list);
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+
+            // when color picker clicked in outside
+            if (this.checkInHtml(e.target)) {
+                //this.setHideDelay(hideDelay);
+            } else if (this.checkColorPickerClass(e.target) == false) {
+                this.hide();
+            }
+        }
+    }]);
+    return ColorPicker;
+}(BaseColorPicker);
 
 var Hue = function (_EventMachin) {
     inherits(Hue, _EventMachin);
@@ -7068,7 +7338,7 @@ var ColorInformation = function (_EventMachin) {
     createClass(ColorInformation, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        ';
+            return '\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">S</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        ';
         }
     }, {
         key: 'initialize',
@@ -7530,8 +7800,8 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'load $colorSetsColorList',
         value: function load$colorSetsColorList() {
-            var currentColorSets = this.parent.colorSetsList.getCurrentColorSets();
-            var colors = this.parent.colorSetsList.getCurrentColors();
+            var currentColorSets = this.colorSetsList.getCurrentColorSets();
+            var colors = this.colorSetsList.getCurrentColors();
 
             return '\n            <div class="current-color-sets">\n            ' + colors.map(function (color, i) {
                 return '<div class="color-item" title="' + color + '" data-index="' + i + '" data-color="' + color + '">\n                    <div class="empty"></div>\n                    <div class="color-view" style="background-color: ' + color + '"></div>\n                </div>';
@@ -7540,9 +7810,9 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'render',
         value: function render() {
-            get(CurrentColorSets.prototype.__proto__ || Object.getPrototypeOf(CurrentColorSets.prototype), 'render', this).call(this);
             this.colorpicker = this.parent;
             this.colorSetsList = this.colorpicker.colorSetsList;
+            get(CurrentColorSets.prototype.__proto__ || Object.getPrototypeOf(CurrentColorSets.prototype), 'render', this).call(this);
         }
     }, {
         key: 'refreshAll',
@@ -7691,7 +7961,7 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
     return CurrentColorSetsContextMenu;
 }(EventMachin);
 
-var ColorPicker$1 = function (_BaseColorPicker) {
+var ColorPicker$2 = function (_BaseColorPicker) {
     inherits(ColorPicker, _BaseColorPicker);
 
     function ColorPicker(opt) {
@@ -7734,17 +8004,9 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             // root 만들기 
             get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'initialize', this).call(this);
 
-            // dom 만들기, 하위 컴포넌트 연동
             this.render();
 
             this.$root.append(this.$el);
-
-            // this.$root.append(this.palette.$el);
-            // this.$root.append(this.control.$el);
-            // this.$root.append(this.information.$el);
-            // this.$root.append(this.currentColorSets.$el);
-            // this.$root.append(this.colorSetsChooser.$el);
-            // this.$root.append(this.contextMenu.$el);
 
             this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
@@ -7792,118 +8054,6 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             }
 
             return rgb;
-        }
-    }, {
-        key: 'definePositionForArrow',
-        value: function definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
-            //this.$arrow.css({})
-        }
-    }, {
-        key: 'definePosition',
-        value: function definePosition(opt) {
-
-            var width = this.$root.width();
-            var height = this.$root.height();
-
-            // set left position for color picker
-            var elementScreenLeft = opt.left - this.$body.scrollLeft();
-            if (width + elementScreenLeft > window.innerWidth) {
-                elementScreenLeft -= width + elementScreenLeft - window.innerWidth;
-            }
-            if (elementScreenLeft < 0) {
-                elementScreenLeft = 0;
-            }
-
-            // set top position for color picker
-            var elementScreenTop = opt.top - this.$body.scrollTop();
-            if (height + elementScreenTop > window.innerHeight) {
-                elementScreenTop -= height + elementScreenTop - window.innerHeight;
-            }
-            if (elementScreenTop < 0) {
-                elementScreenTop = 0;
-            }
-
-            // set position
-            this.$root.css({
-                left: elementScreenLeft + 'px',
-                top: elementScreenTop + 'px'
-            });
-        }
-    }, {
-        key: 'getInitalizePosition',
-        value: function getInitalizePosition() {
-            if (this.opt.position == 'inline') {
-                return {
-                    position: 'relative',
-                    left: 'auto',
-                    top: 'auto',
-                    display: 'inline-block'
-                };
-            } else {
-                return {
-                    position: 'fixed', // color picker has fixed position
-                    left: '-10000px',
-                    top: '-10000px'
-                };
-            }
-        }
-    }, {
-        key: 'show',
-        value: function show(opt, color$$1, callback) {
-            this.destroy();
-            this.initializeEvent();
-            this.$root.appendTo(this.$body);
-
-            this.$root.css(this.getInitalizePosition()).show();
-
-            this.definePosition(opt);
-
-            this.isColorPickerShow = true;
-
-            this.isShortCut = opt.isShortCut || false;
-
-            this.initColor(color$$1);
-
-            // define colorpicker callback
-            this.colorpickerCallback = callback;
-
-            // define hide delay
-            this.hideDelay = opt.hideDelay || 2000;
-            if (this.hideDelay > 0) {
-                this.setHideDelay(this.hideDelay);
-            }
-        }
-    }, {
-        key: 'setHideDelay',
-        value: function setHideDelay(delayTime) {
-            var _this2 = this;
-
-            delayTime = delayTime || 0;
-
-            this.$root.off('mouseenter');
-            this.$root.off('mouseleave');
-
-            this.$root.on('mouseenter', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
-            });
-
-            this.$root.on('mouseleave', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
-                _this2.timerCloseColorPicker = setTimeout(_this2.hide.bind(_this2), delayTime);
-            });
-
-            clearTimeout(this.timerCloseColorPicker);
-            this.timerCloseColorPicker = setTimeout(this.hide.bind(this), delayTime);
-        }
-    }, {
-        key: 'hide',
-        value: function hide() {
-            if (this.isColorPickerShow) {
-                this.destroy();
-                this.$root.hide();
-                this.$root.remove(); // not empty 
-                this.isColorPickerShow = false;
-            }
         }
     }, {
         key: 'convertRGB',
@@ -8049,6 +8199,7 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             this.setCurrentFormat(format);
 
             var hsv = this.getHSV(colorObj);
+
             this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
             this.setColorUI();
             this.setHueColor();
@@ -8116,19 +8267,6 @@ var ColorPicker$1 = function (_BaseColorPicker) {
         value: function setColorSets(list) {
             this.colorSetsList.setUserList(list);
         }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'destroy', this).call(this);
-
-            this.control.destroy();
-            this.palette.destroy();
-            this.information.destroy();
-            this.colorSetsChooser.destroy();
-            this.colorSetsList.destroy();
-            this.currentColorSets.destroy();
-            this.contextMenu.destroy();
-        }
 
         // Event Bindings 
 
@@ -8150,15 +8288,18 @@ var ColorPicker$1 = function (_BaseColorPicker) {
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
+            case 'macos':
+                return new ColorPicker$1(opts);
             case 'sketch':
             case 'palette':
             default:
-                return new ColorPicker$1(opts);
+                return new ColorPicker$2(opts);
         }
     },
 
-    ColorPicker: ColorPicker$1,
-    ChromeDevToolColorPicker: ColorPicker$1
+    ColorPicker: ColorPicker$2,
+    ChromeDevToolColorPicker: ColorPicker$2,
+    MacOSColorPicker: ColorPicker$1
 };
 
 var colorpicker_class = 'codemirror-colorview';

@@ -314,7 +314,7 @@ const color = {
         var S = s;
         var V = v;
 
-        if (H == 360) {
+        if (H >= 360) {
             H = 0;
         }
 
@@ -470,7 +470,7 @@ const color = {
     HSLtoHSV(h, s, l) {
 
         if (arguments.length == 1) {
-            var { h, s, v } = arguments[0];
+            var { h, s, l } = arguments[0];
         }
         const rgb = this.HSLtoRGB(h, s, l);
 

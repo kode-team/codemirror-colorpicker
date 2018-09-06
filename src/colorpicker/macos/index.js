@@ -1,49 +1,28 @@
 import Color from '../../util/Color'
 
 import BaseColorPicker from '../BaseColorPicker'
-
-import ColorControl from './ColorControl'
-import ColorInformation from './ColorInformation'
-import ColorPalette from './ColorPalette'
-import ColorSetsChooser from './ColorSetsChooser'
-import CurrentColorSets from './CurrentColorSets'
-import CurrentColorSetsContextMenu from './CurrentColorSetsContextMenu'
+import Dom from '../../util/Dom';
 
 export default class ColorPicker extends BaseColorPicker {
     constructor(opt) {
         super(opt);
         
-        // this.control = new ColorControl(this);
-        // this.palette = new ColorPalette(this);
-        // this.information = new ColorInformation(this);
-        // this.colorSetsChooser = new ColorSetsChooser(this);
-        // this.currentColorSets = new CurrentColorSets(this);
-        // this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
-
         this.initialize();
     }
 
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div>
-                <div target="control"></div>
-                <div target="information"></div>
-                <div target="currentColorSets"></div>
-                <div target="colorSetsChooser"></div>
-                <div target="contextMenu"></div>
+                <div class="colorwheel" style="padding:10px;">
+                    <canvas ref="$colorwheel" width="204px" height="204px" style="border-radius:50%;"></canvas>
+                </div>
             </div>
         `
     }
 
     components() {
         return { 
-            palette: ColorPalette,  
-            control: ColorControl,
-            information: ColorInformation,
-            currentColorSets: CurrentColorSets,
-            colorSetsChooser: ColorSetsChooser,
-            contextMenu: CurrentColorSetsContextMenu
+
         }
     }
 
@@ -56,16 +35,62 @@ export default class ColorPicker extends BaseColorPicker {
 
         this.$root.append(this.$el)
 
-        this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
+        // this.initColor(this.opt.color);
 
-        this.initColor(this.opt.color);
 
         // 이벤트 연결 
         this.initializeEvent();        
+
+        this.renderCanvas()        
     }
 
-    showContextMenu(e, index) {
-        this.contextMenu.show(e, index);
+    renderCanvas () {
+
+        const $canvas = this.refs.$colorwheel
+        // console.log($canvas);
+        const context = $canvas.el.getContext('2d')
+
+        const [width, height] = $canvas.size()
+
+        // console.log(width, height);
+
+
+        var img = context.getImageData(0, 0, width, height);
+        var pixels = img.data;
+        var half_width = Math.floor(width/2)
+        var half_height = Math.floor(height/2)
+
+        var radius = (width > height) ? half_height : half_width;
+        var cx = half_width;
+        var cy = half_height;
+
+        for(var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                var rx = x - cx + 1,
+                ry = y - cy + 1,
+                d = rx * rx + ry * ry,
+                hue = (Math.atan2(ry, rx) * 180 / Math.PI);
+
+                if (hue < 0) {   // 각도가 0보다 작으면 360 에서 반전시킨다. 
+                    hue = 360 - Math.abs(hue)
+                }
+                var rgb = Color.HSVtoRGB(
+                    hue,     // 0~360 hue 
+                    Math.min(Math.sqrt(d) / radius, 1),     // 0..1 Saturation 
+                    1  //  0..1 Value
+                );
+
+                var index = (y * width + x) * 4; 
+                pixels[index + 0] = rgb.r;
+                pixels[index + 1] = rgb.g;
+                pixels[index + 2] = rgb.b;
+                pixels[index + 3] = 255;
+            }
+        }
+
+
+        context.putImageData(img,0, 0)
+
     }
 
     setColor(value, isDirect = false) {
@@ -105,7 +130,6 @@ export default class ColorPicker extends BaseColorPicker {
     }
 
 
-
     convertRGB() {
         return Color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
     }
@@ -116,10 +140,6 @@ export default class ColorPicker extends BaseColorPicker {
 
     convertHSL() {
         return Color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-    }
-
-    getCurrentColor() {
-        return this.information.getFormattedColor();
     }
 
     getFormattedColor(format) {
@@ -142,14 +162,14 @@ export default class ColorPicker extends BaseColorPicker {
 
 
     setInputColor(isNoInputColor) {
-        this.information.setInputColor(isNoInputColor);
-        this.control.setInputColor(isNoInputColor);
+        // this.information.setInputColor(isNoInputColor);
+        // this.control.setInputColor(isNoInputColor);
 
         this.callbackColorValue();
     }
 
     changeInputColorAfterNextFormat() {
-        this.control.setInputColor();
+        // this.control.setInputColor();
 
         this.callbackColorValue();
     }
@@ -171,33 +191,6 @@ export default class ColorPicker extends BaseColorPicker {
         }
     }
 
-    caculateHSV() {
-
-        var obj = this.palette.caculateSV();
-        var control = this.control.caculateH();
-
-        var s = obj.s;
-        var v = obj.v;
-        var h = control.h;
-
-
-        if (obj.width == 0) {
-            h = 0;
-            s = 0;
-            v = 0;
-        }
-
-        this.currentH = h
-        this.currentS = s
-        this.currentV = v 
-    }
-
-
-    setColorUI() {
-        this.control.setColorUI()
-        this.palette.setColorUI()
-    }
-
     setCurrentHSV(h, s, v, a) {
         this.currentA = a;
         this.currentH = h;
@@ -214,15 +207,6 @@ export default class ColorPicker extends BaseColorPicker {
         this.currentA = a;
     }
 
-    setBackgroundColor(color) {
-        this.palette.setBackgroundColor(color);
-    }
-
-    setCurrentFormat(format) {
-        this.format = format;
-        this.information.setCurrentFormat(format);
-    }
-
     getHSV(colorObj) {
         if (colorObj.type == 'hsl') {
             return Color.HSLtoHSV(colorObj);
@@ -236,55 +220,8 @@ export default class ColorPicker extends BaseColorPicker {
         let c = newColor || "#FF0000", colorObj = Color.parse(c);
         format = format || colorObj.type;
 
-        this.setCurrentFormat(format);
-
-        let hsv = this.getHSV(colorObj);
-
-        this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-        this.setColorUI();
-        this.setHueColor();
-        this.setInputColor();
-    }
-
-    changeInformationColor(newColor) {
-        let c = newColor || "#FF0000", colorObj = Color.parse(c);
-
         let hsv = this.getHSV(colorObj);
         this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-        this.setColorUI();
-        this.setHueColor();
-        this.control.setInputColor();
-        this.callbackColorValue();
-    }
-
-    setHueColor() {
-        this.control.setOnlyHueColor();
-    }
-
-   
-    initializeEvent() {
-
-        this.initializeEventMachin();
-
-        this.palette.initializeEvent();
-        this.control.initializeEvent();
-        this.information.initializeEvent()
-        this.currentColorSets.initializeEvent()
-        this.colorSetsChooser.initializeEvent();
-        this.contextMenu.initializeEvent();
-
-    }
-
-    currentFormat() {
-        this.information.currentFormat();
-    }
-
-    toggleColorChooser() {
-        this.colorSetsChooser.toggle();
-    }
-
-    refreshColorSetsChooser() {
-        this.colorSetsChooser.load();
     }
 
     getColorSetsList() {
@@ -293,7 +230,7 @@ export default class ColorPicker extends BaseColorPicker {
 
     setCurrentColorSets(nameOrIndex) {
         this.colorSetsList.setCurrentColorSets(nameOrIndex);
-        this.currentColorSets.load();
+        // this.currentColorSets.load();
     }
 
     setColorSets(list) {

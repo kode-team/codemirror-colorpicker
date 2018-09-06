@@ -51,7 +51,7 @@ export default class ColorInformation extends EventMachin {
                 <div class="input-field hsl-s">
                     <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />
                     <div class="postfix">%</div>
-                    <div class="title">H</div>
+                    <div class="title">S</div>
                 </div>
                 <div class="input-field hsl-l">
                     <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />

@@ -63,6 +63,15 @@ test('Color parse for hsl', () => {
     expect(result).toEqual({ type: 'hsl', h: 0, s: 0, l: 69, a: 1, r: rgb.r, g: rgb.b, b: rgb.r });
 });
 
+test('Color parse for hsla', () => {
+    const colorCode = 'hsla(0,0%,69%, 0.67)';
+    const result = Color.parse(colorCode);
+
+    const rgb = Color.HSLtoRGB(result.h, result.s, result.l);
+
+    expect(result).toEqual({ type: 'hsl', h: 0, s: 0, l: 69, a: 0.67, r: rgb.r, g: rgb.b, b: rgb.r });
+});
+
 test('Color matches', () => {
     const colorCode = 'hsl(0,0%,69%) #aaa #ccc #ddd #ffffff blue';
     const result = Color.matches(colorCode);
