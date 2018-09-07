@@ -19,7 +19,8 @@ export default class BaseColorPicker extends EventMachin {
         this.currentV = 0;
         
         this.colorSetsList = new ColorSetsList(this);
-        this.colorpickerCallback = function () { };
+        this.colorpickerShowCallback = function () { };
+        this.colorpickerHideCallback = function () { };
 
         this.isColorPickerShow = false;
         this.isShortCut = false;
@@ -130,7 +131,7 @@ export default class BaseColorPicker extends EventMachin {
         }
     }
 
-    show(opt, color, callback) {
+    show(opt, color, showCallback, hideCallback) {
         this.destroy();
         this.initializeEvent();
         this.$root.appendTo(this.$body);
@@ -146,13 +147,14 @@ export default class BaseColorPicker extends EventMachin {
         this.initColor(color);
 
         // define colorpicker callback
-        this.colorpickerCallback = callback;
+        this.colorpickerShowCallback = showCallback;
+        this.colorpickerHideCallback = hideCallback;        
 
         // define hide delay
         this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
-        // if (this.hideDelay > 0) {
+        if (this.hideDelay > 0) {
             this.setHideDelay(this.hideDelay);
-        // }
+        }
 
     }
 
@@ -183,6 +185,8 @@ export default class BaseColorPicker extends EventMachin {
             this.$root.hide();
             this.$root.remove();  // not empty 
             this.isColorPickerShow = false;
+
+            this.callbackHideColorValue()
         }
     }
 
@@ -218,18 +222,32 @@ export default class BaseColorPicker extends EventMachin {
 
 
     callbackColorValue(color) {
-
+        color = color || this.getCurrentColor();
         if (!isNaN(this.currentA)) {
             if (typeof this.opt.onChange == 'function') {
                 this.opt.onChange.call(this, color);
             }
     
-            if (typeof this.colorpickerCallback == 'function') {
-                this.colorpickerCallback(color);
+            if (typeof this.colorpickerShowCallback == 'function') {
+                this.colorpickerShowCallback(color);
             }        
 
         }
     }
+
+    callbackHideColorValue(color) {
+        color = color || this.getCurrentColor();
+        if (!isNaN(this.currentA)) {
+            if (typeof this.opt.onHide == 'function') {
+                this.opt.onHide.call(this, color);
+            }
+    
+            if (typeof this.colorpickerHideCallback == 'function') {
+                this.colorpickerHideCallback(color);
+            }        
+
+        }
+    }    
 
     setCurrentHSV(h, s, v, a) {
         this.currentA = a;
@@ -289,10 +307,17 @@ export default class BaseColorPicker extends EventMachin {
         this.colorSetsList.setUserList(list);
     }
 
+    setColorsInPalette (colors = []) {
+        this.colorSetsList.setCurrentColorAll(colors);
+    }    
+
     destroy() {
         super.destroy();
 
         // remove color picker callback
-        this.colorpickerCallback = undefined;
+        this.colorpickerShowCallback = undefined;
+
+        this.colorpickerHideCallback = undefined;   
     }
+    
 }

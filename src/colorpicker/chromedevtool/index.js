@@ -152,24 +152,7 @@ export default class ColorPicker extends BaseColorPicker {
         this.control.setInputColor();
 
         this.callbackColorValue();
-    }
-
-    callbackColorValue(color) {
-
-        color = color || this.getCurrentColor();
-
-
-        if (!isNaN(this.currentA)) {
-            if (typeof this.opt.onChange == 'function') {
-                this.opt.onChange.call(this, color);
-            }
-    
-            if (typeof this.colorpickerCallback == 'function') {
-                this.colorpickerCallback(color);
-            }        
-
-        }
-    }
+    }      
 
     caculateHSV() {
 
@@ -298,6 +281,11 @@ export default class ColorPicker extends BaseColorPicker {
 
     setColorSets(list) {
         this.colorSetsList.setUserList(list);
+    }
+
+    setColorsInPalette (colors = []) {
+        this.colorSetsList.setCurrentColorAll(colors);
+        this.currentColorSets.load()
     }
 
      // Event Bindings 

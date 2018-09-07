@@ -82,6 +82,10 @@ export default class ColorSetsList {
         } 
     }
 
+    setCurrentColorAll(colors = []) {
+        this.currentColorSets.colors = colors;
+    }
+
     removeCurrentColor (index) {
         if (this.currentColorSets.colors[index]) {
             this.currentColorSets.colors.splice(index, 1);

@@ -6250,6 +6250,13 @@ var ColorSetsList = function () {
             }
         }
     }, {
+        key: 'setCurrentColorAll',
+        value: function setCurrentColorAll() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.currentColorSets.colors = colors;
+        }
+    }, {
         key: 'removeCurrentColor',
         value: function removeCurrentColor(index) {
             if (this.currentColorSets.colors[index]) {
@@ -6324,7 +6331,8 @@ var BaseColorPicker = function (_EventMachin) {
         _this.currentV = 0;
 
         _this.colorSetsList = new ColorSetsList(_this);
-        _this.colorpickerCallback = function () {};
+        _this.colorpickerShowCallback = function () {};
+        _this.colorpickerHideCallback = function () {};
 
         _this.isColorPickerShow = false;
         _this.isShortCut = false;
@@ -6454,7 +6462,7 @@ var BaseColorPicker = function (_EventMachin) {
         }
     }, {
         key: 'show',
-        value: function show(opt, color$$1, callback) {
+        value: function show(opt, color$$1, showCallback, hideCallback) {
             this.destroy();
             this.initializeEvent();
             this.$root.appendTo(this.$body);
@@ -6470,13 +6478,14 @@ var BaseColorPicker = function (_EventMachin) {
             this.initColor(color$$1);
 
             // define colorpicker callback
-            this.colorpickerCallback = callback;
+            this.colorpickerShowCallback = showCallback;
+            this.colorpickerHideCallback = hideCallback;
 
             // define hide delay
             this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay);
-            // if (this.hideDelay > 0) {
-            this.setHideDelay(this.hideDelay);
-            // }
+            if (this.hideDelay > 0) {
+                this.setHideDelay(this.hideDelay);
+            }
         }
     }, {
         key: 'setHideDelay',
@@ -6510,6 +6519,8 @@ var BaseColorPicker = function (_EventMachin) {
                 this.$root.hide();
                 this.$root.remove(); // not empty 
                 this.isColorPickerShow = false;
+
+                this.callbackHideColorValue();
             }
         }
     }, {
@@ -6548,14 +6559,28 @@ var BaseColorPicker = function (_EventMachin) {
     }, {
         key: 'callbackColorValue',
         value: function callbackColorValue(color$$1) {
-
+            color$$1 = color$$1 || this.getCurrentColor();
             if (!isNaN(this.currentA)) {
                 if (typeof this.opt.onChange == 'function') {
                     this.opt.onChange.call(this, color$$1);
                 }
 
-                if (typeof this.colorpickerCallback == 'function') {
-                    this.colorpickerCallback(color$$1);
+                if (typeof this.colorpickerShowCallback == 'function') {
+                    this.colorpickerShowCallback(color$$1);
+                }
+            }
+        }
+    }, {
+        key: 'callbackHideColorValue',
+        value: function callbackHideColorValue(color$$1) {
+            color$$1 = color$$1 || this.getCurrentColor();
+            if (!isNaN(this.currentA)) {
+                if (typeof this.opt.onHide == 'function') {
+                    this.opt.onHide.call(this, color$$1);
+                }
+
+                if (typeof this.colorpickerHideCallback == 'function') {
+                    this.colorpickerHideCallback(color$$1);
                 }
             }
         }
@@ -6625,12 +6650,21 @@ var BaseColorPicker = function (_EventMachin) {
             this.colorSetsList.setUserList(list);
         }
     }, {
+        key: 'setColorsInPalette',
+        value: function setColorsInPalette() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.colorSetsList.setCurrentColorAll(colors);
+        }
+    }, {
         key: 'destroy',
         value: function destroy() {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'destroy', this).call(this);
 
             // remove color picker callback
-            this.colorpickerCallback = undefined;
+            this.colorpickerShowCallback = undefined;
+
+            this.colorpickerHideCallback = undefined;
         }
     }]);
     return BaseColorPicker;
@@ -6812,22 +6846,6 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             this.callbackColorValue();
         }
     }, {
-        key: 'callbackColorValue',
-        value: function callbackColorValue(color$$1) {
-
-            color$$1 = color$$1 || this.getCurrentColor();
-
-            if (!isNaN(this.currentA)) {
-                if (typeof this.opt.onChange == 'function') {
-                    this.opt.onChange.call(this, color$$1);
-                }
-
-                if (typeof this.colorpickerCallback == 'function') {
-                    this.colorpickerCallback(color$$1);
-                }
-            }
-        }
-    }, {
         key: 'setCurrentHSV',
         value: function setCurrentHSV(h, s, v, a) {
             this.currentA = a;
@@ -6879,6 +6897,14 @@ var ColorPicker$1 = function (_BaseColorPicker) {
         key: 'setColorSets',
         value: function setColorSets(list) {
             this.colorSetsList.setUserList(list);
+        }
+    }, {
+        key: 'setColorsInPalette',
+        value: function setColorsInPalette() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.colorSetsList.setCurrentColorAll(colors);
+            // this.currentColorSets.load()
         }
 
         // Event Bindings 
@@ -8009,22 +8035,6 @@ var ColorPicker$2 = function (_BaseColorPicker) {
             this.callbackColorValue();
         }
     }, {
-        key: 'callbackColorValue',
-        value: function callbackColorValue(color$$1) {
-
-            color$$1 = color$$1 || this.getCurrentColor();
-
-            if (!isNaN(this.currentA)) {
-                if (typeof this.opt.onChange == 'function') {
-                    this.opt.onChange.call(this, color$$1);
-                }
-
-                if (typeof this.colorpickerCallback == 'function') {
-                    this.colorpickerCallback(color$$1);
-                }
-            }
-        }
-    }, {
         key: 'caculateHSV',
         value: function caculateHSV() {
 
@@ -8166,6 +8176,14 @@ var ColorPicker$2 = function (_BaseColorPicker) {
         key: 'setColorSets',
         value: function setColorSets(list) {
             this.colorSetsList.setUserList(list);
+        }
+    }, {
+        key: 'setColorsInPalette',
+        value: function setColorsInPalette() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.colorSetsList.setCurrentColorAll(colors);
+            this.currentColorSets.load();
         }
 
         // Event Bindings 

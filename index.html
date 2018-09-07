@@ -994,7 +994,10 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         },
         colorpicker : {
             mode : 'edit',
-            hideDelay: 0
+            hideDelay: 0,
+            onHide: function (color) {
+                console.log('hide', color)
+            }
         }
     });
 
@@ -1117,17 +1120,21 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
 
         var type = item.getAttribute('data-type');
 
-        for(var j = 0; j < 1; j++) {
-            var picker = new CodeMirrorColorPicker.create({
-                position: 'inline',
-                container: item,
-                type: type,
-                color: 'blue',
-                onChange : function (c) {
-                    console.log(this, c);
-                }
-            });
-        }
+
+        var picker = new CodeMirrorColorPicker.create({
+            position: 'inline',
+            container: item,
+            type: type,
+            color: 'blue',
+            onHide: function (c) {
+                console.log('hide', c)
+            },
+            onChange : function (c) {
+                console.log(this, c);
+            }
+        });
+
+        picker.setColorsInPalette(['yellow', 'red'])
 
     }
 </script>
