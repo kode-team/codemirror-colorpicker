@@ -170,7 +170,7 @@
     .codemirror-colorpicker .colorpicker-body > .control .drag-bar, .codemirror-colorpicker .colorpicker-body > .control .drag-bar2 {
       position: absolute;
       cursor: pointer;
-      top: 50% !important;
+      top: 50%;
       left: 0px;
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
@@ -668,6 +668,62 @@
             .codemirror-colorpicker.palette > .colorpicker-body > .color-chooser.open .color-chooser-container .colorsets-list .colorsets-item:last-child {
               border-bottom-left-radius: 3px;
               border-bottom-right-radius: 3px; }
+  .codemirror-colorpicker.macos .colorpicker-body .wheel {
+    width: 224px;
+    height: 224px;
+    position: relative;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+    .codemirror-colorpicker.macos .colorpicker-body .wheel .wheel-canvas {
+      width: 214px;
+      height: 214px;
+      border-radius: 50%;
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      z-index: 1; }
+    .codemirror-colorpicker.macos .colorpicker-body .wheel .drag-pointer {
+      display: inline-block;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      left: 50%;
+      top: 50%;
+      border: 1px solid white;
+      border-radius: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      z-index: 2; }
+  .codemirror-colorpicker.macos .control {
+    padding-top: 0px; }
+    .codemirror-colorpicker.macos .control > .color, .codemirror-colorpicker.macos .control > .empty {
+      top: 4px; }
+  .codemirror-colorpicker.macos .value {
+    position: relative;
+    padding: 6px 16px;
+    margin: 0px 0px 0px 42px;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    cursor: pointer; }
+    .codemirror-colorpicker.macos .value > .value-container {
+      position: relative;
+      width: 100%;
+      height: 10px;
+      border-radius: 3px;
+      background: -webkit-gradient(linear, left top, right top, from(#333333), to(#ffffff));
+      background: linear-gradient(to right, #333333 0%, #ffffff 100%);
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .codemirror-colorpicker.macos .value > .value-container .drag-bar {
+        position: absolute;
+        cursor: pointer;
+        top: 50%;
+        left: 0px;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+                transform: translateX(-50%) translateY(-50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%; }
 
 .colorsets-contextmenu {
   position: fixed;

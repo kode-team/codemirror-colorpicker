@@ -1,13 +1,12 @@
-import Dom from '../../util/Dom'
 import Event from '../../util/Event'
-import EventMachin from '../../util/EventMachin'
+import UIElement from '../UIElement';
 
-export default class CurrentColorSetsContextMenu extends EventMachin {
-    constructor (colorpicker) {
-        super();
+export default class CurrentColorSetsContextMenu extends UIElement {
+    constructor (opt) {
+        super(opt);
 
-        this.colorpicker = colorpicker; 
-        this.currentColorSets = colorpicker.currentColorSets;
+        this.colorpicker = opt; 
+        this.currentColorSets = opt.currentColorSets;
 
         this.initialize();
     } 

@@ -1,24 +1,22 @@
 import Color from '../util/Color'
 import Dom from '../util/Dom'
-import EventMachin from '../util/EventMachin'
 import ColorSetsList from './ColorSetsList'
+import UIElement from './UIElement'
+import ColorManager from './ColorManager';
 
-
-export default class BaseColorPicker extends EventMachin {
+export default class BaseColorPicker extends UIElement {
     constructor(opt) {
         super();
 
         this.opt = opt || {};
         this.$body = null;
         this.$root = null; 
-
-        this.format = 'rgb';
-        this.currentA = 0;
-        this.currentH = 0;
-        this.currentS = 0;
-        this.currentV = 0;
         
-        this.colorSetsList = new ColorSetsList(this);
+        this.$store = {
+            $ColorManager: new ColorManager(),
+            $ColorSetsList: new ColorSetsList(this)
+        }
+
         this.colorpickerShowCallback = function () { };
         this.colorpickerHideCallback = function () { };
 
@@ -74,14 +72,7 @@ export default class BaseColorPicker extends EventMachin {
     }
 
     getColor(type) {
-        this.caculateHSV();
-        var rgb = this.convertRGB();
-
-        if (type) {
-            return Color.format(rgb, type);
-        }
-
-        return rgb;
+        return this.$store.$ColorManager.toString(type);
     }
 
     definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
@@ -190,96 +181,35 @@ export default class BaseColorPicker extends EventMachin {
         }
     }
 
-    convertRGB() {
-        return Color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-    }
-
-    convertHEX() {
-        return Color.format(this.convertRGB(), 'hex');
-    }
-
-    convertHSL() {
-        return Color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-    }
-
-
-    getFormattedColor(format) {
-        format = format || 'hex';
-
-        if (format == 'rgb') {
-            var rgb = this.convertRGB();
-            rgb.a = this.currentA;
-            return Color.format(rgb, 'rgb');
-        } else if (format == 'hsl') {
-            var hsl = this.convertHSL();
-            hsl.a = this.currentA;
-            return Color.format(hsl, 'hsl');
-        } else {
-            var rgb = this.convertRGB();
-            return Color.format(rgb, 'hex');
-        }
-    }
-
-
     callbackColorValue(color) {
         color = color || this.getCurrentColor();
-        if (!isNaN(this.currentA)) {
-            if (typeof this.opt.onChange == 'function') {
-                this.opt.onChange.call(this, color);
-            }
-    
-            if (typeof this.colorpickerShowCallback == 'function') {
-                this.colorpickerShowCallback(color);
-            }        
 
+        if (typeof this.opt.onChange == 'function') {
+            this.opt.onChange.call(this, color);
         }
+
+        if (typeof this.colorpickerShowCallback == 'function') {
+            this.colorpickerShowCallback(color);
+        }        
     }
 
     callbackHideColorValue(color) {
         color = color || this.getCurrentColor();
-        if (!isNaN(this.currentA)) {
-            if (typeof this.opt.onHide == 'function') {
-                this.opt.onHide.call(this, color);
-            }
-    
-            if (typeof this.colorpickerHideCallback == 'function') {
-                this.colorpickerHideCallback(color);
-            }        
-
+        if (typeof this.opt.onHide == 'function') {
+            this.opt.onHide.call(this, color);
         }
+
+        if (typeof this.colorpickerHideCallback == 'function') {
+            this.colorpickerHideCallback(color);
+        }        
     }    
 
-    setCurrentHSV(h, s, v, a) {
-        this.currentA = a;
-        this.currentH = h;
-        this.currentS = s ;
-        this.currentV = v;
-    }
-
-    setCurrentH(h) {
-        this.currentH = h;
-    }
-
-    setCurrentA(a) {
-        this.currentA = a;
-    }
-
-
-    getHSV(colorObj) {
-        if (colorObj.type == 'hsl') {
-            return Color.HSLtoHSV(colorObj);
-        } else {
-            return Color.RGBtoHSV(colorObj);
-        }
-
+    getCurrentColor() {
+        return this.$store.$ColorManager.toString();
     }
 
     initColor(newColor, format) {
-        let c = newColor || "#FF0000", colorObj = Color.parse(c);
-        format = format || colorObj.type;
-
-        let hsv = this.getHSV(colorObj);
-        this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+        this.$store.$ColorManager.changeColor(newColor, format);
     }
 
     checkColorPickerClass(el) {
@@ -299,24 +229,34 @@ export default class BaseColorPicker extends EventMachin {
 
     initializeEvent() {
 
-        this.initializeEventMachin();
+        super.initializeEvent();
 
+        this.callbackChange = () => {
+            this.callbackColorValue()
+        }
+
+        this.$store.$ColorManager.on('change', this.callbackChange)
+        this.$store.$ColorManager.on('changeFormat', this.callbackChange)                
     }
 
     setColorSets(list) {
-        this.colorSetsList.setUserList(list);
+        this.$store.$ColorSetsList.setUserList(list);
     }
 
     setColorsInPalette (colors = []) {
-        this.colorSetsList.setCurrentColorAll(colors);
+        this.$store.$ColorSetsList.setCurrentColorAll(colors);
     }    
-
+ 
     destroy() {
         super.destroy();
 
+        this.$store.$ColorManager.off('change', this.callbackChange)
+        this.$store.$ColorManager.off('changeFormat', this.callbackChange)        
+
+        this.callbackChange = undefined; 
+
         // remove color picker callback
         this.colorpickerShowCallback = undefined;
-
         this.colorpickerHideCallback = undefined;   
     }
     

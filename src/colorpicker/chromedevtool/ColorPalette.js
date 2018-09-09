@@ -1,11 +1,12 @@
+import UIElement from '../UIElement';
 
-import EventMachin from '../../util/EventMachin'
+const source = 'chromedevtool-palette';
 
-export default class ColorPalette extends EventMachin {
-    constructor (colorpicker) {
-        super();
+export default class ColorPalette extends UIElement {
+    constructor (opt) {
+        super(opt);
 
-        this.colorpicker = colorpicker; 
+        this.initialize();
     } 
 
     template () {
@@ -24,6 +25,14 @@ export default class ColorPalette extends EventMachin {
         this.$el.css("background-color", color);
     }
 
+    initialize () {
+        this.$store.$ColorManager.on('change', (sourceType) => {
+            if (source != sourceType) {
+                this.refresh()
+            }
+        })        
+    }    
+
     refresh () {
         this.setColorUI();
     }
@@ -37,11 +46,17 @@ export default class ColorPalette extends EventMachin {
         var s = (pos.x / width);
         var v = ((height - pos.y) / height);
 
-        return { s , v, width, height }
+        this.$store.$ColorManager.changeColor({
+            type: 'hsv',
+            s,
+            v,
+            source
+        })        
     }
 
     setColorUI() {
-        var  x = this.state.get('$el.width') * this.colorpicker.currentS, y = this.state.get('$el.height') * ( 1 - this.colorpicker.currentV );
+        var  x = this.state.get('$el.width') * this.$store.$ColorManager.hsv.s, 
+        y = this.state.get('$el.height') * ( 1 - this.$store.$ColorManager.hsv.v );
     
         this.refs.$drag_pointer.css({
             left : (x - 5) + "px",
@@ -49,6 +64,8 @@ export default class ColorPalette extends EventMachin {
         });
     
         this.drag_pointer_pos = { x , y };
+
+        this.setBackgroundColor(this.$store.$ColorManager.getHueColor())
     }
 
 
@@ -73,9 +90,8 @@ export default class ColorPalette extends EventMachin {
         });
     
         this.drag_pointer_pos = { x , y }
-    
-        this.colorpicker.caculateHSV()
-        this.colorpicker.setInputColor();
+
+        this.caculateSV()
     }    
 
     'mouseup document' (e) {

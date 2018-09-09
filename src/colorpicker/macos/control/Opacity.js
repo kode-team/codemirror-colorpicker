@@ -3,7 +3,7 @@ import Color from '../../../util/Color'
 import Event from '../../../util/Event'
 import UIElement from '../../UIElement';
 
-const source = 'chromedevtool-control-Opacity';
+const source = 'macos-control-Opacity';
 
 export default class Opacity extends UIElement {
     constructor (opt) {
@@ -66,8 +66,6 @@ export default class Opacity extends UIElement {
             this.refs.$bar.removeClass('first').removeClass('last')
         }  
 
-
-    
         this.setColorUI(dist/100);
 
         this.$store.$ColorManager.changeColor({

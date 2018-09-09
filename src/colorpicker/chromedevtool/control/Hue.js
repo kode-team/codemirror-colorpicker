@@ -1,13 +1,12 @@
 
-import Color from '../../../util/Color'
-import HueColor from '../../../util/HueColor'
 import Event from '../../../util/Event'
-import EventMachin from '../../../util/EventMachin'
+import UIElement from '../../UIElement';
 
-export default class Hue extends EventMachin {
-    constructor (parent) {
-        super();
-        this.parent = parent ; 
+const source = 'chromedevtool-control-Hue';
+
+export default class Hue extends UIElement {
+    constructor (opt) {
+        super(opt);
         this.initialize();
     } 
 
@@ -24,40 +23,39 @@ export default class Hue extends EventMachin {
     initialize () {
 
         this.pos = {}
+
+        this.$store.$ColorManager.on('change', (sourceType) => {
+            if (source != sourceType) {
+                this.refresh()
+            }
+        })
     }
 
     refresh () {
         this.setColorUI();
     }
  
-    setColorUI() {
+    setColorUI(h) {
     
-        var hueX = this.state.get('$container.width') * (this.parent.colorpicker.currentH / 360);      
+        h = h || this.$store.$ColorManager.hsv.h; 
+
+        var x = this.state.get('$container.width') * ( h / 360);      
 
         this.refs.$bar.css({
-            left : (hueX) + 'px'
+            left : (x) + 'px'
         });
     
-        this.pos = { x : hueX };
+        this.pos = { x };
         
     }
-
-    caculateH() {
-
-        var huePos = this.pos  || { x : 0 };
         
-        var h = (huePos.x / this.state.get('$container.width')) * 360;
-
-        return { h } ; 
-    }
-        
-    setHueColor(e, isOnlyHue) {
+    setHueColor(e) {
 
         if (!this.state.get('$container.width')) return;
 
         var min = this.refs.$container.offset().left;
         var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).clientX : min + (max - min) * (this.parent.colorpicker.currentH / 360);
+        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.$ColorManager.hsv.h / 360);
     
         var dist;
         if (current < min) {
@@ -71,29 +69,14 @@ export default class Hue extends EventMachin {
             this.refs.$bar.removeClass('first').removeClass('last')
         }
     
-        var x = (this.state.get('$container.width') * (dist/100));
-    
-        this.refs.$bar.css({
-            // left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
-            left: (x) + 'px'
-        });
-    
-        this.pos = { x };
+        this.setColorUI(dist/100 * 360);
 
-        var hueColor = HueColor.checkHueColor(dist/100);
-    
-        this.parent.colorpicker.setBackgroundColor(hueColor);
-        this.parent.colorpicker.setCurrentH((dist/100) * 360);
-
-        if (!isOnlyHue) {
-            this.parent.colorpicker.setInputColor();
-        }
-
-    }    
-
-    setOnlyHueColor() {
-        this.setHueColor(null, true)
-    }       
+        this.$store.$ColorManager.changeColor({
+            h: (dist/100) * 360,
+            type: 'hsv',
+            source
+        })
+    }     
 
     // Event Bindings 
     'mouseup document' (e) {

@@ -1,11 +1,11 @@
 import Dom from '../../util/Dom'
-import EventMachin from '../../util/EventMachin'
+import UIElement from '../UIElement';
 
-export default class CurrentColorSets extends EventMachin {
-    constructor (parent) {
-        super();
+export default class CurrentColorSets extends UIElement {
+    constructor (opt) {
+        super(opt);
 
-        this.parent = parent; 
+        this.colorpicker = opt; 
     } 
 
     template() {
@@ -20,8 +20,8 @@ export default class CurrentColorSets extends EventMachin {
     }    
     
     'load $colorSetsColorList' () {
-        const currentColorSets  = this.colorSetsList.getCurrentColorSets()
-        const colors  = this.colorSetsList.getCurrentColors()
+        const currentColorSets  = this.$store.$ColorSetsList.getCurrentColorSets()
+        const colors  = this.$store.$ColorSetsList.getCurrentColors()
 
         return `
             <div class="current-color-sets">
@@ -36,35 +36,28 @@ export default class CurrentColorSets extends EventMachin {
         `
     }    
 
-    render () {
-        this.colorpicker = this.parent; 
-        this.colorSetsList = this.colorpicker.colorSetsList;        
-        super.render();
-
-    }
-
     refreshAll () {
         this.load();
         this.colorpicker.refreshColorSetsChooser();        
     }
 
     addColor (color) {
-        this.colorSetsList.addCurrentColor(color);
+        this.$store.$ColorSetsList.addCurrentColor(color);
         this.refreshAll();
     }
 
     removeColor (index) {
-        this.colorSetsList.removeCurrentColor(index);
+        this.$store.$ColorSetsList.removeCurrentColor(index);
         this.refreshAll();
     }
 
     removeAllToTheRight (index) {
-        this.colorSetsList.removeCurrentColorToTheRight(index);
+        this.$store.$ColorSetsList.removeCurrentColorToTheRight(index);
         this.refreshAll();
     }
 
     clearPalette () {
-        this.colorSetsList.clearPalette();
+        this.$store.$ColorSetsList.clearPalette();
         this.refreshAll();
     }
 
@@ -74,7 +67,7 @@ export default class CurrentColorSets extends EventMachin {
 
     'contextmenu $colorSetsColorList' (e) {
         e.preventDefault();
-        const currentColorSets  = this.colorSetsList.getCurrentColorSets()
+        const currentColorSets  = this.$store.$ColorSetsList.getCurrentColorSets()
 
         if (!currentColorSets.edit) {
             return; 
@@ -100,7 +93,7 @@ export default class CurrentColorSets extends EventMachin {
     'click $colorSetsColorList .color-item'  (e) {
 
         const isDirect = !!this.colorpicker.isPaletteType(); 
-
+ 
         this.colorpicker.setColor(e.$delegateTarget.attr('data-color'), isDirect);
     }
 

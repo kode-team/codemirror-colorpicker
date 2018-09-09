@@ -1,13 +1,12 @@
-import Dom from '../../util/Dom'
-import EventMachin from '../../util/EventMachin'
+import UIElement from '../UIElement';
 
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
-export default class ColorSetsChooser extends EventMachin {
-    constructor (colorpicker) {
-        super();
+export default class ColorSetsChooser extends UIElement {
+    constructor (opt) {
+        super(opt);
 
-        this.colorpicker = colorpicker;       
+        this.colorpicker = opt;       
 
         this.initialize();
     } 
@@ -34,7 +33,7 @@ export default class ColorSetsChooser extends EventMachin {
     // loadable 
     'load $colorsetsList' () {
         // colorsets 
-        const colorSets = this.colorpicker.getColorSetsList();
+        const colorSets = this.$store.$ColorSetsList.getColorSetsList();
 
         return `
             <div>

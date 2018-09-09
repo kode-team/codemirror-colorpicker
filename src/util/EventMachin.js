@@ -15,14 +15,20 @@ export default class EventMachin {
     this.childComponents = this.components()
   }
 
-  render () {
+  newChildComponents () {
     const childKeys = Object.keys(this.childComponents)
     childKeys.forEach(key => {
       const Component = this.childComponents[key]
 
       this[key] = new Component(this);
+      this[key].$store = this.$store || {};
     })
+  }
 
+  render () {
+    this.newChildComponents();
+
+    const childKeys = Object.keys(this.childComponents)
     this.$el = this.parseTemplate(this.template())
     this.refs.$el = this.$el; 
 

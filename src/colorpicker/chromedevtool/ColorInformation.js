@@ -1,16 +1,13 @@
-import Color from '../../util/Color'
-import Dom from '../../util/Dom'
 import Event from '../../util/Event'
-import EventMachin from '../../util/EventMachin'
+import UIElement from '../UIElement';
 
-export default class ColorInformation extends EventMachin {
+const source = 'chromedevtool-information';
 
-    constructor(colorpicker) {
-        super();
-        
-        this.colorpicker = colorpicker;
+export default class ColorInformation extends UIElement {
+
+    constructor(opt) {
+        super(opt);
         this.initialize()
-
     }
 
     template () {
@@ -70,22 +67,17 @@ export default class ColorInformation extends EventMachin {
     initialize () {
 
         this.format = 'hex'; 
-    }
 
-    currentFormat () {
-        var current_format = this.format || 'hex';
-        if (this.colorpicker.currentA < 1 && current_format == 'hex' ) {
-            var next_format = 'rgb';
-            this.$el.removeClass(current_format);
-            this.$el.addClass(next_format);
-            this.format = next_format;
-    
-            this.colorpicker.setInputColor();
-        }
+        this.$store.$ColorManager.on('change', (sourceType) => {
+            if (source != sourceType) {
+                this.refresh()
+            }
+        })        
     }
 
     setCurrentFormat (format) {
         this.format = format
+
         this.initFormat();
     }
     
@@ -107,7 +99,7 @@ export default class ColorInformation extends EventMachin {
         } else if (current_format == 'rgb') {
             next_format = 'hsl';
         } else if (current_format == 'hsl') {
-            if (this.colorpicker.currentA == 1) {
+            if (this.$store.$ColorManager.alpha == 1) {
                 next_format = 'hex';
             } else {
                 next_format = 'rgb';
@@ -118,98 +110,12 @@ export default class ColorInformation extends EventMachin {
         this.$el.addClass(next_format);
         this.format = next_format;
 
-        this.setInputColor();
-        this.colorpicker.changeInputColorAfterNextFormat();
+        this.$store.$ColorManager.changeFormat(this.format);
     }
     
-
-
-    setRGBInput(r, g, b) {
-        this.refs.$rgb_r.val(r);
-        this.refs.$rgb_g.val(g);
-        this.refs.$rgb_b.val(b);
-        this.refs.$rgb_a.val(this.colorpicker.currentA);
-    }
-    
-    setHSLInput(h, s, l) {
-        this.refs.$hsl_h.val(h);
-        this.refs.$hsl_s.val(s);
-        this.refs.$hsl_l.val(l);
-        this.refs.$hsl_a.val(this.colorpicker.currentA);
-    }
-    
-    getHexFormat() {
-        return Color.format({
-            r : this.refs.$rgb_r.int(),
-            g : this.refs.$rgb_g.int(),
-            b : this.refs.$rgb_b.int()
-        }, 'hex', this.colorpicker.opt.color);
-    }
-
-    getRgbFormat() {
-        return Color.format({
-            r : this.refs.$rgb_r.int(),
-            g : this.refs.$rgb_g.int(),
-            b : this.refs.$rgb_b.int(),
-            a : this.refs.$rgb_a.float()
-        }, 'rgb', this.colorpicker.opt.color);
-    }    
-
-    getHslFormat() {
-        return Color.format({
-            h : this.refs.$hsl_h.val(),
-            s : this.refs.$hsl_s.val(),
-            l : this.refs.$hsl_l.val(),
-            a : this.refs.$hsl_a.float()
-        }, 'hsl', this.colorpicker.opt.color);
-    }        
-    
-    
-    convertRGB() {
-        return this.colorpicker.convertRGB();
-    }
-    
-    convertHEX() {
-        return this.colorpicker.convertHEX();
-    }
-    
-    convertHSL() {
-        return this.colorpicker.convertHSL();
-    }
-    
-    getFormattedColor (format, fixed = false) {
-        format = format || this.getFormat();
-        if (format == 'hex') {
-            return this.refs.$hexCode.val();
-        } else if (format == 'rgb') {
-            return this.getRgbFormat(fixed);
-        } else if (format == 'hsl') {
-            return this.getHslFormat(fixed);
-        }
-    }
-
     getFormat () {
         return this.format || 'hex';   
     }
-
-    setInputColor() {
-        var format = this.getFormat();
-
-        var rgb = null;
-        if (format == 'hex') {
-            this.refs.$hexCode.val(this.convertHEX());
-            var rgb = this.convertRGB();
-            this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);            
-        } else if (format == 'rgb') {
-            var rgb = this.convertRGB();
-            this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
-            this.refs.$hexCode.val(this.convertHEX());
-        } else if (format == 'hsl') {
-            var hsl = this.convertHSL();
-            this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
-        }
-    }
-        
 
     checkNumberKey(e) {
         return Event.checkNumberKey(e);
@@ -220,22 +126,36 @@ export default class ColorInformation extends EventMachin {
     }        
 
     changeRgbColor () {
-        this.colorpicker.changeInformationColor(this.getRgbFormat());
+        this.$store.$ColorManager.changeColor({
+            type: 'rgb',
+            r : this.refs.$rgb_r.int(),
+            g : this.refs.$rgb_g.int(),
+            b : this.refs.$rgb_b.int(),
+            a : this.refs.$rgb_a.float(),
+            source
+        })
     }
 
     changeHslColor () {
-        this.colorpicker.changeInformationColor(this.getHslFormat());
+        this.$store.$ColorManager.changeColor({
+            type: 'hsl',
+            h : this.refs.$hsl_h.int(),
+            s : this.refs.$hsl_s.int(),
+            l : this.refs.$hsl_l.int(),
+            a : this.refs.$hsl_a.float(),
+            source
+        })        
     }    
 
-    'change $rgb_r' (e) {  this.changeRgbColor(); }
-    'change $rgb_g' (e) {  this.changeRgbColor(); }
-    'change $rgb_b' (e) {  this.changeRgbColor(); }
-    'change $rgb_a' (e) {  this.changeRgbColor(); }  
+    'input $rgb_r' (e) {  this.changeRgbColor(); }
+    'input $rgb_g' (e) {  this.changeRgbColor(); }
+    'input $rgb_b' (e) {  this.changeRgbColor(); }
+    'input $rgb_a' (e) {  this.changeRgbColor(); }  
     
-    'change $hsl_h' (e) {  this.changeHslColor(); }
-    'change $hsl_s' (e) {  this.changeHslColor(); }
-    'change $hsl_l' (e) {  this.changeHslColor(); }
-    'change $hsl_a' (e) {  this.changeHslColor(); }      
+    'input $hsl_h' (e) {  this.changeHslColor(); }
+    'input $hsl_s' (e) {  this.changeHslColor(); }
+    'input $hsl_l' (e) {  this.changeHslColor(); }
+    'input $hsl_a' (e) {  this.changeHslColor(); }      
 
     'keydown $hexCode' (e) {
         if(e.which < 65 || e.which > 70) {
@@ -247,8 +167,7 @@ export default class ColorInformation extends EventMachin {
         var code = this.refs.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
-            this.colorpicker.changeInformationColor(code);
-            this.setInputColor();
+            this.$store.$ColorManager.changeColor(code, source)    
         }
     }
     
@@ -256,7 +175,28 @@ export default class ColorInformation extends EventMachin {
         this.nextFormat();
     }
 
-    refresh () {
+    setRGBInput() {
+        this.refs.$rgb_r.val(this.$store.$ColorManager.rgb.r);
+        this.refs.$rgb_g.val(this.$store.$ColorManager.rgb.g);
+        this.refs.$rgb_b.val(this.$store.$ColorManager.rgb.b);
+        this.refs.$rgb_a.val(this.$store.$ColorManager.alpha);
+    }
+    
+    setHSLInput() {
+        this.refs.$hsl_h.val(this.$store.$ColorManager.hsl.h);
+        this.refs.$hsl_s.val(this.$store.$ColorManager.hsl.s);
+        this.refs.$hsl_l.val(this.$store.$ColorManager.hsl.l);
+        this.refs.$hsl_a.val(this.$store.$ColorManager.alpha);
+    }    
 
+    setHexInput () {
+        this.refs.$hexCode.val(this.$store.$ColorManager.toHEX());
+    }
+
+    refresh () {
+        this.setCurrentFormat(this.$store.$ColorManager.format);
+        this.setRGBInput();
+        this.setHSLInput();
+        this.setHexInput();
     }
 }

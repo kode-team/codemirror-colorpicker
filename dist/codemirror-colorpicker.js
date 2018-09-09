@@ -5862,425 +5862,20 @@ var Dom = function () {
     return Dom;
 }();
 
-var Event = {
-    addEvent: function addEvent(dom, eventName, callback) {
-        dom.addEventListener(eventName, callback);
-    },
-    removeEvent: function removeEvent(dom, eventName, callback) {
-        dom.removeEventListener(eventName, callback);
-    },
-    pos: function pos(e) {
-        if (e.touches && e.touches[0]) {
-            return e.touches[0];
-        }
-
-        return e;
-    }
-};
-
-var DELEGATE_SPLIT = '.';
-
-var State = function () {
-  function State(masterObj) {
-    var settingObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, State);
-
-
-    this.masterObj = masterObj;
-    this.settingObj = settingObj;
-  }
-
-  createClass(State, [{
-    key: 'set',
-    value: function set$$1(key, value) {
-      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-
-      this.settingObj[key] = value || defaultValue;
-    }
-  }, {
-    key: 'init',
-    value: function init(key) {
-
-      if (!this.has(key)) {
-
-        var arr = key.split(DELEGATE_SPLIT);
-
-        var obj = this.masterObj.refs[arr[0]] || this.masterObj[arr[0]] || this.masterObj;
-        var method = arr.pop();
-
-        if (obj[method]) {
-          for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            args[_key - 1] = arguments[_key];
-          }
-
-          var value = obj[method].apply(obj, args);
-
-          this.set(key, value);
-        }
-      }
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(key) {
-      var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-
-      this.init(key, defaultValue);
-
-      return this.settingObj[key] || defaultValue;
-    }
-  }, {
-    key: 'has',
-    value: function has(key) {
-      return !!this.settingObj[key];
-    }
-  }]);
-  return State;
-}();
-
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
-var EVENT_SAPARATOR = ' ';
-var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
-
-var EventMachin = function () {
-  function EventMachin() {
-    classCallCheck(this, EventMachin);
-
-    this.state = new State(this);
-    this.refs = {};
-
-    this.childComponents = this.components();
-  }
-
-  createClass(EventMachin, [{
-    key: 'render',
-    value: function render() {
-      var _this = this;
-
-      var childKeys = Object.keys(this.childComponents);
-      childKeys.forEach(function (key) {
-        var Component = _this.childComponents[key];
-
-        _this[key] = new Component(_this);
-      });
-
-      this.$el = this.parseTemplate(this.template());
-      this.refs.$el = this.$el;
-
-      childKeys.forEach(function (key) {
-        _this[key].render();
-      });
-
-      this.parseTarget();
-      childKeys.forEach(function (key) {
-        _this[key].parseTarget();
-      });
-
-      this.load();
-    }
-  }, {
-    key: 'components',
-    value: function components() {
-      return {};
-    }
-  }, {
-    key: 'parseTemplate',
-    value: function parseTemplate(html) {
-      var _this2 = this;
-
-      var $el = new Dom("div").html(html).firstChild();
-      var refs = $el.findAll("[ref]");
-      [].concat(toConsumableArray(refs)).forEach(function (node) {
-        var name = node.getAttribute("ref");
-        _this2.refs[name] = new Dom(node);
-
-        var callbackName = 'load ' + name;
-
-        if (_this2[callbackName]) {
-          _this2.refs[name].load = function () {
-            new Dom(node).html(_this2.parseTemplate(_this2[callbackName].call(_this2)));
-          };
-        }
-      });
-
-      return $el;
-    }
-  }, {
-    key: 'parseTarget',
-    value: function parseTarget() {
-      var _this3 = this;
-
-      var $el = this.$el;
-      var targets = $el.findAll('[target]');
-
-      [].concat(toConsumableArray(targets)).forEach(function (node) {
-        var targetComponentName = node.getAttribute('target');
-
-        if (_this3[targetComponentName]) {
-          $el.replace(node, _this3[targetComponentName].$el.el);
-        }
-      });
-    }
-  }, {
-    key: 'load',
-    value: function load() {
-      var _this4 = this;
-
-      Object.keys(this.refs).forEach(function (key) {
-        if (_this4.refs[key].load) {
-          _this4.refs[key].load();
-        }
-      });
-    }
-  }, {
-    key: 'template',
-    value: function template() {
-      return '<div></div>';
-    }
-  }, {
-    key: 'initializeEvent',
-    value: function initializeEvent() {
-      var _this5 = this;
-
-      this.initializeEventMachin();
-
-      Object.keys(this.childComponents).forEach(function (key) {
-        if (_this5[key]) _this5[key].initializeEvent();
-      });
-    }
-  }, {
-    key: 'destroy',
-    value: function destroy() {
-      var _this6 = this;
-
-      this.destroyEventMachin();
-      // this.refs = {} 
-
-      Object.keys(this.childComponents).forEach(function (key) {
-        if (_this6[key]) _this6[key].destroy();
-      });
-    }
-  }, {
-    key: 'destroyEventMachin',
-    value: function destroyEventMachin() {
-      this.removeEventAll();
-    }
-  }, {
-    key: 'initializeEventMachin',
-    value: function initializeEventMachin() {
-      this.filterProps(CHECK_EVENT_PATTERN).forEach(this.parseEvent.bind(this));
-    }
-  }, {
-    key: 'filterProps',
-    value: function filterProps(pattern) {
-      return Object.getOwnPropertyNames(this.__proto__).filter(function (key) {
-        return key.match(pattern);
-      });
-    }
-  }, {
-    key: 'parseEvent',
-    value: function parseEvent(key) {
-      var arr = key.split(EVENT_SAPARATOR);
-
-      this.bindingEvent(arr, this[key].bind(this));
-    }
-  }, {
-    key: 'getDefaultDomElement',
-    value: function getDefaultDomElement(dom) {
-      var el = void 0;
-
-      if (dom) {
-        el = this.refs[dom] || this[dom] || window[dom];
-      } else {
-        el = this.el || this.$el || this.$root;
-      }
-
-      if (el instanceof Dom) {
-        return el.getElement();
-      }
-
-      return el;
-    }
-  }, {
-    key: 'getDefaultEventObject',
-    value: function getDefaultEventObject(eventName) {
-      var _this7 = this;
-
-      var arr = eventName.split('.');
-      var realEventName = arr.shift();
-
-      var isControl = arr.includes('Control');
-      var isShift = arr.includes('Shift');
-      var isAlt = arr.includes('Alt');
-      var isMeta = arr.includes('Meta');
-
-      arr = arr.filter(function (code) {
-        return META_KEYS.includes(code) === false;
-      });
-
-      var checkMethodList = arr.filter(function (code) {
-        return !!_this7[code];
-      });
-
-      arr = arr.filter(function (code) {
-        return checkMethodList.includes(code) === false;
-      }).map(function (code) {
-        return code.toLowerCase();
-      });
-
-      return {
-        eventName: realEventName,
-        isControl: isControl,
-        isShift: isShift,
-        isAlt: isAlt,
-        isMeta: isMeta,
-        codes: arr,
-        checkMethodList: checkMethodList
-      };
-    }
-  }, {
-    key: 'bindingEvent',
-    value: function bindingEvent(_ref, callback) {
-      var _ref2 = toArray(_ref),
-          eventName = _ref2[0],
-          dom = _ref2[1],
-          delegate = _ref2.slice(2);
-
-      dom = this.getDefaultDomElement(dom);
-      var eventObject = this.getDefaultEventObject(eventName);
-
-      eventObject.dom = dom;
-      eventObject.delegate = delegate.join(EVENT_SAPARATOR);
-
-      this.addEvent(eventObject, callback);
-    }
-  }, {
-    key: 'matchPath',
-    value: function matchPath(el, selector) {
-      if (el) {
-        if (el.matches(selector)) {
-          return el;
-        }
-        return this.matchPath(el.parentElement, selector);
-      }
-      return null;
-    }
-  }, {
-    key: 'getBindings',
-    value: function getBindings() {
-
-      if (!this._bindings) {
-        this.initBindings();
-      }
-
-      return this._bindings;
-    }
-  }, {
-    key: 'addBinding',
-    value: function addBinding(obj) {
-      this.getBindings().push(obj);
-    }
-  }, {
-    key: 'initBindings',
-    value: function initBindings() {
-      this._bindings = [];
-    }
-  }, {
-    key: 'checkEventType',
-    value: function checkEventType(e, eventObject) {
-      var _this8 = this;
-
-      var onlyControl = e.ctrlKey ? eventObject.isControl : true;
-      var onlyShift = e.shiftKey ? eventObject.isShift : true;
-      var onlyAlt = e.altKey ? eventObject.isAlt : true;
-      var onlyMeta = e.metaKey ? eventObject.isMeta : true;
-
-      var hasKeyCode = true;
-      if (eventObject.codes.length) {
-        hasKeyCode = eventObject.codes.includes(e.code.toLowerCase()) || eventObject.codes.includes(e.key.toLowerCase());
-      }
-
-      var isAllCheck = true;
-      if (eventObject.checkMethodList.length) {
-        // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
-        isAllCheck = eventObject.checkMethodList.every(function (method) {
-          return _this8[method].call(_this8, e);
-        });
-      }
-
-      return onlyControl && onlyAlt && onlyShift && onlyMeta && hasKeyCode && isAllCheck;
-    }
-  }, {
-    key: 'makeCallback',
-    value: function makeCallback(eventObject, callback) {
-      var _this9 = this;
-
-      if (eventObject.delegate) {
-        return function (e) {
-
-          if (_this9.checkEventType(e, eventObject)) {
-            var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
-
-            if (delegateTarget) {
-              // delegate target 이 있는 경우만 callback 실행 
-              e.delegateTarget = delegateTarget;
-              e.$delegateTarget = new Dom(delegateTarget);
-              return callback(e);
-            }
-          }
-        };
-      } else {
-        return function (e) {
-          if (_this9.checkEventType(e, eventObject)) {
-            return callback(e);
-          }
-        };
-      }
-    }
-  }, {
-    key: 'addEvent',
-    value: function addEvent(eventObject, callback) {
-      eventObject.callback = this.makeCallback(eventObject, callback);
-      this.addBinding(eventObject);
-      Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback);
-    }
-  }, {
-    key: 'removeEventAll',
-    value: function removeEventAll() {
-      var _this10 = this;
-
-      this.getBindings().forEach(function (obj) {
-        _this10.removeEvent(obj);
-      });
-      this.initBindings();
-    }
-  }, {
-    key: 'removeEvent',
-    value: function removeEvent(_ref3) {
-      var eventName = _ref3.eventName,
-          dom = _ref3.dom,
-          callback = _ref3.callback;
-
-      Event.removeEvent(dom, eventName, callback);
-    }
-  }]);
-  return EventMachin;
-}();
-
-var colorSetsList = [{
-    name: "Material",
-    colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
-}, {
-    name: "Custom", "edit": true, "colors": []
-}, {
-    name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
-}];
-
 var ColorSetsList = function () {
     function ColorSetsList(colorpicker) {
         classCallCheck(this, ColorSetsList);
 
         this.colorpicker = colorpicker;
+
+        this.colorSetsList = [{
+            name: "Material",
+            colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
+        }, {
+            name: "Custom", "edit": true, "colors": []
+        }, {
+            name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
+        }];
 
         this.setUserList(this.colorpicker.getOption('colorSets'));
     }
@@ -6288,7 +5883,7 @@ var ColorSetsList = function () {
     createClass(ColorSetsList, [{
         key: 'list',
         value: function list() {
-            return this.userList || colorSetsList;
+            return this.userList || this.colorSetsList;
         }
     }, {
         key: 'setUserList',
@@ -6408,12 +6003,614 @@ var ColorSetsList = function () {
     }, {
         key: 'destroy',
         value: function destroy() {}
+    }, {
+        key: 'on',
+        value: function on(event, callback) {
+            this.callbacks.push({ event: event, callback: callback });
+        }
+    }, {
+        key: 'off',
+        value: function off(event, callback) {
+
+            if (arguments.length == 0) {
+                this.callbacks = [];
+            } else if (arguments.length == 1) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event;
+                });
+            } else if (arguments.length == 2) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event && f.callback != callback;
+                });
+            }
+        }
+    }, {
+        key: 'emit',
+        value: function emit() {
+            var args = [].concat(Array.prototype.slice.call(arguments));
+            var event = args.shift();
+
+            this.callbacks.filter(function (f) {
+                return f.event == event;
+            }).forEach(function (f) {
+                f.callback.apply(f, toConsumableArray(args));
+            });
+        }
     }]);
     return ColorSetsList;
 }();
 
-var BaseColorPicker = function (_EventMachin) {
-    inherits(BaseColorPicker, _EventMachin);
+var Event = {
+    addEvent: function addEvent(dom, eventName, callback) {
+        dom.addEventListener(eventName, callback);
+    },
+    removeEvent: function removeEvent(dom, eventName, callback) {
+        dom.removeEventListener(eventName, callback);
+    },
+    pos: function pos(e) {
+        if (e.touches && e.touches[0]) {
+            return e.touches[0];
+        }
+
+        return e;
+    }
+};
+
+var DELEGATE_SPLIT = '.';
+
+var State = function () {
+  function State(masterObj) {
+    var settingObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    classCallCheck(this, State);
+
+
+    this.masterObj = masterObj;
+    this.settingObj = settingObj;
+  }
+
+  createClass(State, [{
+    key: 'set',
+    value: function set$$1(key, value) {
+      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+
+      this.settingObj[key] = value || defaultValue;
+    }
+  }, {
+    key: 'init',
+    value: function init(key) {
+
+      if (!this.has(key)) {
+
+        var arr = key.split(DELEGATE_SPLIT);
+
+        var obj = this.masterObj.refs[arr[0]] || this.masterObj[arr[0]] || this.masterObj;
+        var method = arr.pop();
+
+        if (obj[method]) {
+          for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          var value = obj[method].apply(obj, args);
+
+          this.set(key, value);
+        }
+      }
+    }
+  }, {
+    key: 'get',
+    value: function get$$1(key) {
+      var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+
+      this.init(key, defaultValue);
+
+      return this.settingObj[key] || defaultValue;
+    }
+  }, {
+    key: 'has',
+    value: function has(key) {
+      return !!this.settingObj[key];
+    }
+  }]);
+  return State;
+}();
+
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
+var EVENT_SAPARATOR = ' ';
+var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
+
+var EventMachin = function () {
+  function EventMachin() {
+    classCallCheck(this, EventMachin);
+
+    this.state = new State(this);
+    this.refs = {};
+
+    this.childComponents = this.components();
+  }
+
+  createClass(EventMachin, [{
+    key: 'newChildComponents',
+    value: function newChildComponents() {
+      var _this = this;
+
+      var childKeys = Object.keys(this.childComponents);
+      childKeys.forEach(function (key) {
+        var Component = _this.childComponents[key];
+
+        _this[key] = new Component(_this);
+        _this[key].$store = _this.$store || {};
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      this.newChildComponents();
+
+      var childKeys = Object.keys(this.childComponents);
+      this.$el = this.parseTemplate(this.template());
+      this.refs.$el = this.$el;
+
+      childKeys.forEach(function (key) {
+        _this2[key].render();
+      });
+
+      this.parseTarget();
+      childKeys.forEach(function (key) {
+        _this2[key].parseTarget();
+      });
+
+      this.load();
+    }
+  }, {
+    key: 'components',
+    value: function components() {
+      return {};
+    }
+  }, {
+    key: 'parseTemplate',
+    value: function parseTemplate(html) {
+      var _this3 = this;
+
+      var $el = new Dom("div").html(html).firstChild();
+      var refs = $el.findAll("[ref]");
+      [].concat(toConsumableArray(refs)).forEach(function (node) {
+        var name = node.getAttribute("ref");
+        _this3.refs[name] = new Dom(node);
+
+        var callbackName = 'load ' + name;
+
+        if (_this3[callbackName]) {
+          _this3.refs[name].load = function () {
+            new Dom(node).html(_this3.parseTemplate(_this3[callbackName].call(_this3)));
+          };
+        }
+      });
+
+      return $el;
+    }
+  }, {
+    key: 'parseTarget',
+    value: function parseTarget() {
+      var _this4 = this;
+
+      var $el = this.$el;
+      var targets = $el.findAll('[target]');
+
+      [].concat(toConsumableArray(targets)).forEach(function (node) {
+        var targetComponentName = node.getAttribute('target');
+
+        if (_this4[targetComponentName]) {
+          $el.replace(node, _this4[targetComponentName].$el.el);
+        }
+      });
+    }
+  }, {
+    key: 'load',
+    value: function load() {
+      var _this5 = this;
+
+      Object.keys(this.refs).forEach(function (key) {
+        if (_this5.refs[key].load) {
+          _this5.refs[key].load();
+        }
+      });
+    }
+  }, {
+    key: 'template',
+    value: function template() {
+      return '<div></div>';
+    }
+  }, {
+    key: 'initializeEvent',
+    value: function initializeEvent() {
+      var _this6 = this;
+
+      this.initializeEventMachin();
+
+      Object.keys(this.childComponents).forEach(function (key) {
+        if (_this6[key]) _this6[key].initializeEvent();
+      });
+    }
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      var _this7 = this;
+
+      this.destroyEventMachin();
+      // this.refs = {} 
+
+      Object.keys(this.childComponents).forEach(function (key) {
+        if (_this7[key]) _this7[key].destroy();
+      });
+    }
+  }, {
+    key: 'destroyEventMachin',
+    value: function destroyEventMachin() {
+      this.removeEventAll();
+    }
+  }, {
+    key: 'initializeEventMachin',
+    value: function initializeEventMachin() {
+      this.filterProps(CHECK_EVENT_PATTERN).forEach(this.parseEvent.bind(this));
+    }
+  }, {
+    key: 'filterProps',
+    value: function filterProps(pattern) {
+      return Object.getOwnPropertyNames(this.__proto__).filter(function (key) {
+        return key.match(pattern);
+      });
+    }
+  }, {
+    key: 'parseEvent',
+    value: function parseEvent(key) {
+      var arr = key.split(EVENT_SAPARATOR);
+
+      this.bindingEvent(arr, this[key].bind(this));
+    }
+  }, {
+    key: 'getDefaultDomElement',
+    value: function getDefaultDomElement(dom) {
+      var el = void 0;
+
+      if (dom) {
+        el = this.refs[dom] || this[dom] || window[dom];
+      } else {
+        el = this.el || this.$el || this.$root;
+      }
+
+      if (el instanceof Dom) {
+        return el.getElement();
+      }
+
+      return el;
+    }
+  }, {
+    key: 'getDefaultEventObject',
+    value: function getDefaultEventObject(eventName) {
+      var _this8 = this;
+
+      var arr = eventName.split('.');
+      var realEventName = arr.shift();
+
+      var isControl = arr.includes('Control');
+      var isShift = arr.includes('Shift');
+      var isAlt = arr.includes('Alt');
+      var isMeta = arr.includes('Meta');
+
+      arr = arr.filter(function (code) {
+        return META_KEYS.includes(code) === false;
+      });
+
+      var checkMethodList = arr.filter(function (code) {
+        return !!_this8[code];
+      });
+
+      arr = arr.filter(function (code) {
+        return checkMethodList.includes(code) === false;
+      }).map(function (code) {
+        return code.toLowerCase();
+      });
+
+      return {
+        eventName: realEventName,
+        isControl: isControl,
+        isShift: isShift,
+        isAlt: isAlt,
+        isMeta: isMeta,
+        codes: arr,
+        checkMethodList: checkMethodList
+      };
+    }
+  }, {
+    key: 'bindingEvent',
+    value: function bindingEvent(_ref, callback) {
+      var _ref2 = toArray(_ref),
+          eventName = _ref2[0],
+          dom = _ref2[1],
+          delegate = _ref2.slice(2);
+
+      dom = this.getDefaultDomElement(dom);
+      var eventObject = this.getDefaultEventObject(eventName);
+
+      eventObject.dom = dom;
+      eventObject.delegate = delegate.join(EVENT_SAPARATOR);
+
+      this.addEvent(eventObject, callback);
+    }
+  }, {
+    key: 'matchPath',
+    value: function matchPath(el, selector) {
+      if (el) {
+        if (el.matches(selector)) {
+          return el;
+        }
+        return this.matchPath(el.parentElement, selector);
+      }
+      return null;
+    }
+  }, {
+    key: 'getBindings',
+    value: function getBindings() {
+
+      if (!this._bindings) {
+        this.initBindings();
+      }
+
+      return this._bindings;
+    }
+  }, {
+    key: 'addBinding',
+    value: function addBinding(obj) {
+      this.getBindings().push(obj);
+    }
+  }, {
+    key: 'initBindings',
+    value: function initBindings() {
+      this._bindings = [];
+    }
+  }, {
+    key: 'checkEventType',
+    value: function checkEventType(e, eventObject) {
+      var _this9 = this;
+
+      var onlyControl = e.ctrlKey ? eventObject.isControl : true;
+      var onlyShift = e.shiftKey ? eventObject.isShift : true;
+      var onlyAlt = e.altKey ? eventObject.isAlt : true;
+      var onlyMeta = e.metaKey ? eventObject.isMeta : true;
+
+      var hasKeyCode = true;
+      if (eventObject.codes.length) {
+        hasKeyCode = eventObject.codes.includes(e.code.toLowerCase()) || eventObject.codes.includes(e.key.toLowerCase());
+      }
+
+      var isAllCheck = true;
+      if (eventObject.checkMethodList.length) {
+        // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
+        isAllCheck = eventObject.checkMethodList.every(function (method) {
+          return _this9[method].call(_this9, e);
+        });
+      }
+
+      return onlyControl && onlyAlt && onlyShift && onlyMeta && hasKeyCode && isAllCheck;
+    }
+  }, {
+    key: 'makeCallback',
+    value: function makeCallback(eventObject, callback) {
+      var _this10 = this;
+
+      if (eventObject.delegate) {
+        return function (e) {
+
+          if (_this10.checkEventType(e, eventObject)) {
+            var delegateTarget = _this10.matchPath(e.target || e.srcElement, eventObject.delegate);
+
+            if (delegateTarget) {
+              // delegate target 이 있는 경우만 callback 실행 
+              e.delegateTarget = delegateTarget;
+              e.$delegateTarget = new Dom(delegateTarget);
+              return callback(e);
+            }
+          }
+        };
+      } else {
+        return function (e) {
+          if (_this10.checkEventType(e, eventObject)) {
+            return callback(e);
+          }
+        };
+      }
+    }
+  }, {
+    key: 'addEvent',
+    value: function addEvent(eventObject, callback) {
+      eventObject.callback = this.makeCallback(eventObject, callback);
+      this.addBinding(eventObject);
+      Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback);
+    }
+  }, {
+    key: 'removeEventAll',
+    value: function removeEventAll() {
+      var _this11 = this;
+
+      this.getBindings().forEach(function (obj) {
+        _this11.removeEvent(obj);
+      });
+      this.initBindings();
+    }
+  }, {
+    key: 'removeEvent',
+    value: function removeEvent(_ref3) {
+      var eventName = _ref3.eventName,
+          dom = _ref3.dom,
+          callback = _ref3.callback;
+
+      Event.removeEvent(dom, eventName, callback);
+    }
+  }]);
+  return EventMachin;
+}();
+
+var ColorManager = function () {
+    function ColorManager(color$$1) {
+        classCallCheck(this, ColorManager);
+
+        this.color = color$$1;
+        this.callbacks = [];
+        this.rgb = {};
+        this.hsl = {};
+        this.hsv = {};
+        this.alpha = 1;
+        this.initialize();
+    }
+
+    createClass(ColorManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            this.changeColor(this.color);
+        }
+    }, {
+        key: 'changeFormat',
+        value: function changeFormat(format) {
+            this.format = format;
+
+            this.emit('changeFormat');
+        }
+    }, {
+        key: 'isUndefined',
+        value: function isUndefined(v) {
+            return typeof v == 'undefined' || v == null;
+        }
+    }, {
+        key: 'changeColor',
+        value: function changeColor(colorObj, source) {
+
+            colorObj = colorObj || '#FF0000';
+
+            if (typeof colorObj == 'string') {
+                colorObj = color.parse(colorObj);
+            }
+
+            colorObj.source = colorObj.source || source;
+
+            console.log('set', colorObj, colorObj.a);
+
+            this.alpha = this.isUndefined(colorObj.a) ? this.alpha : colorObj.a;
+            this.format = colorObj.type != 'hsv' ? colorObj.type || this.format : this.format;
+
+            if (this.format == 'hex' && this.alpha < 1) {
+                this.format = 'rgb';
+            }
+
+            if (colorObj.type == 'hsl') {
+                this.hsl = Object.assign(this.hsl, colorObj);
+                this.rgb = color.HSLtoRGB(this.hsl);
+                this.hsv = color.HSLtoHSV(colorObj);
+            } else if (colorObj.type == 'hex') {
+                this.rgb = Object.assign(this.rgb, colorObj);
+                this.hsl = color.RGBtoHSL(this.rgb);
+                this.hsv = color.RGBtoHSV(colorObj);
+            } else if (colorObj.type == 'rgb') {
+                this.rgb = Object.assign(this.rgb, colorObj);
+                this.hsl = color.RGBtoHSL(this.rgb);
+                this.hsv = color.RGBtoHSV(colorObj);
+            } else if (colorObj.type == 'hsv') {
+                this.hsv = Object.assign(this.hsv, colorObj);
+                this.rgb = color.HSVtoRGB(this.hsv);
+                this.hsl = color.HSVtoHSL(this.hsv);
+            }
+
+            console.log('alpha', this.alpha);
+
+            this.emit('change', colorObj.source);
+        }
+    }, {
+        key: 'getHueColor',
+        value: function getHueColor() {
+            return HueColor.checkHueColor(this.hsv.h / 360);
+        }
+    }, {
+        key: 'toString',
+        value: function toString(type) {
+            type = type || this.format;
+            var colorObj = this[type] || this.rgb;
+            return color.format(Object.assign({}, colorObj, { a: this.alpha }), type);
+        }
+    }, {
+        key: 'toRGB',
+        value: function toRGB() {
+            return this.toString('rgb');
+        }
+    }, {
+        key: 'toHSL',
+        value: function toHSL() {
+            return this.toString('hsl');
+        }
+    }, {
+        key: 'toHEX',
+        value: function toHEX() {
+            return this.toString('hex');
+        }
+    }, {
+        key: 'on',
+        value: function on(event, callback) {
+            this.callbacks.push({ event: event, callback: callback });
+        }
+    }, {
+        key: 'off',
+        value: function off(event, callback) {
+
+            if (arguments.length == 0) {
+                this.callbacks = [];
+            } else if (arguments.length == 1) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event;
+                });
+            } else if (arguments.length == 2) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event && f.callback != callback;
+                });
+            }
+        }
+    }, {
+        key: 'emit',
+        value: function emit() {
+            var args = [].concat(Array.prototype.slice.call(arguments));
+            var event = args.shift();
+
+            this.callbacks.filter(function (f) {
+                return f.event == event;
+            }).forEach(function (f) {
+                f.callback.apply(f, toConsumableArray(args));
+            });
+        }
+    }]);
+    return ColorManager;
+}();
+
+var UIElement = function (_EventMachin) {
+    inherits(UIElement, _EventMachin);
+
+    function UIElement(opt) {
+        classCallCheck(this, UIElement);
+
+        var _this = possibleConstructorReturn(this, (UIElement.__proto__ || Object.getPrototypeOf(UIElement)).call(this, opt));
+
+        if (opt && opt.$store) {
+            _this.$store = opt.$store;
+        }
+
+        return _this;
+    }
+
+    return UIElement;
+}(EventMachin);
+
+var BaseColorPicker = function (_UIElement) {
+    inherits(BaseColorPicker, _UIElement);
 
     function BaseColorPicker(opt) {
         classCallCheck(this, BaseColorPicker);
@@ -6424,13 +6621,11 @@ var BaseColorPicker = function (_EventMachin) {
         _this.$body = null;
         _this.$root = null;
 
-        _this.format = 'rgb';
-        _this.currentA = 0;
-        _this.currentH = 0;
-        _this.currentS = 0;
-        _this.currentV = 0;
+        _this.$store = {
+            $ColorManager: new ColorManager(),
+            $ColorSetsList: new ColorSetsList(_this)
+        };
 
-        _this.colorSetsList = new ColorSetsList(_this);
         _this.colorpickerShowCallback = function () {};
         _this.colorpickerHideCallback = function () {};
 
@@ -6497,14 +6692,7 @@ var BaseColorPicker = function (_EventMachin) {
     }, {
         key: 'getColor',
         value: function getColor(type) {
-            this.caculateHSV();
-            var rgb = this.convertRGB();
-
-            if (type) {
-                return color.format(rgb, type);
-            }
-
-            return rgb;
+            return this.$store.$ColorManager.toString(type);
         }
     }, {
         key: 'definePositionForArrow',
@@ -6624,102 +6812,39 @@ var BaseColorPicker = function (_EventMachin) {
             }
         }
     }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return color.format(this.convertRGB(), 'hex');
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            format = format || 'hex';
-
-            if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                rgb.a = this.currentA;
-                return color.format(rgb, 'rgb');
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                hsl.a = this.currentA;
-                return color.format(hsl, 'hsl');
-            } else {
-                var rgb = this.convertRGB();
-                return color.format(rgb, 'hex');
-            }
-        }
-    }, {
         key: 'callbackColorValue',
         value: function callbackColorValue(color$$1) {
             color$$1 = color$$1 || this.getCurrentColor();
-            if (!isNaN(this.currentA)) {
-                if (typeof this.opt.onChange == 'function') {
-                    this.opt.onChange.call(this, color$$1);
-                }
 
-                if (typeof this.colorpickerShowCallback == 'function') {
-                    this.colorpickerShowCallback(color$$1);
-                }
+            if (typeof this.opt.onChange == 'function') {
+                this.opt.onChange.call(this, color$$1);
+            }
+
+            if (typeof this.colorpickerShowCallback == 'function') {
+                this.colorpickerShowCallback(color$$1);
             }
         }
     }, {
         key: 'callbackHideColorValue',
         value: function callbackHideColorValue(color$$1) {
             color$$1 = color$$1 || this.getCurrentColor();
-            if (!isNaN(this.currentA)) {
-                if (typeof this.opt.onHide == 'function') {
-                    this.opt.onHide.call(this, color$$1);
-                }
+            if (typeof this.opt.onHide == 'function') {
+                this.opt.onHide.call(this, color$$1);
+            }
 
-                if (typeof this.colorpickerHideCallback == 'function') {
-                    this.colorpickerHideCallback(color$$1);
-                }
+            if (typeof this.colorpickerHideCallback == 'function') {
+                this.colorpickerHideCallback(color$$1);
             }
         }
     }, {
-        key: 'setCurrentHSV',
-        value: function setCurrentHSV(h, s, v, a) {
-            this.currentA = a;
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setCurrentH',
-        value: function setCurrentH(h) {
-            this.currentH = h;
-        }
-    }, {
-        key: 'setCurrentA',
-        value: function setCurrentA(a) {
-            this.currentA = a;
-        }
-    }, {
-        key: 'getHSV',
-        value: function getHSV(colorObj) {
-            if (colorObj.type == 'hsl') {
-                return color.HSLtoHSV(colorObj);
-            } else {
-                return color.RGBtoHSV(colorObj);
-            }
+        key: 'getCurrentColor',
+        value: function getCurrentColor() {
+            return this.$store.$ColorManager.toString();
         }
     }, {
         key: 'initColor',
         value: function initColor(newColor, format) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-            format = format || colorObj.type;
-
-            var hsv = this.getHSV(colorObj);
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
+            this.$store.$ColorManager.changeColor(newColor, format);
         }
     }, {
         key: 'checkColorPickerClass',
@@ -6741,79 +6866,103 @@ var BaseColorPicker = function (_EventMachin) {
     }, {
         key: 'initializeEvent',
         value: function initializeEvent() {
+            var _this3 = this;
 
-            this.initializeEventMachin();
+            get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'initializeEvent', this).call(this);
+
+            this.callbackChange = function () {
+                _this3.callbackColorValue();
+            };
+
+            this.$store.$ColorManager.on('change', this.callbackChange);
+            this.$store.$ColorManager.on('changeFormat', this.callbackChange);
         }
     }, {
         key: 'setColorSets',
         value: function setColorSets(list) {
-            this.colorSetsList.setUserList(list);
+            this.$store.$ColorSetsList.setUserList(list);
         }
     }, {
         key: 'setColorsInPalette',
         value: function setColorsInPalette() {
             var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-            this.colorSetsList.setCurrentColorAll(colors);
+            this.$store.$ColorSetsList.setCurrentColorAll(colors);
         }
     }, {
         key: 'destroy',
         value: function destroy() {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'destroy', this).call(this);
 
+            this.$store.$ColorManager.off('change', this.callbackChange);
+            this.$store.$ColorManager.off('changeFormat', this.callbackChange);
+
+            this.callbackChange = undefined;
+
             // remove color picker callback
             this.colorpickerShowCallback = undefined;
-
             this.colorpickerHideCallback = undefined;
         }
     }]);
     return BaseColorPicker;
-}(EventMachin);
+}(UIElement);
 
-var ColorPicker$1 = function (_BaseColorPicker) {
-    inherits(ColorPicker, _BaseColorPicker);
+var source = 'macos-colorwheel';
 
-    function ColorPicker(opt) {
-        classCallCheck(this, ColorPicker);
+var ColorWheel = function (_UIElement) {
+    inherits(ColorWheel, _UIElement);
 
-        var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
+    function ColorWheel(opt) {
+        classCallCheck(this, ColorWheel);
+
+        var _this = possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).call(this, opt));
 
         _this.initialize();
         return _this;
     }
 
-    createClass(ColorPicker, [{
+    createClass(ColorWheel, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div class="colorwheel" style="padding:10px;">\n                    <canvas ref="$colorwheel" width="204px" height="204px" style="border-radius:50%;"></canvas>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'components',
-        value: function components() {
-            return {};
+            return '\n        <div class="wheel">\n            <canvas class="wheel-canvas" ref="$colorwheel" ></canvas>\n            <div class="wheel-canvas" ref="$valuewheel" ></div>\n            <div class="drag-pointer" ref="$drag_pointer"></div>\n        </div>\n        ';
         }
     }, {
         key: 'initialize',
         value: function initialize() {
+            var _this2 = this;
 
-            // root 만들기 
-            get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'initialize', this).call(this);
-
-            this.render();
-
-            this.$root.append(this.$el);
-
-            // this.initColor(this.opt.color);
-
-
-            // 이벤트 연결 
-            this.initializeEvent();
-
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source != sourceType) {
+                    _this2.refresh(true);
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh(isEvent) {
+            this.setColorUI(isEvent);
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(isEvent) {
             this.renderCanvas();
+            this.renderValue();
+            this.setHueColor(null, isEvent);
+        }
+    }, {
+        key: 'renderValue',
+        value: function renderValue() {
+            var value = 1 - this.$store.$ColorManager.hsv.v;
+            this.refs.$valuewheel.css({
+                'background-color': 'rgba(0, 0, 0, ' + value + ')'
+            });
         }
     }, {
         key: 'renderCanvas',
         value: function renderCanvas() {
+
+            // only once rendering 
+            if (this.$store.createdWheelCanvas) return;
 
             var $canvas = this.refs.$colorwheel;
             // console.log($canvas);
@@ -6824,8 +6973,8 @@ var ColorPicker$1 = function (_BaseColorPicker) {
                 width = _$canvas$size2[0],
                 height = _$canvas$size2[1];
 
-            // console.log(width, height);
-
+            $canvas.el.width = width;
+            $canvas.el.height = height;
 
             var img = context.getImageData(0, 0, width, height);
             var pixels = img.data;
@@ -6841,19 +6990,15 @@ var ColorPicker$1 = function (_BaseColorPicker) {
                     var rx = x - cx + 1,
                         ry = y - cy + 1,
                         d = rx * rx + ry * ry,
-                        hue = Math.atan2(ry, rx) * 180 / Math.PI;
+                        hue = this.radianToDegree(Math.atan2(ry, rx));
 
-                    if (hue < 0) {
-                        // 각도가 0보다 작으면 360 에서 반전시킨다. 
-                        hue = 360 - Math.abs(hue);
-                    }
                     var rgb = color.HSVtoRGB(hue, // 0~360 hue 
                     Math.min(Math.sqrt(d) / radius, 1), // 0..1 Saturation 
                     1 //  0..1 Value
                     );
 
                     var index = (y * width + x) * 4;
-                    pixels[index + 0] = rgb.r;
+                    pixels[index] = rgb.r;
                     pixels[index + 1] = rgb.g;
                     pixels[index + 2] = rgb.b;
                     pixels[index + 3] = 255;
@@ -6861,264 +7006,94 @@ var ColorPicker$1 = function (_BaseColorPicker) {
             }
 
             context.putImageData(img, 0, 0);
+            this.$store.createdWheelCanvas = true;
         }
     }, {
-        key: 'setColor',
-        value: function setColor(value) {
-            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-
-            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
-                if (!value.r || !value.g || !value.b) return;
-
-                if (isDirect) {
-                    this.callbackColorValue(color.format(value, "hex"));
-                } else {
-                    this.initColor(color.format(value, "hex"));
-                }
-            } else if (typeof value == "string") {
-
-                if (isDirect) {
-                    this.callbackColorValue(value);
-                } else {
-                    this.initColor(value);
-                }
-            }
+        key: 'degreeToRadian',
+        value: function degreeToRadian(angle) {
+            return angle * Math.PI / 180;
         }
-    }, {
-        key: 'getColor',
-        value: function getColor(type) {
-            this.caculateHSV();
-            var rgb = this.convertRGB();
 
-            if (type) {
-                return color.format(rgb, type);
+        /**
+         * 
+         * convert radian to degree 
+         * 
+         * @param {*} radian 
+         * @returns {Number} 0..360
+         */
+
+    }, {
+        key: 'radianToDegree',
+        value: function radianToDegree(radian) {
+            var angle = radian * 180 / Math.PI;
+
+            if (angle < 0) {
+                // 각도가 0보다 작으면 360 에서 반전시킨다. 
+                angle = 360 + angle;
             }
 
-            return rgb;
+            return angle;
         }
     }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
+        key: 'getX',
+        value: function getX(angle, radius) {
+            var centerX = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+            return centerX + radius * Math.cos(this.degreeToRadian(angle));
         }
     }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return color.format(this.convertRGB(), 'hex');
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            format = format || 'hex';
+        key: 'getY',
+        value: function getY(angle, radius) {
+            var centerY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-            if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                rgb.a = this.currentA;
-                return color.format(rgb, 'rgb');
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                hsl.a = this.currentA;
-                return color.format(hsl, 'hsl');
-            } else {
-                var rgb = this.convertRGB();
-                return color.format(rgb, 'hex');
-            }
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor(isNoInputColor) {
-            // this.information.setInputColor(isNoInputColor);
-            // this.control.setInputColor(isNoInputColor);
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'changeInputColorAfterNextFormat',
-        value: function changeInputColorAfterNextFormat() {
-            // this.control.setInputColor();
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'setCurrentHSV',
-        value: function setCurrentHSV(h, s, v, a) {
-            this.currentA = a;
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setCurrentH',
-        value: function setCurrentH(h) {
-            this.currentH = h;
-        }
-    }, {
-        key: 'setCurrentA',
-        value: function setCurrentA(a) {
-            this.currentA = a;
-        }
-    }, {
-        key: 'getHSV',
-        value: function getHSV(colorObj) {
-            if (colorObj.type == 'hsl') {
-                return color.HSLtoHSV(colorObj);
-            } else {
-                return color.RGBtoHSV(colorObj);
-            }
-        }
-    }, {
-        key: 'initColor',
-        value: function initColor(newColor, format) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-            format = format || colorObj.type;
-
-            var hsv = this.getHSV(colorObj);
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-        }
-    }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            return this.colorSetsList.getColorSetsList();
-        }
-    }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
-            this.colorSetsList.setCurrentColorSets(nameOrIndex);
-            // this.currentColorSets.load();
-        }
-    }, {
-        key: 'setColorSets',
-        value: function setColorSets(list) {
-            this.colorSetsList.setUserList(list);
-        }
-    }, {
-        key: 'setColorsInPalette',
-        value: function setColorsInPalette() {
-            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-            this.colorSetsList.setCurrentColorAll(colors);
-            // this.currentColorSets.load()
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-
-            // when color picker clicked in outside
-            if (this.checkInHtml(e.target)) {
-                //this.setHideDelay(hideDelay);
-            } else if (this.checkColorPickerClass(e.target) == false) {
-                this.hide();
-            }
-        }
-    }]);
-    return ColorPicker;
-}(BaseColorPicker);
-
-var Hue = function (_EventMachin) {
-    inherits(Hue, _EventMachin);
-
-    function Hue(parent) {
-        classCallCheck(this, Hue);
-
-        var _this = possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).call(this));
-
-        _this.parent = parent;
-        _this.initialize();
-        return _this;
-    }
-
-    createClass(Hue, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-
-            this.pos = {};
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-
-            var hueX = this.state.get('$container.width') * (this.parent.colorpicker.currentH / 360);
-
-            this.refs.$bar.css({
-                left: hueX + 'px'
-            });
-
-            this.pos = { x: hueX };
-        }
-    }, {
-        key: 'caculateH',
-        value: function caculateH() {
-
-            var huePos = this.pos || { x: 0 };
-
-            var h = huePos.x / this.state.get('$container.width') * 360;
-
-            return { h: h };
+            return centerY + radius * Math.sin(this.degreeToRadian(angle));
         }
     }, {
         key: 'setHueColor',
-        value: function setHueColor(e, isOnlyHue) {
+        value: function setHueColor(e, isEvent) {
 
-            if (!this.state.get('$container.width')) return;
+            if (!this.state.get('$el.width')) return;
 
-            var min = this.refs.$container.offset().left;
-            var max = min + this.state.get('$container.width');
-            var current = e ? Event.pos(e).clientX : min + (max - min) * (this.parent.colorpicker.currentH / 360);
+            var width = this.state.get('$el.width');
+            var height = this.state.get('$el.height');
+            var radius = this.state.get('$colorwheel.width') / 2;
 
-            var dist;
-            if (current < min) {
-                dist = 0;
-                this.refs.$bar.addClass('first').removeClass('last');
-            } else if (current > max) {
-                dist = 100;
-                this.refs.$bar.addClass('last').removeClass('first');
-            } else {
-                dist = (current - min) / (max - min) * 100;
-                this.refs.$bar.removeClass('first').removeClass('last');
+            var minX = this.refs.$el.offset().left;
+            var centerX = minX + width / 2;
+
+            var minY = this.refs.$el.offset().top;
+            var centerY = minY + height / 2;
+
+            var x = e ? Event.pos(e).pageX : this.getX(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerX);
+            var y = e ? Event.pos(e).pageY : this.getY(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerY);
+
+            var rx = x - centerX,
+                ry = y - centerY,
+                d = rx * rx + ry * ry,
+                hue = this.radianToDegree(Math.atan2(ry, rx));
+
+            if (d > radius * radius) {
+                x = this.getX(hue, radius, centerX);
+                y = this.getY(hue, radius, centerY);
             }
 
-            var x = this.state.get('$container.width') * (dist / 100);
+            // saturation 을 
+            var saturation = Math.min(Math.sqrt(d) / radius, 1);
 
-            this.refs.$bar.css({
-                // left: (x -Math.ceil(this.state.get('$drag_bar.width')/2)) + 'px'
-                left: x + 'px'
+            // set drag pointer position 
+            this.refs.$drag_pointer.css({
+                left: x - minX + 'px',
+                top: y - minY + 'px'
             });
 
-            this.pos = { x: x };
-
-            var hueColor = HueColor.checkHueColor(dist / 100);
-
-            this.parent.colorpicker.setBackgroundColor(hueColor);
-            this.parent.colorpicker.setCurrentH(dist / 100 * 360);
-
-            if (!isOnlyHue) {
-                this.parent.colorpicker.setInputColor();
+            if (!isEvent) {
+                this.$store.$ColorManager.changeColor({
+                    type: 'hsv',
+                    h: hue,
+                    s: saturation,
+                    source: source
+                });
             }
-        }
-    }, {
-        key: 'setOnlyHueColor',
-        value: function setOnlyHueColor() {
-            this.setHueColor(null, true);
         }
 
         // Event Bindings 
@@ -7136,6 +7111,118 @@ var Hue = function (_EventMachin) {
             }
         }
     }, {
+        key: 'mousedown $drag_pointer',
+        value: function mousedown$drag_pointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $el',
+        value: function mousedown$el(e) {
+            this.isDown = true;
+            this.setHueColor(e);
+        }
+    }]);
+    return ColorWheel;
+}(UIElement);
+
+var source$2 = 'macos-control-Opacity';
+
+var Value = function (_UIElement) {
+    inherits(Value, _UIElement);
+
+    function Value(opt) {
+        classCallCheck(this, Value);
+
+        var _this = possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(Value, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="value">\n                <div ref="$container" class="value-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.pos = {};
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$2 != sourceType) {
+                    _this2.refresh();
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(v) {
+
+            v = v || this.$store.$ColorManager.hsv.v;
+
+            var valueX = this.state.get('$container.width') * v;
+
+            this.refs.$bar.css({
+                left: valueX + 'px'
+            });
+
+            this.pos = { x: valueX };
+        }
+    }, {
+        key: 'setValueForHSV',
+        value: function setValueForHSV(e) {
+
+            if (!this.state.get('$container.width')) return;
+
+            var min = this.refs.$container.offset().left;
+            var max = min + this.state.get('$container.width');
+            var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.$ColorManager.hsv.v / 100);
+
+            var dist;
+            if (current < min) {
+                dist = 0;
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (current > max) {
+                dist = 100;
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                dist = (current - min) / (max - min) * 100;
+                this.refs.$bar.removeClass('first').removeClass('last');
+            }
+
+            this.setColorUI(dist / 100);
+
+            this.$store.$ColorManager.changeColor({
+                type: 'hsv',
+                v: dist / 100,
+                source: source$2
+            });
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setValueForHSV(e);
+            }
+        }
+    }, {
         key: 'mousedown $bar',
         value: function mousedown$bar(e) {
             e.preventDefault();
@@ -7145,21 +7232,22 @@ var Hue = function (_EventMachin) {
         key: 'mousedown $container',
         value: function mousedown$container(e) {
             this.isDown = true;
-            this.setHueColor(e);
+            this.setValueForHSV(e);
         }
     }]);
-    return Hue;
-}(EventMachin);
+    return Value;
+}(UIElement);
 
-var Opacity = function (_EventMachin) {
-    inherits(Opacity, _EventMachin);
+var source$3 = 'macos-control-Opacity';
 
-    function Opacity(parent) {
+var Opacity = function (_UIElement) {
+    inherits(Opacity, _UIElement);
+
+    function Opacity(opt) {
         classCallCheck(this, Opacity);
 
-        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this));
+        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
 
-        _this.parent = parent;
         _this.initialize();
         return _this;
     }
@@ -7172,17 +7260,26 @@ var Opacity = function (_EventMachin) {
     }, {
         key: 'initialize',
         value: function initialize() {
+            var _this2 = this;
+
             this.pos = {};
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$3 != sourceType) {
+                    _this2.refresh();
+                }
+            });
         }
     }, {
         key: 'refresh',
         value: function refresh() {
             this.setColorUI();
+            this.setOpacityColorBar();
         }
     }, {
         key: 'setOpacityColorBar',
-        value: function setOpacityColorBar(hueColor) {
-            var rgb = color.parse(hueColor);
+        value: function setOpacityColorBar() {
+            var rgb = Object.assign({}, this.$store.$ColorManager.rgb);
 
             rgb.a = 0;
             var start = color.format(rgb, 'rgb');
@@ -7197,7 +7294,7 @@ var Opacity = function (_EventMachin) {
         value: function setOpacity(e) {
             var min = this.refs.$container.offset().left;
             var max = min + this.state.get('$container.width');
-            var current = Event.pos(e).clientX;
+            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.$ColorManager.alpha;
             var dist;
 
             var dist;
@@ -7212,42 +7309,21 @@ var Opacity = function (_EventMachin) {
                 this.refs.$bar.removeClass('first').removeClass('last');
             }
 
-            var x = this.state.get('$container.width') * (dist / 100);
+            this.setColorUI(dist / 100);
 
-            this.refs.$bar.css({
-                // left: (x -Math.ceil(this.state.get('$opacity_drag_bar.width')/2)) + 'px'
-                left: x + 'px'
+            this.$store.$ColorManager.changeColor({
+                a: Math.floor(dist) / 100,
+                source: source$3
             });
-
-            this.pos = { x: x };
-
-            this.parent.colorpicker.setCurrentA(this.caculateOpacity());
-            this.parent.colorpicker.currentFormat();
-            this.parent.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor() {
-            this.setBackgroundColor(this.parent.colorpicker.getFormattedColor('rgb'));
-
-            var rgb = this.parent.colorpicker.convertRGB();
-            var colorString = color.format(rgb, 'rgb');
-            this.setOpacityColorBar(colorString);
         }
     }, {
         key: 'setColorUI',
-        value: function setColorUI() {
-            var x = this.state.get('$container.width') * (this.parent.colorpicker.currentA || 0);
+        value: function setColorUI(alpha) {
+            alpha = alpha || this.$store.$ColorManager.alpha;
+
+            var x = this.state.get('$container.width') * (alpha || 0);
             this.refs.$bar.css({ left: x + 'px' });
             this.pos = { x: x };
-        }
-    }, {
-        key: 'caculateOpacity',
-        value: function caculateOpacity() {
-            var opacityPos = this.pos || { x: 0 };
-            var a = Math.round(opacityPos.x / this.state.get('$container.width') * 100) / 100;
-
-            return isNaN(a) ? 1 : a;
         }
 
         // Event Bindings 
@@ -7278,86 +7354,75 @@ var Opacity = function (_EventMachin) {
         }
     }]);
     return Opacity;
-}(EventMachin);
+}(UIElement);
 
-var ColorControl = function (_EventMachin) {
-    inherits(ColorControl, _EventMachin);
+var source$1 = 'macos-control';
 
-    function ColorControl(colorpicker) {
+var ColorControl = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl(opt) {
         classCallCheck(this, ColorControl);
 
-        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this));
+        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this, opt));
 
-        _this.colorpicker = colorpicker;
+        _this.initialize();
         return _this;
     }
 
     createClass(ColorControl, [{
         key: 'components',
         value: function components() {
-            return { Hue: Hue, Opacity: Opacity };
+            return { Value: Value, Opacity: Opacity };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$1 != sourceType) {
+                    _this2.refresh();
+                }
+            });
         }
     }, {
         key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.refs.$controlColor.css("background-color", color$$1);
+        value: function setBackgroundColor() {
+            this.refs.$controlColor.css("background-color", this.$store.$ColorManager.toRGB());
         }
     }, {
         key: 'refresh',
         value: function refresh() {
             this.setColorUI();
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor() {
-            this.setBackgroundColor(this.colorpicker.getFormattedColor('rgb'));
-
-            var rgb = this.colorpicker.convertRGB();
-            var colorString = color.format(rgb, 'rgb');
-            this.Opacity.setOpacityColorBar(colorString);
+            this.setBackgroundColor();
         }
     }, {
         key: 'setColorUI',
         value: function setColorUI() {
-
-            this.Hue.setColorUI();
+            this.Value.setColorUI();
             this.Opacity.setColorUI();
-        }
-    }, {
-        key: 'caculateH',
-        value: function caculateH() {
-            return this.Hue.caculateH();
-        }
-    }, {
-        key: 'setControlColor',
-        value: function setControlColor(color$$1) {
-            this.refs.$controlColor.css('background-color', color$$1);
-        }
-    }, {
-        key: 'setOnlyHueColor',
-        value: function setOnlyHueColor() {
-            this.Hue.setOnlyHueColor();
         }
     }]);
     return ColorControl;
-}(EventMachin);
+}(UIElement);
 
-var ColorInformation = function (_EventMachin) {
-    inherits(ColorInformation, _EventMachin);
+var source$4 = 'chromedevtool-information';
 
-    function ColorInformation(colorpicker) {
+var ColorInformation = function (_UIElement) {
+    inherits(ColorInformation, _UIElement);
+
+    function ColorInformation(opt) {
         classCallCheck(this, ColorInformation);
 
-        var _this = possibleConstructorReturn(this, (ColorInformation.__proto__ || Object.getPrototypeOf(ColorInformation)).call(this));
+        var _this = possibleConstructorReturn(this, (ColorInformation.__proto__ || Object.getPrototypeOf(ColorInformation)).call(this, opt));
 
-        _this.colorpicker = colorpicker;
         _this.initialize();
-
         return _this;
     }
 
@@ -7369,26 +7434,21 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'initialize',
         value: function initialize() {
+            var _this2 = this;
 
             this.format = 'hex';
-        }
-    }, {
-        key: 'currentFormat',
-        value: function currentFormat() {
-            var current_format = this.format || 'hex';
-            if (this.colorpicker.currentA < 1 && current_format == 'hex') {
-                var next_format = 'rgb';
-                this.$el.removeClass(current_format);
-                this.$el.addClass(next_format);
-                this.format = next_format;
 
-                this.colorpicker.setInputColor();
-            }
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$4 != sourceType) {
+                    _this2.refresh();
+                }
+            });
         }
     }, {
         key: 'setCurrentFormat',
         value: function setCurrentFormat(format) {
             this.format = format;
+
             this.initFormat();
         }
     }, {
@@ -7412,7 +7472,7 @@ var ColorInformation = function (_EventMachin) {
             } else if (current_format == 'rgb') {
                 next_format = 'hsl';
             } else if (current_format == 'hsl') {
-                if (this.colorpicker.currentA == 1) {
+                if (this.$store.$ColorManager.alpha == 1) {
                     next_format = 'hex';
                 } else {
                     next_format = 'rgb';
@@ -7423,106 +7483,12 @@ var ColorInformation = function (_EventMachin) {
             this.$el.addClass(next_format);
             this.format = next_format;
 
-            this.setInputColor();
-            this.colorpicker.changeInputColorAfterNextFormat();
-        }
-    }, {
-        key: 'setRGBInput',
-        value: function setRGBInput(r, g, b) {
-            this.refs.$rgb_r.val(r);
-            this.refs.$rgb_g.val(g);
-            this.refs.$rgb_b.val(b);
-            this.refs.$rgb_a.val(this.colorpicker.currentA);
-        }
-    }, {
-        key: 'setHSLInput',
-        value: function setHSLInput(h, s, l) {
-            this.refs.$hsl_h.val(h);
-            this.refs.$hsl_s.val(s);
-            this.refs.$hsl_l.val(l);
-            this.refs.$hsl_a.val(this.colorpicker.currentA);
-        }
-    }, {
-        key: 'getHexFormat',
-        value: function getHexFormat() {
-            return color.format({
-                r: this.refs.$rgb_r.int(),
-                g: this.refs.$rgb_g.int(),
-                b: this.refs.$rgb_b.int()
-            }, 'hex', this.colorpicker.opt.color);
-        }
-    }, {
-        key: 'getRgbFormat',
-        value: function getRgbFormat() {
-            return color.format({
-                r: this.refs.$rgb_r.int(),
-                g: this.refs.$rgb_g.int(),
-                b: this.refs.$rgb_b.int(),
-                a: this.refs.$rgb_a.float()
-            }, 'rgb', this.colorpicker.opt.color);
-        }
-    }, {
-        key: 'getHslFormat',
-        value: function getHslFormat() {
-            return color.format({
-                h: this.refs.$hsl_h.val(),
-                s: this.refs.$hsl_s.val(),
-                l: this.refs.$hsl_l.val(),
-                a: this.refs.$hsl_a.float()
-            }, 'hsl', this.colorpicker.opt.color);
-        }
-    }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return this.colorpicker.convertRGB();
-        }
-    }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return this.colorpicker.convertHEX();
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return this.colorpicker.convertHSL();
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            var fixed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-            format = format || this.getFormat();
-            if (format == 'hex') {
-                return this.refs.$hexCode.val();
-            } else if (format == 'rgb') {
-                return this.getRgbFormat(fixed);
-            } else if (format == 'hsl') {
-                return this.getHslFormat(fixed);
-            }
+            this.$store.$ColorManager.changeFormat(this.format);
         }
     }, {
         key: 'getFormat',
         value: function getFormat() {
             return this.format || 'hex';
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor() {
-            var format = this.getFormat();
-
-            var rgb = null;
-            if (format == 'hex') {
-                this.refs.$hexCode.val(this.convertHEX());
-                var rgb = this.convertRGB();
-                this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
-            } else if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                this.setRGBInput(rgb.r, rgb.g, rgb.b, rgb.a);
-                this.refs.$hexCode.val(this.convertHEX());
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                this.setHSLInput(hsl.h, hsl.s, hsl.l, hsl.a);
-            }
         }
     }, {
         key: 'checkNumberKey',
@@ -7537,51 +7503,65 @@ var ColorInformation = function (_EventMachin) {
     }, {
         key: 'changeRgbColor',
         value: function changeRgbColor() {
-            this.colorpicker.changeInformationColor(this.getRgbFormat());
+            this.$store.$ColorManager.changeColor({
+                type: 'rgb',
+                r: this.refs.$rgb_r.int(),
+                g: this.refs.$rgb_g.int(),
+                b: this.refs.$rgb_b.int(),
+                a: this.refs.$rgb_a.float(),
+                source: source$4
+            });
         }
     }, {
         key: 'changeHslColor',
         value: function changeHslColor() {
-            this.colorpicker.changeInformationColor(this.getHslFormat());
+            this.$store.$ColorManager.changeColor({
+                type: 'hsl',
+                h: this.refs.$hsl_h.int(),
+                s: this.refs.$hsl_s.int(),
+                l: this.refs.$hsl_l.int(),
+                a: this.refs.$hsl_a.float(),
+                source: source$4
+            });
         }
     }, {
-        key: 'change $rgb_r',
-        value: function change$rgb_r(e) {
+        key: 'input $rgb_r',
+        value: function input$rgb_r(e) {
             this.changeRgbColor();
         }
     }, {
-        key: 'change $rgb_g',
-        value: function change$rgb_g(e) {
+        key: 'input $rgb_g',
+        value: function input$rgb_g(e) {
             this.changeRgbColor();
         }
     }, {
-        key: 'change $rgb_b',
-        value: function change$rgb_b(e) {
+        key: 'input $rgb_b',
+        value: function input$rgb_b(e) {
             this.changeRgbColor();
         }
     }, {
-        key: 'change $rgb_a',
-        value: function change$rgb_a(e) {
+        key: 'input $rgb_a',
+        value: function input$rgb_a(e) {
             this.changeRgbColor();
         }
     }, {
-        key: 'change $hsl_h',
-        value: function change$hsl_h(e) {
+        key: 'input $hsl_h',
+        value: function input$hsl_h(e) {
             this.changeHslColor();
         }
     }, {
-        key: 'change $hsl_s',
-        value: function change$hsl_s(e) {
+        key: 'input $hsl_s',
+        value: function input$hsl_s(e) {
             this.changeHslColor();
         }
     }, {
-        key: 'change $hsl_l',
-        value: function change$hsl_l(e) {
+        key: 'input $hsl_l',
+        value: function input$hsl_l(e) {
             this.changeHslColor();
         }
     }, {
-        key: 'change $hsl_a',
-        value: function change$hsl_a(e) {
+        key: 'input $hsl_a',
+        value: function input$hsl_a(e) {
             this.changeHslColor();
         }
     }, {
@@ -7597,8 +7577,7 @@ var ColorInformation = function (_EventMachin) {
             var code = this.refs.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.colorpicker.changeInformationColor(code);
-                this.setInputColor();
+                this.$store.$ColorManager.changeColor(code, source$4);
             }
         }
     }, {
@@ -7607,128 +7586,49 @@ var ColorInformation = function (_EventMachin) {
             this.nextFormat();
         }
     }, {
-        key: 'refresh',
-        value: function refresh() {}
-    }]);
-    return ColorInformation;
-}(EventMachin);
-
-var ColorPalette = function (_EventMachin) {
-    inherits(ColorPalette, _EventMachin);
-
-    function ColorPalette(colorpicker) {
-        classCallCheck(this, ColorPalette);
-
-        var _this = possibleConstructorReturn(this, (ColorPalette.__proto__ || Object.getPrototypeOf(ColorPalette)).call(this));
-
-        _this.colorpicker = colorpicker;
-        return _this;
-    }
-
-    createClass(ColorPalette, [{
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="color">\n            <div ref="$saturation" class="saturation">\n                <div ref="$value" class="value">\n                    <div ref="$drag_pointer" class="drag-pointer"></div>\n                </div>\n            </div>        \n        </div>        \n        ';
+        key: 'setRGBInput',
+        value: function setRGBInput() {
+            this.refs.$rgb_r.val(this.$store.$ColorManager.rgb.r);
+            this.refs.$rgb_g.val(this.$store.$ColorManager.rgb.g);
+            this.refs.$rgb_b.val(this.$store.$ColorManager.rgb.b);
+            this.refs.$rgb_a.val(this.$store.$ColorManager.alpha);
         }
     }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color) {
-            this.$el.css("background-color", color);
+        key: 'setHSLInput',
+        value: function setHSLInput() {
+            this.refs.$hsl_h.val(this.$store.$ColorManager.hsl.h);
+            this.refs.$hsl_s.val(this.$store.$ColorManager.hsl.s);
+            this.refs.$hsl_l.val(this.$store.$ColorManager.hsl.l);
+            this.refs.$hsl_a.val(this.$store.$ColorManager.alpha);
+        }
+    }, {
+        key: 'setHexInput',
+        value: function setHexInput() {
+            this.refs.$hexCode.val(this.$store.$ColorManager.toHEX());
         }
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'caculateSV',
-        value: function caculateSV() {
-            var pos = this.drag_pointer_pos || { x: 0, y: 0 };
-
-            var width = this.state.get('$el.width');
-            var height = this.state.get('$el.height');
-
-            var s = pos.x / width;
-            var v = (height - pos.y) / height;
-
-            return { s: s, v: v, width: width, height: height };
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            var x = this.state.get('$el.width') * this.colorpicker.currentS,
-                y = this.state.get('$el.height') * (1 - this.colorpicker.currentV);
-
-            this.refs.$drag_pointer.css({
-                left: x - 5 + "px",
-                top: y - 5 + "px"
-            });
-
-            this.drag_pointer_pos = { x: x, y: y };
-        }
-    }, {
-        key: 'setMainColor',
-        value: function setMainColor(e) {
-            e.preventDefault();
-            var pos = this.$el.position(); // position for screen
-            var w = this.state.get('$el.contentWidth');
-            var h = this.state.get('$el.contentHeight');
-
-            var x = e.clientX - pos.left;
-            var y = e.clientY - pos.top;
-
-            if (x < 0) x = 0;else if (x > w) x = w;
-
-            if (y < 0) y = 0;else if (y > h) y = h;
-
-            this.refs.$drag_pointer.css({
-                left: x - 5 + 'px',
-                top: y - 5 + 'px'
-            });
-
-            this.drag_pointer_pos = { x: x, y: y };
-
-            this.colorpicker.caculateHSV();
-            this.colorpicker.setInputColor();
-        }
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
-            if (this.isDown) {
-                this.setMainColor(e);
-            }
-        }
-    }, {
-        key: 'mousedown',
-        value: function mousedown(e) {
-            this.isDown = true;
-            this.setMainColor(e);
-        }
-    }, {
-        key: 'mouseup',
-        value: function mouseup(e) {
-            this.isDown = false;
+            this.setCurrentFormat(this.$store.$ColorManager.format);
+            this.setRGBInput();
+            this.setHSLInput();
+            this.setHexInput();
         }
     }]);
-    return ColorPalette;
-}(EventMachin);
+    return ColorInformation;
+}(UIElement);
 
 var DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
-var ColorSetsChooser = function (_EventMachin) {
-    inherits(ColorSetsChooser, _EventMachin);
+var ColorSetsChooser = function (_UIElement) {
+    inherits(ColorSetsChooser, _UIElement);
 
-    function ColorSetsChooser(colorpicker) {
+    function ColorSetsChooser(opt) {
         classCallCheck(this, ColorSetsChooser);
 
-        var _this = possibleConstructorReturn(this, (ColorSetsChooser.__proto__ || Object.getPrototypeOf(ColorSetsChooser)).call(this));
+        var _this = possibleConstructorReturn(this, (ColorSetsChooser.__proto__ || Object.getPrototypeOf(ColorSetsChooser)).call(this, opt));
 
-        _this.colorpicker = colorpicker;
+        _this.colorpicker = opt;
 
         _this.initialize();
         return _this;
@@ -7752,7 +7652,7 @@ var ColorSetsChooser = function (_EventMachin) {
         key: 'load $colorsetsList',
         value: function load$colorsetsList() {
             // colorsets 
-            var colorSets = this.colorpicker.getColorSetsList();
+            var colorSets = this.$store.$ColorSetsList.getColorSetsList();
 
             return '\n            <div>\n                ' + colorSets.map(function (element, index) {
                 return '\n                        <div class="colorsets-item" data-colorsets-index="' + index + '" >\n                            <h1 class="title">' + element.name + '</h1>\n                            <div class="items">\n                                <div>\n                                    ' + element.colors.filter(function (color, i) {
@@ -7804,17 +7704,17 @@ var ColorSetsChooser = function (_EventMachin) {
         }
     }]);
     return ColorSetsChooser;
-}(EventMachin);
+}(UIElement);
 
-var CurrentColorSets = function (_EventMachin) {
-    inherits(CurrentColorSets, _EventMachin);
+var CurrentColorSets = function (_UIElement) {
+    inherits(CurrentColorSets, _UIElement);
 
-    function CurrentColorSets(parent) {
+    function CurrentColorSets(opt) {
         classCallCheck(this, CurrentColorSets);
 
-        var _this = possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).call(this));
+        var _this = possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).call(this, opt));
 
-        _this.parent = parent;
+        _this.colorpicker = opt;
         return _this;
     }
 
@@ -7826,19 +7726,12 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'load $colorSetsColorList',
         value: function load$colorSetsColorList() {
-            var currentColorSets = this.colorSetsList.getCurrentColorSets();
-            var colors = this.colorSetsList.getCurrentColors();
+            var currentColorSets = this.$store.$ColorSetsList.getCurrentColorSets();
+            var colors = this.$store.$ColorSetsList.getCurrentColors();
 
             return '\n            <div class="current-color-sets">\n            ' + colors.map(function (color, i) {
                 return '<div class="color-item" title="' + color + '" data-index="' + i + '" data-color="' + color + '">\n                    <div class="empty"></div>\n                    <div class="color-view" style="background-color: ' + color + '"></div>\n                </div>';
             }).join('') + '   \n            ' + (currentColorSets.edit ? '<div class="add-color-item">+</div>' : '') + '         \n            </div>\n        ';
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            this.colorpicker = this.parent;
-            this.colorSetsList = this.colorpicker.colorSetsList;
-            get(CurrentColorSets.prototype.__proto__ || Object.getPrototypeOf(CurrentColorSets.prototype), 'render', this).call(this);
         }
     }, {
         key: 'refreshAll',
@@ -7849,25 +7742,25 @@ var CurrentColorSets = function (_EventMachin) {
     }, {
         key: 'addColor',
         value: function addColor(color) {
-            this.colorSetsList.addCurrentColor(color);
+            this.$store.$ColorSetsList.addCurrentColor(color);
             this.refreshAll();
         }
     }, {
         key: 'removeColor',
         value: function removeColor(index) {
-            this.colorSetsList.removeCurrentColor(index);
+            this.$store.$ColorSetsList.removeCurrentColor(index);
             this.refreshAll();
         }
     }, {
         key: 'removeAllToTheRight',
         value: function removeAllToTheRight(index) {
-            this.colorSetsList.removeCurrentColorToTheRight(index);
+            this.$store.$ColorSetsList.removeCurrentColorToTheRight(index);
             this.refreshAll();
         }
     }, {
         key: 'clearPalette',
         value: function clearPalette() {
-            this.colorSetsList.clearPalette();
+            this.$store.$ColorSetsList.clearPalette();
             this.refreshAll();
         }
     }, {
@@ -7879,7 +7772,7 @@ var CurrentColorSets = function (_EventMachin) {
         key: 'contextmenu $colorSetsColorList',
         value: function contextmenu$colorSetsColorList(e) {
             e.preventDefault();
-            var currentColorSets = this.colorSetsList.getCurrentColorSets();
+            var currentColorSets = this.$store.$ColorSetsList.getCurrentColorSets();
 
             if (!currentColorSets.edit) {
                 return;
@@ -7912,18 +7805,18 @@ var CurrentColorSets = function (_EventMachin) {
         }
     }]);
     return CurrentColorSets;
-}(EventMachin);
+}(UIElement);
 
-var CurrentColorSetsContextMenu = function (_EventMachin) {
-    inherits(CurrentColorSetsContextMenu, _EventMachin);
+var CurrentColorSetsContextMenu = function (_UIElement) {
+    inherits(CurrentColorSetsContextMenu, _UIElement);
 
-    function CurrentColorSetsContextMenu(colorpicker) {
+    function CurrentColorSetsContextMenu(opt) {
         classCallCheck(this, CurrentColorSetsContextMenu);
 
-        var _this = possibleConstructorReturn(this, (CurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(CurrentColorSetsContextMenu)).call(this));
+        var _this = possibleConstructorReturn(this, (CurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(CurrentColorSetsContextMenu)).call(this, opt));
 
-        _this.colorpicker = colorpicker;
-        _this.currentColorSets = colorpicker.currentColorSets;
+        _this.colorpicker = opt;
+        _this.currentColorSets = opt.currentColorSets;
 
         _this.initialize();
         return _this;
@@ -7985,20 +7878,556 @@ var CurrentColorSetsContextMenu = function (_EventMachin) {
         }
     }]);
     return CurrentColorSetsContextMenu;
-}(EventMachin);
+}(UIElement);
 
-var ColorPicker$2 = function (_BaseColorPicker) {
+var MacOSColorPicker = function (_BaseColorPicker) {
+    inherits(MacOSColorPicker, _BaseColorPicker);
+
+    function MacOSColorPicker(opt) {
+        classCallCheck(this, MacOSColorPicker);
+
+        var _this = possibleConstructorReturn(this, (MacOSColorPicker.__proto__ || Object.getPrototypeOf(MacOSColorPicker)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(MacOSColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div target="colorwheel"></div>\n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>                \n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                colorwheel: ColorWheel,
+                control: ColorControl,
+                information: ColorInformation,
+                currentColorSets: CurrentColorSets,
+                colorSetsChooser: ColorSetsChooser,
+                contextMenu: CurrentColorSetsContextMenu
+            };
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+
+            // root 만들기 
+            get(MacOSColorPicker.prototype.__proto__ || Object.getPrototypeOf(MacOSColorPicker.prototype), 'initialize', this).call(this);
+
+            this.render();
+
+            this.$root.append(this.$el);
+
+            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
+
+            this.initColor(this.opt.color);
+
+            // 이벤트 연결 
+            this.initializeEvent();
+        }
+    }, {
+        key: 'showContextMenu',
+        value: function showContextMenu(e, index) {
+            this.contextMenu.show(e, index);
+        }
+    }, {
+        key: 'setColor',
+        value: function setColor(value) {
+            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+
+            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
+                if (!value.r || !value.g || !value.b) return;
+
+                if (isDirect) {
+                    this.callbackColorValue(color.format(value, "hex"));
+                } else {
+                    this.initColor(color.format(value, "hex"));
+                }
+            } else if (typeof value == "string") {
+
+                if (isDirect) {
+                    this.callbackColorValue(value);
+                } else {
+                    this.initColor(value);
+                }
+            }
+        }
+    }, {
+        key: 'toggleColorChooser',
+        value: function toggleColorChooser() {
+            this.colorSetsChooser.toggle();
+        }
+    }, {
+        key: 'refreshColorSetsChooser',
+        value: function refreshColorSetsChooser() {
+            this.colorSetsChooser.load();
+        }
+    }, {
+        key: 'getColorSetsList',
+        value: function getColorSetsList() {
+            return this.$store.$ColorSetsList.getColorSetsList();
+        }
+    }, {
+        key: 'setCurrentColorSets',
+        value: function setCurrentColorSets(nameOrIndex) {
+            this.$store.$ColorSetsList.setCurrentColorSets(nameOrIndex);
+            this.currentColorSets.load();
+        }
+    }, {
+        key: 'setColorSets',
+        value: function setColorSets(list) {
+            this.$store.$ColorSetsList.setUserList(list);
+        }
+    }, {
+        key: 'setColorsInPalette',
+        value: function setColorsInPalette() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.$store.$ColorSetsList.setCurrentColorAll(colors);
+            this.currentColorSets.load();
+            this.colorSetsChooser.load();
+        }
+    }, {
+        key: 'refreshValue',
+        value: function refreshValue() {
+            this.colorwheel.renderValue();
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+
+            // when color picker clicked in outside
+            if (this.checkInHtml(e.target)) {
+                //this.setHideDelay(hideDelay);
+            } else if (this.checkColorPickerClass(e.target) == false) {
+                this.hide();
+            }
+        }
+    }]);
+    return MacOSColorPicker;
+}(BaseColorPicker);
+
+var source$6 = 'chromedevtool-control-Hue';
+
+var Hue = function (_UIElement) {
+    inherits(Hue, _UIElement);
+
+    function Hue(opt) {
+        classCallCheck(this, Hue);
+
+        var _this = possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(Hue, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.pos = {};
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$6 != sourceType) {
+                    _this2.refresh();
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(h) {
+
+            h = h || this.$store.$ColorManager.hsv.h;
+
+            var x = this.state.get('$container.width') * (h / 360);
+
+            this.refs.$bar.css({
+                left: x + 'px'
+            });
+
+            this.pos = { x: x };
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor(e) {
+
+            if (!this.state.get('$container.width')) return;
+
+            var min = this.refs.$container.offset().left;
+            var max = min + this.state.get('$container.width');
+            var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.$ColorManager.hsv.h / 360);
+
+            var dist;
+            if (current < min) {
+                dist = 0;
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (current > max) {
+                dist = 100;
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                dist = (current - min) / (max - min) * 100;
+                this.refs.$bar.removeClass('first').removeClass('last');
+            }
+
+            this.setColorUI(dist / 100 * 360);
+
+            this.$store.$ColorManager.changeColor({
+                h: dist / 100 * 360,
+                type: 'hsv',
+                source: source$6
+            });
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setHueColor(e);
+            }
+        }
+    }, {
+        key: 'mousedown $bar',
+        value: function mousedown$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $container',
+        value: function mousedown$container(e) {
+            this.isDown = true;
+            this.setHueColor(e);
+        }
+    }]);
+    return Hue;
+}(UIElement);
+
+var source$7 = 'chromedevtool-control-Opacity';
+
+var Opacity$2 = function (_UIElement) {
+    inherits(Opacity, _UIElement);
+
+    function Opacity(opt) {
+        classCallCheck(this, Opacity);
+
+        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(Opacity, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.pos = {};
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$7 != sourceType) {
+                    _this2.refresh();
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+            this.setOpacityColorBar();
+        }
+    }, {
+        key: 'setOpacityColorBar',
+        value: function setOpacityColorBar() {
+            var rgb = Object.assign({}, this.$store.$ColorManager.rgb);
+
+            rgb.a = 0;
+            var start = color.format(rgb, 'rgb');
+
+            rgb.a = 1;
+            var end = color.format(rgb, 'rgb');
+
+            this.refs.$colorbar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
+        }
+    }, {
+        key: 'setOpacity',
+        value: function setOpacity(e) {
+            var min = this.refs.$container.offset().left;
+            var max = min + this.state.get('$container.width');
+            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.$ColorManager.alpha;
+            var dist;
+
+            var dist;
+            if (current < min) {
+                dist = 0;
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (current > max) {
+                dist = 100;
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                dist = (current - min) / (max - min) * 100;
+                this.refs.$bar.removeClass('first').removeClass('last');
+            }
+
+            this.setColorUI(dist / 100);
+
+            this.$store.$ColorManager.changeColor({
+                a: Math.floor(dist) / 100,
+                source: source$7
+            });
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(alpha) {
+            alpha = alpha || this.$store.$ColorManager.alpha;
+
+            var x = this.state.get('$container.width') * (alpha || 0);
+            this.refs.$bar.css({ left: x + 'px' });
+            this.pos = { x: x };
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setOpacity(e);
+            }
+        }
+    }, {
+        key: 'mousedown $bar',
+        value: function mousedown$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $container',
+        value: function mousedown$container(e) {
+            this.isDown = true;
+            this.setOpacity(e);
+        }
+    }]);
+    return Opacity;
+}(UIElement);
+
+var source$5 = 'chromedevtool-control';
+
+var ColorControl$2 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl(opt) {
+        classCallCheck(this, ColorControl);
+
+        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: Hue, Opacity: Opacity$2 };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$5 != sourceType) {
+                    _this2.refresh();
+                }
+            });
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+            this.refs.$controlColor.css("background-color", this.$store.$ColorManager.toRGB());
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+            this.setBackgroundColor();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var source$8 = 'chromedevtool-palette';
+
+var ColorPalette = function (_UIElement) {
+    inherits(ColorPalette, _UIElement);
+
+    function ColorPalette(opt) {
+        classCallCheck(this, ColorPalette);
+
+        var _this = possibleConstructorReturn(this, (ColorPalette.__proto__ || Object.getPrototypeOf(ColorPalette)).call(this, opt));
+
+        _this.initialize();
+        return _this;
+    }
+
+    createClass(ColorPalette, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="color">\n            <div ref="$saturation" class="saturation">\n                <div ref="$value" class="value">\n                    <div ref="$drag_pointer" class="drag-pointer"></div>\n                </div>\n            </div>        \n        </div>        \n        ';
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor(color) {
+            this.$el.css("background-color", color);
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.$store.$ColorManager.on('change', function (sourceType) {
+                if (source$8 != sourceType) {
+                    _this2.refresh();
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'caculateSV',
+        value: function caculateSV() {
+            var pos = this.drag_pointer_pos || { x: 0, y: 0 };
+
+            var width = this.state.get('$el.width');
+            var height = this.state.get('$el.height');
+
+            var s = pos.x / width;
+            var v = (height - pos.y) / height;
+
+            this.$store.$ColorManager.changeColor({
+                type: 'hsv',
+                s: s,
+                v: v,
+                source: source$8
+            });
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            var x = this.state.get('$el.width') * this.$store.$ColorManager.hsv.s,
+                y = this.state.get('$el.height') * (1 - this.$store.$ColorManager.hsv.v);
+
+            this.refs.$drag_pointer.css({
+                left: x - 5 + "px",
+                top: y - 5 + "px"
+            });
+
+            this.drag_pointer_pos = { x: x, y: y };
+
+            this.setBackgroundColor(this.$store.$ColorManager.getHueColor());
+        }
+    }, {
+        key: 'setMainColor',
+        value: function setMainColor(e) {
+            e.preventDefault();
+            var pos = this.$el.position(); // position for screen
+            var w = this.state.get('$el.contentWidth');
+            var h = this.state.get('$el.contentHeight');
+
+            var x = e.clientX - pos.left;
+            var y = e.clientY - pos.top;
+
+            if (x < 0) x = 0;else if (x > w) x = w;
+
+            if (y < 0) y = 0;else if (y > h) y = h;
+
+            this.refs.$drag_pointer.css({
+                left: x - 5 + 'px',
+                top: y - 5 + 'px'
+            });
+
+            this.drag_pointer_pos = { x: x, y: y };
+
+            this.caculateSV();
+        }
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            if (this.isDown) {
+                this.setMainColor(e);
+            }
+        }
+    }, {
+        key: 'mousedown',
+        value: function mousedown(e) {
+            this.isDown = true;
+            this.setMainColor(e);
+        }
+    }, {
+        key: 'mouseup',
+        value: function mouseup(e) {
+            this.isDown = false;
+        }
+    }]);
+    return ColorPalette;
+}(UIElement);
+
+var ColorPicker$1 = function (_BaseColorPicker) {
     inherits(ColorPicker, _BaseColorPicker);
 
     function ColorPicker(opt) {
         classCallCheck(this, ColorPicker);
-
-        // this.control = new ColorControl(this);
-        // this.palette = new ColorPalette(this);
-        // this.information = new ColorInformation(this);
-        // this.colorSetsChooser = new ColorSetsChooser(this);
-        // this.currentColorSets = new CurrentColorSets(this);
-        // this.contextMenu = new CurrentColorSetsContextMenu(this, this.currentColorSets);
 
         var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
 
@@ -8016,7 +8445,7 @@ var ColorPicker$2 = function (_BaseColorPicker) {
         value: function components() {
             return {
                 palette: ColorPalette,
-                control: ColorControl,
+                control: ColorControl$2,
                 information: ColorInformation,
                 currentColorSets: CurrentColorSets,
                 colorSetsChooser: ColorSetsChooser,
@@ -8070,188 +8499,6 @@ var ColorPicker$2 = function (_BaseColorPicker) {
             }
         }
     }, {
-        key: 'getColor',
-        value: function getColor(type) {
-            this.caculateHSV();
-            var rgb = this.convertRGB();
-
-            if (type) {
-                return color.format(rgb, type);
-            }
-
-            return rgb;
-        }
-    }, {
-        key: 'convertRGB',
-        value: function convertRGB() {
-            return color.HSVtoRGB(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'convertHEX',
-        value: function convertHEX() {
-            return color.format(this.convertRGB(), 'hex');
-        }
-    }, {
-        key: 'convertHSL',
-        value: function convertHSL() {
-            return color.HSVtoHSL(this.currentH, this.currentS, this.currentV);
-        }
-    }, {
-        key: 'getCurrentColor',
-        value: function getCurrentColor() {
-            return this.information.getFormattedColor();
-        }
-    }, {
-        key: 'getFormattedColor',
-        value: function getFormattedColor(format) {
-            format = format || 'hex';
-
-            if (format == 'rgb') {
-                var rgb = this.convertRGB();
-                rgb.a = this.currentA;
-                return color.format(rgb, 'rgb');
-            } else if (format == 'hsl') {
-                var hsl = this.convertHSL();
-                hsl.a = this.currentA;
-                return color.format(hsl, 'hsl');
-            } else {
-                var rgb = this.convertRGB();
-                return color.format(rgb, 'hex');
-            }
-        }
-    }, {
-        key: 'setInputColor',
-        value: function setInputColor(isNoInputColor) {
-            this.information.setInputColor(isNoInputColor);
-            this.control.setInputColor(isNoInputColor);
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'changeInputColorAfterNextFormat',
-        value: function changeInputColorAfterNextFormat() {
-            this.control.setInputColor();
-
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'caculateHSV',
-        value: function caculateHSV() {
-
-            var obj = this.palette.caculateSV();
-            var control = this.control.caculateH();
-
-            var s = obj.s;
-            var v = obj.v;
-            var h = control.h;
-
-            if (obj.width == 0) {
-                h = 0;
-                s = 0;
-                v = 0;
-            }
-
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.control.setColorUI();
-            this.palette.setColorUI();
-        }
-    }, {
-        key: 'setCurrentHSV',
-        value: function setCurrentHSV(h, s, v, a) {
-            this.currentA = a;
-            this.currentH = h;
-            this.currentS = s;
-            this.currentV = v;
-        }
-    }, {
-        key: 'setCurrentH',
-        value: function setCurrentH(h) {
-            this.currentH = h;
-        }
-    }, {
-        key: 'setCurrentA',
-        value: function setCurrentA(a) {
-            this.currentA = a;
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor(color$$1) {
-            this.palette.setBackgroundColor(color$$1);
-        }
-    }, {
-        key: 'setCurrentFormat',
-        value: function setCurrentFormat(format) {
-            this.format = format;
-            this.information.setCurrentFormat(format);
-        }
-    }, {
-        key: 'getHSV',
-        value: function getHSV(colorObj) {
-            if (colorObj.type == 'hsl') {
-                return color.HSLtoHSV(colorObj);
-            } else {
-                return color.RGBtoHSV(colorObj);
-            }
-        }
-    }, {
-        key: 'initColor',
-        value: function initColor(newColor, format) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-            format = format || colorObj.type;
-
-            this.setCurrentFormat(format);
-
-            var hsv = this.getHSV(colorObj);
-
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-            this.setColorUI();
-            this.setHueColor();
-            this.setInputColor();
-        }
-    }, {
-        key: 'changeInformationColor',
-        value: function changeInformationColor(newColor) {
-            var c = newColor || "#FF0000",
-                colorObj = color.parse(c);
-
-            var hsv = this.getHSV(colorObj);
-            this.setCurrentHSV(hsv.h, hsv.s, hsv.v, colorObj.a);
-            this.setColorUI();
-            this.setHueColor();
-            this.control.setInputColor();
-            this.callbackColorValue();
-        }
-    }, {
-        key: 'setHueColor',
-        value: function setHueColor() {
-            this.control.setOnlyHueColor();
-        }
-    }, {
-        key: 'initializeEvent',
-        value: function initializeEvent() {
-
-            this.initializeEventMachin();
-
-            this.palette.initializeEvent();
-            this.control.initializeEvent();
-            this.information.initializeEvent();
-            this.currentColorSets.initializeEvent();
-            this.colorSetsChooser.initializeEvent();
-            this.contextMenu.initializeEvent();
-        }
-    }, {
-        key: 'currentFormat',
-        value: function currentFormat() {
-            this.information.currentFormat();
-        }
-    }, {
         key: 'toggleColorChooser',
         value: function toggleColorChooser() {
             this.colorSetsChooser.toggle();
@@ -8264,26 +8511,27 @@ var ColorPicker$2 = function (_BaseColorPicker) {
     }, {
         key: 'getColorSetsList',
         value: function getColorSetsList() {
-            return this.colorSetsList.getColorSetsList();
+            return this.$store.$ColorSetsList.getColorSetsList();
         }
     }, {
         key: 'setCurrentColorSets',
         value: function setCurrentColorSets(nameOrIndex) {
-            this.colorSetsList.setCurrentColorSets(nameOrIndex);
+            this.$store.$ColorSetsList.setCurrentColorSets(nameOrIndex);
             this.currentColorSets.load();
         }
     }, {
         key: 'setColorSets',
         value: function setColorSets(list) {
-            this.colorSetsList.setUserList(list);
+            this.$store.$ColorSetsList.setUserList(list);
         }
     }, {
         key: 'setColorsInPalette',
         value: function setColorsInPalette() {
             var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-            this.colorSetsList.setCurrentColorAll(colors);
+            this.$store.$ColorSetsList.setCurrentColorAll(colors);
             this.currentColorSets.load();
+            this.colorSetsChooser.load();
         }
 
         // Event Bindings 
@@ -8307,17 +8555,17 @@ var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
             case 'macos':
-                return new ColorPicker$1(opts);
+                return new MacOSColorPicker(opts);
             case 'sketch':
             case 'palette':
             default:
-                return new ColorPicker$2(opts);
+                return new ColorPicker$1(opts);
         }
     },
 
-    ColorPicker: ColorPicker$2,
-    ChromeDevToolColorPicker: ColorPicker$2,
-    MacOSColorPicker: ColorPicker$1
+    ColorPicker: ColorPicker$1,
+    ChromeDevToolColorPicker: ColorPicker$1,
+    MacOSColorPicker: MacOSColorPicker
 };
 
 var colorpicker_class = 'codemirror-colorview';

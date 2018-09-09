@@ -1,8 +1,8 @@
-import Hue from './control/Hue';
+import Value from './control/Value';
 import Opacity from './control/Opacity'
 import UIElement from '../UIElement';
 
-const source = 'chromedevtool-control';
+const source = 'macos-control';
 
 export default class ColorControl extends UIElement {
     constructor (opt) {
@@ -11,13 +11,13 @@ export default class ColorControl extends UIElement {
     } 
 
     components () {
-        return { Hue, Opacity }
+        return { Value, Opacity }
     }
 
     template () {
         return `
         <div class="control">
-            <div target="Hue" ></div>
+            <div target="Value" ></div>
             <div target="Opacity" ></div>
             <div ref="$controlPattern" class="empty"></div>
             <div ref="$controlColor" class="color"></div>
@@ -44,7 +44,7 @@ export default class ColorControl extends UIElement {
     }
 
     setColorUI() {
-        this.Hue.setColorUI()
+        this.Value.setColorUI()
         this.Opacity.setColorUI()
     }    
 

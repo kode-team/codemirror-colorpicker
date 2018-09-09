@@ -54,7 +54,7 @@
     .drag-bar, .drag-bar2 {
       position: absolute;
       cursor: pointer;
-      top: 50% !important;
+      top: 50%;
       left: 0px;
       transform: translateX(-50%) translateY(-50%);
       width: 12px;
