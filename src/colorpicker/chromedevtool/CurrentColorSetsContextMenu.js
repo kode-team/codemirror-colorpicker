@@ -2,11 +2,6 @@ import Event from '../../util/Event'
 import UIElement from '../UIElement';
 
 export default class CurrentColorSetsContextMenu extends UIElement {
-    constructor (opt) {
-        super(opt);
-
-        this.initialize ();
-    } 
 
     template () {
         return `
@@ -16,12 +11,6 @@ export default class CurrentColorSetsContextMenu extends UIElement {
                 <li class="menu-item" data-type="clear-palette">Clear palette</li>
             </ul>
         `
-    }
-
-    initialize () {
-        this.$store.on('showContextMenu', (e, index) => {
-            this.show(e, index);
-        })  
     }
 
     show (e, index) {
@@ -58,6 +47,10 @@ export default class CurrentColorSetsContextMenu extends UIElement {
             this.$store.dispatch('/clearPalette');
             break;
         }
+    }
+
+    '@showContextMenu' (e, index) {
+        this.show(e, index)
     }
 
     'click $el .menu-item' (e) {

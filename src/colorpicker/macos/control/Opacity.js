@@ -6,10 +6,7 @@ import UIElement from '../../UIElement';
 const source = 'macos-control-Opacity';
 
 export default class Opacity extends UIElement {
-    constructor (opt) {
-        super(opt);
-        this.initialize();
-    } 
+
     template () {
         return `
         <div class="opacity">
@@ -19,16 +16,6 @@ export default class Opacity extends UIElement {
             </div>
         </div>
         `
-    }
-    
-    initialize () {
-        this.pos = {}    
-
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })
     }
 
     refresh () {
@@ -81,6 +68,12 @@ export default class Opacity extends UIElement {
         var x = this.state.get('$container.width') * (alpha || 0);
         this.refs.$bar.css({ left : (x) + 'px' });
         this.pos = { x };
+    }
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
     }
 
     // Event Bindings 

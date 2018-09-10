@@ -9,11 +9,6 @@ import CurrentColorSets from '../chromedevtool/CurrentColorSets'
 import CurrentColorSetsContextMenu from '../chromedevtool/CurrentColorSetsContextMenu'
 
 export default class MacOSColorPicker extends BaseColorPicker {
-    constructor(opt) {
-        super(opt);
-         
-        this.initialize();
-    }
  
     template () {
         return `
@@ -37,21 +32,6 @@ export default class MacOSColorPicker extends BaseColorPicker {
             colorSetsChooser: ColorSetsChooser,
             contextMenu: CurrentColorSetsContextMenu
         }
-    }
-
-    initialize() {
-
-        // root 만들기 
-        super.initialize()
-
-        this.render()
-
-        this.$root.append(this.$el)
-
-        this.initColor(this.opt.color);
-
-        // 이벤트 연결 
-        this.initializeEvent();        
     }
 
     // Event Bindings 

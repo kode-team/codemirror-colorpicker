@@ -5,10 +5,6 @@ import UIElement from '../../UIElement';
 const source = 'macos-control-Opacity';
 
 export default class Value extends UIElement {
-    constructor (opt) {
-        super(opt);
-        this.initialize();
-    } 
 
     template () {
         return `
@@ -18,17 +14,6 @@ export default class Value extends UIElement {
                 </div>
             </div>
         `
-    }
-    
-    initialize () {
-
-        this.pos = {}
-
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })        
     }
 
     refresh () {
@@ -77,6 +62,12 @@ export default class Value extends UIElement {
             source
         })        
     }    
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
+    }
 
     // Event Bindings 
     'mouseup document' (e) {

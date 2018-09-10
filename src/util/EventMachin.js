@@ -89,6 +89,10 @@ export default class EventMachin {
     return '<div></div>';
   }
 
+  initialize() {
+    
+  }
+
   initializeEvent () { 
     this.initializeEventMachin();
 

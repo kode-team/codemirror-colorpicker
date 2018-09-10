@@ -2,13 +2,6 @@ import Dom from '../../util/Dom'
 import UIElement from '../UIElement';
 
 export default class CurrentColorSets extends UIElement {
-    constructor (opt) {
-        super(opt);
-
-        this.colorpicker = opt; 
-
-        this.initialize()
-    } 
 
     template() {
         return `
@@ -38,12 +31,6 @@ export default class CurrentColorSets extends UIElement {
         `
     }    
 
-    initialize () {
-        this.$store.on('changeCurrentColorSets', () => {
-            this.refresh()
-        })  
-    }
-
     refresh () {
         this.load();
     }
@@ -51,6 +38,10 @@ export default class CurrentColorSets extends UIElement {
 
     addColor (color) {
         this.$store.dispatch('/addCurrentColor', color);
+    }
+
+    '@changeCurrentColorSets' () {
+        this.refresh()
     }
 
     'click $colorSetsChooseButton' (e) {

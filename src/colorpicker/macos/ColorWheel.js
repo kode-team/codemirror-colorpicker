@@ -6,11 +6,6 @@ import UIElement from '../UIElement';
 const source = 'macos-colorwheel'
 
 export default class ColorWheel extends UIElement {
-    constructor (opt) {
-        super(opt);
-
-        this.initialize()
-    }  
 
     template () {
         return `
@@ -20,14 +15,6 @@ export default class ColorWheel extends UIElement {
             <div class="drag-pointer" ref="$drag_pointer"></div>
         </div>
         `
-    }
-
-    initialize () {        
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh(true);
-            }
-        })      
     }
 
     refresh (isEvent) {
@@ -170,6 +157,12 @@ export default class ColorWheel extends UIElement {
                 s: saturation,
                 source
             })
+        }
+    }
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh(true);
         }
     }
 

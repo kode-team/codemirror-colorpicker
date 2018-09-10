@@ -5,10 +5,8 @@ import ColorManager from './module/ColorManager';
 import BaseStore from './BaseStore';
 
 export default class BaseColorPicker extends UIElement {
-    constructor(opt) {
-        super();
 
-        this.opt = opt || {};
+    initialize () {
         this.$body = null;
         this.$root = null; 
         
@@ -32,9 +30,6 @@ export default class BaseColorPicker extends UIElement {
         this.timerCloseColorPicker;
         this.autoHide = this.opt.autoHide || true;
         this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
-    }
-
-    initialize () {
 
         this.$body = new Dom(this.getContainer());
         this.$root = new Dom('div', 'codemirror-colorpicker');
@@ -53,6 +48,17 @@ export default class BaseColorPicker extends UIElement {
         this.$root.append(this.$arrow);
 
         this.$store.dispatch('/setUserList', this.opt.colorSets);
+
+
+        this.render()
+
+        this.$root.append(this.$el)
+
+        this.initColor(this.opt.color);
+
+        // 이벤트 연결 
+        this.initializeEvent();           
+
     }
 
     /** 

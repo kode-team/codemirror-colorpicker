@@ -5,11 +5,6 @@ import UIElement from '../../UIElement';
 const source = 'chromedevtool-control-Hue';
 
 export default class Hue extends UIElement {
-    constructor (opt) {
-        super(opt);
-        this.initialize();
-    } 
-
     template () {
         return `
             <div class="hue">
@@ -18,17 +13,6 @@ export default class Hue extends UIElement {
                 </div>
             </div>
         `
-    }
-    
-    initialize () {
-
-        this.pos = {}
-
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })
     }
 
     refresh () {
@@ -77,6 +61,12 @@ export default class Hue extends UIElement {
             source
         })
     }     
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
+    }
 
     // Event Bindings 
     'mouseup document' (e) {

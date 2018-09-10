@@ -3,13 +3,6 @@ import UIElement from '../UIElement';
 const DATA_COLORSETS_INDEX = 'data-colorsets-index';
 
 export default class ColorSetsChooser extends UIElement {
-    constructor (opt) {
-        super(opt);
-
-        this.colorpicker = opt;       
-
-        this.initialize();
-    } 
 
     template () {
         return `
@@ -25,22 +18,16 @@ export default class ColorSetsChooser extends UIElement {
         `
     }
 
-    initialize () {
-
-
-        this.$store.on('changeCurrentColorSets', () => {
-            this.refresh() 
-        })  
-
-        this.$store.on('toggleColorChooser', () => {
-            this.toggle();
-        })
-
-        this.refresh();
-    }
-
     refresh () {
         this.load();
+    }
+
+    '@changeCurrentColorSets' () {
+        this.refresh()
+    }
+
+    '@toggleColorChooser' () {
+        this.toggle()
     }
 
     // loadable 

@@ -5,11 +5,6 @@ const source = 'chromedevtool-information';
 
 export default class ColorInformation extends UIElement {
 
-    constructor(opt) {
-        super(opt);
-        this.initialize()
-    }
-
     template () {
         return `
         <div class="information hex">
@@ -63,18 +58,7 @@ export default class ColorInformation extends UIElement {
         </div>
         `
     }
-
-    initialize () {
-
-        this.format = 'hex'; 
-
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })        
-    }
-
+    
     setCurrentFormat (format) {
         this.format = format
 
@@ -146,6 +130,12 @@ export default class ColorInformation extends UIElement {
             source
         })        
     }    
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
+    }
 
     'input $rgb_r' (e) {  this.changeRgbColor(); }
     'input $rgb_g' (e) {  this.changeRgbColor(); }

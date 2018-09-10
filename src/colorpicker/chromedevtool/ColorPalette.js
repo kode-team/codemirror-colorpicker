@@ -3,11 +3,6 @@ import UIElement from '../UIElement';
 const source = 'chromedevtool-palette';
 
 export default class ColorPalette extends UIElement {
-    constructor (opt) {
-        super(opt);
-
-        this.initialize();
-    } 
 
     template () {
         return `
@@ -24,14 +19,6 @@ export default class ColorPalette extends UIElement {
     setBackgroundColor (color) {
         this.$el.css("background-color", color);
     }
-
-    initialize () {
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })        
-    }    
 
     refresh () {
         this.setColorUI();
@@ -93,6 +80,12 @@ export default class ColorPalette extends UIElement {
 
         this.caculateSV()
     }    
+
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
+    }
 
     'mouseup document' (e) {
         this.isDown = false; 

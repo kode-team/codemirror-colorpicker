@@ -6207,6 +6207,9 @@ var EventMachin = function () {
       return '<div></div>';
     }
   }, {
+    key: 'initialize',
+    value: function initialize() {}
+  }, {
     key: 'initializeEvent',
     value: function initializeEvent() {
       var _this6 = this;
@@ -6436,6 +6439,8 @@ var EventMachin = function () {
   return EventMachin;
 }();
 
+var CHECK_STORE_EVENT_PATTERN = /^@/;
+
 var UIElement = function (_EventMachin) {
     inherits(UIElement, _EventMachin);
 
@@ -6444,13 +6449,55 @@ var UIElement = function (_EventMachin) {
 
         var _this = possibleConstructorReturn(this, (UIElement.__proto__ || Object.getPrototypeOf(UIElement)).call(this, opt));
 
+        _this.opt = opt;
+
         if (opt && opt.$store) {
             _this.$store = opt.$store;
         }
 
+        _this.initialize();
+
+        _this.initializeStoreEvent();
         return _this;
     }
 
+    createClass(UIElement, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(UIElement.prototype.__proto__ || Object.getPrototypeOf(UIElement.prototype), 'initialize', this).call(this);
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            get(UIElement.prototype.__proto__ || Object.getPrototypeOf(UIElement.prototype), 'destroy', this).call(this);
+
+            this.destoryStoreEvent();
+        }
+    }, {
+        key: 'initializeStoreEvent',
+        value: function initializeStoreEvent() {
+            var _this2 = this;
+
+            this.storeEvents = {};
+            this.filterProps(CHECK_STORE_EVENT_PATTERN).forEach(function (key) {
+                var arr = key.split('@');
+                arr.shift();
+                var event = arr.join('@');
+
+                _this2.storeEvents[event] = _this2[key].bind(_this2);
+                _this2.$store.on(event, _this2.storeEvents[event]);
+            });
+        }
+    }, {
+        key: 'destoryStoreEvent',
+        value: function destoryStoreEvent() {
+            var _this3 = this;
+
+            Object.keys(this.storeEvents).forEach(function (key) {
+                _this3.$store.off(event, _this3.storeEvents[event]);
+            });
+        }
+    }]);
     return UIElement;
 }(EventMachin);
 
@@ -6648,38 +6695,36 @@ var BaseStore = function () {
 var BaseColorPicker = function (_UIElement) {
     inherits(BaseColorPicker, _UIElement);
 
-    function BaseColorPicker(opt) {
+    function BaseColorPicker() {
         classCallCheck(this, BaseColorPicker);
-
-        var _this = possibleConstructorReturn(this, (BaseColorPicker.__proto__ || Object.getPrototypeOf(BaseColorPicker)).call(this));
-
-        _this.opt = opt || {};
-        _this.$body = null;
-        _this.$root = null;
-
-        _this.$store = new BaseStore({
-            modules: [ColorManager, ColorSetsList]
-        });
-
-        _this.callbackChange = function () {
-            _this.callbackColorValue();
-        };
-
-        _this.colorpickerShowCallback = function () {};
-        _this.colorpickerHideCallback = function () {};
-
-        _this.isColorPickerShow = false;
-        _this.isShortCut = false;
-        _this.hideDelay = +(typeof _this.opt.hideDeplay == 'undefined' ? 2000 : _this.opt.hideDelay);
-        _this.timerCloseColorPicker;
-        _this.autoHide = _this.opt.autoHide || true;
-        _this.$checkColorPickerClass = _this.checkColorPickerClass.bind(_this);
-        return _this;
+        return possibleConstructorReturn(this, (BaseColorPicker.__proto__ || Object.getPrototypeOf(BaseColorPicker)).apply(this, arguments));
     }
 
     createClass(BaseColorPicker, [{
         key: 'initialize',
         value: function initialize() {
+            var _this2 = this;
+
+            this.$body = null;
+            this.$root = null;
+
+            this.$store = new BaseStore({
+                modules: [ColorManager, ColorSetsList]
+            });
+
+            this.callbackChange = function () {
+                _this2.callbackColorValue();
+            };
+
+            this.colorpickerShowCallback = function () {};
+            this.colorpickerHideCallback = function () {};
+
+            this.isColorPickerShow = false;
+            this.isShortCut = false;
+            this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
+            this.timerCloseColorPicker;
+            this.autoHide = this.opt.autoHide || true;
+            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
             this.$body = new Dom(this.getContainer());
             this.$root = new Dom('div', 'codemirror-colorpicker');
@@ -6699,6 +6744,15 @@ var BaseColorPicker = function (_UIElement) {
             this.$root.append(this.$arrow);
 
             this.$store.dispatch('/setUserList', this.opt.colorSets);
+
+            this.render();
+
+            this.$root.append(this.$el);
+
+            this.initColor(this.opt.color);
+
+            // 이벤트 연결 
+            this.initializeEvent();
         }
 
         /** 
@@ -6885,7 +6939,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'setHideDelay',
         value: function setHideDelay(delayTime) {
-            var _this2 = this;
+            var _this3 = this;
 
             delayTime = delayTime || 0;
 
@@ -6895,12 +6949,12 @@ var BaseColorPicker = function (_UIElement) {
             this.$root.off('mouseleave');
 
             this.$root.on('mouseenter', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
+                clearTimeout(_this3.timerCloseColorPicker);
             });
 
             this.$root.on('mouseleave', function () {
-                clearTimeout(_this2.timerCloseColorPicker);
-                _this2.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+                clearTimeout(_this3.timerCloseColorPicker);
+                _this3.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
             });
 
             clearTimeout(this.timerCloseColorPicker);
@@ -6985,30 +7039,15 @@ var source = 'macos-colorwheel';
 var ColorWheel = function (_UIElement) {
     inherits(ColorWheel, _UIElement);
 
-    function ColorWheel(opt) {
+    function ColorWheel() {
         classCallCheck(this, ColorWheel);
-
-        var _this = possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).apply(this, arguments));
     }
 
     createClass(ColorWheel, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="wheel">\n            <canvas class="wheel-canvas" ref="$colorwheel" ></canvas>\n            <div class="wheel-canvas" ref="$valuewheel" ></div>\n            <div class="drag-pointer" ref="$drag_pointer"></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source != sourceType) {
-                    _this2.refresh(true);
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -7168,6 +7207,13 @@ var ColorWheel = function (_UIElement) {
                 });
             }
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source != sourceType) {
+                this.refresh(true);
+            }
+        }
 
         // Event Bindings 
 
@@ -7204,32 +7250,15 @@ var source$2 = 'macos-control-Opacity';
 var Value = function (_UIElement) {
     inherits(Value, _UIElement);
 
-    function Value(opt) {
+    function Value() {
         classCallCheck(this, Value);
-
-        var _this = possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).apply(this, arguments));
     }
 
     createClass(Value, [{
         key: 'template',
         value: function template() {
             return '\n            <div class="value">\n                <div ref="$container" class="value-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.pos = {};
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$2 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -7280,6 +7309,13 @@ var Value = function (_UIElement) {
                 source: source$2
             });
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$2 != sourceType) {
+                this.refresh();
+            }
+        }
 
         // Event Bindings 
 
@@ -7316,32 +7352,15 @@ var source$3 = 'macos-control-Opacity';
 var Opacity = function (_UIElement) {
     inherits(Opacity, _UIElement);
 
-    function Opacity(opt) {
+    function Opacity() {
         classCallCheck(this, Opacity);
-
-        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).apply(this, arguments));
     }
 
     createClass(Opacity, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.pos = {};
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$3 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -7398,6 +7417,13 @@ var Opacity = function (_UIElement) {
             this.refs.$bar.css({ left: x + 'px' });
             this.pos = { x: x };
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$3 != sourceType) {
+                this.refresh();
+            }
+        }
 
         // Event Bindings 
 
@@ -7434,13 +7460,9 @@ var source$1 = 'macos-control';
 var ColorControl = function (_UIElement) {
     inherits(ColorControl, _UIElement);
 
-    function ColorControl(opt) {
+    function ColorControl() {
         classCallCheck(this, ColorControl);
-
-        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
     }
 
     createClass(ColorControl, [{
@@ -7452,17 +7474,6 @@ var ColorControl = function (_UIElement) {
         key: 'template',
         value: function template() {
             return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$1 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'setBackgroundColor',
@@ -7481,6 +7492,13 @@ var ColorControl = function (_UIElement) {
             this.Value.setColorUI();
             this.Opacity.setColorUI();
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$1 != sourceType) {
+                this.refresh();
+            }
+        }
     }]);
     return ColorControl;
 }(UIElement);
@@ -7490,32 +7508,15 @@ var source$4 = 'chromedevtool-information';
 var ColorInformation = function (_UIElement) {
     inherits(ColorInformation, _UIElement);
 
-    function ColorInformation(opt) {
+    function ColorInformation() {
         classCallCheck(this, ColorInformation);
-
-        var _this = possibleConstructorReturn(this, (ColorInformation.__proto__ || Object.getPrototypeOf(ColorInformation)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorInformation.__proto__ || Object.getPrototypeOf(ColorInformation)).apply(this, arguments));
     }
 
     createClass(ColorInformation, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">S</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.format = 'hex';
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$4 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'setCurrentFormat',
@@ -7596,6 +7597,13 @@ var ColorInformation = function (_UIElement) {
                 a: this.refs.$hsl_a.float(),
                 source: source$4
             });
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$4 != sourceType) {
+                this.refresh();
+            }
         }
     }, {
         key: 'input $rgb_r',
@@ -7696,15 +7704,9 @@ var DATA_COLORSETS_INDEX = 'data-colorsets-index';
 var ColorSetsChooser = function (_UIElement) {
     inherits(ColorSetsChooser, _UIElement);
 
-    function ColorSetsChooser(opt) {
+    function ColorSetsChooser() {
         classCallCheck(this, ColorSetsChooser);
-
-        var _this = possibleConstructorReturn(this, (ColorSetsChooser.__proto__ || Object.getPrototypeOf(ColorSetsChooser)).call(this, opt));
-
-        _this.colorpicker = opt;
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorSetsChooser.__proto__ || Object.getPrototypeOf(ColorSetsChooser)).apply(this, arguments));
     }
 
     createClass(ColorSetsChooser, [{
@@ -7713,24 +7715,19 @@ var ColorSetsChooser = function (_UIElement) {
             return '\n            <div class="color-chooser">\n                <div class="color-chooser-container">\n                    <div class="colorsets-item colorsets-item-header">\n                        <h1 class="title">Color Palettes</h1>\n                        <span ref="$toggleButton" class="items">&times;</span>\n                    </div>\n                    <div ref="$colorsetsList" class="colorsets-list"></div>\n                </div>\n            </div>\n        ';
         }
     }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeCurrentColorSets', function () {
-                _this2.refresh();
-            });
-
-            this.$store.on('toggleColorChooser', function () {
-                _this2.toggle();
-            });
-
-            this.refresh();
-        }
-    }, {
         key: 'refresh',
         value: function refresh() {
             this.load();
+        }
+    }, {
+        key: '@changeCurrentColorSets',
+        value: function changeCurrentColorSets() {
+            this.refresh();
+        }
+    }, {
+        key: '@toggleColorChooser',
+        value: function toggleColorChooser() {
+            this.toggle();
         }
 
         // loadable 
@@ -7798,15 +7795,9 @@ var ColorSetsChooser = function (_UIElement) {
 var CurrentColorSets = function (_UIElement) {
     inherits(CurrentColorSets, _UIElement);
 
-    function CurrentColorSets(opt) {
+    function CurrentColorSets() {
         classCallCheck(this, CurrentColorSets);
-
-        var _this = possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).call(this, opt));
-
-        _this.colorpicker = opt;
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).apply(this, arguments));
     }
 
     createClass(CurrentColorSets, [{
@@ -7825,15 +7816,6 @@ var CurrentColorSets = function (_UIElement) {
             }).join('') + '   \n            ' + (currentColorSets.edit ? '<div class="add-color-item">+</div>' : '') + '         \n            </div>\n        ';
         }
     }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeCurrentColorSets', function () {
-                _this2.refresh();
-            });
-        }
-    }, {
         key: 'refresh',
         value: function refresh() {
             this.load();
@@ -7842,6 +7824,11 @@ var CurrentColorSets = function (_UIElement) {
         key: 'addColor',
         value: function addColor(color) {
             this.$store.dispatch('/addCurrentColor', color);
+        }
+    }, {
+        key: '@changeCurrentColorSets',
+        value: function changeCurrentColorSets() {
+            this.refresh();
         }
     }, {
         key: 'click $colorSetsChooseButton',
@@ -7887,28 +7874,15 @@ var CurrentColorSets = function (_UIElement) {
 var CurrentColorSetsContextMenu = function (_UIElement) {
     inherits(CurrentColorSetsContextMenu, _UIElement);
 
-    function CurrentColorSetsContextMenu(opt) {
+    function CurrentColorSetsContextMenu() {
         classCallCheck(this, CurrentColorSetsContextMenu);
-
-        var _this = possibleConstructorReturn(this, (CurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(CurrentColorSetsContextMenu)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (CurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(CurrentColorSetsContextMenu)).apply(this, arguments));
     }
 
     createClass(CurrentColorSetsContextMenu, [{
         key: 'template',
         value: function template() {
             return '\n            <ul class="colorsets-contextmenu">\n                <li class="menu-item small-hide" data-type="remove-color">Remove color</li>\n                <li class="menu-item small-hide" data-type="remove-all-to-the-right">Remove all to the right</li>\n                <li class="menu-item" data-type="clear-palette">Clear palette</li>\n            </ul>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('showContextMenu', function (e, index) {
-                _this2.show(e, index);
-            });
         }
     }, {
         key: 'show',
@@ -7949,6 +7923,11 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
             }
         }
     }, {
+        key: '@showContextMenu',
+        value: function showContextMenu(e, index) {
+            this.show(e, index);
+        }
+    }, {
         key: 'click $el .menu-item',
         value: function click$elMenuItem(e) {
             e.preventDefault();
@@ -7963,13 +7942,9 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
 var MacOSColorPicker = function (_BaseColorPicker) {
     inherits(MacOSColorPicker, _BaseColorPicker);
 
-    function MacOSColorPicker(opt) {
+    function MacOSColorPicker() {
         classCallCheck(this, MacOSColorPicker);
-
-        var _this = possibleConstructorReturn(this, (MacOSColorPicker.__proto__ || Object.getPrototypeOf(MacOSColorPicker)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (MacOSColorPicker.__proto__ || Object.getPrototypeOf(MacOSColorPicker)).apply(this, arguments));
     }
 
     createClass(MacOSColorPicker, [{
@@ -7988,22 +7963,6 @@ var MacOSColorPicker = function (_BaseColorPicker) {
                 colorSetsChooser: ColorSetsChooser,
                 contextMenu: CurrentColorSetsContextMenu
             };
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-
-            // root 만들기 
-            get(MacOSColorPicker.prototype.__proto__ || Object.getPrototypeOf(MacOSColorPicker.prototype), 'initialize', this).call(this);
-
-            this.render();
-
-            this.$root.append(this.$el);
-
-            this.initColor(this.opt.color);
-
-            // 이벤트 연결 
-            this.initializeEvent();
         }
 
         // Event Bindings 
@@ -8028,32 +7987,15 @@ var source$6 = 'chromedevtool-control-Hue';
 var Hue = function (_UIElement) {
     inherits(Hue, _UIElement);
 
-    function Hue(opt) {
+    function Hue() {
         classCallCheck(this, Hue);
-
-        var _this = possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).apply(this, arguments));
     }
 
     createClass(Hue, [{
         key: 'template',
         value: function template() {
             return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.pos = {};
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$6 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -8104,6 +8046,13 @@ var Hue = function (_UIElement) {
                 source: source$6
             });
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$6 != sourceType) {
+                this.refresh();
+            }
+        }
 
         // Event Bindings 
 
@@ -8140,32 +8089,15 @@ var source$7 = 'chromedevtool-control-Opacity';
 var Opacity$2 = function (_UIElement) {
     inherits(Opacity, _UIElement);
 
-    function Opacity(opt) {
+    function Opacity() {
         classCallCheck(this, Opacity);
-
-        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).apply(this, arguments));
     }
 
     createClass(Opacity, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.pos = {};
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$7 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -8222,6 +8154,13 @@ var Opacity$2 = function (_UIElement) {
             this.refs.$bar.css({ left: x + 'px' });
             this.pos = { x: x };
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$7 != sourceType) {
+                this.refresh();
+            }
+        }
 
         // Event Bindings 
 
@@ -8258,13 +8197,9 @@ var source$5 = 'chromedevtool-control';
 var ColorControl$2 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
 
-    function ColorControl(opt) {
+    function ColorControl() {
         classCallCheck(this, ColorControl);
-
-        var _this = possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
     }
 
     createClass(ColorControl, [{
@@ -8276,17 +8211,6 @@ var ColorControl$2 = function (_UIElement) {
         key: 'template',
         value: function template() {
             return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$5 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'setBackgroundColor',
@@ -8305,6 +8229,13 @@ var ColorControl$2 = function (_UIElement) {
             this.Hue.setColorUI();
             this.Opacity.setColorUI();
         }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$5 != sourceType) {
+                this.refresh();
+            }
+        }
     }]);
     return ColorControl;
 }(UIElement);
@@ -8314,13 +8245,9 @@ var source$8 = 'chromedevtool-palette';
 var ColorPalette = function (_UIElement) {
     inherits(ColorPalette, _UIElement);
 
-    function ColorPalette(opt) {
+    function ColorPalette() {
         classCallCheck(this, ColorPalette);
-
-        var _this = possibleConstructorReturn(this, (ColorPalette.__proto__ || Object.getPrototypeOf(ColorPalette)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorPalette.__proto__ || Object.getPrototypeOf(ColorPalette)).apply(this, arguments));
     }
 
     createClass(ColorPalette, [{
@@ -8332,17 +8259,6 @@ var ColorPalette = function (_UIElement) {
         key: 'setBackgroundColor',
         value: function setBackgroundColor(color) {
             this.$el.css("background-color", color);
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-            var _this2 = this;
-
-            this.$store.on('changeColor', function (sourceType) {
-                if (source$8 != sourceType) {
-                    _this2.refresh();
-                }
-            });
         }
     }, {
         key: 'refresh',
@@ -8407,6 +8323,13 @@ var ColorPalette = function (_UIElement) {
             this.caculateSV();
         }
     }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$8 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
         key: 'mouseup document',
         value: function mouseupDocument(e) {
             this.isDown = false;
@@ -8436,13 +8359,9 @@ var ColorPalette = function (_UIElement) {
 var ColorPicker$1 = function (_BaseColorPicker) {
     inherits(ColorPicker, _BaseColorPicker);
 
-    function ColorPicker(opt) {
+    function ColorPicker() {
         classCallCheck(this, ColorPicker);
-
-        var _this = possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).call(this, opt));
-
-        _this.initialize();
-        return _this;
+        return possibleConstructorReturn(this, (ColorPicker.__proto__ || Object.getPrototypeOf(ColorPicker)).apply(this, arguments));
     }
 
     createClass(ColorPicker, [{
@@ -8461,22 +8380,6 @@ var ColorPicker$1 = function (_BaseColorPicker) {
                 colorSetsChooser: ColorSetsChooser,
                 contextMenu: CurrentColorSetsContextMenu
             };
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize() {
-
-            // root 만들기 
-            get(ColorPicker.prototype.__proto__ || Object.getPrototypeOf(ColorPicker.prototype), 'initialize', this).call(this);
-
-            this.render();
-
-            this.$root.append(this.$el);
-
-            this.initColor(this.opt.color);
-
-            // 이벤트 연결 
-            this.initializeEvent();
         }
 
         // Event Bindings 

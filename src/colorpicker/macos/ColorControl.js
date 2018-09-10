@@ -5,10 +5,6 @@ import UIElement from '../UIElement';
 const source = 'macos-control';
 
 export default class ColorControl extends UIElement {
-    constructor (opt) {
-        super(opt);
-        this.initialize();        
-    } 
 
     components () {
         return { Value, Opacity }
@@ -25,15 +21,6 @@ export default class ColorControl extends UIElement {
         `
     }
 
-    initialize () {
-
-        this.$store.on('changeColor', (sourceType) => {
-            if (source != sourceType) {
-                this.refresh()
-            }
-        })
-    }
-
     setBackgroundColor () {
         this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
     }
@@ -46,7 +33,13 @@ export default class ColorControl extends UIElement {
     setColorUI() {
         this.Value.setColorUI()
         this.Opacity.setColorUI()
-    }    
+    }   
+    
+    '@changeColor' (sourceType) {
+        if (source != sourceType) {
+            this.refresh()
+        }
+    } 
 
 }
  
