@@ -27,6 +27,13 @@ class UIElement extends EventMachin {
         this.destoryStoreEvent()
     }
 
+    /**
+     * initialize store event 
+     * 
+     * you can define '@xxx' method(event) in UIElement 
+     * 
+     * 
+     */
     initializeStoreEvent () {
         this.storeEvents = {}
         this.filterProps(CHECK_STORE_EVENT_PATTERN).forEach((key) => {
@@ -40,7 +47,7 @@ class UIElement extends EventMachin {
     }
 
     destoryStoreEvent () {
-        Object.keys(this.storeEvents).forEach(key => {
+        Object.keys(this.storeEvents).forEach(event => {
             this.$store.off(event, this.storeEvents[event])
         })
     }

@@ -6473,6 +6473,15 @@ var UIElement = function (_EventMachin) {
 
             this.destoryStoreEvent();
         }
+
+        /**
+         * initialize store event 
+         * 
+         * you can define '@xxx' method(event) in UIElement 
+         * 
+         * 
+         */
+
     }, {
         key: 'initializeStoreEvent',
         value: function initializeStoreEvent() {
@@ -6493,7 +6502,7 @@ var UIElement = function (_EventMachin) {
         value: function destoryStoreEvent() {
             var _this3 = this;
 
-            Object.keys(this.storeEvents).forEach(function (key) {
+            Object.keys(this.storeEvents).forEach(function (event) {
                 _this3.$store.off(event, _this3.storeEvents[event]);
             });
         }
