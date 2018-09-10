@@ -68,7 +68,7 @@ export default class ColorInformation extends UIElement {
 
         this.format = 'hex'; 
 
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -99,7 +99,7 @@ export default class ColorInformation extends UIElement {
         } else if (current_format == 'rgb') {
             next_format = 'hsl';
         } else if (current_format == 'hsl') {
-            if (this.$store.$ColorManager.alpha == 1) {
+            if (this.$store.alpha == 1) {
                 next_format = 'hex';
             } else {
                 next_format = 'rgb';
@@ -110,7 +110,7 @@ export default class ColorInformation extends UIElement {
         this.$el.addClass(next_format);
         this.format = next_format;
 
-        this.$store.$ColorManager.changeFormat(this.format);
+        this.$store.dispatch('/changeFormat', this.format);
     }
     
     getFormat () {
@@ -126,7 +126,7 @@ export default class ColorInformation extends UIElement {
     }        
 
     changeRgbColor () {
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor', {
             type: 'rgb',
             r : this.refs.$rgb_r.int(),
             g : this.refs.$rgb_g.int(),
@@ -137,7 +137,7 @@ export default class ColorInformation extends UIElement {
     }
 
     changeHslColor () {
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor', {
             type: 'hsl',
             h : this.refs.$hsl_h.int(),
             s : this.refs.$hsl_s.int(),
@@ -167,7 +167,7 @@ export default class ColorInformation extends UIElement {
         var code = this.refs.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
-            this.$store.$ColorManager.changeColor(code, source)    
+            this.$store.dispatch('/changeColor', code, source)
         }
     }
     
@@ -176,25 +176,25 @@ export default class ColorInformation extends UIElement {
     }
 
     setRGBInput() {
-        this.refs.$rgb_r.val(this.$store.$ColorManager.rgb.r);
-        this.refs.$rgb_g.val(this.$store.$ColorManager.rgb.g);
-        this.refs.$rgb_b.val(this.$store.$ColorManager.rgb.b);
-        this.refs.$rgb_a.val(this.$store.$ColorManager.alpha);
+        this.refs.$rgb_r.val(this.$store.rgb.r);
+        this.refs.$rgb_g.val(this.$store.rgb.g);
+        this.refs.$rgb_b.val(this.$store.rgb.b);
+        this.refs.$rgb_a.val(this.$store.alpha);
     }
     
     setHSLInput() {
-        this.refs.$hsl_h.val(this.$store.$ColorManager.hsl.h);
-        this.refs.$hsl_s.val(this.$store.$ColorManager.hsl.s);
-        this.refs.$hsl_l.val(this.$store.$ColorManager.hsl.l);
-        this.refs.$hsl_a.val(this.$store.$ColorManager.alpha);
+        this.refs.$hsl_h.val(this.$store.hsl.h);
+        this.refs.$hsl_s.val(this.$store.hsl.s);
+        this.refs.$hsl_l.val(this.$store.hsl.l);
+        this.refs.$hsl_a.val(this.$store.alpha);
     }    
 
     setHexInput () {
-        this.refs.$hexCode.val(this.$store.$ColorManager.toHEX());
+        this.refs.$hexCode.val(this.$store.dispatch('/toHEX'));
     }
 
     refresh () {
-        this.setCurrentFormat(this.$store.$ColorManager.format);
+        this.setCurrentFormat(this.$store.format);
         this.setRGBInput();
         this.setHSLInput();
         this.setHexInput();

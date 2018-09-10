@@ -24,7 +24,7 @@ export default class Value extends UIElement {
 
         this.pos = {}
 
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -37,7 +37,7 @@ export default class Value extends UIElement {
  
     setColorUI(v) {
     
-        v = v || (this.$store.$ColorManager.hsv.v)
+        v = v || (this.$store.hsv.v)
 
         var valueX = this.state.get('$container.width') * v;
 
@@ -55,7 +55,7 @@ export default class Value extends UIElement {
 
         var min = this.refs.$container.offset().left;
         var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.$ColorManager.hsv.v/100);
+        var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.hsv.v/100);
     
         var dist;
         if (current < min) {
@@ -71,7 +71,7 @@ export default class Value extends UIElement {
 
         this.setColorUI(dist/100)
 
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor', {
             type: 'hsv',
             v: dist/100,
             source

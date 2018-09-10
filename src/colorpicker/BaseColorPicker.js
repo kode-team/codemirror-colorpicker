@@ -1,8 +1,8 @@
-import Color from '../util/Color'
 import Dom from '../util/Dom'
-import ColorSetsList from './ColorSetsList'
+import ColorSetsList from './module/ColorSetsList'
 import UIElement from './UIElement'
-import ColorManager from './ColorManager';
+import ColorManager from './module/ColorManager';
+import BaseStore from './BaseStore';
 
 export default class BaseColorPicker extends UIElement {
     constructor(opt) {
@@ -12,9 +12,15 @@ export default class BaseColorPicker extends UIElement {
         this.$body = null;
         this.$root = null; 
         
-        this.$store = {
-            $ColorManager: new ColorManager(),
-            $ColorSetsList: new ColorSetsList(this)
+        this.$store = new BaseStore({
+            modules: [
+                ColorManager,
+                ColorSetsList
+            ]
+        });
+
+        this.callbackChange = () => {
+            this.callbackColorValue()
         }
 
         this.colorpickerShowCallback = function () { };
@@ -25,7 +31,7 @@ export default class BaseColorPicker extends UIElement {
         this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
         this.timerCloseColorPicker;
         this.autoHide = this.opt.autoHide || true;
-
+        this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
     }
 
     initialize () {
@@ -45,7 +51,90 @@ export default class BaseColorPicker extends UIElement {
         this.$arrow = new Dom('div', 'arrow');
         
         this.$root.append(this.$arrow);
+
+        this.$store.dispatch('/setUserList', this.opt.colorSets);
     }
+
+    /** 
+     * public method 
+     * 
+     */
+
+    /**
+     * 
+     * show colorpicker with position  
+     * 
+     * @param {{left, top, hideDelay, isShortCut}} opt 
+     * @param {String|Object} color  
+     * @param {Function} showCallback  it is called when colorpicker is shown
+     * @param {Function} hideCallback  it is called once when colorpicker is hidden
+     */
+    show(opt, color, showCallback, hideCallback) {
+        this.destroy();
+        this.initializeEvent();
+        this.$root.appendTo(this.$body);
+
+        this.$root.css(this.getInitalizePosition()).show();
+
+        this.definePosition(opt);
+
+        this.isColorPickerShow = true;
+
+        this.isShortCut = opt.isShortCut || false;
+
+        this.initColor(color);
+
+        // define colorpicker callback
+        this.colorpickerShowCallback = showCallback;
+        this.colorpickerHideCallback = hideCallback;        
+
+        // define hide delay
+        this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
+        if (this.hideDelay > 0) {
+            this.setHideDelay(this.hideDelay);
+        }
+
+    }     
+
+    /**
+     * 
+     * initialize color for colorpicker
+     * 
+     * @param {String|Object} newColor 
+     * @param {String} format  hex, rgb, hsl
+     */
+    initColor(newColor, format) {
+        this.$store.dispatch('/changeColor', newColor, format);
+    }
+
+
+    /**
+     * hide colorpicker 
+     * 
+     */
+    hide() {
+        if (this.isColorPickerShow) {
+            this.destroy();
+            this.$root.hide();
+            this.$root.remove();  // not empty 
+            this.isColorPickerShow = false;
+
+            this.callbackHideColorValue()
+        }
+    }
+
+    /**
+     * set to colors in current sets that you see 
+     * @param {Array} colors 
+     */
+    setColorsInPalette (colors = []) {
+        this.$store.dispatch('/setCurrentColorAll', colors);
+    }    
+
+
+    /**
+     * private method 
+     */
 
     getOption(key) {
         return this.opt[key];
@@ -72,7 +161,7 @@ export default class BaseColorPicker extends UIElement {
     }
 
     getColor(type) {
-        return this.$store.$ColorManager.toString(type);
+        return this.$store.dispatch('/toColor', type);
     }
 
     definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
@@ -122,32 +211,7 @@ export default class BaseColorPicker extends UIElement {
         }
     }
 
-    show(opt, color, showCallback, hideCallback) {
-        this.destroy();
-        this.initializeEvent();
-        this.$root.appendTo(this.$body);
-
-        this.$root.css(this.getInitalizePosition()).show();
-
-        this.definePosition(opt);
-
-        this.isColorPickerShow = true;
-
-        this.isShortCut = opt.isShortCut || false;
-
-        this.initColor(color);
-
-        // define colorpicker callback
-        this.colorpickerShowCallback = showCallback;
-        this.colorpickerHideCallback = hideCallback;        
-
-        // define hide delay
-        this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
-        if (this.hideDelay > 0) {
-            this.setHideDelay(this.hideDelay);
-        }
-
-    }
+    
 
     setHideDelay(delayTime) {
         delayTime = delayTime || 0;
@@ -168,17 +232,6 @@ export default class BaseColorPicker extends UIElement {
 
         clearTimeout(this.timerCloseColorPicker);
         // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
-    }
-
-    hide() {
-        if (this.isColorPickerShow) {
-            this.destroy();
-            this.$root.hide();
-            this.$root.remove();  // not empty 
-            this.isColorPickerShow = false;
-
-            this.callbackHideColorValue()
-        }
     }
 
     callbackColorValue(color) {
@@ -205,12 +258,9 @@ export default class BaseColorPicker extends UIElement {
     }    
 
     getCurrentColor() {
-        return this.$store.$ColorManager.toString();
+        return this.$store.dispatch('/toColor');
     }
 
-    initColor(newColor, format) {
-        this.$store.$ColorManager.changeColor(newColor, format);
-    }
 
     checkColorPickerClass(el) {
         var hasColorView = new Dom(el).closest('codemirror-colorview');
@@ -231,27 +281,15 @@ export default class BaseColorPicker extends UIElement {
 
         super.initializeEvent();
 
-        this.callbackChange = () => {
-            this.callbackColorValue()
-        }
-
-        this.$store.$ColorManager.on('change', this.callbackChange)
-        this.$store.$ColorManager.on('changeFormat', this.callbackChange)                
+        this.$store.on('changeColor', this.callbackChange)
+        this.$store.on('changeFormat', this.callbackChange)
     }
-
-    setColorSets(list) {
-        this.$store.$ColorSetsList.setUserList(list);
-    }
-
-    setColorsInPalette (colors = []) {
-        this.$store.$ColorSetsList.setCurrentColorAll(colors);
-    }    
  
     destroy() {
         super.destroy();
 
-        this.$store.$ColorManager.off('change', this.callbackChange)
-        this.$store.$ColorManager.off('changeFormat', this.callbackChange)        
+        this.$store.off('changeColor', this.callbackChange);
+        this.$store.off('changeFormat', this.callbackChange);
 
         this.callbackChange = undefined; 
 

@@ -1,4 +1,3 @@
-import Color from '../../util/Color'
 import BaseColorPicker from '../BaseColorPicker'
 
 import ColorWheel from './ColorWheel'
@@ -49,73 +48,10 @@ export default class MacOSColorPicker extends BaseColorPicker {
 
         this.$root.append(this.$el)
 
-        this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
-
         this.initColor(this.opt.color);
 
         // 이벤트 연결 
         this.initializeEvent();        
-    }
-
-
-    showContextMenu(e, index) {
-        this.contextMenu.show(e, index);
-    }
-
-    setColor(value, isDirect = false) {
-
-        if (typeof (value) == "object") {
-            if (!value.r || !value.g || !value.b)
-                return;
-
-            if (isDirect) {
-                this.callbackColorValue(Color.format(value, "hex"));
-            } else {
-                this.initColor(Color.format(value, "hex"));
-            }
-
-        } else if (typeof (value) == "string") {
-
-            if (isDirect) {
-                this.callbackColorValue(value);
-            } else {
-                this.initColor(value);
-            }
-
-
-
-        }
-    }
-
-    toggleColorChooser() {
-        this.colorSetsChooser.toggle();
-    }
-
-    refreshColorSetsChooser() {
-        this.colorSetsChooser.load();
-    }
-
-    getColorSetsList() {
-        return this.$store.$ColorSetsList.getColorSetsList();
-    }
-
-    setCurrentColorSets(nameOrIndex) {
-        this.$store.$ColorSetsList.setCurrentColorSets(nameOrIndex);
-        this.currentColorSets.load();
-    }
-
-    setColorSets(list) {
-        this.$store.$ColorSetsList.setUserList(list);
-    }
-
-    setColorsInPalette (colors = []) {
-        this.$store.$ColorSetsList.setCurrentColorAll(colors);
-        this.currentColorSets.load()
-        this.colorSetsChooser.load();
-    }
-
-    refreshValue () {
-        this.colorwheel.renderValue()
     }
 
     // Event Bindings 

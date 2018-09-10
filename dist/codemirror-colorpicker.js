@@ -384,22 +384,6 @@ var Canvas = {
     }
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -5862,50 +5846,78 @@ var Dom = function () {
     return Dom;
 }();
 
-var ColorSetsList = function () {
-    function ColorSetsList(colorpicker) {
+var BaseModule = function () {
+    function BaseModule($store) {
+        classCallCheck(this, BaseModule);
+
+        this.$store = $store;
+        this.initialize();
+    }
+
+    createClass(BaseModule, [{
+        key: 'initialize',
+        value: function initialize() {
+            var _this = this;
+
+            this.filterProps().forEach(function (key) {
+                _this.$store.action(key, _this);
+            });
+        }
+    }, {
+        key: 'filterProps',
+        value: function filterProps() {
+            var pattern = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+
+            return Object.getOwnPropertyNames(this.__proto__).filter(function (key) {
+                return key.startsWith(pattern);
+            });
+        }
+    }]);
+    return BaseModule;
+}();
+
+var ColorSetsList = function (_BaseModule) {
+    inherits(ColorSetsList, _BaseModule);
+
+    function ColorSetsList() {
         classCallCheck(this, ColorSetsList);
-
-        this.colorpicker = colorpicker;
-
-        this.colorSetsList = [{
-            name: "Material",
-            colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
-        }, {
-            name: "Custom", "edit": true, "colors": []
-        }, {
-            name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5
-        }];
-
-        this.setUserList(this.colorpicker.getOption('colorSets'));
+        return possibleConstructorReturn(this, (ColorSetsList.__proto__ || Object.getPrototypeOf(ColorSetsList)).apply(this, arguments));
     }
 
     createClass(ColorSetsList, [{
-        key: 'list',
-        value: function list() {
-            return this.userList || this.colorSetsList;
+        key: 'initialize',
+        value: function initialize() {
+            get(ColorSetsList.prototype.__proto__ || Object.getPrototypeOf(ColorSetsList.prototype), 'initialize', this).call(this);
+
+            // set property
+            this.$store.colorSetsList = [{ name: "Material",
+                colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B']
+            }, { name: "Custom", "edit": true, "colors": [] }, { name: "Color Scale", "scale": ['red', 'yellow', 'black'], count: 5 }];
+            this.$store.currentColorSets = {};
         }
     }, {
-        key: 'setUserList',
-        value: function setUserList(list) {
-            this.userList = list;
-
-            this.resetUserList();
-
-            this.setCurrentColorSets();
+        key: '/list',
+        value: function list($store) {
+            return Array.isArray($store.userList) && $store.userList.length ? $store.userList : $store.colorSetsList;
         }
     }, {
-        key: 'resetUserList',
-        value: function resetUserList() {
-            var _this = this;
+        key: '/setUserList',
+        value: function setUserList($store, list) {
+            $store.userList = list;
 
-            if (this.userList && this.userList.length) {
-                this.userList = this.userList.map(function (element, index) {
+            $store.dispatch('/resetUserList');
+            $store.dispatch('/setCurrentColorSets');
+        }
+    }, {
+        key: '/resetUserList',
+        value: function resetUserList($store) {
+            if ($store.userList && $store.userList.length) {
+                $store.userList = $store.userList.map(function (element, index) {
 
                     if (typeof element.colors == 'function') {
                         var makeCallback = element.colors;
 
-                        element.colors = makeCallback(_this.colorpicker, _this);
+                        element.colors = makeCallback($store);
                         element._colors = makeCallback;
                     }
 
@@ -5914,73 +5926,81 @@ var ColorSetsList = function () {
                         colors: []
                     }, element);
                 });
+
+                $store.emit('changeUserList');
             }
         }
     }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
+        key: '/setCurrentColorSets',
+        value: function setCurrentColorSets($store, nameOrIndex) {
 
-            var _list = this.list();
+            var _list = $store.dispatch('/list');
 
             if (typeof nameOrIndex == 'undefined') {
-                this.currentColorSets = _list[0];
+                $store.currentColorSets = _list[0];
             } else if (typeof nameOrIndex == 'number') {
-                this.currentColorSets = _list[nameOrIndex];
+                $store.currentColorSets = _list[nameOrIndex];
             } else {
-                this.currentColorSets = _list.filter(function (obj) {
+                $store.currentColorSets = _list.filter(function (obj) {
                     return obj.name == nameOrIndex;
                 })[0];
             }
-        }
-    }, {
-        key: 'getCurrentColorSets',
-        value: function getCurrentColorSets() {
-            return this.currentColorSets;
-        }
-    }, {
-        key: 'addCurrentColor',
-        value: function addCurrentColor(color$$1) {
-            if (Array.isArray(this.currentColorSets.colors)) {
-                this.currentColorSets.colors.push(color$$1);
-            }
-        }
-    }, {
-        key: 'setCurrentColorAll',
-        value: function setCurrentColorAll() {
-            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-            this.currentColorSets.colors = colors;
+            $store.emit('changeCurrentColorSets');
         }
     }, {
-        key: 'removeCurrentColor',
-        value: function removeCurrentColor(index) {
-            if (this.currentColorSets.colors[index]) {
-                this.currentColorSets.colors.splice(index, 1);
+        key: '/getCurrentColorSets',
+        value: function getCurrentColorSets($store) {
+            return $store.currentColorSets;
+        }
+    }, {
+        key: '/addCurrentColor',
+        value: function addCurrentColor($store, color$$1) {
+            if (Array.isArray($store.currentColorSets.colors)) {
+                $store.currentColorSets.colors.push(color$$1);
+                $store.emit('changeCurrentColorSets');
             }
         }
     }, {
-        key: 'removeCurrentColorToTheRight',
-        value: function removeCurrentColorToTheRight(index) {
-            if (this.currentColorSets.colors[index]) {
-                this.currentColorSets.colors.splice(index, Number.MAX_VALUE);
-            }
-        }
-    }, {
-        key: 'clearPalette',
-        value: function clearPalette() {
-            if (this.currentColorSets.colors) {
-                this.currentColorSets.colors = [];
-            }
-        }
-    }, {
-        key: 'getCurrentColors',
-        value: function getCurrentColors() {
-            return this.getColors(this.currentColorSets);
-        }
-    }, {
-        key: 'getColors',
-        value: function getColors(element) {
+        key: '/setCurrentColorAll',
+        value: function setCurrentColorAll($store) {
+            var colors = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
+            $store.currentColorSets.colors = colors;
+            $store.emit('changeCurrentColorSets');
+        }
+    }, {
+        key: '/removeCurrentColor',
+        value: function removeCurrentColor($store, index) {
+            if ($store.currentColorSets.colors[index]) {
+                $store.currentColorSets.colors.splice(index, 1);
+                $store.emit('changeCurrentColorSets');
+            }
+        }
+    }, {
+        key: '/removeCurrentColorToTheRight',
+        value: function removeCurrentColorToTheRight($store, index) {
+            if ($store.currentColorSets.colors[index]) {
+                $store.currentColorSets.colors.splice(index, Number.MAX_VALUE);
+                $store.emit('changeCurrentColorSets');
+            }
+        }
+    }, {
+        key: '/clearPalette',
+        value: function clearPalette($store) {
+            if ($store.currentColorSets.colors) {
+                $store.currentColorSets.colors = [];
+                $store.emit('changeCurrentColorSets');
+            }
+        }
+    }, {
+        key: '/getCurrentColors',
+        value: function getCurrentColors($store) {
+            return $store.dispatch('/getColors', $store.currentColorSets);
+        }
+    }, {
+        key: '/getColors',
+        value: function getColors($store, element) {
             if (element.scale) {
                 return color.scale(element.scale, element.count);
             }
@@ -5988,57 +6008,19 @@ var ColorSetsList = function () {
             return element.colors || [];
         }
     }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            var _this2 = this;
-
-            return this.list().map(function (element) {
+        key: '/getColorSetsList',
+        value: function getColorSetsList($store) {
+            return $store.dispatch('/list').map(function (element) {
                 return {
                     name: element.name,
                     edit: element.edit,
-                    colors: _this2.getColors(element)
+                    colors: $store.dispatch('/getColors', element)
                 };
-            });
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {}
-    }, {
-        key: 'on',
-        value: function on(event, callback) {
-            this.callbacks.push({ event: event, callback: callback });
-        }
-    }, {
-        key: 'off',
-        value: function off(event, callback) {
-
-            if (arguments.length == 0) {
-                this.callbacks = [];
-            } else if (arguments.length == 1) {
-                this.callbacks = this.callbacks.filter(function (f) {
-                    return f.event != event;
-                });
-            } else if (arguments.length == 2) {
-                this.callbacks = this.callbacks.filter(function (f) {
-                    return f.event != event && f.callback != callback;
-                });
-            }
-        }
-    }, {
-        key: 'emit',
-        value: function emit() {
-            var args = [].concat(Array.prototype.slice.call(arguments));
-            var event = args.shift();
-
-            this.callbacks.filter(function (f) {
-                return f.event == event;
-            }).forEach(function (f) {
-                f.callback.apply(f, toConsumableArray(args));
             });
         }
     }]);
     return ColorSetsList;
-}();
+}(BaseModule);
 
 var Event = {
     addEvent: function addEvent(dom, eventName, callback) {
@@ -6454,143 +6436,6 @@ var EventMachin = function () {
   return EventMachin;
 }();
 
-var ColorManager = function () {
-    function ColorManager(color$$1) {
-        classCallCheck(this, ColorManager);
-
-        this.color = color$$1;
-        this.callbacks = [];
-        this.rgb = {};
-        this.hsl = {};
-        this.hsv = {};
-        this.alpha = 1;
-        this.initialize();
-    }
-
-    createClass(ColorManager, [{
-        key: 'initialize',
-        value: function initialize() {
-            this.changeColor(this.color);
-        }
-    }, {
-        key: 'changeFormat',
-        value: function changeFormat(format) {
-            this.format = format;
-
-            this.emit('changeFormat');
-        }
-    }, {
-        key: 'isUndefined',
-        value: function isUndefined(v) {
-            return typeof v == 'undefined' || v == null;
-        }
-    }, {
-        key: 'changeColor',
-        value: function changeColor(colorObj, source) {
-
-            colorObj = colorObj || '#FF0000';
-
-            if (typeof colorObj == 'string') {
-                colorObj = color.parse(colorObj);
-            }
-
-            colorObj.source = colorObj.source || source;
-
-            console.log('set', colorObj, colorObj.a);
-
-            this.alpha = this.isUndefined(colorObj.a) ? this.alpha : colorObj.a;
-            this.format = colorObj.type != 'hsv' ? colorObj.type || this.format : this.format;
-
-            if (this.format == 'hex' && this.alpha < 1) {
-                this.format = 'rgb';
-            }
-
-            if (colorObj.type == 'hsl') {
-                this.hsl = Object.assign(this.hsl, colorObj);
-                this.rgb = color.HSLtoRGB(this.hsl);
-                this.hsv = color.HSLtoHSV(colorObj);
-            } else if (colorObj.type == 'hex') {
-                this.rgb = Object.assign(this.rgb, colorObj);
-                this.hsl = color.RGBtoHSL(this.rgb);
-                this.hsv = color.RGBtoHSV(colorObj);
-            } else if (colorObj.type == 'rgb') {
-                this.rgb = Object.assign(this.rgb, colorObj);
-                this.hsl = color.RGBtoHSL(this.rgb);
-                this.hsv = color.RGBtoHSV(colorObj);
-            } else if (colorObj.type == 'hsv') {
-                this.hsv = Object.assign(this.hsv, colorObj);
-                this.rgb = color.HSVtoRGB(this.hsv);
-                this.hsl = color.HSVtoHSL(this.hsv);
-            }
-
-            console.log('alpha', this.alpha);
-
-            this.emit('change', colorObj.source);
-        }
-    }, {
-        key: 'getHueColor',
-        value: function getHueColor() {
-            return HueColor.checkHueColor(this.hsv.h / 360);
-        }
-    }, {
-        key: 'toString',
-        value: function toString(type) {
-            type = type || this.format;
-            var colorObj = this[type] || this.rgb;
-            return color.format(Object.assign({}, colorObj, { a: this.alpha }), type);
-        }
-    }, {
-        key: 'toRGB',
-        value: function toRGB() {
-            return this.toString('rgb');
-        }
-    }, {
-        key: 'toHSL',
-        value: function toHSL() {
-            return this.toString('hsl');
-        }
-    }, {
-        key: 'toHEX',
-        value: function toHEX() {
-            return this.toString('hex');
-        }
-    }, {
-        key: 'on',
-        value: function on(event, callback) {
-            this.callbacks.push({ event: event, callback: callback });
-        }
-    }, {
-        key: 'off',
-        value: function off(event, callback) {
-
-            if (arguments.length == 0) {
-                this.callbacks = [];
-            } else if (arguments.length == 1) {
-                this.callbacks = this.callbacks.filter(function (f) {
-                    return f.event != event;
-                });
-            } else if (arguments.length == 2) {
-                this.callbacks = this.callbacks.filter(function (f) {
-                    return f.event != event && f.callback != callback;
-                });
-            }
-        }
-    }, {
-        key: 'emit',
-        value: function emit() {
-            var args = [].concat(Array.prototype.slice.call(arguments));
-            var event = args.shift();
-
-            this.callbacks.filter(function (f) {
-                return f.event == event;
-            }).forEach(function (f) {
-                f.callback.apply(f, toConsumableArray(args));
-            });
-        }
-    }]);
-    return ColorManager;
-}();
-
 var UIElement = function (_EventMachin) {
     inherits(UIElement, _EventMachin);
 
@@ -6609,6 +6454,197 @@ var UIElement = function (_EventMachin) {
     return UIElement;
 }(EventMachin);
 
+function isUndefined(v) {
+    return typeof v == 'undefined' || v == null;
+}
+
+var ColorManager = function (_BaseModule) {
+    inherits(ColorManager, _BaseModule);
+
+    function ColorManager() {
+        classCallCheck(this, ColorManager);
+        return possibleConstructorReturn(this, (ColorManager.__proto__ || Object.getPrototypeOf(ColorManager)).apply(this, arguments));
+    }
+
+    createClass(ColorManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(ColorManager.prototype.__proto__ || Object.getPrototypeOf(ColorManager.prototype), 'initialize', this).call(this);
+
+            this.$store.rgb = {};
+            this.$store.hsl = {};
+            this.$store.hsv = {};
+            this.$store.alpha = 1;
+            this.$store.format = 'hex';
+
+            this.$store.dispatch('/changeColor');
+        }
+    }, {
+        key: '/changeFormat',
+        value: function changeFormat(format) {
+            this.format = format;
+
+            this.emit('changeFormat');
+        }
+    }, {
+        key: '/changeColor',
+        value: function changeColor($store, colorObj, source) {
+
+            colorObj = colorObj || '#FF0000';
+
+            if (typeof colorObj == 'string') {
+                colorObj = color.parse(colorObj);
+            }
+
+            colorObj.source = colorObj.source || source;
+
+            $store.alpha = isUndefined(colorObj.a) ? $store.alpha : colorObj.a;
+            $store.format = colorObj.type != 'hsv' ? colorObj.type || $store.format : $store.format;
+
+            if ($store.format == 'hex' && $store.alpha < 1) {
+                $store.format = 'rgb';
+            }
+
+            if (colorObj.type == 'hsl') {
+                $store.hsl = Object.assign($store.hsl, colorObj);
+                $store.rgb = color.HSLtoRGB($store.hsl);
+                $store.hsv = color.HSLtoHSV(colorObj);
+            } else if (colorObj.type == 'hex') {
+                $store.rgb = Object.assign($store.rgb, colorObj);
+                $store.hsl = color.RGBtoHSL($store.rgb);
+                $store.hsv = color.RGBtoHSV(colorObj);
+            } else if (colorObj.type == 'rgb') {
+                $store.rgb = Object.assign($store.rgb, colorObj);
+                $store.hsl = color.RGBtoHSL($store.rgb);
+                $store.hsv = color.RGBtoHSV(colorObj);
+            } else if (colorObj.type == 'hsv') {
+                $store.hsv = Object.assign($store.hsv, colorObj);
+                $store.rgb = color.HSVtoRGB($store.hsv);
+                $store.hsl = color.HSVtoHSL($store.hsv);
+            }
+
+            $store.emit('changeColor', colorObj.source);
+        }
+    }, {
+        key: '/getHueColor',
+        value: function getHueColor($store) {
+            return HueColor.checkHueColor($store.hsv.h / 360);
+        }
+    }, {
+        key: '/toString',
+        value: function toString($store, type) {
+            type = type || $store.format;
+            var colorObj = $store[type] || $store.rgb;
+            return color.format(Object.assign({}, colorObj, { a: $store.alpha }), type);
+        }
+    }, {
+        key: '/toColor',
+        value: function toColor($store, type) {
+            return $store.dispatch('/toString', type);
+        }
+    }, {
+        key: '/toRGB',
+        value: function toRGB($store) {
+            return $store.dispatch('/toString', 'rgb');
+        }
+    }, {
+        key: '/toHSL',
+        value: function toHSL($store) {
+            return $store.dispatch('/toString', 'hsl');
+        }
+    }, {
+        key: '/toHEX',
+        value: function toHEX($store) {
+            return $store.dispatch('/toString', 'hex');
+        }
+    }]);
+    return ColorManager;
+}(BaseModule);
+
+var BaseStore = function () {
+    function BaseStore(opt) {
+        classCallCheck(this, BaseStore);
+
+        this.callbacks = [];
+        this.actions = [];
+        this.modules = opt.modules || [];
+
+        this.initialize();
+    }
+
+    createClass(BaseStore, [{
+        key: "initialize",
+        value: function initialize() {
+            this.initializeModule();
+        }
+    }, {
+        key: "initializeModule",
+        value: function initializeModule() {
+            var _this = this;
+
+            this.modules.forEach(function (Module) {
+                var instance = new Module(_this);
+            });
+        }
+    }, {
+        key: "action",
+        value: function action(_action, context) {
+            this.actions[_action] = { context: context, callback: context[_action] };
+        }
+    }, {
+        key: "dispatch",
+        value: function dispatch(action) {
+            var args = [].concat(Array.prototype.slice.call(arguments));
+            var action = args.shift();
+
+            var m = this.actions[action];
+
+            if (m) {
+                return m.callback.apply(m.context, [this].concat(toConsumableArray(args)));
+            }
+        }
+    }, {
+        key: "module",
+        value: function module(ModuleObject) {
+            // this.action()
+        }
+    }, {
+        key: "on",
+        value: function on(event, callback) {
+            this.callbacks.push({ event: event, callback: callback });
+        }
+    }, {
+        key: "off",
+        value: function off(event, callback) {
+
+            if (arguments.length == 0) {
+                this.callbacks = [];
+            } else if (arguments.length == 1) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event;
+                });
+            } else if (arguments.length == 2) {
+                this.callbacks = this.callbacks.filter(function (f) {
+                    return f.event != event && f.callback != callback;
+                });
+            }
+        }
+    }, {
+        key: "emit",
+        value: function emit() {
+            var args = [].concat(Array.prototype.slice.call(arguments));
+            var event = args.shift();
+
+            this.callbacks.filter(function (f) {
+                return f.event == event;
+            }).forEach(function (f) {
+                f.callback.apply(f, toConsumableArray(args));
+            });
+        }
+    }]);
+    return BaseStore;
+}();
+
 var BaseColorPicker = function (_UIElement) {
     inherits(BaseColorPicker, _UIElement);
 
@@ -6621,9 +6657,12 @@ var BaseColorPicker = function (_UIElement) {
         _this.$body = null;
         _this.$root = null;
 
-        _this.$store = {
-            $ColorManager: new ColorManager(),
-            $ColorSetsList: new ColorSetsList(_this)
+        _this.$store = new BaseStore({
+            modules: [ColorManager, ColorSetsList]
+        });
+
+        _this.callbackChange = function () {
+            _this.callbackColorValue();
         };
 
         _this.colorpickerShowCallback = function () {};
@@ -6634,7 +6673,7 @@ var BaseColorPicker = function (_UIElement) {
         _this.hideDelay = +(typeof _this.opt.hideDeplay == 'undefined' ? 2000 : _this.opt.hideDelay);
         _this.timerCloseColorPicker;
         _this.autoHide = _this.opt.autoHide || true;
-
+        _this.$checkColorPickerClass = _this.checkColorPickerClass.bind(_this);
         return _this;
     }
 
@@ -6658,7 +6697,102 @@ var BaseColorPicker = function (_UIElement) {
             this.$arrow = new Dom('div', 'arrow');
 
             this.$root.append(this.$arrow);
+
+            this.$store.dispatch('/setUserList', this.opt.colorSets);
         }
+
+        /** 
+         * public method 
+         * 
+         */
+
+        /**
+         * 
+         * show colorpicker with position  
+         * 
+         * @param {{left, top, hideDelay, isShortCut}} opt 
+         * @param {String|Object} color  
+         * @param {Function} showCallback  it is called when colorpicker is shown
+         * @param {Function} hideCallback  it is called once when colorpicker is hidden
+         */
+
+    }, {
+        key: 'show',
+        value: function show(opt, color, showCallback, hideCallback) {
+            this.destroy();
+            this.initializeEvent();
+            this.$root.appendTo(this.$body);
+
+            this.$root.css(this.getInitalizePosition()).show();
+
+            this.definePosition(opt);
+
+            this.isColorPickerShow = true;
+
+            this.isShortCut = opt.isShortCut || false;
+
+            this.initColor(color);
+
+            // define colorpicker callback
+            this.colorpickerShowCallback = showCallback;
+            this.colorpickerHideCallback = hideCallback;
+
+            // define hide delay
+            this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay);
+            if (this.hideDelay > 0) {
+                this.setHideDelay(this.hideDelay);
+            }
+        }
+
+        /**
+         * 
+         * initialize color for colorpicker
+         * 
+         * @param {String|Object} newColor 
+         * @param {String} format  hex, rgb, hsl
+         */
+
+    }, {
+        key: 'initColor',
+        value: function initColor(newColor, format) {
+            this.$store.dispatch('/changeColor', newColor, format);
+        }
+
+        /**
+         * hide colorpicker 
+         * 
+         */
+
+    }, {
+        key: 'hide',
+        value: function hide() {
+            if (this.isColorPickerShow) {
+                this.destroy();
+                this.$root.hide();
+                this.$root.remove(); // not empty 
+                this.isColorPickerShow = false;
+
+                this.callbackHideColorValue();
+            }
+        }
+
+        /**
+         * set to colors in current sets that you see 
+         * @param {Array} colors 
+         */
+
+    }, {
+        key: 'setColorsInPalette',
+        value: function setColorsInPalette() {
+            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.$store.dispatch('/setCurrentColorAll', colors);
+        }
+
+        /**
+         * private method 
+         */
+
     }, {
         key: 'getOption',
         value: function getOption(key) {
@@ -6692,7 +6826,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'getColor',
         value: function getColor(type) {
-            return this.$store.$ColorManager.toString(type);
+            return this.$store.dispatch('/toColor', type);
         }
     }, {
         key: 'definePositionForArrow',
@@ -6749,33 +6883,6 @@ var BaseColorPicker = function (_UIElement) {
             }
         }
     }, {
-        key: 'show',
-        value: function show(opt, color$$1, showCallback, hideCallback) {
-            this.destroy();
-            this.initializeEvent();
-            this.$root.appendTo(this.$body);
-
-            this.$root.css(this.getInitalizePosition()).show();
-
-            this.definePosition(opt);
-
-            this.isColorPickerShow = true;
-
-            this.isShortCut = opt.isShortCut || false;
-
-            this.initColor(color$$1);
-
-            // define colorpicker callback
-            this.colorpickerShowCallback = showCallback;
-            this.colorpickerHideCallback = hideCallback;
-
-            // define hide delay
-            this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay);
-            if (this.hideDelay > 0) {
-                this.setHideDelay(this.hideDelay);
-            }
-        }
-    }, {
         key: 'setHideDelay',
         value: function setHideDelay(delayTime) {
             var _this2 = this;
@@ -6800,51 +6907,34 @@ var BaseColorPicker = function (_UIElement) {
             // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
         }
     }, {
-        key: 'hide',
-        value: function hide() {
-            if (this.isColorPickerShow) {
-                this.destroy();
-                this.$root.hide();
-                this.$root.remove(); // not empty 
-                this.isColorPickerShow = false;
-
-                this.callbackHideColorValue();
-            }
-        }
-    }, {
         key: 'callbackColorValue',
-        value: function callbackColorValue(color$$1) {
-            color$$1 = color$$1 || this.getCurrentColor();
+        value: function callbackColorValue(color) {
+            color = color || this.getCurrentColor();
 
             if (typeof this.opt.onChange == 'function') {
-                this.opt.onChange.call(this, color$$1);
+                this.opt.onChange.call(this, color);
             }
 
             if (typeof this.colorpickerShowCallback == 'function') {
-                this.colorpickerShowCallback(color$$1);
+                this.colorpickerShowCallback(color);
             }
         }
     }, {
         key: 'callbackHideColorValue',
-        value: function callbackHideColorValue(color$$1) {
-            color$$1 = color$$1 || this.getCurrentColor();
+        value: function callbackHideColorValue(color) {
+            color = color || this.getCurrentColor();
             if (typeof this.opt.onHide == 'function') {
-                this.opt.onHide.call(this, color$$1);
+                this.opt.onHide.call(this, color);
             }
 
             if (typeof this.colorpickerHideCallback == 'function') {
-                this.colorpickerHideCallback(color$$1);
+                this.colorpickerHideCallback(color);
             }
         }
     }, {
         key: 'getCurrentColor',
         value: function getCurrentColor() {
-            return this.$store.$ColorManager.toString();
-        }
-    }, {
-        key: 'initColor',
-        value: function initColor(newColor, format) {
-            this.$store.$ColorManager.changeColor(newColor, format);
+            return this.$store.dispatch('/toColor');
         }
     }, {
         key: 'checkColorPickerClass',
@@ -6866,36 +6956,19 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'initializeEvent',
         value: function initializeEvent() {
-            var _this3 = this;
 
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'initializeEvent', this).call(this);
 
-            this.callbackChange = function () {
-                _this3.callbackColorValue();
-            };
-
-            this.$store.$ColorManager.on('change', this.callbackChange);
-            this.$store.$ColorManager.on('changeFormat', this.callbackChange);
-        }
-    }, {
-        key: 'setColorSets',
-        value: function setColorSets(list) {
-            this.$store.$ColorSetsList.setUserList(list);
-        }
-    }, {
-        key: 'setColorsInPalette',
-        value: function setColorsInPalette() {
-            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-            this.$store.$ColorSetsList.setCurrentColorAll(colors);
+            this.$store.on('changeColor', this.callbackChange);
+            this.$store.on('changeFormat', this.callbackChange);
         }
     }, {
         key: 'destroy',
         value: function destroy() {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'destroy', this).call(this);
 
-            this.$store.$ColorManager.off('change', this.callbackChange);
-            this.$store.$ColorManager.off('changeFormat', this.callbackChange);
+            this.$store.off('changeColor', this.callbackChange);
+            this.$store.off('changeFormat', this.callbackChange);
 
             this.callbackChange = undefined;
 
@@ -6931,7 +7004,7 @@ var ColorWheel = function (_UIElement) {
         value: function initialize() {
             var _this2 = this;
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source != sourceType) {
                     _this2.refresh(true);
                 }
@@ -6952,7 +7025,7 @@ var ColorWheel = function (_UIElement) {
     }, {
         key: 'renderValue',
         value: function renderValue() {
-            var value = 1 - this.$store.$ColorManager.hsv.v;
+            var value = 1 - this.$store.hsv.v;
             this.refs.$valuewheel.css({
                 'background-color': 'rgba(0, 0, 0, ' + value + ')'
             });
@@ -7064,8 +7137,8 @@ var ColorWheel = function (_UIElement) {
             var minY = this.refs.$el.offset().top;
             var centerY = minY + height / 2;
 
-            var x = e ? Event.pos(e).pageX : this.getX(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerX);
-            var y = e ? Event.pos(e).pageY : this.getY(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerY);
+            var x = e ? Event.pos(e).pageX : this.getX(this.$store.hsv.h, this.$store.hsv.s * radius, centerX);
+            var y = e ? Event.pos(e).pageY : this.getY(this.$store.hsv.h, this.$store.hsv.s * radius, centerY);
 
             var rx = x - centerX,
                 ry = y - centerY,
@@ -7087,7 +7160,7 @@ var ColorWheel = function (_UIElement) {
             });
 
             if (!isEvent) {
-                this.$store.$ColorManager.changeColor({
+                this.$store.dispatch('/changeColor', {
                     type: 'hsv',
                     h: hue,
                     s: saturation,
@@ -7152,7 +7225,7 @@ var Value = function (_UIElement) {
 
             this.pos = {};
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$2 != sourceType) {
                     _this2.refresh();
                 }
@@ -7167,7 +7240,7 @@ var Value = function (_UIElement) {
         key: 'setColorUI',
         value: function setColorUI(v) {
 
-            v = v || this.$store.$ColorManager.hsv.v;
+            v = v || this.$store.hsv.v;
 
             var valueX = this.state.get('$container.width') * v;
 
@@ -7185,7 +7258,7 @@ var Value = function (_UIElement) {
 
             var min = this.refs.$container.offset().left;
             var max = min + this.state.get('$container.width');
-            var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.$ColorManager.hsv.v / 100);
+            var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.hsv.v / 100);
 
             var dist;
             if (current < min) {
@@ -7201,7 +7274,7 @@ var Value = function (_UIElement) {
 
             this.setColorUI(dist / 100);
 
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 type: 'hsv',
                 v: dist / 100,
                 source: source$2
@@ -7264,7 +7337,7 @@ var Opacity = function (_UIElement) {
 
             this.pos = {};
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$3 != sourceType) {
                     _this2.refresh();
                 }
@@ -7279,7 +7352,7 @@ var Opacity = function (_UIElement) {
     }, {
         key: 'setOpacityColorBar',
         value: function setOpacityColorBar() {
-            var rgb = Object.assign({}, this.$store.$ColorManager.rgb);
+            var rgb = Object.assign({}, this.$store.rgb);
 
             rgb.a = 0;
             var start = color.format(rgb, 'rgb');
@@ -7294,7 +7367,7 @@ var Opacity = function (_UIElement) {
         value: function setOpacity(e) {
             var min = this.refs.$container.offset().left;
             var max = min + this.state.get('$container.width');
-            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.$ColorManager.alpha;
+            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.alpha;
             var dist;
 
             var dist;
@@ -7311,7 +7384,7 @@ var Opacity = function (_UIElement) {
 
             this.setColorUI(dist / 100);
 
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 a: Math.floor(dist) / 100,
                 source: source$3
             });
@@ -7319,7 +7392,7 @@ var Opacity = function (_UIElement) {
     }, {
         key: 'setColorUI',
         value: function setColorUI(alpha) {
-            alpha = alpha || this.$store.$ColorManager.alpha;
+            alpha = alpha || this.$store.alpha;
 
             var x = this.state.get('$container.width') * (alpha || 0);
             this.refs.$bar.css({ left: x + 'px' });
@@ -7385,7 +7458,7 @@ var ColorControl = function (_UIElement) {
         value: function initialize() {
             var _this2 = this;
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$1 != sourceType) {
                     _this2.refresh();
                 }
@@ -7394,7 +7467,7 @@ var ColorControl = function (_UIElement) {
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor() {
-            this.refs.$controlColor.css("background-color", this.$store.$ColorManager.toRGB());
+            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
         }
     }, {
         key: 'refresh',
@@ -7438,7 +7511,7 @@ var ColorInformation = function (_UIElement) {
 
             this.format = 'hex';
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$4 != sourceType) {
                     _this2.refresh();
                 }
@@ -7472,7 +7545,7 @@ var ColorInformation = function (_UIElement) {
             } else if (current_format == 'rgb') {
                 next_format = 'hsl';
             } else if (current_format == 'hsl') {
-                if (this.$store.$ColorManager.alpha == 1) {
+                if (this.$store.alpha == 1) {
                     next_format = 'hex';
                 } else {
                     next_format = 'rgb';
@@ -7483,7 +7556,7 @@ var ColorInformation = function (_UIElement) {
             this.$el.addClass(next_format);
             this.format = next_format;
 
-            this.$store.$ColorManager.changeFormat(this.format);
+            this.$store.dispatch('/changeFormat', this.format);
         }
     }, {
         key: 'getFormat',
@@ -7503,7 +7576,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'changeRgbColor',
         value: function changeRgbColor() {
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 type: 'rgb',
                 r: this.refs.$rgb_r.int(),
                 g: this.refs.$rgb_g.int(),
@@ -7515,7 +7588,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'changeHslColor',
         value: function changeHslColor() {
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 type: 'hsl',
                 h: this.refs.$hsl_h.int(),
                 s: this.refs.$hsl_s.int(),
@@ -7577,7 +7650,7 @@ var ColorInformation = function (_UIElement) {
             var code = this.refs.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.$store.$ColorManager.changeColor(code, source$4);
+                this.$store.dispatch('/changeColor', code, source$4);
             }
         }
     }, {
@@ -7588,28 +7661,28 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'setRGBInput',
         value: function setRGBInput() {
-            this.refs.$rgb_r.val(this.$store.$ColorManager.rgb.r);
-            this.refs.$rgb_g.val(this.$store.$ColorManager.rgb.g);
-            this.refs.$rgb_b.val(this.$store.$ColorManager.rgb.b);
-            this.refs.$rgb_a.val(this.$store.$ColorManager.alpha);
+            this.refs.$rgb_r.val(this.$store.rgb.r);
+            this.refs.$rgb_g.val(this.$store.rgb.g);
+            this.refs.$rgb_b.val(this.$store.rgb.b);
+            this.refs.$rgb_a.val(this.$store.alpha);
         }
     }, {
         key: 'setHSLInput',
         value: function setHSLInput() {
-            this.refs.$hsl_h.val(this.$store.$ColorManager.hsl.h);
-            this.refs.$hsl_s.val(this.$store.$ColorManager.hsl.s);
-            this.refs.$hsl_l.val(this.$store.$ColorManager.hsl.l);
-            this.refs.$hsl_a.val(this.$store.$ColorManager.alpha);
+            this.refs.$hsl_h.val(this.$store.hsl.h);
+            this.refs.$hsl_s.val(this.$store.hsl.s);
+            this.refs.$hsl_l.val(this.$store.hsl.l);
+            this.refs.$hsl_a.val(this.$store.alpha);
         }
     }, {
         key: 'setHexInput',
         value: function setHexInput() {
-            this.refs.$hexCode.val(this.$store.$ColorManager.toHEX());
+            this.refs.$hexCode.val(this.$store.dispatch('/toHEX'));
         }
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.setCurrentFormat(this.$store.$ColorManager.format);
+            this.setCurrentFormat(this.$store.format);
             this.setRGBInput();
             this.setHSLInput();
             this.setHexInput();
@@ -7642,7 +7715,21 @@ var ColorSetsChooser = function (_UIElement) {
     }, {
         key: 'initialize',
         value: function initialize() {
+            var _this2 = this;
 
+            this.$store.on('changeCurrentColorSets', function () {
+                _this2.refresh();
+            });
+
+            this.$store.on('toggleColorChooser', function () {
+                _this2.toggle();
+            });
+
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
             this.load();
         }
 
@@ -7652,7 +7739,7 @@ var ColorSetsChooser = function (_UIElement) {
         key: 'load $colorsetsList',
         value: function load$colorsetsList() {
             // colorsets 
-            var colorSets = this.$store.$ColorSetsList.getColorSetsList();
+            var colorSets = this.$store.dispatch('/getColorSetsList');
 
             return '\n            <div>\n                ' + colorSets.map(function (element, index) {
                 return '\n                        <div class="colorsets-item" data-colorsets-index="' + index + '" >\n                            <h1 class="title">' + element.name + '</h1>\n                            <div class="items">\n                                <div>\n                                    ' + element.colors.filter(function (color, i) {
@@ -7691,7 +7778,9 @@ var ColorSetsChooser = function (_UIElement) {
             if ($item) {
 
                 var index = parseInt($item.attr(DATA_COLORSETS_INDEX));
-                this.colorpicker.setCurrentColorSets(index);
+
+                this.$store.dispatch('/setCurrentColorSets', index);
+
                 this.hide();
             }
         }
@@ -7715,6 +7804,8 @@ var CurrentColorSets = function (_UIElement) {
         var _this = possibleConstructorReturn(this, (CurrentColorSets.__proto__ || Object.getPrototypeOf(CurrentColorSets)).call(this, opt));
 
         _this.colorpicker = opt;
+
+        _this.initialize();
         return _this;
     }
 
@@ -7726,53 +7817,42 @@ var CurrentColorSets = function (_UIElement) {
     }, {
         key: 'load $colorSetsColorList',
         value: function load$colorSetsColorList() {
-            var currentColorSets = this.$store.$ColorSetsList.getCurrentColorSets();
-            var colors = this.$store.$ColorSetsList.getCurrentColors();
+            var currentColorSets = this.$store.dispatch('/getCurrentColorSets');
+            var colors = this.$store.dispatch('/getCurrentColors');
 
             return '\n            <div class="current-color-sets">\n            ' + colors.map(function (color, i) {
                 return '<div class="color-item" title="' + color + '" data-index="' + i + '" data-color="' + color + '">\n                    <div class="empty"></div>\n                    <div class="color-view" style="background-color: ' + color + '"></div>\n                </div>';
             }).join('') + '   \n            ' + (currentColorSets.edit ? '<div class="add-color-item">+</div>' : '') + '         \n            </div>\n        ';
         }
     }, {
-        key: 'refreshAll',
-        value: function refreshAll() {
+        key: 'initialize',
+        value: function initialize() {
+            var _this2 = this;
+
+            this.$store.on('changeCurrentColorSets', function () {
+                _this2.refresh();
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
             this.load();
-            this.colorpicker.refreshColorSetsChooser();
         }
     }, {
         key: 'addColor',
         value: function addColor(color) {
-            this.$store.$ColorSetsList.addCurrentColor(color);
-            this.refreshAll();
-        }
-    }, {
-        key: 'removeColor',
-        value: function removeColor(index) {
-            this.$store.$ColorSetsList.removeCurrentColor(index);
-            this.refreshAll();
-        }
-    }, {
-        key: 'removeAllToTheRight',
-        value: function removeAllToTheRight(index) {
-            this.$store.$ColorSetsList.removeCurrentColorToTheRight(index);
-            this.refreshAll();
-        }
-    }, {
-        key: 'clearPalette',
-        value: function clearPalette() {
-            this.$store.$ColorSetsList.clearPalette();
-            this.refreshAll();
+            this.$store.dispatch('/addCurrentColor', color);
         }
     }, {
         key: 'click $colorSetsChooseButton',
         value: function click$colorSetsChooseButton(e) {
-            this.colorpicker.toggleColorChooser();
+            this.$store.emit('toggleColorChooser');
         }
     }, {
         key: 'contextmenu $colorSetsColorList',
         value: function contextmenu$colorSetsColorList(e) {
             e.preventDefault();
-            var currentColorSets = this.$store.$ColorSetsList.getCurrentColorSets();
+            var currentColorSets = this.$store.dispatch('/getCurrentColorSets');
 
             if (!currentColorSets.edit) {
                 return;
@@ -7785,23 +7865,20 @@ var CurrentColorSets = function (_UIElement) {
             if ($item) {
                 var index = parseInt($item.attr('data-index'));
 
-                this.colorpicker.showContextMenu(e, index);
+                this.$store.emit('showContextMenu', e, index);
             } else {
-                this.colorpicker.showContextMenu(e);
+                this.$store.emit('showContextMenu', e);
             }
         }
     }, {
         key: 'click $colorSetsColorList .add-color-item',
         value: function click$colorSetsColorListAddColorItem(e) {
-            this.addColor(this.colorpicker.getCurrentColor());
+            this.addColor(this.$store.dispatch('/toColor'));
         }
     }, {
         key: 'click $colorSetsColorList .color-item',
         value: function click$colorSetsColorListColorItem(e) {
-
-            var isDirect = !!this.colorpicker.isPaletteType();
-
-            this.colorpicker.setColor(e.$delegateTarget.attr('data-color'), isDirect);
+            this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
         }
     }]);
     return CurrentColorSets;
@@ -7815,9 +7892,6 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
 
         var _this = possibleConstructorReturn(this, (CurrentColorSetsContextMenu.__proto__ || Object.getPrototypeOf(CurrentColorSetsContextMenu)).call(this, opt));
 
-        _this.colorpicker = opt;
-        _this.currentColorSets = opt.currentColorSets;
-
         _this.initialize();
         return _this;
     }
@@ -7829,7 +7903,13 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
         }
     }, {
         key: 'initialize',
-        value: function initialize() {}
+        value: function initialize() {
+            var _this2 = this;
+
+            this.$store.on('showContextMenu', function (e, index) {
+                _this2.show(e, index);
+            });
+        }
     }, {
         key: 'show',
         value: function show(e, index) {
@@ -7858,13 +7938,13 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
         value: function runCommand(command) {
             switch (command) {
                 case 'remove-color':
-                    this.currentColorSets.removeColor(this.selectedColorIndex);
+                    this.$store.dispatch('/removeCurrentColor', this.selectedColorIndex);
                     break;
                 case 'remove-all-to-the-right':
-                    this.currentColorSets.removeAllToTheRight(this.selectedColorIndex);
+                    this.$store.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);
                     break;
                 case 'clear-palette':
-                    this.currentColorSets.clearPalette();
+                    this.$store.dispatch('/clearPalette');
                     break;
             }
         }
@@ -7920,80 +8000,10 @@ var MacOSColorPicker = function (_BaseColorPicker) {
 
             this.$root.append(this.$el);
 
-            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
-
             this.initColor(this.opt.color);
 
             // 이벤트 연결 
             this.initializeEvent();
-        }
-    }, {
-        key: 'showContextMenu',
-        value: function showContextMenu(e, index) {
-            this.contextMenu.show(e, index);
-        }
-    }, {
-        key: 'setColor',
-        value: function setColor(value) {
-            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-
-            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
-                if (!value.r || !value.g || !value.b) return;
-
-                if (isDirect) {
-                    this.callbackColorValue(color.format(value, "hex"));
-                } else {
-                    this.initColor(color.format(value, "hex"));
-                }
-            } else if (typeof value == "string") {
-
-                if (isDirect) {
-                    this.callbackColorValue(value);
-                } else {
-                    this.initColor(value);
-                }
-            }
-        }
-    }, {
-        key: 'toggleColorChooser',
-        value: function toggleColorChooser() {
-            this.colorSetsChooser.toggle();
-        }
-    }, {
-        key: 'refreshColorSetsChooser',
-        value: function refreshColorSetsChooser() {
-            this.colorSetsChooser.load();
-        }
-    }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            return this.$store.$ColorSetsList.getColorSetsList();
-        }
-    }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
-            this.$store.$ColorSetsList.setCurrentColorSets(nameOrIndex);
-            this.currentColorSets.load();
-        }
-    }, {
-        key: 'setColorSets',
-        value: function setColorSets(list) {
-            this.$store.$ColorSetsList.setUserList(list);
-        }
-    }, {
-        key: 'setColorsInPalette',
-        value: function setColorsInPalette() {
-            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-            this.$store.$ColorSetsList.setCurrentColorAll(colors);
-            this.currentColorSets.load();
-            this.colorSetsChooser.load();
-        }
-    }, {
-        key: 'refreshValue',
-        value: function refreshValue() {
-            this.colorwheel.renderValue();
         }
 
         // Event Bindings 
@@ -8039,7 +8049,7 @@ var Hue = function (_UIElement) {
 
             this.pos = {};
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$6 != sourceType) {
                     _this2.refresh();
                 }
@@ -8054,7 +8064,7 @@ var Hue = function (_UIElement) {
         key: 'setColorUI',
         value: function setColorUI(h) {
 
-            h = h || this.$store.$ColorManager.hsv.h;
+            h = h || this.$store.hsv.h;
 
             var x = this.state.get('$container.width') * (h / 360);
 
@@ -8072,7 +8082,7 @@ var Hue = function (_UIElement) {
 
             var min = this.refs.$container.offset().left;
             var max = min + this.state.get('$container.width');
-            var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.$ColorManager.hsv.h / 360);
+            var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.hsv.h / 360);
 
             var dist;
             if (current < min) {
@@ -8088,7 +8098,7 @@ var Hue = function (_UIElement) {
 
             this.setColorUI(dist / 100 * 360);
 
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 h: dist / 100 * 360,
                 type: 'hsv',
                 source: source$6
@@ -8151,7 +8161,7 @@ var Opacity$2 = function (_UIElement) {
 
             this.pos = {};
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$7 != sourceType) {
                     _this2.refresh();
                 }
@@ -8166,7 +8176,7 @@ var Opacity$2 = function (_UIElement) {
     }, {
         key: 'setOpacityColorBar',
         value: function setOpacityColorBar() {
-            var rgb = Object.assign({}, this.$store.$ColorManager.rgb);
+            var rgb = Object.assign({}, this.$store.rgb);
 
             rgb.a = 0;
             var start = color.format(rgb, 'rgb');
@@ -8181,7 +8191,7 @@ var Opacity$2 = function (_UIElement) {
         value: function setOpacity(e) {
             var min = this.refs.$container.offset().left;
             var max = min + this.state.get('$container.width');
-            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.$ColorManager.alpha;
+            var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.alpha;
             var dist;
 
             var dist;
@@ -8198,7 +8208,7 @@ var Opacity$2 = function (_UIElement) {
 
             this.setColorUI(dist / 100);
 
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 a: Math.floor(dist) / 100,
                 source: source$7
             });
@@ -8206,7 +8216,7 @@ var Opacity$2 = function (_UIElement) {
     }, {
         key: 'setColorUI',
         value: function setColorUI(alpha) {
-            alpha = alpha || this.$store.$ColorManager.alpha;
+            alpha = alpha || this.$store.alpha;
 
             var x = this.state.get('$container.width') * (alpha || 0);
             this.refs.$bar.css({ left: x + 'px' });
@@ -8272,7 +8282,7 @@ var ColorControl$2 = function (_UIElement) {
         value: function initialize() {
             var _this2 = this;
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$5 != sourceType) {
                     _this2.refresh();
                 }
@@ -8281,7 +8291,7 @@ var ColorControl$2 = function (_UIElement) {
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor() {
-            this.refs.$controlColor.css("background-color", this.$store.$ColorManager.toRGB());
+            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
         }
     }, {
         key: 'refresh',
@@ -8328,7 +8338,7 @@ var ColorPalette = function (_UIElement) {
         value: function initialize() {
             var _this2 = this;
 
-            this.$store.$ColorManager.on('change', function (sourceType) {
+            this.$store.on('changeColor', function (sourceType) {
                 if (source$8 != sourceType) {
                     _this2.refresh();
                 }
@@ -8350,7 +8360,7 @@ var ColorPalette = function (_UIElement) {
             var s = pos.x / width;
             var v = (height - pos.y) / height;
 
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 type: 'hsv',
                 s: s,
                 v: v,
@@ -8360,8 +8370,8 @@ var ColorPalette = function (_UIElement) {
     }, {
         key: 'setColorUI',
         value: function setColorUI() {
-            var x = this.state.get('$el.width') * this.$store.$ColorManager.hsv.s,
-                y = this.state.get('$el.height') * (1 - this.$store.$ColorManager.hsv.v);
+            var x = this.state.get('$el.width') * this.$store.hsv.s,
+                y = this.state.get('$el.height') * (1 - this.$store.hsv.v);
 
             this.refs.$drag_pointer.css({
                 left: x - 5 + "px",
@@ -8370,7 +8380,7 @@ var ColorPalette = function (_UIElement) {
 
             this.drag_pointer_pos = { x: x, y: y };
 
-            this.setBackgroundColor(this.$store.$ColorManager.getHueColor());
+            this.setBackgroundColor(this.$store.dispatch('/getHueColor'));
         }
     }, {
         key: 'setMainColor',
@@ -8463,75 +8473,10 @@ var ColorPicker$1 = function (_BaseColorPicker) {
 
             this.$root.append(this.$el);
 
-            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
-
             this.initColor(this.opt.color);
 
             // 이벤트 연결 
             this.initializeEvent();
-        }
-    }, {
-        key: 'showContextMenu',
-        value: function showContextMenu(e, index) {
-            this.contextMenu.show(e, index);
-        }
-    }, {
-        key: 'setColor',
-        value: function setColor(value) {
-            var isDirect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-
-            if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) == "object") {
-                if (!value.r || !value.g || !value.b) return;
-
-                if (isDirect) {
-                    this.callbackColorValue(color.format(value, "hex"));
-                } else {
-                    this.initColor(color.format(value, "hex"));
-                }
-            } else if (typeof value == "string") {
-
-                if (isDirect) {
-                    this.callbackColorValue(value);
-                } else {
-                    this.initColor(value);
-                }
-            }
-        }
-    }, {
-        key: 'toggleColorChooser',
-        value: function toggleColorChooser() {
-            this.colorSetsChooser.toggle();
-        }
-    }, {
-        key: 'refreshColorSetsChooser',
-        value: function refreshColorSetsChooser() {
-            this.colorSetsChooser.load();
-        }
-    }, {
-        key: 'getColorSetsList',
-        value: function getColorSetsList() {
-            return this.$store.$ColorSetsList.getColorSetsList();
-        }
-    }, {
-        key: 'setCurrentColorSets',
-        value: function setCurrentColorSets(nameOrIndex) {
-            this.$store.$ColorSetsList.setCurrentColorSets(nameOrIndex);
-            this.currentColorSets.load();
-        }
-    }, {
-        key: 'setColorSets',
-        value: function setColorSets(list) {
-            this.$store.$ColorSetsList.setUserList(list);
-        }
-    }, {
-        key: 'setColorsInPalette',
-        value: function setColorsInPalette() {
-            var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-            this.$store.$ColorSetsList.setCurrentColorAll(colors);
-            this.currentColorSets.load();
-            this.colorSetsChooser.load();
         }
 
         // Event Bindings 

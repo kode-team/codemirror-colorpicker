@@ -6,6 +6,8 @@ export default class CurrentColorSets extends UIElement {
         super(opt);
 
         this.colorpicker = opt; 
+
+        this.initialize()
     } 
 
     template() {
@@ -20,8 +22,8 @@ export default class CurrentColorSets extends UIElement {
     }    
     
     'load $colorSetsColorList' () {
-        const currentColorSets  = this.$store.$ColorSetsList.getCurrentColorSets()
-        const colors  = this.$store.$ColorSetsList.getCurrentColors()
+        const currentColorSets  = this.$store.dispatch('/getCurrentColorSets')
+        const colors  = this.$store.dispatch('/getCurrentColors')
 
         return `
             <div class="current-color-sets">
@@ -36,38 +38,28 @@ export default class CurrentColorSets extends UIElement {
         `
     }    
 
-    refreshAll () {
-        this.load();
-        this.colorpicker.refreshColorSetsChooser();        
+    initialize () {
+        this.$store.on('changeCurrentColorSets', () => {
+            this.refresh()
+        })  
     }
+
+    refresh () {
+        this.load();
+    }
+
 
     addColor (color) {
-        this.$store.$ColorSetsList.addCurrentColor(color);
-        this.refreshAll();
-    }
-
-    removeColor (index) {
-        this.$store.$ColorSetsList.removeCurrentColor(index);
-        this.refreshAll();
-    }
-
-    removeAllToTheRight (index) {
-        this.$store.$ColorSetsList.removeCurrentColorToTheRight(index);
-        this.refreshAll();
-    }
-
-    clearPalette () {
-        this.$store.$ColorSetsList.clearPalette();
-        this.refreshAll();
+        this.$store.dispatch('/addCurrentColor', color);
     }
 
     'click $colorSetsChooseButton' (e) {
-        this.colorpicker.toggleColorChooser();
+        this.$store.emit('toggleColorChooser');
     }
 
     'contextmenu $colorSetsColorList' (e) {
         e.preventDefault();
-        const currentColorSets  = this.$store.$ColorSetsList.getCurrentColorSets()
+        const currentColorSets  = this.$store.dispatch('/getCurrentColorSets')
 
         if (!currentColorSets.edit) {
             return; 
@@ -79,22 +71,19 @@ export default class CurrentColorSets extends UIElement {
 
         if ($item) {
             const index = parseInt($item.attr('data-index'));
-            
-            this.colorpicker.showContextMenu(e, index);
+
+            this.$store.emit('showContextMenu', e, index);
         } else {
-            this.colorpicker.showContextMenu(e);
+            this.$store.emit('showContextMenu', e);            
         }
     }
 
     'click $colorSetsColorList .add-color-item' (e) {
-        this.addColor(this.colorpicker.getCurrentColor());
+        this.addColor(this.$store.dispatch('/toColor'));
     }
 
     'click $colorSetsColorList .color-item'  (e) {
-
-        const isDirect = !!this.colorpicker.isPaletteType(); 
- 
-        this.colorpicker.setColor(e.$delegateTarget.attr('data-color'), isDirect);
+        this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
     }
 
 }

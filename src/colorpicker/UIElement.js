@@ -1,5 +1,4 @@
 import EventMachin from "../util/EventMachin";
-import ColorManager from './ColorManager'
 
 class UIElement extends EventMachin {
     constructor (opt) {

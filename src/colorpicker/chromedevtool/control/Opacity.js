@@ -24,7 +24,7 @@ export default class Opacity extends UIElement {
     initialize () {
         this.pos = {}    
 
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -37,7 +37,7 @@ export default class Opacity extends UIElement {
     }
 
     setOpacityColorBar() {
-        var rgb = Object.assign({}, this.$store.$ColorManager.rgb);
+        var rgb = Object.assign({}, this.$store.rgb);
     
         rgb.a = 0;
         var start = Color.format(rgb, 'rgb');
@@ -51,7 +51,7 @@ export default class Opacity extends UIElement {
     setOpacity(e) {
         var min = this.refs.$container.offset().left;
         var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.$ColorManager.alpha);
+        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.alpha);
         var dist;
     
         var dist;
@@ -70,7 +70,7 @@ export default class Opacity extends UIElement {
     
         this.setColorUI(dist/100);
 
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor', {
             a: Math.floor(dist) / 100,
             source
         })
@@ -78,7 +78,7 @@ export default class Opacity extends UIElement {
     }
  
     setColorUI(alpha) {
-        alpha = alpha || this.$store.$ColorManager.alpha
+        alpha = alpha || this.$store.alpha
 
         var x = this.state.get('$container.width') * (alpha || 0);
         this.refs.$bar.css({ left : (x) + 'px' });

@@ -27,13 +27,26 @@ export default class ColorSetsChooser extends UIElement {
 
     initialize () {
 
+
+        this.$store.on('changeCurrentColorSets', () => {
+            this.refresh() 
+        })  
+
+        this.$store.on('toggleColorChooser', () => {
+            this.toggle();
+        })
+
+        this.refresh();
+    }
+
+    refresh () {
         this.load();
     }
 
     // loadable 
     'load $colorsetsList' () {
         // colorsets 
-        const colorSets = this.$store.$ColorSetsList.getColorSetsList();
+        const colorSets = this.$store.dispatch('/getColorSetsList');
 
         return `
             <div>
@@ -80,7 +93,9 @@ export default class ColorSetsChooser extends UIElement {
         if ($item) {
 
             const index = parseInt($item.attr(DATA_COLORSETS_INDEX));
-            this.colorpicker.setCurrentColorSets(index);
+
+            this.$store.dispatch('/setCurrentColorSets', index);
+
             this.hide();
         }
     }

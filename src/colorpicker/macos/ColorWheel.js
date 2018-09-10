@@ -23,7 +23,7 @@ export default class ColorWheel extends UIElement {
     }
 
     initialize () {        
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh(true);
             }
@@ -42,7 +42,7 @@ export default class ColorWheel extends UIElement {
 
 
     renderValue () {
-        var value = (1 - (this.$store.$ColorManager.hsv.v) );
+        var value = (1 - (this.$store.hsv.v) );
         this.refs.$valuewheel.css({
             'background-color': `rgba(0, 0, 0, ${value})`
         })
@@ -52,7 +52,6 @@ export default class ColorWheel extends UIElement {
         
         // only once rendering 
         if (this.$store.createdWheelCanvas) return;
-
 
         const $canvas = this.refs.$colorwheel
         // console.log($canvas);
@@ -93,11 +92,9 @@ export default class ColorWheel extends UIElement {
             }
         }
 
-
         context.putImageData(img,0, 0)
         this.$store.createdWheelCanvas = true; 
     }
-
 
     degreeToRadian (angle) {
         return angle * Math.PI / 180;
@@ -143,8 +140,8 @@ export default class ColorWheel extends UIElement {
         var minY = this.refs.$el.offset().top;
         var centerY = minY + height / 2;
 
-        var x = e ? Event.pos(e).pageX : this.getX(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerX)
-        var y = e ? Event.pos(e).pageY : this.getY(this.$store.$ColorManager.hsv.h, this.$store.$ColorManager.hsv.s * radius, centerY)
+        var x = e ? Event.pos(e).pageX : this.getX(this.$store.hsv.h, this.$store.hsv.s * radius, centerX)
+        var y = e ? Event.pos(e).pageY : this.getY(this.$store.hsv.h, this.$store.hsv.s * radius, centerY)
 
 
         var rx = x - centerX,
@@ -159,7 +156,6 @@ export default class ColorWheel extends UIElement {
 
         // saturation 을 
         var saturation = Math.min(Math.sqrt(d) / radius, 1)
-        
 
         // set drag pointer position 
         this.refs.$drag_pointer.css({
@@ -168,17 +164,14 @@ export default class ColorWheel extends UIElement {
         });
 
         if (!isEvent) {
-            this.$store.$ColorManager.changeColor({
+            this.$store.dispatch('/changeColor', {
                 type: 'hsv',
                 h: hue,
                 s: saturation,
                 source
             })
-     
         }
-
     }
-
 
     // Event Bindings 
     'mouseup document' (e) {

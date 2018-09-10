@@ -26,7 +26,7 @@ export default class ColorPalette extends UIElement {
     }
 
     initialize () {
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -46,7 +46,7 @@ export default class ColorPalette extends UIElement {
         var s = (pos.x / width);
         var v = ((height - pos.y) / height);
 
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor', {
             type: 'hsv',
             s,
             v,
@@ -55,8 +55,8 @@ export default class ColorPalette extends UIElement {
     }
 
     setColorUI() {
-        var  x = this.state.get('$el.width') * this.$store.$ColorManager.hsv.s, 
-        y = this.state.get('$el.height') * ( 1 - this.$store.$ColorManager.hsv.v );
+        var  x = this.state.get('$el.width') * this.$store.hsv.s, 
+        y = this.state.get('$el.height') * ( 1 - this.$store.hsv.v );
     
         this.refs.$drag_pointer.css({
             left : (x - 5) + "px",
@@ -65,7 +65,7 @@ export default class ColorPalette extends UIElement {
     
         this.drag_pointer_pos = { x , y };
 
-        this.setBackgroundColor(this.$store.$ColorManager.getHueColor())
+        this.setBackgroundColor(this.$store.dispatch('/getHueColor'))
     }
 
 

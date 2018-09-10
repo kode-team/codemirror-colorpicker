@@ -27,7 +27,7 @@ export default class ColorControl extends UIElement {
 
     initialize () {
 
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -35,7 +35,7 @@ export default class ColorControl extends UIElement {
     }
 
     setBackgroundColor () {
-        this.refs.$controlColor.css("background-color", this.$store.$ColorManager.toRGB());
+        this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
     }
 
     refresh () {

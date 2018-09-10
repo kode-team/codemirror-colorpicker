@@ -24,7 +24,7 @@ export default class Hue extends UIElement {
 
         this.pos = {}
 
-        this.$store.$ColorManager.on('change', (sourceType) => {
+        this.$store.on('changeColor', (sourceType) => {
             if (source != sourceType) {
                 this.refresh()
             }
@@ -37,7 +37,7 @@ export default class Hue extends UIElement {
  
     setColorUI(h) {
     
-        h = h || this.$store.$ColorManager.hsv.h; 
+        h = h || this.$store.hsv.h; 
 
         var x = this.state.get('$container.width') * ( h / 360);      
 
@@ -55,7 +55,7 @@ export default class Hue extends UIElement {
 
         var min = this.refs.$container.offset().left;
         var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.$ColorManager.hsv.h / 360);
+        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.hsv.h / 360);
     
         var dist;
         if (current < min) {
@@ -71,7 +71,7 @@ export default class Hue extends UIElement {
     
         this.setColorUI(dist/100 * 360);
 
-        this.$store.$ColorManager.changeColor({
+        this.$store.dispatch('/changeColor',{
             h: (dist/100) * 360,
             type: 'hsv',
             source

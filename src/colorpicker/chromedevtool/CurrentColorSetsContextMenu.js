@@ -5,10 +5,7 @@ export default class CurrentColorSetsContextMenu extends UIElement {
     constructor (opt) {
         super(opt);
 
-        this.colorpicker = opt; 
-        this.currentColorSets = opt.currentColorSets;
-
-        this.initialize();
+        this.initialize ();
     } 
 
     template () {
@@ -22,7 +19,9 @@ export default class CurrentColorSetsContextMenu extends UIElement {
     }
 
     initialize () {
-
+        this.$store.on('showContextMenu', (e, index) => {
+            this.show(e, index);
+        })  
     }
 
     show (e, index) {
@@ -50,13 +49,13 @@ export default class CurrentColorSetsContextMenu extends UIElement {
     runCommand (command) {
         switch(command) {
         case 'remove-color': 
-            this.currentColorSets.removeColor(this.selectedColorIndex); 
+            this.$store.dispatch('/removeCurrentColor', this.selectedColorIndex);        
             break;
         case 'remove-all-to-the-right': 
-            this.currentColorSets.removeAllToTheRight(this.selectedColorIndex); 
+            this.$store.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);        
             break;
         case 'clear-palette': 
-            this.currentColorSets.clearPalette(); 
+            this.$store.dispatch('/clearPalette');
             break;
         }
     }
