@@ -76,6 +76,8 @@ export default class Opacity extends UIElement {
         }
     }
 
+    '@initColor' () { this.refresh() }    
+
     // Event Bindings 
     'mouseup document' (e) {
         this.isDown = false;

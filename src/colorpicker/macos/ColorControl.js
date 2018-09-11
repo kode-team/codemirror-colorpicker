@@ -1,6 +1,6 @@
 import Value from './control/Value';
-import Opacity from './control/Opacity'
 import UIElement from '../UIElement';
+import Opacity from '../chromedevtool/control/Opacity'
 
 const source = 'macos-control';
 
@@ -24,7 +24,7 @@ export default class ColorControl extends UIElement {
     setBackgroundColor () {
         this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
     }
-
+ 
     refresh () {
         this.setColorUI();
         this.setBackgroundColor()
@@ -40,6 +40,8 @@ export default class ColorControl extends UIElement {
             this.refresh()
         }
     } 
+
+    '@initColor' () { this.refresh() }    
 
 }
  

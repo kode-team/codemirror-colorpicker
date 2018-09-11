@@ -21,14 +21,18 @@ export default class ColorManager extends BaseModule {
         this.$store.dispatch('/changeColor');
     }
 
-    '/changeFormat' (format) {
-        this.format = format;
+    '/changeFormat' ($store, format) {
+        $store.format = format;
 
-        this.emit('changeFormat');
+        $store.emit('changeFormat');
     }
 
+    '/initColor' ($store, colorObj, source) {
+        $store.dispatch('/changeColor', colorObj, source, true);
+        $store.emit('initColor')
+    }
 
-    '/changeColor' ($store, colorObj, source) {
+    '/changeColor' ($store, colorObj, source, isNotEmit) {
 
         colorObj = colorObj || '#FF0000'
 
@@ -63,7 +67,10 @@ export default class ColorManager extends BaseModule {
             $store.hsl = Color.HSVtoHSL($store.hsv);
         }
 
-        $store.emit('changeColor', colorObj.source);
+        if (!isNotEmit) {
+            $store.emit('changeColor', colorObj.source);
+        }
+
     }
 
     '/getHueColor' ($store) {
@@ -77,6 +84,16 @@ export default class ColorManager extends BaseModule {
     }
 
     '/toColor' ($store, type) {
+        type = type || $store.format; 
+
+        if (type == 'rgb') {
+            return $store.dispatch('/toRGB')
+        } else if (type == 'hsl') {
+            return $store.dispatch('/toHSL')
+        } else if (type == 'hex') {
+            return $store.dispatch('/toHEX')            
+        }
+
         return $store.dispatch('/toString', type);
     }
 
@@ -89,7 +106,7 @@ export default class ColorManager extends BaseModule {
     }
 
     '/toHEX' ($store) {
-        return $store.dispatch('/toString', 'hex')
+        return $store.dispatch('/toString', 'hex').toUpperCase()
     }
 
 }

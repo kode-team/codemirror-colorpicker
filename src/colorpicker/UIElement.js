@@ -6,7 +6,7 @@ class UIElement extends EventMachin {
     constructor (opt) {
         super(opt)
 
-        this.opt = opt;
+        this.opt = opt || {};
 
         if (opt && opt.$store) {
             this.$store = opt.$store
@@ -15,16 +15,6 @@ class UIElement extends EventMachin {
         this.initialize();
 
         this.initializeStoreEvent();
-    }
-
-    initialize () {
-        super.initialize()
-    }
-
-    destroy () {
-        super.destroy()
-
-        this.destoryStoreEvent()
     }
 
     /**

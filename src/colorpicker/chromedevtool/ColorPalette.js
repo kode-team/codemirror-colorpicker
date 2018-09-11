@@ -87,6 +87,8 @@ export default class ColorPalette extends UIElement {
         }
     }
 
+    '@initColor' () { this.refresh() }    
+
     'mouseup document' (e) {
         this.isDown = false; 
     }    

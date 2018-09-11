@@ -16,8 +16,14 @@ export default class Value extends UIElement {
         `
     }
 
+    setBackgroundColor () {
+        this.refs.$container.css("background-color", this.$store.dispatch('/toRGB'));
+    }
+
+
     refresh () {
         this.setColorUI();
+        this.setBackgroundColor();
     }
  
     setColorUI(v) {
@@ -40,7 +46,7 @@ export default class Value extends UIElement {
 
         var min = this.refs.$container.offset().left;
         var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * (1 - this.$store.hsv.v/100);
+        var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.hsv.v;
     
         var dist;
         if (current < min) {
@@ -68,6 +74,8 @@ export default class Value extends UIElement {
             this.refresh()
         }
     }
+
+    '@initColor' () { this.refresh() }    
 
     // Event Bindings 
     'mouseup document' (e) {

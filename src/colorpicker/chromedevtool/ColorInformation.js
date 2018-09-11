@@ -137,6 +137,8 @@ export default class ColorInformation extends UIElement {
         }
     }
 
+    '@initColor' () { this.refresh() }    
+
     'input $rgb_r' (e) {  this.changeRgbColor(); }
     'input $rgb_g' (e) {  this.changeRgbColor(); }
     'input $rgb_b' (e) {  this.changeRgbColor(); }

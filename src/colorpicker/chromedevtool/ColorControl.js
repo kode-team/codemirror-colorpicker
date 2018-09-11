@@ -41,5 +41,7 @@ export default class ColorControl extends UIElement {
         }
     }
 
+    '@initColor' () { this.refresh() }    
+
 }
  

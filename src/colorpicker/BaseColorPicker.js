@@ -6,6 +6,18 @@ import BaseStore from './BaseStore';
 
 export default class BaseColorPicker extends UIElement {
 
+    constructor (opt) {
+        super(opt);
+
+        this.isColorPickerShow = false;
+        this.isShortCut = false;
+        this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
+        this.timerCloseColorPicker;
+        this.autoHide = this.opt.autoHide || true;
+        this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
+
+    }
+
     initialize () {
         this.$body = null;
         this.$root = null; 
@@ -22,14 +34,8 @@ export default class BaseColorPicker extends UIElement {
         }
 
         this.colorpickerShowCallback = function () { };
-        this.colorpickerHideCallback = function () { };
+        this.colorpickerHideCallback = function () { };           
 
-        this.isColorPickerShow = false;
-        this.isShortCut = false;
-        this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
-        this.timerCloseColorPicker;
-        this.autoHide = this.opt.autoHide || true;
-        this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
         this.$body = new Dom(this.getContainer());
         this.$root = new Dom('div', 'codemirror-colorpicker');
@@ -54,11 +60,15 @@ export default class BaseColorPicker extends UIElement {
 
         this.$root.append(this.$el)
 
-        this.initColor(this.opt.color);
+        this.initColorWithoutChangeEvent(this.opt.color);
 
         // 이벤트 연결 
         this.initializeEvent();           
 
+    }
+
+    initColorWithoutChangeEvent (color) {
+        this.$store.dispatch('/initColor', color);
     }
 
     /** 
@@ -76,10 +86,13 @@ export default class BaseColorPicker extends UIElement {
      * @param {Function} hideCallback  it is called once when colorpicker is hidden
      */
     show(opt, color, showCallback, hideCallback) {
-        this.destroy();
-        this.initializeEvent();
-        this.$root.appendTo(this.$body);
 
+        // 매번 이벤트를 지우고 다시 생성할 필요가 없어서 초기화 코드는 지움. 
+        // this.destroy();
+        // this.initializeEvent();
+        // define colorpicker callback
+        this.colorpickerShowCallback = showCallback;
+        this.colorpickerHideCallback = hideCallback;        
         this.$root.css(this.getInitalizePosition()).show();
 
         this.definePosition(opt);
@@ -88,18 +101,15 @@ export default class BaseColorPicker extends UIElement {
 
         this.isShortCut = opt.isShortCut || false;
 
-        this.initColor(color);
-
-        // define colorpicker callback
-        this.colorpickerShowCallback = showCallback;
-        this.colorpickerHideCallback = hideCallback;        
-
         // define hide delay
         this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
         if (this.hideDelay > 0) {
             this.setHideDelay(this.hideDelay);
-        }
+        }        
+        
+        this.$root.appendTo(this.$body);
 
+        this.initColorWithoutChangeEvent(color);
     }     
 
     /**
@@ -120,7 +130,7 @@ export default class BaseColorPicker extends UIElement {
      */
     hide() {
         if (this.isColorPickerShow) {
-            this.destroy();
+            // this.destroy();
             this.$root.hide();
             this.$root.remove();  // not empty 
             this.isColorPickerShow = false;
@@ -283,12 +293,11 @@ export default class BaseColorPicker extends UIElement {
         return IsInHtml;
     }
 
-    initializeEvent() {
-
-        super.initializeEvent();
+    initializeStoreEvent () {
+        super.initializeStoreEvent()
 
         this.$store.on('changeColor', this.callbackChange)
-        this.$store.on('changeFormat', this.callbackChange)
+        this.$store.on('changeFormat', this.callbackChange)        
     }
  
     destroy() {

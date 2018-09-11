@@ -63,7 +63,9 @@ export default class BaseStore {
         this.callbacks.filter(f => {
             return (f.event == event)
         }).forEach(f => {
-            f.callback(...args);
+            if (f && typeof f.callback == 'function') {
+                f.callback(...args);
+            }
         })
     }    
 }
