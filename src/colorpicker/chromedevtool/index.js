@@ -1,20 +1,18 @@
-import Color from '../../util/Color'
-
 import BaseColorPicker from '../BaseColorPicker'
 
 import ColorControl from './ColorControl'
-import ColorInformation from './ColorInformation'
-import ColorPalette from './ColorPalette'
-import ColorSetsChooser from './ColorSetsChooser'
-import CurrentColorSets from './CurrentColorSets'
-import CurrentColorSetsContextMenu from './CurrentColorSetsContextMenu'
+import ColorInformation from '../ui/ColorInformation'
+import ColorPalette from '../ui/ColorPalette'
+import ColorSetsChooser from '../ui/ColorSetsChooser'
+import CurrentColorSets from '../ui/CurrentColorSets'
+import CurrentColorSetsContextMenu from '../ui/CurrentColorSetsContextMenu'
 
-export default class ColorPicker extends BaseColorPicker {
+export default class ChromeDevToolColorPicker extends BaseColorPicker {
 
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div>
+                <div target="palette"></div> 
                 <div target="control"></div>
                 <div target="information"></div>
                 <div target="currentColorSets"></div>
@@ -32,17 +30,6 @@ export default class ColorPicker extends BaseColorPicker {
             currentColorSets: CurrentColorSets,
             colorSetsChooser: ColorSetsChooser,
             contextMenu: CurrentColorSetsContextMenu
-        }
-    }
-
-     // Event Bindings 
-     'mouseup document' (e) {
-
-        // when color picker clicked in outside
-        if (this.checkInHtml(e.target)) {
-            //this.setHideDelay(hideDelay);
-        } else if (this.checkColorPickerClass(e.target) == false) {
-            this.hide();
         }
     }
 

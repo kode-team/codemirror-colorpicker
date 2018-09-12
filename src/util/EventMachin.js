@@ -161,8 +161,28 @@ export default class EventMachin {
     this.filterProps(CHECK_EVENT_PATTERN).forEach(this.parseEvent.bind(this));
   }
 
+  /**
+   * property 수집하기 
+   * 상위 클래스의 모든 property 를 수집해서 리턴한다. 
+   */
+  collectProps () {
+
+    if (!this.collapsedProps) {
+      var p = this.__proto__ 
+      var results = [] 
+      do {
+        results.push(...Object.getOwnPropertyNames(p))
+        p  = p.__proto__;
+      } while( p );
+
+      this.collapsedProps = results
+    }
+
+    return this.collapsedProps; 
+  }
+
   filterProps (pattern) {
-    return Object.getOwnPropertyNames(this.__proto__).filter(key => {
+    return this.collectProps().filter(key => {
       return key.match(pattern);
     });
   }

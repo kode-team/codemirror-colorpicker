@@ -1,12 +1,12 @@
 import BaseColorPicker from '../BaseColorPicker'
 
-import ColorWheel from './ColorWheel'
 import ColorControl from './ColorControl'
 
-import ColorInformation from '../chromedevtool/ColorInformation'
-import ColorSetsChooser from '../chromedevtool/ColorSetsChooser'
-import CurrentColorSets from '../chromedevtool/CurrentColorSets'
-import CurrentColorSetsContextMenu from '../chromedevtool/CurrentColorSetsContextMenu'
+import ColorWheel from '../ui/ColorWheel'
+import ColorInformation from '../ui/ColorInformation'
+import ColorSetsChooser from '../ui/ColorSetsChooser'
+import CurrentColorSets from '../ui/CurrentColorSets'
+import CurrentColorSetsContextMenu from '../ui/CurrentColorSetsContextMenu'
 
 export default class MacOSColorPicker extends BaseColorPicker {
  
@@ -31,17 +31,6 @@ export default class MacOSColorPicker extends BaseColorPicker {
             currentColorSets: CurrentColorSets,
             colorSetsChooser: ColorSetsChooser,
             contextMenu: CurrentColorSetsContextMenu
-        }
-    }
-
-    // Event Bindings 
-    'mouseup document' (e) {
-
-        // when color picker clicked in outside
-        if (this.checkInHtml(e.target)) {
-            //this.setHideDelay(hideDelay);
-        } else if (this.checkColorPickerClass(e.target) == false) {
-            this.hide();
         }
     }
 

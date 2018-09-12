@@ -1,5 +1,5 @@
-import Hue from './control/Hue';
-import Opacity from './control/Opacity'
+import Hue from '../ui/control/Hue';
+import Opacity from '../ui/control/Opacity'
 import UIElement from '../UIElement';
 
 const source = 'chromedevtool-control';

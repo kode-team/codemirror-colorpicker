@@ -1,11 +1,11 @@
 
 import Color from '../../../util/Color'
 import Event from '../../../util/Event'
-import UIElement from '../../UIElement';
+import BaseSlider from '../../BaseSlider';
 
 const source = 'chromedevtool-control-Opacity';
 
-export default class Opacity extends UIElement {
+export default class Opacity extends BaseSlider {
 
     template () {
         return `
@@ -36,22 +36,8 @@ export default class Opacity extends UIElement {
     }
     
     setOpacity(e) {
-        var min = this.refs.$container.offset().left;
-        var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * (this.$store.alpha);
-        var dist;
-    
-        var dist;
-        if (current < min) {
-            dist = 0;
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (current > max) {
-            dist = 100;
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            dist = (current - min) / (max - min) * 100;
-            this.refs.$bar.removeClass('first').removeClass('last')
-        }  
+        var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.alpha);
+        var dist = this.getDist(current);
 
         this.setColorUI(dist/100);
 
@@ -64,6 +50,14 @@ export default class Opacity extends UIElement {
  
     setColorUI(alpha) {
         alpha = alpha || this.$store.alpha
+
+        if (alpha == 0) {
+            this.refs.$bar.addClass('first').removeClass('last')
+        } else if (alpha == 1) {
+            this.refs.$bar.addClass('last').removeClass('first')
+        } else {
+            this.refs.$bar.removeClass('last').removeClass('first')
+        }        
 
         var x = this.state.get('$container.width') * (alpha || 0);
         this.refs.$bar.css({ left : (x) + 'px' });
@@ -78,24 +72,12 @@ export default class Opacity extends UIElement {
 
     '@initColor' () { this.refresh() }    
 
-    // Event Bindings 
-    'mouseup document' (e) {
-        this.isDown = false;
+    onDragMove (e) {
+        this.setOpacity(e);
     }
 
-    'mousemove document' (e) {
-        if (this.isDown) {
-            this.setOpacity(e);
-        }
-    }
-    
-    'mousedown $bar' (e) {
-        e.preventDefault();
-        this.isDown = true; 
-    }
-    
-    'mousedown $container' (e) {
-        this.isDown = true; 
+    onDragStart (e) {
         this.setOpacity(e);
-    }    
+    }
+
 }

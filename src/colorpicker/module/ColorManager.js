@@ -18,7 +18,7 @@ export default class ColorManager extends BaseModule {
         this.$store.alpha = 1 
         this.$store.format = 'hex'
 
-        this.$store.dispatch('/changeColor');
+        // this.$store.dispatch('/changeColor');
     }
 
     '/changeFormat' ($store, format) {

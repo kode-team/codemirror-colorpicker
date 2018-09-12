@@ -1,10 +1,10 @@
 
 import Event from '../../../util/Event'
-import UIElement from '../../UIElement';
+import BaseSlider from '../../BaseSlider';
 
 const source = 'macos-control-Opacity';
 
-export default class Value extends UIElement {
+export default class Value extends BaseSlider {
 
     template () {
         return `
@@ -30,6 +30,14 @@ export default class Value extends UIElement {
     
         v = v || (this.$store.hsv.v)
 
+        if (v == 0) {
+            this.refs.$bar.addClass('first').removeClass('last')
+        } else if (v == 1) {
+            this.refs.$bar.addClass('last').removeClass('first')            
+        } else {
+            this.refs.$bar.removeClass('last').removeClass('first')            
+        }
+
         var valueX = this.state.get('$container.width') * v;
 
         this.refs.$bar.css({
@@ -44,21 +52,9 @@ export default class Value extends UIElement {
 
         if (!this.state.get('$container.width')) return;
 
-        var min = this.refs.$container.offset().left;
-        var max = min + this.state.get('$container.width');
-        var current = e ? Event.pos(e).pageX : min + (max - min) * this.$store.hsv.v;
+        var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.v);
     
-        var dist;
-        if (current < min) {
-            dist = 0;
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (current > max) {
-            dist = 100;
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            dist = (current - min) / (max - min) * 100;
-            this.refs.$bar.removeClass('first').removeClass('last')
-        }
+        var dist = this.getDist(current);
 
         this.setColorUI(dist/100)
 
@@ -77,24 +73,11 @@ export default class Value extends UIElement {
 
     '@initColor' () { this.refresh() }    
 
-    // Event Bindings 
-    'mouseup document' (e) {
-        this.isDown = false ;
+    onDragMove (e) {
+        this.setValueForHSV(e);
     }
 
-    'mousemove document' (e) {
-        if (this.isDown) {
-            this.setValueForHSV(e);
-        }
-    }
-
-    'mousedown $bar' (e) {
-        e.preventDefault();
-        this.isDown = true; 
-    }
-    
-    'mousedown $container' (e) {
-        this.isDown = true; 
+    onDragStart (e) {
         this.setValueForHSV(e);
     }
     

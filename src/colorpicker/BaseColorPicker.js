@@ -312,5 +312,17 @@ export default class BaseColorPicker extends UIElement {
         this.colorpickerShowCallback = undefined;
         this.colorpickerHideCallback = undefined;   
     }
+
+
+     // Event Bindings 
+     'mouseup document' (e) {
+
+        // when color picker clicked in outside
+        if (this.checkInHtml(e.target)) {
+            //this.setHideDelay(hideDelay);
+        } else if (this.checkColorPickerClass(e.target) == false) {
+            this.hide();
+        }
+    }
     
 }
