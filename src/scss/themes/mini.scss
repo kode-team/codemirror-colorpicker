@@ -1,5 +1,6 @@
 &.mini {
     width: 180px;
+    display: inline-block;
 
     .control {
         padding: 0px;
@@ -21,6 +22,7 @@
             overflow: hidden;
             height: 20px;            
         }
+        
 
         .drag-bar, .drag-bar2 {
             border:0px;

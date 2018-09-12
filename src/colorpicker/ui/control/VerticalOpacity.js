@@ -1,11 +1,11 @@
 
 import Color from '../../../util/Color'
 import Event from '../../../util/Event'
-import BaseSlider from '../../BaseSlider';
+import VerticalSlider from '../../VerticalSlider';
 
 const source = 'chromedevtool-control-Opacity';
 
-export default class Opacity extends BaseSlider {
+export default class Opacity extends VerticalSlider {
 
     template () {
         return `
@@ -32,19 +32,11 @@ export default class Opacity extends BaseSlider {
         rgb.a = 1;
         var end = Color.format(rgb, 'rgb');
     
-        this.setOpacityColorBarBackground(start, end);
-    }
-
-    setOpacityColorBarBackground(start, end) {
-        this.refs.$colorbar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
-    }
-
-    getMousePosition (e) {
-        return Event.pos(e).pageX;
+        this.refs.$colorbar.css('background',  'linear-gradient(to bottom, ' + start + ', ' + end + ')');
     }
     
     setOpacity(e) {
-        var current = e ? this.getMousePosition(e) : this.getCurrent(this.$store.alpha);
+        var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.alpha);
         var dist = this.getDist(current);
 
         this.setColorUI(dist/100);
@@ -67,11 +59,9 @@ export default class Opacity extends BaseSlider {
             this.refs.$bar.removeClass('last').removeClass('first')
         }        
 
-        this.setAlphaPosition(alpha)
-    }
-
-    setAlphaPosition (alpha) {
-        this.refs.$bar.css({ left : (this.getMaxDist() * (alpha || 0)) + 'px' });
+        var y = this.getMaxDist() * (alpha || 0);
+        this.refs.$bar.css({ top : (y) + 'px' });
+        this.pos = { y };
     }
 
     '@changeColor' (sourceType) {

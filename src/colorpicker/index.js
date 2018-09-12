@@ -1,6 +1,7 @@
 import MacOSColorPicker from './macos/index'
 import ChromeDevToolColorPicker from './chromedevtool/index'
 import MiniColorPicker from './mini/index'
+import MiniVerticalColorPicker from './mini-vertical/index'
 
 export default {
     create (opts) {
@@ -9,6 +10,8 @@ export default {
             return new MacOSColorPicker(opts);
         case 'mini': 
             return new MiniColorPicker(opts);            
+        case 'mini-vertical': 
+            return new MiniVerticalColorPicker(opts);
         case 'sketch':
         case 'palette':
         default: 
@@ -18,5 +21,6 @@ export default {
     ColorPicker: ChromeDevToolColorPicker,
     ChromeDevToolColorPicker,
     MacOSColorPicker,
-    MiniColorPicker
+    MiniColorPicker,
+    MiniVerticalColorPicker
 }    

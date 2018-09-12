@@ -1,10 +1,10 @@
 
 import Event from '../../../util/Event'
-import BaseSlider from '../../BaseSlider';
+import VerticalSlider from '../../VerticalSlider';
 
 const source = 'chromedevtool-control-Hue';
 
-export default class Hue extends BaseSlider {
+export default class Hue extends VerticalSlider {
     template () {
         return `
             <div class="hue">
@@ -31,21 +31,17 @@ export default class Hue extends BaseSlider {
             this.refs.$bar.removeClass('last').removeClass('first')
         }
 
-        var x = this.getMaxDist() * ( h / 360);      
+        var y = this.getMaxDist() * ( h / 360);      
 
         this.refs.$bar.css({
-            left : (x) + 'px'
+            top : (y) + 'px'
         });
     
-        this.pos = { x };
-        
     }
         
     setHueColor(e) {
 
-        if (!this.state.get('$container.width')) return;
-
-        var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.h / 360);
+        var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.hsv.h / 360);
         var dist = this.getDist(current);
     
         this.setColorUI(dist/100 * 360);

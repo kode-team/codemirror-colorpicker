@@ -11,16 +11,24 @@ export default class BaseSlider extends UIElement {
     onDragEnd (e) {}
 
     getMinMax () {
-        var min = this.refs.$container.offset().left;
-        var width = this.state.get('$container.width')
+        var min = this.getMinPosition();
+        var width = this.getMaxDist()
         var max = min + width;
 
         return { min, max, width }
     }
 
     getCurrent (value) {
-        var width = this.state.get('$container.width')
-        return min + width * value; 
+        return min + this.getMaxDist() * value; 
+    }
+
+
+    getMinPosition () {
+        return this.refs.$container.offset().left;
+    }    
+
+    getMaxDist () {
+        return this.state.get('$container.width');
     }
 
     getDist (current) {

@@ -189,9 +189,7 @@
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 0px;
-        background: -webkit-gradient(linear, left top, right top, from(rgba(232, 232, 232, 0)), to(#e8e8e8));
-        background: linear-gradient(to right, rgba(232, 232, 232, 0), #e8e8e8); }
+        top: 0px; }
     .codemirror-colorpicker .colorpicker-body > .control > .empty {
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
     .codemirror-colorpicker .colorpicker-body > .control .drag-bar,
@@ -724,7 +722,8 @@
         height: 12px;
         border-radius: 50%; }
   .codemirror-colorpicker.mini {
-    width: 180px; }
+    width: 180px;
+    display: inline-block; }
     .codemirror-colorpicker.mini .control {
       padding: 0px; }
       .codemirror-colorpicker.mini .control .hue, .codemirror-colorpicker.mini .control .opacity {
@@ -775,6 +774,77 @@
           border-left: 4px solid transparent;
           border-right: 4px solid transparent;
           border-bottom: 4px solid black; }
+  .codemirror-colorpicker.mini-vertical {
+    width: 180px;
+    display: inline-block; }
+    .codemirror-colorpicker.mini-vertical .color {
+      display: inline-block;
+      width: 140px;
+      height: 160px;
+      vertical-align: middle; }
+    .codemirror-colorpicker.mini-vertical .control {
+      height: 160px;
+      padding: 0px;
+      vertical-align: middle;
+      display: inline-block; }
+      .codemirror-colorpicker.mini-vertical .control .hue, .codemirror-colorpicker.mini-vertical .control .opacity {
+        margin: 0px;
+        padding: 0px;
+        width: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        height: 100%;
+        position: relative; }
+      .codemirror-colorpicker.mini-vertical .control .hue > .hue-container {
+        border-radius: 0px;
+        overflow: hidden;
+        height: 100%;
+        background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(17%, #ffff00), color-stop(33%, #00ff00), color-stop(50%, #00ffff), color-stop(67%, #0000ff), color-stop(83%, #ff00ff), to(#ff0000));
+        background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }
+      .codemirror-colorpicker.mini-vertical .control .opacity > .opacity-container {
+        border-radius: 0px;
+        overflow: hidden;
+        height: 100%;
+        width: 20px; }
+      .codemirror-colorpicker.mini-vertical .control .drag-bar, .codemirror-colorpicker.mini-vertical .control .drag-bar2 {
+        border: 0px;
+        background-color: transparent;
+        height: 2px;
+        width: 100%;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        -webkit-box-shadow: none;
+                box-shadow: none;
+        -webkit-transform: none;
+                transform: none; }
+        .codemirror-colorpicker.mini-vertical .control .drag-bar.last:before, .codemirror-colorpicker.mini-vertical .control .drag-bar.last:after, .codemirror-colorpicker.mini-vertical .control .drag-bar2.last:before, .codemirror-colorpicker.mini-vertical .control .drag-bar2.last:after {
+          top: -1px; }
+        .codemirror-colorpicker.mini-vertical .control .drag-bar.first:before, .codemirror-colorpicker.mini-vertical .control .drag-bar.first:after, .codemirror-colorpicker.mini-vertical .control .drag-bar2.first:before, .codemirror-colorpicker.mini-vertical .control .drag-bar2.first:after {
+          top: 1px; }
+        .codemirror-colorpicker.mini-vertical .control .drag-bar:before, .codemirror-colorpicker.mini-vertical .control .drag-bar2:before {
+          content: "";
+          position: absolute;
+          left: 0px;
+          top: 2px;
+          width: 0;
+          height: 0;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-left: 4px solid black; }
+        .codemirror-colorpicker.mini-vertical .control .drag-bar:after, .codemirror-colorpicker.mini-vertical .control .drag-bar2:after {
+          content: "";
+          position: absolute;
+          top: 2px;
+          right: 0px;
+          width: 0;
+          height: 0;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-right: 4px solid black; }
 
 .colorsets-contextmenu {
   position: fixed;

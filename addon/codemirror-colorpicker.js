@@ -7139,8 +7139,8 @@ var BaseSlider = function (_UIElement) {
     }, {
         key: 'getMinMax',
         value: function getMinMax() {
-            var min = this.refs.$container.offset().left;
-            var width = this.state.get('$container.width');
+            var min = this.getMinPosition();
+            var width = this.getMaxDist();
             var max = min + width;
 
             return { min: min, max: max, width: width };
@@ -7148,8 +7148,17 @@ var BaseSlider = function (_UIElement) {
     }, {
         key: 'getCurrent',
         value: function getCurrent(value) {
-            var width = this.state.get('$container.width');
-            return min + width * value;
+            return min + this.getMaxDist() * value;
+        }
+    }, {
+        key: 'getMinPosition',
+        value: function getMinPosition() {
+            return this.refs.$container.offset().left;
+        }
+    }, {
+        key: 'getMaxDist',
+        value: function getMaxDist() {
+            return this.state.get('$container.width');
         }
     }, {
         key: 'getDist',
@@ -7240,20 +7249,15 @@ var Value = function (_BaseSlider) {
                 this.refs.$bar.removeClass('last').removeClass('first');
             }
 
-            var valueX = this.state.get('$container.width') * v;
+            var x = this.getMaxDist() * v;
 
             this.refs.$bar.css({
-                left: valueX + 'px'
+                left: x + 'px'
             });
-
-            this.pos = { x: valueX };
         }
     }, {
         key: 'setValueForHSV',
         value: function setValueForHSV(e) {
-
-            if (!this.state.get('$container.width')) return;
-
             var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.v);
 
             var dist = this.getDist(current);
@@ -7324,12 +7328,22 @@ var Opacity = function (_BaseSlider) {
             rgb.a = 1;
             var end = Color$1.format(rgb, 'rgb');
 
+            this.setOpacityColorBarBackground(start, end);
+        }
+    }, {
+        key: 'setOpacityColorBarBackground',
+        value: function setOpacityColorBarBackground(start, end) {
             this.refs.$colorbar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
+        }
+    }, {
+        key: 'getMousePosition',
+        value: function getMousePosition(e) {
+            return Event.pos(e).pageX;
         }
     }, {
         key: 'setOpacity',
         value: function setOpacity(e) {
-            var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.alpha);
+            var current = e ? this.getMousePosition(e) : this.getCurrent(this.$store.alpha);
             var dist = this.getDist(current);
 
             this.setColorUI(dist / 100);
@@ -7352,9 +7366,12 @@ var Opacity = function (_BaseSlider) {
                 this.refs.$bar.removeClass('last').removeClass('first');
             }
 
-            var x = this.state.get('$container.width') * (alpha || 0);
-            this.refs.$bar.css({ left: x + 'px' });
-            this.pos = { x: x };
+            this.setAlphaPosition(alpha);
+        }
+    }, {
+        key: 'setAlphaPosition',
+        value: function setAlphaPosition(alpha) {
+            this.refs.$bar.css({ left: this.getMaxDist() * (alpha || 0) + 'px' });
         }
     }, {
         key: '@changeColor',
@@ -8155,7 +8172,7 @@ var Hue = function (_BaseSlider) {
                 this.refs.$bar.removeClass('last').removeClass('first');
             }
 
-            var x = this.state.get('$container.width') * (h / 360);
+            var x = this.getMaxDist() * (h / 360);
 
             this.refs.$bar.css({
                 left: x + 'px'
@@ -8481,6 +8498,271 @@ var MiniColorPicker = function (_BaseColorPicker) {
     return MiniColorPicker;
 }(BaseColorPicker);
 
+var VerticalSlider = function (_BaseSlider) {
+    inherits(VerticalSlider, _BaseSlider);
+
+    function VerticalSlider() {
+        classCallCheck(this, VerticalSlider);
+        return possibleConstructorReturn(this, (VerticalSlider.__proto__ || Object.getPrototypeOf(VerticalSlider)).apply(this, arguments));
+    }
+
+    createClass(VerticalSlider, [{
+        key: 'getMaxDist',
+        value: function getMaxDist() {
+            return this.state.get('$container.height');
+        }
+    }, {
+        key: 'getMinPosition',
+        value: function getMinPosition() {
+            return this.refs.$container.offset().top;
+        }
+    }]);
+    return VerticalSlider;
+}(BaseSlider);
+
+var source$11 = 'chromedevtool-control-Hue';
+
+var Hue$2 = function (_VerticalSlider) {
+    inherits(Hue, _VerticalSlider);
+
+    function Hue() {
+        classCallCheck(this, Hue);
+        return possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).apply(this, arguments));
+    }
+
+    createClass(Hue, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(h) {
+
+            h = h || this.$store.hsv.h;
+
+            if (h == 0) {
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (h == 360) {
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                this.refs.$bar.removeClass('last').removeClass('first');
+            }
+
+            var y = this.getMaxDist() * (h / 360);
+
+            this.refs.$bar.css({
+                top: y + 'px'
+            });
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor(e) {
+
+            var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.hsv.h / 360);
+            var dist = this.getDist(current);
+
+            this.setColorUI(dist / 100 * 360);
+
+            this.$store.dispatch('/changeColor', {
+                h: dist / 100 * 360,
+                type: 'hsv',
+                source: source$11
+            });
+        }
+    }, {
+        key: 'onDragStart',
+        value: function onDragStart(e) {
+            this.setHueColor(e);
+        }
+    }, {
+        key: 'onDragMove',
+        value: function onDragMove(e) {
+            this.setHueColor(e);
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$11 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return Hue;
+}(VerticalSlider);
+
+var source$13 = 'chromedevtool-control-Opacity';
+
+var Opacity$2 = function (_VerticalSlider) {
+    inherits(Opacity, _VerticalSlider);
+
+    function Opacity() {
+        classCallCheck(this, Opacity);
+        return possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).apply(this, arguments));
+    }
+
+    createClass(Opacity, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+            this.setOpacityColorBar();
+        }
+    }, {
+        key: 'setOpacityColorBar',
+        value: function setOpacityColorBar() {
+            var rgb = Object.assign({}, this.$store.rgb);
+
+            rgb.a = 0;
+            var start = Color$1.format(rgb, 'rgb');
+
+            rgb.a = 1;
+            var end = Color$1.format(rgb, 'rgb');
+
+            this.refs.$colorbar.css('background', 'linear-gradient(to bottom, ' + start + ', ' + end + ')');
+        }
+    }, {
+        key: 'setOpacity',
+        value: function setOpacity(e) {
+            var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.alpha);
+            var dist = this.getDist(current);
+
+            this.setColorUI(dist / 100);
+
+            this.$store.dispatch('/changeColor', {
+                a: Math.floor(dist) / 100,
+                source: source$13
+            });
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(alpha) {
+            alpha = alpha || this.$store.alpha;
+
+            if (alpha == 0) {
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (alpha == 1) {
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                this.refs.$bar.removeClass('last').removeClass('first');
+            }
+
+            var y = this.getMaxDist() * (alpha || 0);
+            this.refs.$bar.css({ top: y + 'px' });
+            this.pos = { y: y };
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$13 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }, {
+        key: 'onDragMove',
+        value: function onDragMove(e) {
+            this.setOpacity(e);
+        }
+    }, {
+        key: 'onDragStart',
+        value: function onDragStart(e) {
+            this.setOpacity(e);
+        }
+    }]);
+    return Opacity;
+}(VerticalSlider);
+
+var source$10 = 'mini-control';
+
+var ColorControl$6 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl() {
+        classCallCheck(this, ColorControl);
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: Hue$2, Opacity: Opacity$2 };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '<div class="control"><div target="Hue" ></div><div target="Opacity" ></div></div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$10 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var MiniColorPicker$2 = function (_BaseColorPicker) {
+    inherits(MiniColorPicker, _BaseColorPicker);
+
+    function MiniColorPicker() {
+        classCallCheck(this, MiniColorPicker);
+        return possibleConstructorReturn(this, (MiniColorPicker.__proto__ || Object.getPrototypeOf(MiniColorPicker)).apply(this, arguments));
+    }
+
+    createClass(MiniColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div><div target="control"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                palette: ColorPalette,
+                control: ColorControl$6
+            };
+        }
+    }]);
+    return MiniColorPicker;
+}(BaseColorPicker);
+
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
@@ -8488,6 +8770,8 @@ var ColorPicker = {
                 return new MacOSColorPicker(opts);
             case 'mini':
                 return new MiniColorPicker(opts);
+            case 'mini-vertical':
+                return new MiniColorPicker$2(opts);
             case 'sketch':
             case 'palette':
             default:
@@ -8498,7 +8782,8 @@ var ColorPicker = {
     ColorPicker: ChromeDevToolColorPicker,
     ChromeDevToolColorPicker: ChromeDevToolColorPicker,
     MacOSColorPicker: MacOSColorPicker,
-    MiniColorPicker: MiniColorPicker
+    MiniColorPicker: MiniColorPicker,
+    MiniVerticalColorPicker: MiniColorPicker$2
 };
 
 var colorpicker_class = 'codemirror-colorview';

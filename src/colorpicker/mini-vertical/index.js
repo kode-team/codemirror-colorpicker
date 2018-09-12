@@ -8,8 +8,7 @@ export default class MiniColorPicker extends BaseColorPicker {
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div>
-                <div target="control"></div>
+                <div target="palette"></div><div target="control"></div>
             </div>
         `
     } 

@@ -1,18 +1,14 @@
+import BaseSlider from "./BaseSlider";
 
 const source = 'vertical-slider';
 
 export default class VerticalSlider extends BaseSlider {
 
-    getMinMax () {
-        var min = this.refs.$container.offset().top;
-        var height = this.state.get('$container.height')
-        var max = min + height;
-
-        return { min, max, height }
+    getMaxDist () {
+        return this.state.get('$container.height');
     }
 
-    getCurrent (value) {
-        var height = this.state.get('$container.height')
-        return min + height * value; 
+    getMinPosition () {
+        return this.refs.$container.offset().top;
     }
 }

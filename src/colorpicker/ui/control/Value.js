@@ -38,20 +38,15 @@ export default class Value extends BaseSlider {
             this.refs.$bar.removeClass('last').removeClass('first')            
         }
 
-        var valueX = this.state.get('$container.width') * v;
+        var x = this.getMaxDist() * v;
 
         this.refs.$bar.css({
-            left : (valueX) + 'px'
+            left : (x) + 'px'
         });
-    
-        this.pos = { x : valueX };
         
     }
         
     setValueForHSV(e) {
-
-        if (!this.state.get('$container.width')) return;
-
         var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.v);
     
         var dist = this.getDist(current);
