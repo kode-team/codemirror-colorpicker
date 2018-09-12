@@ -6900,6 +6900,7 @@ var BaseColorPicker = function (_UIElement) {
         _this.hideDelay = +(typeof _this.opt.hideDeplay == 'undefined' ? 2000 : _this.opt.hideDelay);
         _this.timerCloseColorPicker;
         _this.autoHide = _this.opt.autoHide || true;
+        _this.outputFormat = _this.opt.outputFormat;
         _this.$checkColorPickerClass = _this.checkColorPickerClass.bind(_this);
 
         return _this;
@@ -6988,8 +6989,8 @@ var BaseColorPicker = function (_UIElement) {
             this.definePosition(opt);
 
             this.isColorPickerShow = true;
-
             this.isShortCut = opt.isShortCut || false;
+            this.outputFormat = opt.outputFormat;
 
             // define hide delay
             this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay);
@@ -7192,7 +7193,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'getCurrentColor',
         value: function getCurrentColor() {
-            return this.$store.dispatch('/toColor');
+            return this.$store.dispatch('/toColor', this.outputFormat);
         }
     }, {
         key: 'checkColorPickerClass',

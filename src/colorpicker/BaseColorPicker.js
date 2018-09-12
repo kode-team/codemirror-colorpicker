@@ -14,6 +14,7 @@ export default class BaseColorPicker extends UIElement {
         this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
         this.timerCloseColorPicker;
         this.autoHide = this.opt.autoHide || true;
+        this.outputFormat = this.opt.outputFormat
         this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
 
     }
@@ -98,8 +99,8 @@ export default class BaseColorPicker extends UIElement {
         this.definePosition(opt);
 
         this.isColorPickerShow = true;
-
         this.isShortCut = opt.isShortCut || false;
+        this.outputFormat = opt.outputFormat  
 
         // define hide delay
         this.hideDelay = +(typeof opt.hideDelay == 'undefined' ? 2000 : opt.hideDelay );
@@ -274,7 +275,7 @@ export default class BaseColorPicker extends UIElement {
     }    
 
     getCurrentColor() {
-        return this.$store.dispatch('/toColor');
+        return this.$store.dispatch('/toColor', this.outputFormat);
     }
 
 
