@@ -23,7 +23,7 @@ export default class Opacity extends VerticalSlider {
     }
 
     refresh () {
-        this.setColorUI();
+        super.refresh() 
         this.setOpacityColorBar()
     }
 

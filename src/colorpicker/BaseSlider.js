@@ -14,10 +14,6 @@ export default class BaseSlider extends UIElement {
         this.source = 'base-slider'
     }
 
-    /* called when mouse is moved  */
-    onDragMove (e) { }
-    /* called when mouse is started on move  */
-    onDragStart (e) { }
     /* called when mouse is ended move  */
     onDragEnd (e) {}
 
@@ -138,6 +134,10 @@ export default class BaseSlider extends UIElement {
 
     onDragMove (e) {
         this.refreshColorUI(e);
+    }
+
+    refreshColorUI (e) {
+        
     }
 
     '@changeColor' (sourceType) {

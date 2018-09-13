@@ -7,6 +7,13 @@ const source = 'macos-colorwheel'
 
 export default class ColorWheel extends UIElement {
 
+    constructor (opt) {
+        super(opt)
+
+        this.width = 214;
+        this.height = 214;
+    }
+
     template () {
         return `
         <div class="wheel">
@@ -44,10 +51,14 @@ export default class ColorWheel extends UIElement {
         // console.log($canvas);
         const context = $canvas.el.getContext('2d')
 
-        const [width, height] = $canvas.size()
+        let [width, height] = $canvas.size()
+
+        if (this.width && !width) width = this.width;
+        if (this.height && !height) height = this.height;
 
         $canvas.el.width = width;
-        $canvas.el.height = height;
+        $canvas.el.height = height; 
+        $canvas.css({ width: width + 'px', height: height + 'px' })
 
         var img = context.getImageData(0, 0, width, height);
         var pixels = img.data;

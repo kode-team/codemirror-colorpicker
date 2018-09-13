@@ -1,7 +1,7 @@
-import Color from '../util/Color'
-import ColorPicker from '../colorpicker/index';
+import Color from '../../util/Color'
+import ColorPicker from '../../colorpicker/index';
 
-const colorpicker_class = 'codemirror-colorview';
+const colorpicker_class = 'codemirror-colorview'; 
 const colorpicker_background_class = 'codemirror-colorview-background';
 // Excluded tokens do not show color views..
 let excluded_token = ['comment'];

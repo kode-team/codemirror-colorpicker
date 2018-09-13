@@ -7266,20 +7266,10 @@ var BaseSlider = function (_UIElement) {
         return _this;
     }
 
-    /* called when mouse is moved  */
+    /* called when mouse is ended move  */
 
 
     createClass(BaseSlider, [{
-        key: 'onDragMove',
-        value: function onDragMove(e) {}
-        /* called when mouse is started on move  */
-
-    }, {
-        key: 'onDragStart',
-        value: function onDragStart(e) {}
-        /* called when mouse is ended move  */
-
-    }, {
         key: 'onDragEnd',
         value: function onDragEnd(e) {}
 
@@ -7442,6 +7432,9 @@ var BaseSlider = function (_UIElement) {
         value: function onDragMove(e) {
             this.refreshColorUI(e);
         }
+    }, {
+        key: 'refreshColorUI',
+        value: function refreshColorUI(e) {}
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
@@ -7630,9 +7623,14 @@ var source$3 = 'macos-colorwheel';
 var ColorWheel = function (_UIElement) {
     inherits(ColorWheel, _UIElement);
 
-    function ColorWheel() {
+    function ColorWheel(opt) {
         classCallCheck(this, ColorWheel);
-        return possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).apply(this, arguments));
+
+        var _this = possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).call(this, opt));
+
+        _this.width = 214;
+        _this.height = 214;
+        return _this;
     }
 
     createClass(ColorWheel, [{
@@ -7676,8 +7674,12 @@ var ColorWheel = function (_UIElement) {
                 width = _$canvas$size2[0],
                 height = _$canvas$size2[1];
 
+            if (this.width && !width) width = this.width;
+            if (this.height && !height) height = this.height;
+
             $canvas.el.width = width;
             $canvas.el.height = height;
+            $canvas.css({ width: width + 'px', height: height + 'px' });
 
             var img = context.getImageData(0, 0, width, height);
             var pixels = img.data;
@@ -8736,7 +8738,7 @@ var Opacity$2 = function (_VerticalSlider) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.setColorUI();
+            get(Opacity.prototype.__proto__ || Object.getPrototypeOf(Opacity.prototype), 'refresh', this).call(this);
             this.setOpacityColorBar();
         }
     }, {

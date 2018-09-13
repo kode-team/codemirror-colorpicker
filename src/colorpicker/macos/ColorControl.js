@@ -8,7 +8,7 @@ export default class ColorControl extends UIElement {
 
     components () {
         return { Value, Opacity }
-    }
+    } 
 
     template () {
         return `

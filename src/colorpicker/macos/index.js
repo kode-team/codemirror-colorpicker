@@ -34,4 +34,5 @@ export default class MacOSColorPicker extends BaseColorPicker {
         }
     }
 
+
 }

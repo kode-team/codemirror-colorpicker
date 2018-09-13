@@ -22,5 +22,5 @@ export default {
     ChromeDevToolColorPicker,
     MacOSColorPicker,
     MiniColorPicker,
-    MiniVerticalColorPicker
+    MiniVerticalColorPicker 
 }    
