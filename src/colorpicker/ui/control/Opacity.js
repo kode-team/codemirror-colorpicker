@@ -7,6 +7,14 @@ const source = 'chromedevtool-control-Opacity';
 
 export default class Opacity extends BaseSlider {
 
+    constructor (opt) {
+        super(opt);
+
+        this.minValue = 0;
+        this.maxValue = 1; 
+        this.source = 'opacity-control'
+    }
+
     template () {
         return `
         <div class="opacity">
@@ -19,7 +27,7 @@ export default class Opacity extends BaseSlider {
     }
 
     refresh () {
-        this.setColorUI();
+        super.refresh()
         this.setOpacityColorBar()
     }
 
@@ -39,55 +47,19 @@ export default class Opacity extends BaseSlider {
         this.refs.$colorbar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
     }
 
-    getMousePosition (e) {
-        return Event.pos(e).pageX;
+    getDefaultValue () {
+        return this.$store.alpha
     }
     
-    setOpacity(e) {
-        var current = e ? this.getMousePosition(e) : this.getCurrent(this.$store.alpha);
-        var dist = this.getDist(current);
+    refreshColorUI(e) {
+        var dist = this.getCaculatedDist(e);
 
         this.setColorUI(dist/100);
 
-        this.$store.dispatch('/changeColor', {
-            a: Math.floor(dist) / 100,
-            source
+        this.changeColor({
+            a: Math.floor(dist) / 100
         })
 
-    }
- 
-    setColorUI(alpha) {
-        alpha = alpha || this.$store.alpha
-
-        if (alpha == 0) {
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (alpha == 1) {
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            this.refs.$bar.removeClass('last').removeClass('first')
-        }        
-
-        this.setAlphaPosition(alpha)
-    }
-
-    setAlphaPosition (alpha) {
-        this.refs.$bar.css({ left : (this.getMaxDist() * (alpha || 0)) + 'px' });
-    }
-
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
-
-    onDragMove (e) {
-        this.setOpacity(e);
-    }
-
-    onDragStart (e) {
-        this.setOpacity(e);
     }
 
 }

@@ -176,7 +176,7 @@
               transform: translateX(-50%) translateY(-50%);
       width: 12px;
       height: 12px;
-      border-radius: 50px; }
+      border-radius: 50%; }
     .codemirror-colorpicker .colorpicker-body > .control > .hue > .hue-container {
       background: -webkit-gradient(linear, left top, right top, from(#ff0000), color-stop(17%, #ffff00), color-stop(33%, #00ff00), color-stop(50%, #00ffff), color-stop(67%, #0000ff), color-stop(83%, #ff00ff), to(#ff0000));
       background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }

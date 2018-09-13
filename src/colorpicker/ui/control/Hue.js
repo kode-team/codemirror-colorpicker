@@ -1,10 +1,15 @@
-
-import Event from '../../../util/Event'
 import BaseSlider from '../../BaseSlider';
 
-const source = 'chromedevtool-control-Hue';
-
 export default class Hue extends BaseSlider {
+
+    constructor (opt) {
+        super(opt)
+
+        this.minValue = 0
+        this.maxValue = 360
+        this.source = 'hue-control'
+    }
+
     template () {
         return `
             <div class="hue">
@@ -15,62 +20,21 @@ export default class Hue extends BaseSlider {
         `
     }
 
-    refresh () {
-        this.setColorUI();
+    getDefaultValue () {
+        return this.$store.hsv.h
     }
- 
-    setColorUI(h) {
-    
-        h = h || this.$store.hsv.h; 
 
-        if (h == 0) {
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (h == 360) {
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            this.refs.$bar.removeClass('last').removeClass('first')
-        }
+    refreshColorUI(e) {
 
-        var x = this.getMaxDist() * ( h / 360);      
+        var dist = this.getCaculatedDist(e);
+     
+        this.setColorUI(dist/100 * this.maxValue);
 
-        this.refs.$bar.css({
-            left : (x) + 'px'
-        });
-    
-        this.pos = { x };
-        
-    }
-        
-    setHueColor(e) {
-
-        if (!this.state.get('$container.width')) return;
-
-        var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.h / 360);
-        var dist = this.getDist(current);
-    
-        this.setColorUI(dist/100 * 360);
-
-        this.$store.dispatch('/changeColor',{
-            h: (dist/100) * 360,
-            type: 'hsv',
-            source
+        this.changeColor({
+            h: (dist/100) * this.maxValue,
+            type: 'hsv'
         })
     }     
 
-    onDragStart (e) {
-        this.setHueColor(e);
-    }
-
-    onDragMove (e) {
-        this.setHueColor(e);
-    }
-
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
 
 }

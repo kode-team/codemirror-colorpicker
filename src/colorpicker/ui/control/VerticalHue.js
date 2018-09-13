@@ -1,10 +1,15 @@
-
-import Event from '../../../util/Event'
 import VerticalSlider from '../../VerticalSlider';
 
-const source = 'chromedevtool-control-Hue';
+export default class VerticalHue extends VerticalSlider {
 
-export default class Hue extends VerticalSlider {
+    constructor (opt) {
+        super(opt)
+
+        this.minValue = 0
+        this.maxValue = 360 
+        this.source = 'vertical-hue-control'
+    }
+
     template () {
         return `
             <div class="hue">
@@ -15,58 +20,20 @@ export default class Hue extends VerticalSlider {
         `
     }
 
-    refresh () {
-        this.setColorUI();
+    getDefaultValue () {
+        return this.$store.hsv.h 
     }
- 
-    setColorUI(h) {
+
+    refreshColorUI(e) {
+
+        var dist = this.getCaculatedDist(e)
     
-        h = h || this.$store.hsv.h; 
+        this.setColorUI(dist/100 * this.maxValue);
 
-        if (h == 0) {
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (h == 360) {
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            this.refs.$bar.removeClass('last').removeClass('first')
-        }
-
-        var y = this.getMaxDist() * ( h / 360);      
-
-        this.refs.$bar.css({
-            top : (y) + 'px'
-        });
-    
-    }
-        
-    setHueColor(e) {
-
-        var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.hsv.h / 360);
-        var dist = this.getDist(current);
-    
-        this.setColorUI(dist/100 * 360);
-
-        this.$store.dispatch('/changeColor',{
-            h: (dist/100) * 360,
-            type: 'hsv',
-            source
+        this.changeColor({
+            h: (dist/100) * this.maxValue,
+            type: 'hsv'
         })
     }     
-
-    onDragStart (e) {
-        this.setHueColor(e);
-    }
-
-    onDragMove (e) {
-        this.setHueColor(e);
-    }
-
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
 
 }

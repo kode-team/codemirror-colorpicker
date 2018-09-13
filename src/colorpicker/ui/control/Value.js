@@ -2,9 +2,15 @@
 import Event from '../../../util/Event'
 import BaseSlider from '../../BaseSlider';
 
-const source = 'macos-control-Opacity';
-
 export default class Value extends BaseSlider {
+
+    constructor (opt) {
+        super(opt)
+
+        this.minValue = 0
+        this.maxValue = 1 
+        this.source = 'value-control'
+    }
 
     template () {
         return `
@@ -22,58 +28,23 @@ export default class Value extends BaseSlider {
 
 
     refresh () {
-        this.setColorUI();
+        super.refresh()
         this.setBackgroundColor();
     }
- 
-    setColorUI(v) {
-    
-        v = v || (this.$store.hsv.v)
 
-        if (v == 0) {
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (v == 1) {
-            this.refs.$bar.addClass('last').removeClass('first')            
-        } else {
-            this.refs.$bar.removeClass('last').removeClass('first')            
-        }
-
-        var x = this.getMaxDist() * v;
-
-        this.refs.$bar.css({
-            left : (x) + 'px'
-        });
-        
+    getDefaultValue () {
+        return this.$store.hsv.v 
     }
-        
-    setValueForHSV(e) {
-        var current = e ? Event.pos(e).pageX : this.getCurrent(this.$store.hsv.v);
-    
-        var dist = this.getDist(current);
+         
+    refreshColorUI(e) {
+        var dist = this.getCaculatedDist(e);
 
-        this.setColorUI(dist/100)
+        this.setColorUI(dist/100 * this.maxValue)
 
-        this.$store.dispatch('/changeColor', {
+        this.changeColor({
             type: 'hsv',
-            v: dist/100,
-            source
-        })        
+            v: dist/100 * this.maxValue
+        })
     }    
-
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
-
-    onDragMove (e) {
-        this.setValueForHSV(e);
-    }
-
-    onDragStart (e) {
-        this.setValueForHSV(e);
-    }
     
 }

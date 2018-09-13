@@ -3,9 +3,13 @@ import Color from '../../../util/Color'
 import Event from '../../../util/Event'
 import VerticalSlider from '../../VerticalSlider';
 
-const source = 'chromedevtool-control-Opacity';
-
 export default class Opacity extends VerticalSlider {
+
+    constructor (opt) {
+        super(opt)
+
+        this.source = 'vertical-opacity-control'
+    }
 
     template () {
         return `
@@ -34,50 +38,18 @@ export default class Opacity extends VerticalSlider {
     
         this.refs.$colorbar.css('background',  'linear-gradient(to bottom, ' + start + ', ' + end + ')');
     }
+
+    getDefaultValue () {
+        return this.$store.alpha
+    }
     
-    setOpacity(e) {
-        var current = e ? Event.pos(e).pageY : this.getCurrent(this.$store.alpha);
-        var dist = this.getDist(current);
+    refreshColorUI(e) {
+        var dist = this.getCaculatedDist(e)
 
-        this.setColorUI(dist/100);
+        this.setColorUI(dist/100 * this.maxValue);
 
-        this.$store.dispatch('/changeColor', {
-            a: Math.floor(dist) / 100,
-            source
+        this.changeColor({
+            a: Math.floor(dist) / 100 * this.maxValue
         })
-
     }
- 
-    setColorUI(alpha) {
-        alpha = alpha || this.$store.alpha
-
-        if (alpha == 0) {
-            this.refs.$bar.addClass('first').removeClass('last')
-        } else if (alpha == 1) {
-            this.refs.$bar.addClass('last').removeClass('first')
-        } else {
-            this.refs.$bar.removeClass('last').removeClass('first')
-        }        
-
-        var y = this.getMaxDist() * (alpha || 0);
-        this.refs.$bar.css({ top : (y) + 'px' });
-        this.pos = { y };
-    }
-
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
-
-    onDragMove (e) {
-        this.setOpacity(e);
-    }
-
-    onDragStart (e) {
-        this.setOpacity(e);
-    }
-
 }
