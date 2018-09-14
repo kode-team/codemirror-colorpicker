@@ -25,14 +25,14 @@ export default class ColorSetsList extends BaseModule {
         return Array.isArray($store.userList) && $store.userList.length ? $store.userList : $store.colorSetsList;
     }
 
-    '/setUserList' ($store, list) {
+    '/setUserPalette' ($store, list) {
         $store.userList = list; 
 
-        $store.dispatch('/resetUserList');
+        $store.dispatch('/resetUserPalette');
         $store.dispatch('/setCurrentColorSets');
     }
 
-    '/resetUserList' ($store) {
+    '/resetUserPalette' ($store) {
         if ($store.userList && $store.userList.length) {
             $store.userList = $store.userList.map( (element, index) => {
 

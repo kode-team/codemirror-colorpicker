@@ -1,10 +1,8 @@
 
 import Event from '../util/Event'
-import UIElement from './UIElement';
+import BaseBox from './BaseBox';
 
-const source = 'base-slider';
-
-export default class BaseSlider extends UIElement {
+export default class BaseSlider extends BaseBox {
 
     constructor (opt) {
         super(opt)
@@ -13,9 +11,6 @@ export default class BaseSlider extends UIElement {
         this.maxValue = 1   // max domain value 
         this.source = 'base-slider'
     }
-
-    /* called when mouse is ended move  */
-    onDragEnd (e) {}
 
     /* slider container's min and max position */
     getMinMaxPosition () {
@@ -98,54 +93,5 @@ export default class BaseSlider extends UIElement {
 
         this.setMousePosition(this.getMaxDist() * ( (v || 0) / this.maxValue));
     }    
-
-    /** push change event  */
-    changeColor (opt) {
-        this.$store.dispatch('/changeColor',Object.assign({
-            source: this.source
-        }, opt || {}))
-    }
-
-    // Event Bindings 
-    'mouseup document' (e) {
-        this.isDown = false ;
-    }
-
-    'mousemove document' (e) {
-        if (this.isDown) {
-            this.onDragMove(e);
-        }
-    }
-
-    'mousedown $bar' (e) {
-        e.preventDefault();
-        this.isDown = true; 
-    }
-    
-    'mousedown $container' (e) {
-        this.isDown = true; 
-        this.onDragStart(e);
-    }
-
-
-    onDragStart (e) {
-        this.refreshColorUI(e);
-    }
-
-    onDragMove (e) {
-        this.refreshColorUI(e);
-    }
-
-    refreshColorUI (e) {
-        
-    }
-
-    '@changeColor' (sourceType) {
-        if (this.source != sourceType) {
-            this.refresh()
-        }
-    }
-
-    '@initColor' () { this.refresh() }    
     
 }

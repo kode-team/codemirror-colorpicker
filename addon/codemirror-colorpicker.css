@@ -845,6 +845,46 @@
           border-top: 4px solid transparent;
           border-bottom: 4px solid transparent;
           border-right: 4px solid black; }
+  .codemirror-colorpicker.ring .colorpicker-body > .color {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    left: 52px;
+    top: 52px; }
+  .codemirror-colorpicker.ring .colorpicker-body .wheel {
+    width: 224px;
+    height: 224px;
+    position: relative;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+    .codemirror-colorpicker.ring .colorpicker-body .wheel .wheel-canvas {
+      width: 214px;
+      height: 214px;
+      border-radius: 50%;
+      position: absolute;
+      left: 5px;
+      top: 5px; }
+    .codemirror-colorpicker.ring .colorpicker-body .wheel .drag-pointer {
+      display: inline-block;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      left: 50%;
+      top: 50%;
+      border: 1px solid white;
+      border-radius: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      z-index: 2; }
+  .codemirror-colorpicker.ring .control {
+    padding-top: 0px; }
+    .codemirror-colorpicker.ring .control .value {
+      display: none; }
+    .codemirror-colorpicker.ring .control > .color, .codemirror-colorpicker.ring .control > .empty {
+      top: -17px;
+      width: 30px;
+      height: 30px;
+      border-radius: 2px; }
 
 .colorsets-contextmenu {
   position: fixed;

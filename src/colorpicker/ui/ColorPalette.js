@@ -1,4 +1,5 @@
 import UIElement from '../UIElement';
+import Event from '../../util/Event'
 
 const source = 'chromedevtool-palette';
 
@@ -57,14 +58,14 @@ export default class ColorPalette extends UIElement {
 
 
     setMainColor(e) {
-        e.preventDefault();
-        var pos = this.$el.position();         // position for screen
+        // e.preventDefault();
+        var pos = this.$el.offset();         // position for screen
         var w = this.state.get('$el.contentWidth');
         var h = this.state.get('$el.contentHeight');
 
-        var x = e.clientX - pos.left;
-        var y = e.clientY - pos.top;
-    
+        var x = Event.pos(e).pageX - pos.left;
+        var y = Event.pos(e).pageY - pos.top;
+
         if (x < 0) x = 0;
         else if (x > w) x = w;
     
@@ -107,5 +108,26 @@ export default class ColorPalette extends UIElement {
     mouseup (e) {
         this.isDown = false; 
     }
+
+
+    'touchend document' (e) {
+        this.isDown = false; 
+    }    
+
+    'touchmove document' (e) {
+        if (this.isDown) {
+            this.setMainColor(e);
+        }
+    }
+
+    touchstart (e) {
+        e.preventDefault()
+        this.isDown = true; 
+        this.setMainColor(e);
+    }
+    
+    touchend (e) {
+        this.isDown = false; 
+    }    
 
 }

@@ -1,9 +1,9 @@
 
 import Color from '../../util/Color'
+import Dom from '../../util/Dom'
 import Event from '../../util/Event'
 import UIElement from '../UIElement';
-
-const source = 'macos-colorwheel'
+import { getXYInCircle, caculateAngle } from '../../util/functions/math';
 
 export default class ColorWheel extends UIElement {
 
@@ -12,6 +12,9 @@ export default class ColorWheel extends UIElement {
 
         this.width = 214;
         this.height = 214;
+        this.thinkness = 0; 
+        this.half_thinkness = 0         
+        this.source = 'colorwheel'
     }
 
     template () {
@@ -42,20 +45,15 @@ export default class ColorWheel extends UIElement {
         })
     }
 
-    renderCanvas () {
-        
-        // only once rendering 
-        if (this.$store.createdWheelCanvas) return;
 
-        const $canvas = this.refs.$colorwheel
-        // console.log($canvas);
-        const context = $canvas.el.getContext('2d')
+    renderWheel (width, height) {
 
-        let [width, height] = $canvas.size()
 
         if (this.width && !width) width = this.width;
-        if (this.height && !height) height = this.height;
+        if (this.height && !height) height = this.height;        
 
+        const $canvas = new Dom('canvas');
+        const context = $canvas.el.getContext('2d')
         $canvas.el.width = width;
         $canvas.el.height = height; 
         $canvas.css({ width: width + 'px', height: height + 'px' })
@@ -74,7 +72,7 @@ export default class ColorWheel extends UIElement {
                 var rx = x - cx + 1,
                 ry = y - cy + 1,
                 d = rx * rx + ry * ry,
-                hue = this.radianToDegree(Math.atan2(ry, rx));
+                hue = caculateAngle(rx, ry);
 
                 var rgb = Color.HSVtoRGB(
                     hue,     // 0~360 hue 
@@ -91,43 +89,58 @@ export default class ColorWheel extends UIElement {
         }
 
         context.putImageData(img,0, 0)
+
+        if (this.thinkness > 0) {
+            context.globalCompositeOperation = "destination-out"    // destination-out 은 그리는 영역이 지워진다. 
+            context.fillStyle = 'black'
+            context.beginPath();
+            context.arc(cx, cy, radius - this.thinkness, 0, Math.PI * 2);
+            context.closePath();
+            context.fill()        
+    
+        }
+
+        return $canvas; 
+    }    
+
+    renderCanvas () {
+        
+        // only once rendering 
+        if (this.$store.createdWheelCanvas) return;
+
+        const $canvas = this.refs.$colorwheel
+        // console.log($canvas);
+        const context = $canvas.el.getContext('2d')
+
+        let [width, height] = $canvas.size()
+
+        if (this.width && !width) width = this.width;
+        if (this.height && !height) height = this.height;
+
+        $canvas.el.width = width;
+        $canvas.el.height = height; 
+        $canvas.css({ width: width + 'px', height: height + 'px' })
+
+        var $wheelCanvas = this.renderWheel(width, height)
+
+        context.drawImage($wheelCanvas.el, 0, 0)
+
         this.$store.createdWheelCanvas = true; 
     }
 
-    degreeToRadian (angle) {
-        return angle * Math.PI / 180;
+    getDefaultValue () {
+        return this.$store.hsv.h 
     }
 
-    /**
-     * 
-     * convert radian to degree 
-     * 
-     * @param {*} radian 
-     * @returns {Number} 0..360
-     */
-    radianToDegree(radian) {
-        var angle =  radian * 180 / Math.PI;
-
-
-        if (angle < 0) {   // 각도가 0보다 작으면 360 에서 반전시킨다. 
-            angle = 360 + angle
-        }
-
-        return angle; 
+    getDefaultSaturation () {
+        return this.$store.hsv.s 
     }
 
-    getX (angle, radius, centerX = 0) {
-        return centerX + radius * Math.cos(this.degreeToRadian(angle))
+    getCurrentXY(e, angle, radius, centerX, centerY) {
+        return e ? Event.posXY(e) : getXYInCircle(angle, radius, centerX, centerY)
     }
 
-    getY (angle, radius, centerY = 0) {
-        return centerY + radius * Math.sin(this.degreeToRadian(angle))
-    }    
-
-    setHueColor (e, isEvent) {
-
-        if (!this.state.get('$el.width')) return;
-
+    getRectangle () {
         var width = this.state.get('$el.width');  
         var height = this.state.get('$el.height');  
         var radius = this.state.get('$colorwheel.width') / 2;  
@@ -138,18 +151,27 @@ export default class ColorWheel extends UIElement {
         var minY = this.refs.$el.offset().top;
         var centerY = minY + height / 2;
 
-        var x = e ? Event.pos(e).pageX : this.getX(this.$store.hsv.h, this.$store.hsv.s * radius, centerX)
-        var y = e ? Event.pos(e).pageY : this.getY(this.$store.hsv.h, this.$store.hsv.s * radius, centerY)
+        return { minX, minY, width, height, radius,  centerX, centerY }
+    }
 
+    setHueColor (e, isEvent) {
 
-        var rx = x - centerX,
-        ry = y - centerY,
-        d = rx * rx + ry * ry,
-        hue = this.radianToDegree(Math.atan2(ry, rx));
+        if (!this.state.get('$el.width')) return;
+
+        var { minX, minY, radius,  centerX, centerY } = this.getRectangle()
+
+        var { x , y } = this.getCurrentXY(
+            e, 
+            this.getDefaultValue(),
+            this.getDefaultSaturation() * radius, 
+            centerX, 
+            centerY
+        )
+
+        var rx = x - centerX, ry = y - centerY, d = rx * rx + ry * ry, hue = caculateAngle(rx, ry);
 
         if (d > radius * radius) {
-            x = this.getX(hue, radius, centerX);
-            y = this.getY(hue, radius, centerY);
+            var {x, y} = this.getCurrentXY(null, hue, radius, centerX, centerY);
         }
 
         // saturation 을 
@@ -162,17 +184,22 @@ export default class ColorWheel extends UIElement {
         });
 
         if (!isEvent) {
-            this.$store.dispatch('/changeColor', {
+            this.changeColor({
                 type: 'hsv',
                 h: hue,
-                s: saturation,
-                source
+                s: saturation
             })
         }
     }
 
+    changeColor (opt) {
+        this.$store.dispatch('/changeColor',Object.assign({
+            source: this.source
+        }, opt || {}))
+    }
+
     '@changeColor' (sourceType) {
-        if (source != sourceType) {
+        if (this.source != sourceType) {
             this.refresh(true);
         }
     }
@@ -199,5 +226,26 @@ export default class ColorWheel extends UIElement {
         this.isDown = true; 
         this.setHueColor(e);        
     }    
+
+    'touchend document' (e) {
+        this.isDown = false ;
+    }
+
+    'touchmove document' (e) {
+        if (this.isDown) {
+            this.setHueColor(e);
+        }
+    }
+
+    'touchstart $drag_pointer' (e) {
+        e.preventDefault();
+        this.isDown = true; 
+    }
+
+    'touchstart $el' (e) {
+        e.preventDefault()
+        this.isDown = true; 
+        this.setHueColor(e);        
+    }        
 }
  

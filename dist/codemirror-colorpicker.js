@@ -105,8 +105,61 @@ function round(n, k) {
     return Math.round(n * k) / k;
 }
 
+function degreeToRadian(angle) {
+    return angle * Math.PI / 180;
+}
+
+/**
+ * 
+ * convert radian to degree 
+ * 
+ * @param {*} radian 
+ * @returns {Number} 0..360
+ */
+function radianToDegree(radian) {
+    var angle = radian * 180 / Math.PI;
+
+    if (angle < 0) {
+        // 각도가 0보다 작으면 360 에서 반전시킨다. 
+        angle = 360 + angle;
+    }
+
+    return angle;
+}
+
+function getXInCircle(angle, radius) {
+    var centerX = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+    return centerX + radius * Math.cos(degreeToRadian(angle));
+}
+
+function getYInCircle(angle, radius) {
+    var centerY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+    return centerY + radius * Math.sin(degreeToRadian(angle));
+}
+
+function getXYInCircle(angle, radius) {
+    var centerX = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var centerY = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+    return {
+        x: getXInCircle(angle, radius, centerX),
+        y: getYInCircle(angle, radius, centerY)
+    };
+}
+
+function caculateAngle(rx, ry) {
+    return radianToDegree(Math.atan2(ry, rx));
+}
+
 var math = {
-    round: round
+    round: round,
+    radianToDegree: radianToDegree,
+    degreeToRadian: degreeToRadian,
+    getXInCircle: getXInCircle,
+    getYInCircle: getYInCircle,
+    caculateAngle: caculateAngle
 };
 
 /**
@@ -5998,16 +6051,16 @@ var ColorSetsList = function (_BaseModule) {
             return Array.isArray($store.userList) && $store.userList.length ? $store.userList : $store.colorSetsList;
         }
     }, {
-        key: '/setUserList',
-        value: function setUserList($store, list) {
+        key: '/setUserPalette',
+        value: function setUserPalette($store, list) {
             $store.userList = list;
 
-            $store.dispatch('/resetUserList');
+            $store.dispatch('/resetUserPalette');
             $store.dispatch('/setCurrentColorSets');
         }
     }, {
-        key: '/resetUserList',
-        value: function resetUserList($store) {
+        key: '/resetUserPalette',
+        value: function resetUserPalette($store) {
             if ($store.userList && $store.userList.length) {
                 $store.userList = $store.userList.map(function (element, index) {
 
@@ -6121,10 +6174,14 @@ var ColorSetsList = function (_BaseModule) {
 
 var Event = {
     addEvent: function addEvent(dom, eventName, callback) {
-        dom.addEventListener(eventName, callback);
+        if (dom) {
+            dom.addEventListener(eventName, callback);
+        }
     },
     removeEvent: function removeEvent(dom, eventName, callback) {
-        dom.removeEventListener(eventName, callback);
+        if (dom) {
+            dom.removeEventListener(eventName, callback);
+        }
     },
     pos: function pos(e) {
         if (e.touches && e.touches[0]) {
@@ -6132,6 +6189,13 @@ var Event = {
         }
 
         return e;
+    },
+    posXY: function posXY(e) {
+        var pos = this.pos(e);
+        return {
+            x: pos.pageX,
+            y: pos.pageY
+        };
     }
 };
 
@@ -6195,7 +6259,8 @@ var State = function () {
   return State;
 }();
 
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|touch(start|move|end)|key(down|up|press)|contextmenu|change|input)/ig;
+var CHECK_LOAD_PATTERN = /^load (.*)/ig;
 var EVENT_SAPARATOR = ' ';
 var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
 
@@ -6239,29 +6304,14 @@ var EventMachin = function () {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
-      // 1. 자식이 될 컴포넌트를 생성하고 
-      this.newChildComponents();
-
-      var childKeys = Object.keys(this.childComponents);
-
-      // 2. 나의 template 을 만들어내고  
+      // 1. 나의 template 을 만들어내고  
       this.$el = this.parseTemplate(this.template());
       this.refs.$el = this.$el;
 
-      // 3. 개별 자식 컴포넌트를 다시 render 하고 
-      childKeys.forEach(function (key) {
-        _this2[key].render();
-      });
-
-      // 4. 나의 템플릿에 자식 컴포넌트를 연결하고 
+      // 개별 객체 셋팅하고 
       this.parseTarget();
-      childKeys.forEach(function (key) {
-        _this2[key].parseTarget();
-      });
 
-      // 5. 데이타 로드 할게 있으면 로드 하고 
+      // 데이타 로드 하고 
       this.load();
     }
 
@@ -6285,22 +6335,16 @@ var EventMachin = function () {
   }, {
     key: 'parseTemplate',
     value: function parseTemplate(html) {
-      var _this3 = this;
+      var _this2 = this;
 
       var $el = new Dom("div").html(html).firstChild();
-      var refs = $el.findAll("[ref]");
+
+      // ref element 정리 
+      var refs = $el.findAll('[ref]');
+
       [].concat(toConsumableArray(refs)).forEach(function (node) {
-        var name = node.getAttribute("ref");
-        _this3.refs[name] = new Dom(node);
-
-        var callbackName = 'load ' + name;
-
-        if (_this3[callbackName]) {
-          // load 가 정의되어 있으면 해당 컴포넌트에 load 함수를 넣어준다. 
-          _this3.refs[name].load = function () {
-            new Dom(node).html(_this3.parseTemplate(_this3[callbackName].call(_this3)));
-          };
-        }
+        var name = node.getAttribute('ref');
+        _this2.refs[name] = new Dom(node);
       });
 
       return $el;
@@ -6313,16 +6357,23 @@ var EventMachin = function () {
   }, {
     key: 'parseTarget',
     value: function parseTarget() {
-      var _this4 = this;
+      var _this3 = this;
 
       var $el = this.$el;
       var targets = $el.findAll('[target]');
 
       [].concat(toConsumableArray(targets)).forEach(function (node) {
         var targetComponentName = node.getAttribute('target');
+        var refName = node.getAttribute('ref') || targetComponentName;
 
-        if (_this4[targetComponentName]) {
-          $el.replace(node, _this4[targetComponentName].$el.el);
+        var Component = _this3.childComponents[targetComponentName];
+        var instance = new Component(_this3);
+        _this3[refName] = instance;
+        _this3.refs[refName] = instance.$el;
+
+        if (instance) {
+          instance.render();
+          $el.replace(node, instance.$el.el);
         }
       });
     }
@@ -6332,11 +6383,13 @@ var EventMachin = function () {
   }, {
     key: 'load',
     value: function load() {
-      var _this5 = this;
+      var _this4 = this;
 
-      Object.keys(this.refs).forEach(function (key) {
-        if (_this5.refs[key].load) {
-          _this5.refs[key].load();
+      this.filterProps(CHECK_LOAD_PATTERN).forEach(function (callbackName) {
+        var elName = callbackName.split('load ')[1];
+
+        if (_this4.refs[elName]) {
+          _this4.refs[elName].html(_this4.parseTemplate(_this4[callbackName].call(_this4)));
         }
       });
     }
@@ -6359,14 +6412,14 @@ var EventMachin = function () {
   }, {
     key: 'initializeEvent',
     value: function initializeEvent() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.initializeEventMachin();
 
       // 자식 이벤트도 같이 초기화 한다. 
       // 그래서 이 메소드는 부모에서 한번만 불려도 된다. 
       Object.keys(this.childComponents).forEach(function (key) {
-        if (_this6[key]) _this6[key].initializeEvent();
+        if (_this5[key]) _this5[key].initializeEvent();
       });
     }
 
@@ -6378,13 +6431,13 @@ var EventMachin = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      var _this7 = this;
+      var _this6 = this;
 
       this.destroyEventMachin();
       // this.refs = {} 
 
       Object.keys(this.childComponents).forEach(function (key) {
-        if (_this7[key]) _this7[key].destroy();
+        if (_this6[key]) _this6[key].destroy();
       });
     }
   }, {
@@ -6454,7 +6507,7 @@ var EventMachin = function () {
   }, {
     key: 'getDefaultEventObject',
     value: function getDefaultEventObject(eventName) {
-      var _this8 = this;
+      var _this7 = this;
 
       var arr = eventName.split('.');
       var realEventName = arr.shift();
@@ -6469,7 +6522,7 @@ var EventMachin = function () {
       });
 
       var checkMethodList = arr.filter(function (code) {
-        return !!_this8[code];
+        return !!_this7[code];
       });
 
       arr = arr.filter(function (code) {
@@ -6538,7 +6591,7 @@ var EventMachin = function () {
   }, {
     key: 'checkEventType',
     value: function checkEventType(e, eventObject) {
-      var _this9 = this;
+      var _this8 = this;
 
       var onlyControl = e.ctrlKey ? eventObject.isControl : true;
       var onlyShift = e.shiftKey ? eventObject.isShift : true;
@@ -6554,7 +6607,7 @@ var EventMachin = function () {
       if (eventObject.checkMethodList.length) {
         // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
         isAllCheck = eventObject.checkMethodList.every(function (method) {
-          return _this9[method].call(_this9, e);
+          return _this8[method].call(_this8, e);
         });
       }
 
@@ -6563,13 +6616,13 @@ var EventMachin = function () {
   }, {
     key: 'makeCallback',
     value: function makeCallback(eventObject, callback) {
-      var _this10 = this;
+      var _this9 = this;
 
       if (eventObject.delegate) {
         return function (e) {
 
-          if (_this10.checkEventType(e, eventObject)) {
-            var delegateTarget = _this10.matchPath(e.target || e.srcElement, eventObject.delegate);
+          if (_this9.checkEventType(e, eventObject)) {
+            var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
 
             if (delegateTarget) {
               // delegate target 이 있는 경우만 callback 실행 
@@ -6581,7 +6634,7 @@ var EventMachin = function () {
         };
       } else {
         return function (e) {
-          if (_this10.checkEventType(e, eventObject)) {
+          if (_this9.checkEventType(e, eventObject)) {
             return callback(e);
           }
         };
@@ -6597,10 +6650,10 @@ var EventMachin = function () {
   }, {
     key: 'removeEventAll',
     value: function removeEventAll() {
-      var _this11 = this;
+      var _this10 = this;
 
       this.getBindings().forEach(function (obj) {
-        _this11.removeEvent(obj);
+        _this10.removeEvent(obj);
       });
       this.initBindings();
     }
@@ -6942,7 +6995,7 @@ var BaseColorPicker = function (_UIElement) {
 
             this.$root.append(this.$arrow);
 
-            this.$store.dispatch('/setUserList', this.opt.colorSets);
+            this.$store.dispatch('/setUserPalette', this.opt.colorSets);
 
             this.render();
 
@@ -7046,6 +7099,20 @@ var BaseColorPicker = function (_UIElement) {
             var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
             this.$store.dispatch('/setCurrentColorAll', colors);
+        }
+
+        /**
+         * refresh all color palette 
+         * 
+         * @param {*} list 
+         */
+
+    }, {
+        key: 'setUserPalette',
+        value: function setUserPalette() {
+            var list = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.$store.dispatch('/setUserPalette', list);
         }
 
         /**
@@ -7252,8 +7319,119 @@ var BaseColorPicker = function (_UIElement) {
     return BaseColorPicker;
 }(UIElement);
 
-var BaseSlider = function (_UIElement) {
-    inherits(BaseSlider, _UIElement);
+var BaseBox = function (_UIElement) {
+    inherits(BaseBox, _UIElement);
+
+    function BaseBox(opt) {
+        classCallCheck(this, BaseBox);
+
+        var _this = possibleConstructorReturn(this, (BaseBox.__proto__ || Object.getPrototypeOf(BaseBox)).call(this, opt));
+
+        _this.source = 'base-box';
+        return _this;
+    }
+
+    createClass(BaseBox, [{
+        key: 'refresh',
+        value: function refresh() {}
+    }, {
+        key: 'refreshColorUI',
+        value: function refreshColorUI(e) {}
+
+        /** push change event  */
+
+    }, {
+        key: 'changeColor',
+        value: function changeColor(opt) {
+            this.$store.dispatch('/changeColor', Object.assign({
+                source: this.source
+            }, opt || {}));
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup document',
+        value: function mouseupDocument(e) {
+            this.onDragEnd(e);
+        }
+    }, {
+        key: 'mousemove document',
+        value: function mousemoveDocument(e) {
+            this.onDragMove(e);
+        }
+    }, {
+        key: 'mousedown $bar',
+        value: function mousedown$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'mousedown $container',
+        value: function mousedown$container(e) {
+            this.isDown = true;
+            this.onDragStart(e);
+        }
+    }, {
+        key: 'touchend document',
+        value: function touchendDocument(e) {
+            this.onDragEnd(e);
+        }
+    }, {
+        key: 'touchmove document',
+        value: function touchmoveDocument(e) {
+            this.onDragMove(e);
+        }
+    }, {
+        key: 'touchstart $bar',
+        value: function touchstart$bar(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'touchstart $container',
+        value: function touchstart$container(e) {
+            this.onDragStart(e);
+        }
+    }, {
+        key: 'onDragStart',
+        value: function onDragStart(e) {
+            this.isDown = true;
+            this.refreshColorUI(e);
+        }
+    }, {
+        key: 'onDragMove',
+        value: function onDragMove(e) {
+            if (this.isDown) {
+                this.refreshColorUI(e);
+            }
+        }
+
+        /* called when mouse is ended move  */
+
+    }, {
+        key: 'onDragEnd',
+        value: function onDragEnd(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (this.source != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return BaseBox;
+}(UIElement);
+
+var BaseSlider = function (_BaseBox) {
+    inherits(BaseSlider, _BaseBox);
 
     function BaseSlider(opt) {
         classCallCheck(this, BaseSlider);
@@ -7266,16 +7444,10 @@ var BaseSlider = function (_UIElement) {
         return _this;
     }
 
-    /* called when mouse is ended move  */
+    /* slider container's min and max position */
 
 
     createClass(BaseSlider, [{
-        key: 'onDragEnd',
-        value: function onDragEnd(e) {}
-
-        /* slider container's min and max position */
-
-    }, {
         key: 'getMinMaxPosition',
         value: function getMinMaxPosition() {
             var min = this.getMinPosition();
@@ -7385,71 +7557,9 @@ var BaseSlider = function (_UIElement) {
 
             this.setMousePosition(this.getMaxDist() * ((v || 0) / this.maxValue));
         }
-
-        /** push change event  */
-
-    }, {
-        key: 'changeColor',
-        value: function changeColor(opt) {
-            this.$store.dispatch('/changeColor', Object.assign({
-                source: this.source
-            }, opt || {}));
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
-            if (this.isDown) {
-                this.onDragMove(e);
-            }
-        }
-    }, {
-        key: 'mousedown $bar',
-        value: function mousedown$bar(e) {
-            e.preventDefault();
-            this.isDown = true;
-        }
-    }, {
-        key: 'mousedown $container',
-        value: function mousedown$container(e) {
-            this.isDown = true;
-            this.onDragStart(e);
-        }
-    }, {
-        key: 'onDragStart',
-        value: function onDragStart(e) {
-            this.refreshColorUI(e);
-        }
-    }, {
-        key: 'onDragMove',
-        value: function onDragMove(e) {
-            this.refreshColorUI(e);
-        }
-    }, {
-        key: 'refreshColorUI',
-        value: function refreshColorUI(e) {}
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (this.source != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
     }]);
     return BaseSlider;
-}(UIElement);
+}(BaseBox);
 
 var Value = function (_BaseSlider) {
     inherits(Value, _BaseSlider);
@@ -7618,8 +7728,6 @@ var ColorControl = function (_UIElement) {
     return ColorControl;
 }(UIElement);
 
-var source$3 = 'macos-colorwheel';
-
 var ColorWheel = function (_UIElement) {
     inherits(ColorWheel, _UIElement);
 
@@ -7630,6 +7738,9 @@ var ColorWheel = function (_UIElement) {
 
         _this.width = 214;
         _this.height = 214;
+        _this.thinkness = 0;
+        _this.half_thinkness = 0;
+        _this.source = 'colorwheel';
         return _this;
     }
 
@@ -7659,6 +7770,61 @@ var ColorWheel = function (_UIElement) {
             });
         }
     }, {
+        key: 'renderWheel',
+        value: function renderWheel(width, height) {
+
+            if (this.width && !width) width = this.width;
+            if (this.height && !height) height = this.height;
+
+            var $canvas = new Dom('canvas');
+            var context = $canvas.el.getContext('2d');
+            $canvas.el.width = width;
+            $canvas.el.height = height;
+            $canvas.css({ width: width + 'px', height: height + 'px' });
+
+            var img = context.getImageData(0, 0, width, height);
+            var pixels = img.data;
+            var half_width = Math.floor(width / 2);
+            var half_height = Math.floor(height / 2);
+
+            var radius = width > height ? half_height : half_width;
+            var cx = half_width;
+            var cy = half_height;
+
+            for (var y = 0; y < height; y++) {
+                for (var x = 0; x < width; x++) {
+                    var rx = x - cx + 1,
+                        ry = y - cy + 1,
+                        d = rx * rx + ry * ry,
+                        hue = caculateAngle(rx, ry);
+
+                    var rgb = Color$1.HSVtoRGB(hue, // 0~360 hue 
+                    Math.min(Math.sqrt(d) / radius, 1), // 0..1 Saturation 
+                    1 //  0..1 Value
+                    );
+
+                    var index = (y * width + x) * 4;
+                    pixels[index] = rgb.r;
+                    pixels[index + 1] = rgb.g;
+                    pixels[index + 2] = rgb.b;
+                    pixels[index + 3] = 255;
+                }
+            }
+
+            context.putImageData(img, 0, 0);
+
+            if (this.thinkness > 0) {
+                context.globalCompositeOperation = "destination-out"; // destination-out 은 그리는 영역이 지워진다. 
+                context.fillStyle = 'black';
+                context.beginPath();
+                context.arc(cx, cy, radius - this.thinkness, 0, Math.PI * 2);
+                context.closePath();
+                context.fill();
+            }
+
+            return $canvas;
+        }
+    }, {
         key: 'renderCanvas',
         value: function renderCanvas() {
 
@@ -7681,84 +7847,30 @@ var ColorWheel = function (_UIElement) {
             $canvas.el.height = height;
             $canvas.css({ width: width + 'px', height: height + 'px' });
 
-            var img = context.getImageData(0, 0, width, height);
-            var pixels = img.data;
-            var half_width = Math.floor(width / 2);
-            var half_height = Math.floor(height / 2);
+            var $wheelCanvas = this.renderWheel(width, height);
 
-            var radius = width > height ? half_height : half_width;
-            var cx = half_width;
-            var cy = half_height;
+            context.drawImage($wheelCanvas.el, 0, 0);
 
-            for (var y = 0; y < height; y++) {
-                for (var x = 0; x < width; x++) {
-                    var rx = x - cx + 1,
-                        ry = y - cy + 1,
-                        d = rx * rx + ry * ry,
-                        hue = this.radianToDegree(Math.atan2(ry, rx));
-
-                    var rgb = Color$1.HSVtoRGB(hue, // 0~360 hue 
-                    Math.min(Math.sqrt(d) / radius, 1), // 0..1 Saturation 
-                    1 //  0..1 Value
-                    );
-
-                    var index = (y * width + x) * 4;
-                    pixels[index] = rgb.r;
-                    pixels[index + 1] = rgb.g;
-                    pixels[index + 2] = rgb.b;
-                    pixels[index + 3] = 255;
-                }
-            }
-
-            context.putImageData(img, 0, 0);
             this.$store.createdWheelCanvas = true;
         }
     }, {
-        key: 'degreeToRadian',
-        value: function degreeToRadian(angle) {
-            return angle * Math.PI / 180;
-        }
-
-        /**
-         * 
-         * convert radian to degree 
-         * 
-         * @param {*} radian 
-         * @returns {Number} 0..360
-         */
-
-    }, {
-        key: 'radianToDegree',
-        value: function radianToDegree(radian) {
-            var angle = radian * 180 / Math.PI;
-
-            if (angle < 0) {
-                // 각도가 0보다 작으면 360 에서 반전시킨다. 
-                angle = 360 + angle;
-            }
-
-            return angle;
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+            return this.$store.hsv.h;
         }
     }, {
-        key: 'getX',
-        value: function getX(angle, radius) {
-            var centerX = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-            return centerX + radius * Math.cos(this.degreeToRadian(angle));
+        key: 'getDefaultSaturation',
+        value: function getDefaultSaturation() {
+            return this.$store.hsv.s;
         }
     }, {
-        key: 'getY',
-        value: function getY(angle, radius) {
-            var centerY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-            return centerY + radius * Math.sin(this.degreeToRadian(angle));
+        key: 'getCurrentXY',
+        value: function getCurrentXY(e, angle, radius, centerX, centerY) {
+            return e ? Event.posXY(e) : getXYInCircle(angle, radius, centerX, centerY);
         }
     }, {
-        key: 'setHueColor',
-        value: function setHueColor(e, isEvent) {
-
-            if (!this.state.get('$el.width')) return;
-
+        key: 'getRectangle',
+        value: function getRectangle() {
             var width = this.state.get('$el.width');
             var height = this.state.get('$el.height');
             var radius = this.state.get('$colorwheel.width') / 2;
@@ -7769,17 +7881,34 @@ var ColorWheel = function (_UIElement) {
             var minY = this.refs.$el.offset().top;
             var centerY = minY + height / 2;
 
-            var x = e ? Event.pos(e).pageX : this.getX(this.$store.hsv.h, this.$store.hsv.s * radius, centerX);
-            var y = e ? Event.pos(e).pageY : this.getY(this.$store.hsv.h, this.$store.hsv.s * radius, centerY);
+            return { minX: minX, minY: minY, width: width, height: height, radius: radius, centerX: centerX, centerY: centerY };
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor(e, isEvent) {
+
+            if (!this.state.get('$el.width')) return;
+
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                radius = _getRectangle.radius,
+                centerX = _getRectangle.centerX,
+                centerY = _getRectangle.centerY;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue(), this.getDefaultSaturation() * radius, centerX, centerY),
+                x = _getCurrentXY.x,
+                y = _getCurrentXY.y;
 
             var rx = x - centerX,
                 ry = y - centerY,
                 d = rx * rx + ry * ry,
-                hue = this.radianToDegree(Math.atan2(ry, rx));
+                hue = caculateAngle(rx, ry);
 
             if (d > radius * radius) {
-                x = this.getX(hue, radius, centerX);
-                y = this.getY(hue, radius, centerY);
+                var _getCurrentXY2 = this.getCurrentXY(null, hue, radius, centerX, centerY),
+                    x = _getCurrentXY2.x,
+                    y = _getCurrentXY2.y;
             }
 
             // saturation 을 
@@ -7792,18 +7921,24 @@ var ColorWheel = function (_UIElement) {
             });
 
             if (!isEvent) {
-                this.$store.dispatch('/changeColor', {
+                this.changeColor({
                     type: 'hsv',
                     h: hue,
-                    s: saturation,
-                    source: source$3
+                    s: saturation
                 });
             }
         }
     }, {
+        key: 'changeColor',
+        value: function changeColor(opt) {
+            this.$store.dispatch('/changeColor', Object.assign({
+                source: this.source
+            }, opt || {}));
+        }
+    }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$3 != sourceType) {
+            if (this.source != sourceType) {
                 this.refresh(true);
             }
         }
@@ -7839,11 +7974,36 @@ var ColorWheel = function (_UIElement) {
             this.isDown = true;
             this.setHueColor(e);
         }
+    }, {
+        key: 'touchend document',
+        value: function touchendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'touchmove document',
+        value: function touchmoveDocument(e) {
+            if (this.isDown) {
+                this.setHueColor(e);
+            }
+        }
+    }, {
+        key: 'touchstart $drag_pointer',
+        value: function touchstart$drag_pointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'touchstart $el',
+        value: function touchstart$el(e) {
+            e.preventDefault();
+            this.isDown = true;
+            this.setHueColor(e);
+        }
     }]);
     return ColorWheel;
 }(UIElement);
 
-var source$4 = 'chromedevtool-information';
+var source$2 = 'chromedevtool-information';
 
 var ColorInformation = function (_UIElement) {
     inherits(ColorInformation, _UIElement);
@@ -7923,7 +8083,7 @@ var ColorInformation = function (_UIElement) {
                 g: this.refs.$rgb_g.int(),
                 b: this.refs.$rgb_b.int(),
                 a: this.refs.$rgb_a.float(),
-                source: source$4
+                source: source$2
             });
         }
     }, {
@@ -7935,13 +8095,13 @@ var ColorInformation = function (_UIElement) {
                 s: this.refs.$hsl_s.int(),
                 l: this.refs.$hsl_l.int(),
                 a: this.refs.$hsl_a.float(),
-                source: source$4
+                source: source$2
             });
         }
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$4 != sourceType) {
+            if (source$2 != sourceType) {
                 this.refresh();
             }
         }
@@ -8003,7 +8163,7 @@ var ColorInformation = function (_UIElement) {
             var code = this.refs.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.$store.dispatch('/changeColor', code, source$4);
+                this.$store.dispatch('/changeColor', code, source$2);
             }
         }
     }, {
@@ -8354,7 +8514,7 @@ var Hue = function (_BaseSlider) {
     return Hue;
 }(BaseSlider);
 
-var source$5 = 'chromedevtool-control';
+var source$3 = 'chromedevtool-control';
 
 var ColorControl$2 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
@@ -8394,7 +8554,7 @@ var ColorControl$2 = function (_UIElement) {
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$5 != sourceType) {
+            if (source$3 != sourceType) {
                 this.refresh();
             }
         }
@@ -8407,7 +8567,7 @@ var ColorControl$2 = function (_UIElement) {
     return ColorControl;
 }(UIElement);
 
-var source$6 = 'chromedevtool-palette';
+var source$4 = 'chromedevtool-palette';
 
 var ColorPalette = function (_UIElement) {
     inherits(ColorPalette, _UIElement);
@@ -8447,7 +8607,7 @@ var ColorPalette = function (_UIElement) {
                 type: 'hsv',
                 s: s,
                 v: v,
-                source: source$6
+                source: source$4
             });
         }
     }, {
@@ -8468,13 +8628,13 @@ var ColorPalette = function (_UIElement) {
     }, {
         key: 'setMainColor',
         value: function setMainColor(e) {
-            e.preventDefault();
-            var pos = this.$el.position(); // position for screen
+            // e.preventDefault();
+            var pos = this.$el.offset(); // position for screen
             var w = this.state.get('$el.contentWidth');
             var h = this.state.get('$el.contentHeight');
 
-            var x = e.clientX - pos.left;
-            var y = e.clientY - pos.top;
+            var x = Event.pos(e).pageX - pos.left;
+            var y = Event.pos(e).pageY - pos.top;
 
             if (x < 0) x = 0;else if (x > w) x = w;
 
@@ -8492,7 +8652,7 @@ var ColorPalette = function (_UIElement) {
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$6 != sourceType) {
+            if (source$4 != sourceType) {
                 this.refresh();
             }
         }
@@ -8522,6 +8682,30 @@ var ColorPalette = function (_UIElement) {
     }, {
         key: 'mouseup',
         value: function mouseup(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'touchend document',
+        value: function touchendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'touchmove document',
+        value: function touchmoveDocument(e) {
+            if (this.isDown) {
+                this.setMainColor(e);
+            }
+        }
+    }, {
+        key: 'touchstart',
+        value: function touchstart(e) {
+            e.preventDefault();
+            this.isDown = true;
+            this.setMainColor(e);
+        }
+    }, {
+        key: 'touchend',
+        value: function touchend(e) {
             this.isDown = false;
         }
     }]);
@@ -8557,7 +8741,7 @@ var ChromeDevToolColorPicker = function (_BaseColorPicker) {
     return ChromeDevToolColorPicker;
 }(BaseColorPicker);
 
-var source$7 = 'mini-control';
+var source$5 = 'mini-control';
 
 var ColorControl$4 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
@@ -8591,7 +8775,7 @@ var ColorControl$4 = function (_UIElement) {
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$7 != sourceType) {
+            if (source$5 != sourceType) {
                 this.refresh();
             }
         }
@@ -8774,7 +8958,7 @@ var Opacity$2 = function (_VerticalSlider) {
     return Opacity;
 }(VerticalSlider);
 
-var source$8 = 'mini-control';
+var source$6 = 'mini-control';
 
 var ColorControl$6 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
@@ -8808,7 +8992,7 @@ var ColorControl$6 = function (_UIElement) {
     }, {
         key: '@changeColor',
         value: function changeColor(sourceType) {
-            if (source$8 != sourceType) {
+            if (source$6 != sourceType) {
                 this.refresh();
             }
         }
@@ -8846,11 +9030,173 @@ var MiniColorPicker$2 = function (_BaseColorPicker) {
     return MiniColorPicker;
 }(BaseColorPicker);
 
+var source$7 = 'macos-control';
+
+var ColorControl$8 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl() {
+        classCallCheck(this, ColorControl);
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Value: Value, Opacity: Opacity };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+            this.setBackgroundColor();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Value.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$7 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var ColorRing = function (_ColorWheel) {
+    inherits(ColorRing, _ColorWheel);
+
+    function ColorRing(opt) {
+        classCallCheck(this, ColorRing);
+
+        var _this = possibleConstructorReturn(this, (ColorRing.__proto__ || Object.getPrototypeOf(ColorRing)).call(this, opt));
+
+        _this.width = 214;
+        _this.height = 214;
+        _this.thinkness = 16;
+        _this.half_thinkness = _this.thinkness / 2;
+        _this.source = 'colorring';
+        return _this;
+    }
+
+    createClass(ColorRing, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="wheel" data-type="ring">\n            <canvas class="wheel-canvas" ref="$colorwheel" ></canvas>\n            <div class="drag-pointer" ref="$drag_pointer"></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(isEvent) {
+            this.renderCanvas();
+            this.setHueColor(null, isEvent);
+        }
+    }, {
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+            return this.$store.hsv.h;
+        }
+    }, {
+        key: 'setHueColor',
+        value: function setHueColor(e, isEvent) {
+
+            if (!this.state.get('$el.width')) return;
+
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                radius = _getRectangle.radius,
+                centerX = _getRectangle.centerX,
+                centerY = _getRectangle.centerY;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue(), radius, centerX, centerY),
+                x = _getCurrentXY.x,
+                y = _getCurrentXY.y;
+
+            var rx = x - centerX,
+                ry = y - centerY,
+                hue = caculateAngle(rx, ry);
+
+            {
+                var _getCurrentXY2 = this.getCurrentXY(null, hue, radius - this.half_thinkness, centerX, centerY),
+                    x = _getCurrentXY2.x,
+                    y = _getCurrentXY2.y;
+            }
+
+            // set drag pointer position 
+            this.refs.$drag_pointer.css({
+                left: x - minX + 'px',
+                top: y - minY + 'px'
+            });
+
+            if (!isEvent) {
+                this.changeColor({
+                    type: 'hsv',
+                    h: hue
+                });
+            }
+        }
+    }]);
+    return ColorRing;
+}(ColorWheel);
+
+// import ColorWheel from '../ui/ColorWheel'
+var RingColorPicker = function (_BaseColorPicker) {
+    inherits(RingColorPicker, _BaseColorPicker);
+
+    function RingColorPicker() {
+        classCallCheck(this, RingColorPicker);
+        return possibleConstructorReturn(this, (RingColorPicker.__proto__ || Object.getPrototypeOf(RingColorPicker)).apply(this, arguments));
+    }
+
+    createClass(RingColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div target="colorring"></div>\n                <div target="palette"></div> \n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                colorring: ColorRing,
+                palette: ColorPalette,
+                control: ColorControl$8,
+                information: ColorInformation,
+                currentColorSets: CurrentColorSets,
+                colorSetsChooser: ColorSetsChooser,
+                contextMenu: CurrentColorSetsContextMenu
+            };
+        }
+    }]);
+    return RingColorPicker;
+}(BaseColorPicker);
+
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
             case 'macos':
                 return new MacOSColorPicker(opts);
+            case 'ring':
+                return new RingColorPicker(opts);
             case 'mini':
                 return new MiniColorPicker(opts);
             case 'mini-vertical':
@@ -8865,6 +9211,7 @@ var ColorPicker = {
     ColorPicker: ChromeDevToolColorPicker,
     ChromeDevToolColorPicker: ChromeDevToolColorPicker,
     MacOSColorPicker: MacOSColorPicker,
+    RingColorPicker: RingColorPicker,
     MiniColorPicker: MiniColorPicker,
     MiniVerticalColorPicker: MiniColorPicker$2
 };

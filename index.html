@@ -621,6 +621,10 @@ var colorpicker = new ColorPicker({
         <h3>MacOS Style</h3>
         <div class="colorpicker-style" data-type="macos"></div>
     </div>
+    <div class="colorpicker-type">
+        <h3>Ring Style</h3>
+        <div class="colorpicker-style" data-type="ring"></div>
+    </div>               
 
     <div class="colorpicker-type">
         <h3>Mini Style</h3>
@@ -631,6 +635,7 @@ var colorpicker = new ColorPicker({
         <h3>Mini Vertical Style</h3>
         <div class="colorpicker-style" data-type="mini-vertical"></div>
     </div>        
+     
             
     <!-- <div class="colorpicker-type">
         <h3>Only Palette Style</h3>
@@ -1005,7 +1010,7 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         },
         colorpicker : {
             mode : 'edit',
-            hideDelay: 0,
+            hideDelay: 0, 
             type: 'macos',
             onHide: function (color) {
                 console.log('hide', color)
@@ -1147,9 +1152,17 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
                 console.log('change', c);
             }
         });
-
-        //picker.setColorsInPalette(['yellow', 'red'])
-
+/*
+        picker.setUserPalette([
+            {   name : "ttingttong",  
+                colors: [ 
+                    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5'
+                ]
+            },
+            { name : "Custom", "edit" : true, "colors" : [] },
+            { name: "Color Scale", "scale" : ['red', 'yellow', 'black' ], count : 5 }
+        ])
+*/
     }
 </script>
 <script>hljs.initHighlightingOnLoad();</script>

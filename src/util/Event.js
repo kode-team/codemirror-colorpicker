@@ -1,11 +1,15 @@
 export default {    
 
     addEvent (dom, eventName, callback) {
-        dom.addEventListener(eventName, callback);
+        if (dom) {
+            dom.addEventListener(eventName, callback);
+        }
     },
    
     removeEvent(dom, eventName, callback) {
-        dom.removeEventListener(eventName, callback);
+        if (dom) {
+            dom.removeEventListener(eventName, callback);
+        }
     },
 
     pos(e) {
@@ -14,5 +18,13 @@ export default {
         }
     
         return e;
+    },
+
+    posXY (e) {
+        var pos = this.pos(e);
+        return {
+            x: pos.pageX,
+            y: pos.pageY
+        }
     }
 }

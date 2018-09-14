@@ -54,7 +54,7 @@ export default class BaseColorPicker extends UIElement {
         
         this.$root.append(this.$arrow);
 
-        this.$store.dispatch('/setUserList', this.opt.colorSets);
+        this.$store.dispatch('/setUserPalette', this.opt.colorSets);
 
 
         this.render()
@@ -147,6 +147,15 @@ export default class BaseColorPicker extends UIElement {
     setColorsInPalette (colors = []) {
         this.$store.dispatch('/setCurrentColorAll', colors);
     }    
+
+    /**
+     * refresh all color palette 
+     * 
+     * @param {*} list 
+     */
+    setUserPalette (list = []) {
+        this.$store.dispatch('/setUserPalette', list);
+    }
 
 
     /**

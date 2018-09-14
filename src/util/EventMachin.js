@@ -2,7 +2,8 @@ import Event from './Event'
 import Dom from './Dom'
 import State from './State'
 
-const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|key(down|up|press)|contextmenu|change|input)/ig;
+const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|touch(start|move|end)|key(down|up|press)|contextmenu|change|input)/ig;
+const CHECK_LOAD_PATTERN = /^load (.*)/ig;
 const EVENT_SAPARATOR = ' '
 const META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
 
@@ -36,25 +37,16 @@ export default class EventMachin {
    * 그리고 자동으로 load 되어질게 있으면 로드 해준다. 
    */
   render () {
-
-    // 1. 자식이 될 컴포넌트를 생성하고 
-    this.newChildComponents();
-
-    const childKeys = Object.keys(this.childComponents)
-
-    // 2. 나의 template 을 만들어내고  
+    // 1. 나의 template 을 만들어내고  
     this.$el = this.parseTemplate(this.template())
-    this.refs.$el = this.$el; 
+    this.refs.$el = this.$el;         
 
-    // 3. 개별 자식 컴포넌트를 다시 render 하고 
-    childKeys.forEach(key => { this[key].render(); })    
-
-    // 4. 나의 템플릿에 자식 컴포넌트를 연결하고 
+    // 개별 객체 셋팅하고 
     this.parseTarget()
-    childKeys.forEach(key => { this[key].parseTarget(); })    
 
-    // 5. 데이타 로드 할게 있으면 로드 하고 
-    this.load()
+    // 데이타 로드 하고 
+    this.load()    
+
   }
  
   /**
@@ -72,23 +64,16 @@ export default class EventMachin {
    */
   parseTemplate (html) {
     const $el = new Dom("div").html(html).firstChild()
-    const refs = $el.findAll("[ref]");
+
+    // ref element 정리 
+    var refs = $el.findAll('[ref]');
+
     [...refs].forEach(node => {
-      const name = node.getAttribute("ref");
+      const name = node.getAttribute('ref')
       this.refs[name] = new Dom(node);
-
-      const callbackName = `load ${name}`
-
-      if (this[callbackName]) {
-        // load 가 정의되어 있으면 해당 컴포넌트에 load 함수를 넣어준다. 
-        this.refs[name].load = () => {
-          new Dom(node).html(this.parseTemplate(this[callbackName].call(this)))
-        }  
-      }
     })
 
     return $el; 
-
   }
 
   /**
@@ -100,18 +85,28 @@ export default class EventMachin {
 
     [...targets].forEach(node => {
       const targetComponentName = node.getAttribute('target')
+      const refName = node.getAttribute('ref') || targetComponentName
 
-      if (this[targetComponentName]) {
-        $el.replace(node, this[targetComponentName].$el.el)
+      var Component = this.childComponents[targetComponentName]
+      var instance = new Component(this);
+      this[refName] = instance
+      this.refs[refName] = instance.$el
+
+      if (instance) {
+        instance.render()
+        $el.replace(node, instance.$el.el)                
       }
     })
   }
 
   // load function이 정의된 객체는 load 를 실행해준다. 
   load () {
-    Object.keys(this.refs).forEach(key => {
-      if (this.refs[key].load) {
-        this.refs[key].load()
+    
+    this.filterProps(CHECK_LOAD_PATTERN).forEach(callbackName => {
+      const elName = callbackName.split('load ')[1]
+
+      if (this.refs[elName]) { 
+        this.refs[elName].html(this.parseTemplate(this[callbackName].call(this)))
       }
     })
   }
