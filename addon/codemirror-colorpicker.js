@@ -5684,9 +5684,10 @@ var Dom = function () {
         key: 'offset',
         value: function offset() {
             var rect = this.el.getBoundingClientRect();
+
             return {
-                top: rect.top + document.documentElement.scrollTop,
-                left: rect.left + document.documentElement.scrollLeft
+                top: rect.top + Dom.getScrollTop(),
+                left: rect.left + Dom.getScrollLeft()
             };
         }
     }, {
@@ -5858,6 +5859,16 @@ var Dom = function () {
             this.el.replaceChild(newElement, oldElement);
 
             return this;
+        }
+    }], [{
+        key: 'getScrollTop',
+        value: function getScrollTop() {
+            return Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop);
+        }
+    }, {
+        key: 'getScrollLeft',
+        value: function getScrollLeft() {
+            return Math.max(window.pageXOffset, document.documentElement.scrollLeft, document.body.scrollLeft);
         }
     }]);
     return Dom;

@@ -30,6 +30,13 @@ export default class Dom {
         }
     }
 
+    static getScrollTop () {
+        return Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop)
+    }
+
+    static getScrollLeft () {
+        return Math.max(window.pageXOffset, document.documentElement.scrollLeft, document.body.scrollLeft)
+    }
 
     attr (key, value) {
         if (arguments.length == 1) {
@@ -178,9 +185,10 @@ export default class Dom {
     
     offset () {
         var rect = this.el.getBoundingClientRect();
+
         return {
-            top: rect.top + document.documentElement.scrollTop,
-            left: rect.left + document.documentElement.scrollLeft
+            top: rect.top + Dom.getScrollTop(),
+            left: rect.left + Dom.getScrollLeft()
         };
     }
     
