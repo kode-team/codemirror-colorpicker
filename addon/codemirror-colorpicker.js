@@ -5489,6 +5489,16 @@ var HueColor = {
 // TODO: worker run 
 var ImageFilter = _extends({}, FilterList, functions$1);
 
+var Util = {
+    Color: Color$1,
+    HueColor: HueColor,
+    ColorNames: ColorNames,
+    ImageFilter: ImageFilter,
+    GL: GL,
+    Canvas: Canvas,
+    ImageLoader: ImageLoader
+};
+
 var color = Color$1.color;
 
 var counter = 0;
@@ -5801,7 +5811,7 @@ var Dom = function () {
         key: 'scrollTop',
         value: function scrollTop() {
             if (this.el === document.body) {
-                return document.documentElement.scrollTop;
+                return Dom.getScrollTop();
             }
 
             return this.el.scrollTop;
@@ -5810,7 +5820,7 @@ var Dom = function () {
         key: 'scrollLeft',
         value: function scrollLeft() {
             if (this.el === document.body) {
-                return document.documentElement.scrollLeft;
+                return Dom.getScrollLeft();
             }
 
             return this.el.scrollLeft;
@@ -6869,6 +6879,14 @@ var BaseColorPicker = function (_UIElement) {
                 this.$root.addClass(this.opt.type);
             }
 
+            if (this.opt.hideInformation) {
+                this.$root.addClass('hide-information');
+            }
+
+            if (this.opt.hideColorsets) {
+                this.$root.addClass('hide-colorsets');
+            }
+
             this.$arrow = new Dom('div', 'arrow');
 
             this.$root.append(this.$arrow);
@@ -7035,7 +7053,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'definePositionForArrow',
         value: function definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
-            //this.$arrow.css({})
+            // console.log(arguments)
         }
     }, {
         key: 'definePosition',
@@ -7067,6 +7085,8 @@ var BaseColorPicker = function (_UIElement) {
                 left: elementScreenLeft + 'px',
                 top: elementScreenTop + 'px'
             });
+
+            // this.definePositionForArrow(opt, elementScreenLeft, elementScreenTop);
         }
     }, {
         key: 'getInitalizePosition',
@@ -7543,10 +7563,10 @@ var Opacity = function (_BaseSlider) {
         value: function refreshColorUI(e) {
             var dist = this.getCaculatedDist(e);
 
-            this.setColorUI(dist / 100);
+            this.setColorUI(dist / 100 * this.maxValue);
 
             this.changeColor({
-                a: Math.floor(dist) / 100
+                a: Math.floor(dist) / 100 * this.maxValue
             });
         }
     }]);
@@ -7823,7 +7843,7 @@ var ColorWheel = function (_UIElement) {
     }, {
         key: '@initColor',
         value: function initColor() {
-            this.refresh();
+            this.refresh(true);
         }
 
         // Event Bindings 
@@ -8495,8 +8515,8 @@ var ColorPalette = function (_UIElement) {
                 y = this.state.get('$el.height') * (1 - this.$store.hsv.v);
 
             this.refs.$drag_pointer.css({
-                left: x - 5 + "px",
-                top: y - 5 + "px"
+                left: x + "px",
+                top: y + "px"
             });
 
             this.drag_pointer_pos = { x: x, y: y };
@@ -8519,8 +8539,8 @@ var ColorPalette = function (_UIElement) {
             if (y < 0) y = 0;else if (y > h) y = h;
 
             this.refs.$drag_pointer.css({
-                left: x - 5 + 'px',
-                top: y - 5 + 'px'
+                left: x + 'px',
+                top: y + 'px'
             });
 
             this.drag_pointer_pos = { x: x, y: y };
@@ -8735,6 +8755,38 @@ var VerticalSlider = function (_BaseSlider) {
         value: function getMinPosition() {
             return this.refs.$container.offset().top;
         }
+
+        /** get caculated dist for domain value   */
+
+    }, {
+        key: 'getCaculatedDist',
+        value: function getCaculatedDist(e) {
+            var current = e ? this.getMousePosition(e) : this.getCurrent(this.getDefaultValue() / this.maxValue);
+            var dist = 100 - this.getDist(current);
+
+            return dist;
+        }
+
+        /** set drag bar position  */
+
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI(v) {
+
+            v = v || this.getDefaultValue();
+
+            if (v <= this.minValue) {
+                this.refs.$bar.addClass('first').removeClass('last');
+            } else if (v >= this.maxValue) {
+                this.refs.$bar.addClass('last').removeClass('first');
+            } else {
+                this.refs.$bar.removeClass('last').removeClass('first');
+            }
+
+            var per = 1 - (v || 0) / this.maxValue;
+
+            this.setMousePosition(this.getMaxDist() * per);
+        }
     }]);
     return VerticalSlider;
 }(BaseSlider);
@@ -8814,7 +8866,7 @@ var Opacity$2 = function (_VerticalSlider) {
             rgb.a = 1;
             var end = Color$1.format(rgb, 'rgb');
 
-            this.refs.$colorbar.css('background', 'linear-gradient(to bottom, ' + start + ', ' + end + ')');
+            this.refs.$colorbar.css('background', 'linear-gradient(to top, ' + start + ', ' + end + ')');
         }
     }, {
         key: 'getDefaultValue',
@@ -9067,11 +9119,89 @@ var RingColorPicker = function (_BaseColorPicker) {
     return RingColorPicker;
 }(BaseColorPicker);
 
+var source$8 = 'xd-control';
+
+var ColorControl$10 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl() {
+        classCallCheck(this, ColorControl);
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: VerticalHue, Opacity: Opacity$2 };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$8 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var XDColorPicker = function (_BaseColorPicker) {
+    inherits(XDColorPicker, _BaseColorPicker);
+
+    function XDColorPicker() {
+        classCallCheck(this, XDColorPicker);
+        return possibleConstructorReturn(this, (XDColorPicker.__proto__ || Object.getPrototypeOf(XDColorPicker)).apply(this, arguments));
+    }
+
+    createClass(XDColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div> \n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                palette: ColorPalette,
+                control: ColorControl$10,
+                information: ColorInformation,
+                currentColorSets: CurrentColorSets,
+                colorSetsChooser: ColorSetsChooser,
+                contextMenu: CurrentColorSetsContextMenu
+            };
+        }
+    }]);
+    return XDColorPicker;
+}(BaseColorPicker);
+
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
             case 'macos':
                 return new MacOSColorPicker(opts);
+            case 'xd':
+                return new XDColorPicker(opts);
             case 'ring':
                 return new RingColorPicker(opts);
             case 'mini':
@@ -9432,19 +9562,27 @@ var ColorView = function () {
         key: 'create_marker',
         value: function create_marker(lineNo, start) {
 
-            var key = this.key(lineNo, start);
-
-            if (!this.markers[key]) {
-                this.markers[key] = this.make_element();
+            if (!this.has_marker(lineNo, start)) {
+                this.init_marker(lineNo, start);
             }
 
-            return this.markers[key];
+            return this.get_marker(lineNo, start);
+        }
+    }, {
+        key: 'init_marker',
+        value: function init_marker(lineNo, start) {
+            this.markers[this.key(lineNo, start)] = this.make_element();
         }
     }, {
         key: 'has_marker',
         value: function has_marker(lineNo, start) {
+            return !!this.get_marker(lineNo, start);
+        }
+    }, {
+        key: 'get_marker',
+        value: function get_marker(lineNo, start) {
             var key = this.key(lineNo, start);
-            return !!this.markers[key];
+            return this.markers[key];
         }
     }, {
         key: 'update_element',
@@ -9517,16 +9655,7 @@ if (CodeMirror) {
     });
 }
 
-var index = _extends({
-    Color: Color$1,
-    ColorNames: ColorNames
-}, ColorPicker, {
-    ImageFilter: ImageFilter,
-    GL: GL,
-    HueColor: HueColor,
-    Canvas: Canvas,
-    ImageLoader: ImageLoader
-});
+var index = _extends({}, Util, ColorPicker);
 
 return index;
 

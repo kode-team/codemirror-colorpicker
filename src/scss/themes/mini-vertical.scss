@@ -29,7 +29,7 @@
             border-radius:0px;
             overflow:hidden;
             height: 100%;
-            background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);            
+            background: linear-gradient(to top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);            
         }
       
 
@@ -52,13 +52,13 @@
 
             &.last {
                 &:before, &:after {
-                    top: -1px;
+                    top: 2px;
                 }
             }
 
             &.first {
                 &:before, &:after {
-                    top: 1px;
+                    top: -1px;
                 }
             }
 

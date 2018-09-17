@@ -36,17 +36,17 @@ export default class Opacity extends VerticalSlider {
         rgb.a = 1;
         var end = Color.format(rgb, 'rgb');
     
-        this.refs.$colorbar.css('background',  'linear-gradient(to bottom, ' + start + ', ' + end + ')');
+        this.refs.$colorbar.css('background',  'linear-gradient(to top, ' + start + ', ' + end + ')');
     }
 
     getDefaultValue () {
         return this.$store.alpha
     }
-    
+
     refreshColorUI(e) {
         var dist = this.getCaculatedDist(e)
 
-        this.setColorUI(dist/100 * this.maxValue);
+        this.setColorUI(  ( dist/100 * this.maxValue) );
 
         this.changeColor({
             a: Math.floor(dist) / 100 * this.maxValue

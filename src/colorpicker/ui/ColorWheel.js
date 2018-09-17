@@ -204,7 +204,7 @@ export default class ColorWheel extends UIElement {
         }
     }
 
-    '@initColor' () { this.refresh() }    
+    '@initColor' () { this.refresh(true) }    
 
     // Event Bindings 
     'mouseup document' (e) {

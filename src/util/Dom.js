@@ -289,7 +289,7 @@ export default class Dom {
 
     scrollTop () {
         if (this.el === document.body) {
-            return document.documentElement.scrollTop
+            return Dom.getScrollTop()
         }
 
         return this.el.scrollTop
@@ -297,7 +297,7 @@ export default class Dom {
 
     scrollLeft () {
         if (this.el === document.body) {
-            return document.documentElement.scrollLeft
+            return Dom.getScrollLeft()
         }
 
         return this.el.scrollLeft

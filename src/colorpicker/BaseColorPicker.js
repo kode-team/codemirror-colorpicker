@@ -50,12 +50,19 @@ export default class BaseColorPicker extends UIElement {
             this.$root.addClass(this.opt.type);
         }
 
+        if (this.opt.hideInformation) {
+            this.$root.addClass('hide-information')
+        }
+
+        if (this.opt.hideColorsets) {
+            this.$root.addClass('hide-colorsets')
+        }        
+
         this.$arrow = new Dom('div', 'arrow');
         
         this.$root.append(this.$arrow);
 
         this.$store.dispatch('/setUserPalette', this.opt.colorSets);
-
 
         this.render()
 
@@ -191,7 +198,7 @@ export default class BaseColorPicker extends UIElement {
     }
 
     definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
-        //this.$arrow.css({})
+        // console.log(arguments)
     }
 
     definePosition(opt) {
@@ -218,6 +225,8 @@ export default class BaseColorPicker extends UIElement {
             left: (elementScreenLeft) + 'px',
             top: (elementScreenTop) + 'px'
         });
+
+        // this.definePositionForArrow(opt, elementScreenLeft, elementScreenTop);
     }
 
     getInitalizePosition() {

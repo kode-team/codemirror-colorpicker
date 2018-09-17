@@ -28,7 +28,7 @@ export default class VerticalHue extends VerticalSlider {
 
         var dist = this.getCaculatedDist(e)
     
-        this.setColorUI(dist/100 * this.maxValue);
+        this.setColorUI( dist/100 * this.maxValue);
 
         this.changeColor({
             h: (dist/100) * this.maxValue,

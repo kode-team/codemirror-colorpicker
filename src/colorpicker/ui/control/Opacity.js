@@ -54,10 +54,10 @@ export default class Opacity extends BaseSlider {
     refreshColorUI(e) {
         var dist = this.getCaculatedDist(e);
 
-        this.setColorUI(dist/100);
+        this.setColorUI( (dist/100) * this.maxValue);
 
         this.changeColor({
-            a: Math.floor(dist) / 100
+            a: (Math.floor(dist) / 100) * this.maxValue
         })
 
     }

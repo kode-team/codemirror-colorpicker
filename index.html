@@ -388,7 +388,7 @@
 
     .colorpicker-type {
         display: inline-block;
-        width: 250px;
+        width: 270px;
         vertical-align: top;
     }
 
@@ -613,6 +613,10 @@ var colorpicker = new ColorPicker({
         <h3>Chrome Devtool Style</h3>
         <div class="colorpicker-style" data-type="default"></div>
     </div>
+    <div class="colorpicker-type">
+        <h3>Adobe XD Style</h3>
+        <div class="colorpicker-style" data-type="xd"></div>
+    </div>    
     <div class="colorpicker-type">
         <h3>Sketch Style</h3>
         <div class="colorpicker-style" data-type="sketch"></div>
@@ -1143,8 +1147,8 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             container: item,
             type: type,
             color: 'blue',
-            outputFormat: 'hex',
-            vertical: vertical == 'true',
+            outputFormat: 'hex',    
+            hideDelay: 0,
             onHide: function (c) {
                 console.log('hide', c)
             },

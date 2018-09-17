@@ -21,8 +21,7 @@
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          left: -5px;
-          top: -5px;
+          transform: translateX(-50%) translateY(-50%);
         }
       } 
 

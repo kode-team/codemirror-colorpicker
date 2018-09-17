@@ -47,8 +47,8 @@ export default class ColorPalette extends UIElement {
         y = this.state.get('$el.height') * ( 1 - this.$store.hsv.v );
     
         this.refs.$drag_pointer.css({
-            left : (x - 5) + "px",
-            top : (y - 5) + "px"
+            left : x + "px",
+            top : y + "px"
         });
     
         this.drag_pointer_pos = { x , y };
@@ -73,8 +73,8 @@ export default class ColorPalette extends UIElement {
         else if (y > h) y = h;
     
         this.refs.$drag_pointer.css({
-            left: (x - 5) + 'px',
-            top: (y - 5) + 'px'
+            left: x  + 'px',
+            top: y + 'px'
         });
     
         this.drag_pointer_pos = { x , y }
