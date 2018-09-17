@@ -7,6 +7,7 @@
     .color {
         display:inline-block;
         margin-left: 12px;
+        margin-bottom: 12px;        
         width: 170px;
         height: 170px;
         vertical-align: middle;
@@ -33,7 +34,8 @@
         padding: 0px;
         vertical-align: middle;
         display:inline-block;
-        margin-right: right;
+        margin-right: 12px;
+        margin-bottom: 12px;
 
         .hue, .opacity {
             margin: 0px;

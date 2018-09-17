@@ -892,6 +892,7 @@
     .codemirror-colorpicker.xd .color {
       display: inline-block;
       margin-left: 12px;
+      margin-bottom: 12px;
       width: 170px;
       height: 170px;
       vertical-align: middle;
@@ -911,7 +912,8 @@
       padding: 0px;
       vertical-align: middle;
       display: inline-block;
-      margin-right: right; }
+      margin-right: 12px;
+      margin-bottom: 12px; }
       .codemirror-colorpicker.xd .control .hue, .codemirror-colorpicker.xd .control .opacity {
         margin: 0px;
         padding: 0px;
