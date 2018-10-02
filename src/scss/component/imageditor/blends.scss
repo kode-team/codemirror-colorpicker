@@ -8,64 +8,54 @@ $layer-item-padding: 8px;
     position: relative;
 }
 
-.blend-list-container {
+.blend-list-tab {
     position: relative;
     height: 100%;
     box-sizing: border-box;
-    padding: 5px;
-
-    .blend-mode-title {
-        display: block;
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        top: 0px;
-        height: 30px;
-        font-size: 12px;
-        padding:10px;
-        box-sizing: border-box;
-        background-color: #ececec;
-    }
+    padding: 5px;    
 
     .blend-list {
         display: block;
         position: absolute;
         left: 0px;
         right: 0px;
-        top: 30px;
+        top: 1px;
         bottom: 0px;
-        overflow: auto; 
         box-sizing: border-box;
-        border-bottom: 1px solid #ececec;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        white-space: nowrap;        
+
         .blend-item {
-            display: flex;
+            display: inline-block;
             height: $layer-item-height;            
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            border-bottom: 1px solid #dedede;
+            border: 10px solid #dedede;
             padding: 5px;
-
-            &:first-child {
-                border-top: 1px solid #dedede;
-            }
+            width: 225px;
+            height: 164px;
 
             &.selected {
-                background-color: #dedede;                
+                border-color: #000000;                
                 
             }
 
             .blend-item-view-container {
-                position: relative; 
+                position: absolute; 
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: 0px;
                 @include transparent-background();
                 pointer-events: none;
                 display: inline-block;
                 vertical-align: middle;
                 box-sizing: border-box;
                 flex: 1 1 auto;  
-                padding: 14px;
-                width: 25%;
+                // padding: 14px;
             }
 
             .blend-item-view {

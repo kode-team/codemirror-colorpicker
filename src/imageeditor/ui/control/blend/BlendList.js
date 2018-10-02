@@ -1,21 +1,32 @@
-import UIElement from "../../../../colorpicker/UIElement";
- 
-export default class BlendList extends UIElement {
+import BaseTab from "../../BaseTab";
+import FilterList from "./FilterList";
+
+export default class BlendList extends BaseTab {
+
+    components() {
+        return { FilterList }
+    }
 
     template () { 
         return `
-            <div class='blend-list-container'>
-                <div class='layout-flow padding-0'>
-                    <div class='blend-row'>
-                        <div class="blend-mode-title">Background</div>
+            <div class="tab blend-list-tab">
+                <div class="tab-header" ref="$header">
+                    <div class="tab-item selected" data-id="background">Background Blend</div>
+                    <div class="tab-item" data-id="mix">Mix Blend</div>
+                    <div class="tab-item" data-id="filter">Filter</div>
+                </div>
+                <div class="tab-body" ref="$body">
+                    <div class="tab-content selected" data-id="background">
                         <div class="blend-list" ref="$blendList"></div>
                     </div>
-                    <div class='blend-row'>
-                        <div class="blend-mode-title">Mix</div>
+                    <div class="tab-content" data-id="mix">
                         <div class="blend-list" ref="$mixBlendList"></div>
                     </div>
+                    <div class="tab-content" data-id="filter">
+                        <FilterList></FilterList>
+                    </div>                    
                 </div>
-            </div>
+            </div>        
         `
     }
 

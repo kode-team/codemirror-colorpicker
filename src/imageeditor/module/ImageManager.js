@@ -128,6 +128,14 @@ export default class ImageManager extends BaseModule {
         }
     }
 
+    '/image/toggle/visible' ($store, index) {
+        var current = $store.read('/image/current', index)
+
+        current.visible = !current.visible
+
+        $store.dispatch('/image/change', current, index)
+    }
+
     // 이미지 설정하기 , 이벤트 까지 
     '/image/set' ($store, newImage, index) {
 

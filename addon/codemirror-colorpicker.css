@@ -927,7 +927,7 @@
     bottom: 0px; }
     .imageeditor .layout-main .layout-top {
       position: absolute;
-      left: 250px;
+      left: 300px;
       right: 250px;
       top: 50px;
       bottom: 8px;
@@ -943,13 +943,13 @@
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
-      width: 250px;
+      width: 300px;
       top: 50px;
       bottom: 8px;
       z-index: 1; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 250px;
+      left: 300px;
       right: 250px;
       top: 150px;
       bottom: 50px;
@@ -971,7 +971,7 @@
         text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54); }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 250px;
+      left: 300px;
       right: 250px;
       height: 50px;
       bottom: 0px;
@@ -1005,7 +1005,7 @@
                 flex: none;
         height: 290px;
         margin-top: 0px; }
-      .imageeditor .layout-main .layout-flow > .layout-manager-tab, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row {
+      .imageeditor .layout-main .layout-flow > .layout-manager-tab, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row, .imageeditor .layout-main .layout-flow .image-control {
         -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
                 flex: 1 1 auto;
@@ -1082,10 +1082,11 @@
       display: block;
       position: absolute;
       left: 0px;
-      right: 0px;
+      width: 100px;
       top: 35px;
-      bottom: 12px;
-      overflow: auto; }
+      bottom: 0px;
+      overflow: auto;
+      border-right: 1px solid #ececec; }
       .imageeditor .gradient-layers .layer-list .gradient-item {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -1131,7 +1132,8 @@
                   flex: 1 1 auto;
           width: 25%;
           text-align: center;
-          padding: 8px; }
+          padding: 8px;
+          display: none; }
           .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-check svg {
             display: none; }
         .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible {
@@ -1145,7 +1147,8 @@
                   flex: 1 1 auto;
           width: 25%;
           text-align: center;
-          padding: 8px; }
+          padding: 8px;
+          display: none; }
           .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.on {
             display: none; }
           .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.off {
@@ -1165,7 +1168,8 @@
                   flex: 1 1 auto;
           padding: 8px;
           width: 25%;
-          text-align: center; }
+          text-align: center;
+          display: none; }
         .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-view {
           pointer-events: none;
           position: absolute;
@@ -1173,59 +1177,59 @@
           right: 0px;
           bottom: 0px;
           top: 0px; }
-    .imageeditor .gradient-layers .tools {
-      display: inline-block;
-      position: absolute;
-      left: 5px;
-      right: 5px;
-      top: 5px;
+  .imageeditor .tools {
+    display: inline-block;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    height: 24px;
+    text-align: left; }
+    .imageeditor .tools .divider {
+      color: transparent;
+      margin-left: 10px;
+      margin-right: 10px; }
+    .imageeditor .tools button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+      width: 24px;
       height: 24px;
-      text-align: left; }
-      .imageeditor .gradient-layers .tools .divider {
-        color: transparent;
-        margin-left: 10px;
-        margin-right: 10px; }
-      .imageeditor .gradient-layers .tools button {
-        -webkit-appearance: none;
-           -moz-appearance: none;
-                appearance: none;
-        width: 24px;
-        height: 24px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid #ececec;
-        vertical-align: middle;
-        font-size: 15px;
-        font-weight: bold;
-        font-family: serif, sans-serif;
-        line-height: 1.6;
-        cursor: pointer;
-        outline: none;
-        position: relative; }
-      .imageeditor .gradient-layers .tools button {
-        cursor: pointer;
-        outline: none; }
-        .imageeditor .gradient-layers .tools button.first, .imageeditor .gradient-layers .tools button.last {
-          letter-spacing: -2px; }
-        .imageeditor .gradient-layers .tools button.del {
-          overflow: hidden; }
-          .imageeditor .gradient-layers .tools button.del:after, .imageeditor .gradient-layers .tools button.del:before {
-            content: '';
-            width: 80%;
-            height: 1px;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            -webkit-transform-origin: center center;
-                    transform-origin: center center;
-            -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
-            border-top: 1px solid black;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box; }
-          .imageeditor .gradient-layers .tools button.del:after {
-            -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                    transform: translateX(-50%) translateY(-50%) rotate(135deg); }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border: 1px solid #ececec;
+      vertical-align: middle;
+      font-size: 15px;
+      font-weight: bold;
+      font-family: serif, sans-serif;
+      line-height: 1.6;
+      cursor: pointer;
+      outline: none;
+      position: relative; }
+    .imageeditor .tools button {
+      cursor: pointer;
+      outline: none; }
+      .imageeditor .tools button.first, .imageeditor .tools button.last {
+        letter-spacing: -2px; }
+      .imageeditor .tools button.del {
+        overflow: hidden; }
+        .imageeditor .tools button.del:after, .imageeditor .tools button.del:before {
+          content: '';
+          width: 80%;
+          height: 1px;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          -webkit-transform-origin: center center;
+                  transform-origin: center center;
+          -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                  transform: translateX(-50%) translateY(-50%) rotate(45deg);
+          border-top: 1px solid black;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+        .imageeditor .tools button.del:after {
+          -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                  transform: translateX(-50%) translateY(-50%) rotate(135deg); }
   .imageeditor .gradient-layers-menu {
     position: absolute;
     top: -50px;
@@ -1242,6 +1246,8 @@
       -webkit-box-flex: 1;
           -ms-flex: 1;
               flex: 1; }
+    .imageeditor .gradient-layers-menu > .left {
+      text-align: left; }
     .imageeditor .gradient-layers-menu button {
       -webkit-appearance: none;
          -moz-appearance: none;
@@ -1361,8 +1367,8 @@
           background-color: black; }
   .imageeditor .gradient-view {
     position: absolute;
-    width: 400px;
-    height: 300px;
+    width: 600px;
+    height: 400px;
     left: 50%;
     top: 50%;
     -webkit-transform: translateX(-50%) translateY(-50%);
@@ -1378,8 +1384,8 @@
     .imageeditor .gradient-view .dropzone,
     .imageeditor .gradient-view .gradient-color-view,
     .imageeditor .gradient-view .gradient-color-view-container {
-      width: 400px;
-      height: 300px;
+      width: 100%;
+      height: 100%;
       position: absolute;
       left: 50%;
       top: 50%;
@@ -1960,42 +1966,26 @@
     right: 0px;
     bottom: 0px;
     top: 0px; }
-    .imageeditor .image-control > .left {
+    .imageeditor .image-control > .top {
       position: absolute;
-      width: 180px;
       left: 0px;
       top: 0px;
-      bottom: 0px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      border-right: 1px solid #ececec; }
-    .imageeditor .image-control > .right {
+      right: 0px;
+      bottom: 200px; }
+    .imageeditor .image-control > .bottom {
       position: absolute;
-      left: 180px;
-      top: 0px;
+      left: 0px;
+      height: 200px;
       right: 0px;
       bottom: 0px; }
-      .imageeditor .image-control > .right .gradient-sample-list {
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        top: 0px;
-        height: 100px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        padding: 10px; }
-        .imageeditor .image-control > .right .gradient-sample-list .gradient-sample-item {
-          display: inline-block;
-          vertical-align: middle;
-          width: 34px;
-          height: 34px;
-          border: 3px solid #ececec;
-          cursor: pointer;
-          position: relative;
-          margin: 2px; }
+  .imageeditor .editor-tab {
+    height: 100%; }
   .imageeditor .image-list-container {
-    position: relative;
-    height: 100%;
+    position: absolute;
+    left: 100px;
+    right: 0px;
+    top: 35px;
+    bottom: 0px;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     padding: 5px; }
@@ -2004,9 +1994,10 @@
       position: absolute;
       left: 0px;
       right: 0px;
-      top: 35px;
-      bottom: 12px;
-      overflow: auto; }
+      top: 0px;
+      bottom: 0px;
+      overflow: auto;
+      border-top: 1px solid #dedede; }
       .imageeditor .image-list-container .image-list .image-item {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -2019,8 +2010,6 @@
         overflow: hidden;
         border-bottom: 1px solid #dedede;
         padding: 5px; }
-        .imageeditor .image-list-container .image-list .image-item:first-child {
-          border-top: 1px solid #dedede; }
         .imageeditor .image-list-container .image-list .image-item svg {
           pointer-events: none; }
         .imageeditor .image-list-container .image-list .image-item.selected {
@@ -2093,59 +2082,6 @@
           right: 0px;
           bottom: 0px;
           top: 0px; }
-    .imageeditor .image-list-container .tools {
-      display: inline-block;
-      position: absolute;
-      left: 5px;
-      right: 5px;
-      top: 5px;
-      height: 24px;
-      text-align: left; }
-      .imageeditor .image-list-container .tools .divider {
-        color: transparent;
-        margin-left: 10px;
-        margin-right: 10px; }
-      .imageeditor .image-list-container .tools button {
-        -webkit-appearance: none;
-           -moz-appearance: none;
-                appearance: none;
-        width: 24px;
-        height: 24px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid #ececec;
-        vertical-align: middle;
-        font-size: 15px;
-        font-weight: bold;
-        font-family: serif, sans-serif;
-        line-height: 1.6;
-        cursor: pointer;
-        outline: none;
-        position: relative; }
-      .imageeditor .image-list-container .tools button {
-        cursor: pointer;
-        outline: none; }
-        .imageeditor .image-list-container .tools button.first, .imageeditor .image-list-container .tools button.last {
-          letter-spacing: -2px; }
-        .imageeditor .image-list-container .tools button.del {
-          overflow: hidden; }
-          .imageeditor .image-list-container .tools button.del:after, .imageeditor .image-list-container .tools button.del:before {
-            content: '';
-            width: 80%;
-            height: 1px;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            -webkit-transform-origin: center center;
-                    transform-origin: center center;
-            -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
-            border-top: 1px solid black;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box; }
-          .imageeditor .image-list-container .tools button.del:after {
-            -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                    transform: translateX(-50%) translateY(-50%) rotate(135deg); }
   .imageeditor .blend-control {
     position: absolute;
     left: 0px;
@@ -2169,53 +2105,44 @@
       bottom: 0px; }
   .imageeditor .blend-row {
     position: relative; }
-  .imageeditor .blend-list-container {
+  .imageeditor .blend-list-tab {
     position: relative;
     height: 100%;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     padding: 5px; }
-    .imageeditor .blend-list-container .blend-mode-title {
+    .imageeditor .blend-list-tab .blend-list {
       display: block;
       position: absolute;
       left: 0px;
       right: 0px;
-      top: 0px;
-      height: 30px;
-      font-size: 12px;
-      padding: 10px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      background-color: #ececec; }
-    .imageeditor .blend-list-container .blend-list {
-      display: block;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 30px;
+      top: 1px;
       bottom: 0px;
-      overflow: auto;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      border-bottom: 1px solid #ececec; }
-      .imageeditor .blend-list-container .blend-list .blend-item {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      white-space: nowrap; }
+      .imageeditor .blend-list-tab .blend-list .blend-item {
+        display: inline-block;
         height: 50px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        border-bottom: 1px solid #dedede;
-        padding: 5px; }
-        .imageeditor .blend-list-container .blend-list .blend-item:first-child {
-          border-top: 1px solid #dedede; }
-        .imageeditor .blend-list-container .blend-list .blend-item.selected {
-          background-color: #dedede; }
-        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-view-container {
-          position: relative;
+        border: 10px solid #dedede;
+        padding: 5px;
+        width: 225px;
+        height: 164px; }
+        .imageeditor .blend-list-tab .blend-list .blend-item.selected {
+          border-color: #000000; }
+        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-view-container {
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 0px;
           background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
           pointer-events: none;
           display: inline-block;
@@ -2224,24 +2151,22 @@
                   box-sizing: border-box;
           -webkit-box-flex: 1;
               -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          padding: 14px;
-          width: 25%; }
-        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-view {
+                  flex: 1 1 auto; }
+        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-view {
           pointer-events: none;
           position: absolute;
           left: 0px;
           right: 50%;
           bottom: 0px;
           top: 0px; }
-        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-blend-view {
+        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-blend-view {
           pointer-events: none;
           position: absolute;
           left: 0px;
           right: 0px;
           bottom: 0px;
           top: 0px; }
-        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-text {
+        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-text {
           pointer-events: none;
           position: absolute;
           left: 0px;

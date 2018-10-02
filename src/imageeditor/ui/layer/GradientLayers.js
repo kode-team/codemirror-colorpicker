@@ -1,5 +1,7 @@
 import UIElement from '../../../colorpicker/UIElement';
 import Icon from '../common/Icon';
+import ImageList from '../control/image/ImageList';
+
 
 export default class GradientLayers extends UIElement {
 
@@ -16,8 +18,13 @@ export default class GradientLayers extends UIElement {
                     
                 </div>            
                 <div class="layer-list" ref="$layerList"></div>
+                <ImageLIst></ImageList>        
             </div>
         `
+    }
+
+    components () {
+        return { ImageList }
     }
 
     'load $layerList' () {

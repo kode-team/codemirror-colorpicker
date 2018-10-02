@@ -4,8 +4,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
 .gradient-view {
     position: absolute;
-    width: 400px;
-    height: 300px;    
+    width: 600px;
+    height: 400px;    
     left: 50%;
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
@@ -27,8 +27,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
     .dropzone,
     .gradient-color-view,
     .gradient-color-view-container {
-        width: 400px;
-        height: 300px;
+        width: 100%;
+        height: 100%;
         position: absolute;
         left: 50%;
         top: 50%;

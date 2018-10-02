@@ -5,8 +5,11 @@ $button-size: 24px;
 $layer-item-padding: 8px;
 
 .image-list-container {
-    position: relative;
-    height: 100%;
+    position: absolute;
+    left: 100px;
+    right: 0px;
+    top: 35px;
+    bottom: 0px; 
     box-sizing: border-box;
     padding: 5px;
 
@@ -15,9 +18,10 @@ $layer-item-padding: 8px;
         position: absolute;
         left: 0px;
         right: 0px;
-        top: 35px;
-        bottom: 12px;
+        top: 0px;
+        bottom: 0px;
         overflow: auto; 
+        border-top: 1px solid #dedede;
         .image-item {
             display: flex;
             height: $layer-item-height;            
@@ -27,10 +31,6 @@ $layer-item-padding: 8px;
             overflow: hidden;
             border-bottom: 1px solid #dedede;
             padding: 5px;
-
-            &:first-child {
-                border-top: 1px solid #dedede;
-            }
 
             svg {
                 pointer-events: none;
@@ -110,73 +110,6 @@ $layer-item-padding: 8px;
                 bottom: 0px;
                 top: 0px; 
             }
-        }
-    }
-
-    .tools {
-        display: inline-block;
-        position: absolute;
-        left: 5px;
-        right: 5px;
-        top: 5px;
-        height: 24px;
-
-        text-align: left;
-
-
-
-    .divider {
-        color: rgba(0, 0, 0, 0);
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-
-
-        button {
-            appearance: none;
-            width: $button-size;
-            height: $button-size;
-            box-sizing: border-box;
-            border: 1px solid #ececec;
-            vertical-align: middle;
-            font-size: 15px;
-            font-weight: bold;
-            font-family: serif, sans-serif;
-            line-height: 1.6;
-            cursor: pointer;
-            outline: none;
-            position: relative;
-        }
-
-        button {
-            cursor: pointer; 
-            outline: none;
-
-
-            &.first, &.last {
-                letter-spacing: -2px;
-            }
-    
-            &.del {
-                overflow: hidden;
-                &:after, &:before {
-                    content: '';
-                    width: 80%;
-                    height: 1px;
-                    position: absolute;
-                    left: 50%;
-                    top: 50%;
-                    transform-origin: center center;
-                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                    border-top: 1px solid black;
-                    box-sizing: border-box;
-                }
-    
-                &:after {
-                    transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                }
-            }            
-    
         }
     }
 

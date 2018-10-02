@@ -9603,6 +9603,15 @@ var ImageManager = function (_BaseModule) {
                 $store.dispatch('/image/change', { color: color });
             }
         }
+    }, {
+        key: '/image/toggle/visible',
+        value: function imageToggleVisible($store, index) {
+            var current = $store.read('/image/current', index);
+
+            current.visible = !current.visible;
+
+            $store.dispatch('/image/change', current, index);
+        }
 
         // 이미지 설정하기 , 이벤트 까지 
 
@@ -11156,6 +11165,90 @@ var Icon = {
     CHECK: CHECK
 };
 
+var ImageList = function (_UIElement) {
+    inherits(ImageList, _UIElement);
+
+    function ImageList() {
+        classCallCheck(this, ImageList);
+        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
+    }
+
+    createClass(ImageList, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='image-list-container'> \n                <div class=\"image-list\" ref=\"$imageList\"></div>\n            </div>\n        ";
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            var _this2 = this;
+
+            var list = this.read('/image/list');
+
+            return "<div>" + list.map(function (image, index) {
+
+                var selected = image.selected ? 'selected' : '';
+                return "\n                        <div class='image-item " + selected + "' data-index=\"" + index + "\">\n                            <div class=\"image-item-view-container\">\n                                <div class=\"image-item-view\"  style='" + _this2.read('/image/toString', image) + "' ref=\"$image" + index + "\"></div>\n                            </div>\n                            <div class=\"image-item-visible " + (image.visible ? 'on' : '') + "\" data-index=\"" + index + "\">\n                                " + Icon.VISIBILITY + "\n                                " + Icon.VISIBILITY_OFF + "\n                            </div>                            \n                            <div class=\"image-item-delete\" data-index=\"" + index + "\">\n                                " + Icon.DELETE + "\n                            </div>\n                        </div>";
+            }).join('') + "</div>";
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(c) {
+            if (this.read('/image/get', 'type') == 'static') {
+                var color = this.read('/tool/get', 'color');
+                this.dispatch('/image/change', { color: color });
+                this.refresh();
+            }
+        }
+    }, {
+        key: 'click $createImageButton',
+        value: function click$createImageButton(e) {
+            this.dispatch('/image/add');
+            this.refresh();
+        }
+    }, {
+        key: 'click $imageList .image-item-visible',
+        value: function click$imageListImageItemVisible(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/image/toggle/visible', +index);
+
+            this.refresh();
+        }
+    }, {
+        key: 'click $imageList .image-item-delete',
+        value: function click$imageListImageItemDelete(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/image/remove', +index);
+
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $imageList .image-item',
+        value: function clickSelf$imageListImageItem(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/image/select', +index);
+
+            this.refresh();
+        }
+    }]);
+    return ImageList;
+}(UIElement);
+
 var GradientLayers = function (_UIElement) {
     inherits(GradientLayers, _UIElement);
 
@@ -11167,7 +11260,12 @@ var GradientLayers = function (_UIElement) {
     createClass(GradientLayers, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'gradient-layers\'>\n                <div class="tools">                                \n                    <button type="button" ref="$createLayerButton">+</button>\n                    <span class="divider">|</span>\n                    <button type="button" class="first" ref="$first" title="move layer to first">&lt;&lt;</button>                  \n                    <button type="button" class="prev" ref="$left" title="move layer to prev">&lt;</button>            \n                    <button type="button" class="next" ref="$right" title="move layer to next">&gt;</button>\n                    <button type="button" class="last" ref="$last" title="move layer to last">&gt;&gt;</button>\n                    \n                </div>            \n                <div class="layer-list" ref="$layerList"></div>\n            </div>\n        ';
+            return '\n            <div class=\'gradient-layers\'>\n                <div class="tools">                                \n                    <button type="button" ref="$createLayerButton">+</button>\n                    <span class="divider">|</span>\n                    <button type="button" class="first" ref="$first" title="move layer to first">&lt;&lt;</button>                  \n                    <button type="button" class="prev" ref="$left" title="move layer to prev">&lt;</button>            \n                    <button type="button" class="next" ref="$right" title="move layer to next">&gt;</button>\n                    <button type="button" class="last" ref="$last" title="move layer to last">&gt;&gt;</button>\n                    \n                </div>            \n                <div class="layer-list" ref="$layerList"></div>\n                <ImageLIst></ImageList>        \n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return { ImageList: ImageList };
         }
     }, {
         key: 'load $layerList',
@@ -11244,7 +11342,7 @@ var LayerManagerTab = function (_BaseTab) {
     createClass(LayerManagerTab, [{
         key: "template",
         value: function template() {
-            return "\n            <div class=\"tab layout-manager-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"layer\">Layer</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"layer\">\n                        <GradientLayers></GradientLayers>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class=\"tab layout-manager-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"layer\">Layer</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"layer\">\n                        <GradientLayers></GradientLayers>                 \n                    </div> \n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -11769,6 +11867,29 @@ var GradientType = function (_UIElement) {
     return GradientType;
 }(UIElement);
 
+var ImageMenu = function (_UIElement) {
+    inherits(ImageMenu, _UIElement);
+
+    function ImageMenu() {
+        classCallCheck(this, ImageMenu);
+        return possibleConstructorReturn(this, (ImageMenu.__proto__ || Object.getPrototypeOf(ImageMenu)).apply(this, arguments));
+    }
+
+    createClass(ImageMenu, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class=\"tools\">                                \n                <button type=\"button\" ref=\"$createImageButton\">+</button>\n                <!--\n                <span class=\"divider\">|</span>\n                <button type=\"button\" class=\"first\" ref=\"$first\" title=\"move layer to first\">&lt;&lt;</button>                  \n                <button type=\"button\" class=\"prev\" ref=\"$left\" title=\"move layer to prev\">&lt;</button>            \n                <button type=\"button\" class=\"next\" ref=\"$right\" title=\"move layer to next\">&gt;</button>\n                <button type=\"button\" class=\"last\" ref=\"$last\" title=\"move layer to last\">&gt;&gt;</button>\n                -->\n            </div>                \n        ";
+        }
+    }, {
+        key: 'click $createImageButton',
+        value: function click$createImageButton(e) {
+            this.dispatch('/image/add');
+            this.refresh();
+        }
+    }]);
+    return ImageMenu;
+}(UIElement);
+
 var LayersMenu = function (_UIElement) {
     inherits(LayersMenu, _UIElement);
 
@@ -11780,7 +11901,12 @@ var LayersMenu = function (_UIElement) {
     createClass(LayersMenu, [{
         key: 'template',
         value: function template() {
-            return ' \n            <div class=\'gradient-layers-menu\'>\n                <div class="right">\n                    <span class="divider">|</span>                    \n                    <button type="button" ref="$stackView" class="stack-view" title="Stack View"></button>\n                    <button type="button" ref="$onlyView" class="only-view" title="Only View"></button>\n                    <span class="divider">|</span>\n                    <button type="button" ref="$showAngle" class=\'show-angle\' title="Show angle guide"></button>\n                </div>\n            </div>\n        ';
+            return ' \n            <div class=\'gradient-layers-menu\'>\n                <div class="left">\n                    <ImageMenu></ImageMenu>\n                </div>\n                <div class="right">\n                    <span class="divider">|</span>                    \n                    <button type="button" ref="$stackView" class="stack-view" title="Stack View"></button>\n                    <button type="button" ref="$onlyView" class="only-view" title="Only View"></button>\n                    <span class="divider">|</span>\n                    <button type="button" ref="$showAngle" class=\'show-angle\' title="Show angle guide"></button>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return { ImageMenu: ImageMenu };
         }
     }, {
         key: 'refresh',
@@ -11796,31 +11922,6 @@ var LayersMenu = function (_UIElement) {
         key: '@initLayer',
         value: function initLayer() {
             this.refresh();
-        }
-    }, {
-        key: 'click $left',
-        value: function click$left(e) {
-            this.dispatch('/moveLayerToLeft');
-        }
-    }, {
-        key: 'click $first',
-        value: function click$first(e) {
-            this.dispatch('/moveLayerToFirst');
-        }
-    }, {
-        key: 'click $last',
-        value: function click$last(e) {
-            this.dispatch('/moveLayerToLast');
-        }
-    }, {
-        key: 'click $right',
-        value: function click$right(e) {
-            this.dispatch('/moveLayerToRight');
-        }
-    }, {
-        key: 'click $delete',
-        value: function click$delete(e) {
-            this.dispatch('/removeLayer');
         }
     }, {
         key: 'click $show',
@@ -11854,8 +11955,8 @@ var LayersMenu = function (_UIElement) {
     return LayersMenu;
 }(UIElement);
 
-var GradientView = function (_UIElement) {
-    inherits(GradientView, _UIElement);
+var GradientView = function (_BaseTab) {
+    inherits(GradientView, _BaseTab);
 
     function GradientView() {
         classCallCheck(this, GradientView);
@@ -11865,7 +11966,7 @@ var GradientView = function (_UIElement) {
     createClass(GradientView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'gradient-view\'>\n                <GradientLayersMenu></GradientLayersMenu>\n                <div class="gradient-color-view-container"></div>\n                <div class="gradient-color-view" ref="$colorview"></div>\n                <div class="gradient-color-view" ref="$colorviewOnly"></div>\n                <GradientAngle></GradientAngle>   \n                <GradientPosition></GradientPosition>             \n                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                <GradientType></GradientType>                \n            </div>\n        ';
+            return '\n        <div class="tab editor-tab">\n            <div class="tab-header" ref="$header">\n                <div class="tab-item selected" data-id="editor">Editor</div>\n            </div>\n            <div class="tab-body" ref="$body">\n                <div class="tab-content selected" data-id="editor">\n                    <div class=\'gradient-view\'>\n                        <GradientLayersMenu></GradientLayersMenu>\n                        <div class="gradient-color-view-container"></div>\n                        <div class="gradient-color-view" ref="$colorview"></div>\n                        <div class="gradient-color-view" ref="$colorviewOnly"></div>\n                        <GradientAngle></GradientAngle>   \n                        <GradientPosition></GradientPosition>             \n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientType></GradientType>                \n                    </div>\n                </div>\n            </div>\n        </div>        \n\n        ';
         }
     }, {
         key: 'components',
@@ -11908,116 +12009,27 @@ var GradientView = function (_UIElement) {
         }
     }]);
     return GradientView;
-}(UIElement);
+}(BaseTab);
 
-var ImageList = function (_UIElement) {
-    inherits(ImageList, _UIElement);
+var FilterList$1 = function (_UIElement) {
+    inherits(FilterList, _UIElement);
 
-    function ImageList() {
-        classCallCheck(this, ImageList);
-        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
+    function FilterList() {
+        classCallCheck(this, FilterList);
+        return possibleConstructorReturn(this, (FilterList.__proto__ || Object.getPrototypeOf(FilterList)).apply(this, arguments));
     }
 
-    createClass(ImageList, [{
+    createClass(FilterList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='image-list-container'>\n                <div class=\"tools\">                                \n                    <button type=\"button\" ref=\"$createImageButton\">+</button>\n                    <span class=\"divider\">|</span>\n                    <button type=\"button\" class=\"first\" ref=\"$first\" title=\"move layer to first\">&lt;&lt;</button>                  \n                    <button type=\"button\" class=\"prev\" ref=\"$left\" title=\"move layer to prev\">&lt;</button>            \n                    <button type=\"button\" class=\"next\" ref=\"$right\" title=\"move layer to next\">&gt;</button>\n                    <button type=\"button\" class=\"last\" ref=\"$last\" title=\"move layer to last\">&gt;&gt;</button>\n                    \n                </div>            \n                <div class=\"image-list\" ref=\"$imageList\"></div>\n            </div>\n        ";
-        }
-    }, {
-        key: 'load $imageList',
-        value: function load$imageList() {
-            var _this2 = this;
-
-            var list = this.read('/image/list');
-
-            return "<div>" + list.map(function (image, index) {
-
-                var selected = image.selected ? 'selected' : '';
-                return "\n                        <div class='image-item " + selected + "' data-index=\"" + index + "\">\n                            <div class=\"image-item-view-container\">\n                                <div class=\"image-item-view\"  style='" + _this2.read('/image/toString', image) + "' ref=\"$image" + index + "\"></div>\n                            </div>\n                            <div class=\"image-item-check\" data-index=\"" + index + "\">\n                                " + Icon.CHECK + "\n                            </div>\n                            <div class=\"image-item-visible " + (image.visible ? 'on' : '') + "\" data-index=\"" + index + "\">\n                                " + Icon.VISIBILITY + "\n                                " + Icon.VISIBILITY_OFF + "\n                            </div>                            \n                            <div class=\"image-item-delete\" data-index=\"" + index + "\">\n                                " + Icon.DELETE + "\n                            </div>\n                        </div>";
-            }).join('') + "</div>";
-        }
-    }, {
-        key: "refresh",
-        value: function refresh() {
-            this.load();
-        }
-    }, {
-        key: '@changeLayer',
-        value: function changeLayer() {
-            this.refresh();
-        }
-    }, {
-        key: '@initLayer',
-        value: function initLayer() {
-            this.refresh();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(c) {
-            if (this.read('/image/get', 'type') == 'static') {
-                var color = this.read('/tool/get', 'color');
-                this.dispatch('/image/change', { color: color });
-                this.refresh();
-            }
-        }
-    }, {
-        key: 'click $createImageButton',
-        value: function click$createImageButton(e) {
-            this.dispatch('/image/add');
-            this.refresh();
-        }
-    }, {
-        key: 'click $imageList .image-item-visible',
-        value: function click$imageListImageItemVisible(e) {
-            var index = e.$delegateTarget.attr('data-index');
-            this.dispatch('/image/toggle/visible', +index);
-
-            this.refresh();
-        }
-    }, {
-        key: 'click $imageList .image-item-delete',
-        value: function click$imageListImageItemDelete(e) {
-            var index = e.$delegateTarget.attr('data-index');
-            this.dispatch('/image/remove', +index);
-
-            this.refresh();
-        }
-    }, {
-        key: 'click.self $imageList .image-item',
-        value: function clickSelf$imageListImageItem(e) {
-            var index = e.$delegateTarget.attr('data-index');
-            this.dispatch('/image/select', +index);
-
-            this.refresh();
+            return "<div class='filter-list'>\n        \n        \n        </div>";
         }
     }]);
-    return ImageList;
+    return FilterList;
 }(UIElement);
 
-var ImageControl = function (_UIElement) {
-    inherits(ImageControl, _UIElement);
-
-    function ImageControl() {
-        classCallCheck(this, ImageControl);
-        return possibleConstructorReturn(this, (ImageControl.__proto__ || Object.getPrototypeOf(ImageControl)).apply(this, arguments));
-    }
-
-    createClass(ImageControl, [{
-        key: "template",
-        value: function template() {
-            return " \n            <div class=\"control image-control\">\n                <div class=\"left\">\n                    <ImageLIst></ImageList> \n                </div>\n                <div class=\"right\">\n                    <GradientView></GradientView>                      \n                </div>\n\n            </div>     \n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return { GradientView: GradientView, ImageList: ImageList };
-        }
-    }]);
-    return ImageControl;
-}(UIElement);
-
-var BlendList = function (_UIElement) {
-    inherits(BlendList, _UIElement);
+var BlendList = function (_BaseTab) {
+    inherits(BlendList, _BaseTab);
 
     function BlendList() {
         classCallCheck(this, BlendList);
@@ -12025,9 +12037,14 @@ var BlendList = function (_UIElement) {
     }
 
     createClass(BlendList, [{
-        key: 'template',
+        key: "components",
+        value: function components() {
+            return { FilterList: FilterList$1 };
+        }
+    }, {
+        key: "template",
         value: function template() {
-            return '\n            <div class=\'blend-list-container\'>\n                <div class=\'layout-flow padding-0\'>\n                    <div class=\'blend-row\'>\n                        <div class="blend-mode-title">Background</div>\n                        <div class="blend-list" ref="$blendList"></div>\n                    </div>\n                    <div class=\'blend-row\'>\n                        <div class="blend-mode-title">Mix</div>\n                        <div class="blend-list" ref="$mixBlendList"></div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return "\n            <div class=\"tab blend-list-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"background\">Background Blend</div>\n                    <div class=\"tab-item\" data-id=\"mix\">Mix Blend</div>\n                    <div class=\"tab-item\" data-id=\"filter\">Filter</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"background\">\n                        <div class=\"blend-list\" ref=\"$blendList\"></div>\n                    </div>\n                    <div class=\"tab-content\" data-id=\"mix\">\n                        <div class=\"blend-list\" ref=\"$mixBlendList\"></div>\n                    </div>\n                    <div class=\"tab-content\" data-id=\"filter\">\n                        <FilterList></FilterList>\n                    </div>                    \n                </div>\n            </div>        \n        ";
         }
     }, {
         key: 'load $blendList',
@@ -12037,11 +12054,11 @@ var BlendList = function (_UIElement) {
             var list = this.read('/blend/list');
             var layer = this.read('/layer/get');
             var backgroundBlendMode = this.read('/layer/get', 'backgroundBlendMode');
-            return '<div>' + list.map(function (blend) {
+            return "<div>" + list.map(function (blend) {
 
                 var selected = blend == backgroundBlendMode ? 'selected' : '';
-                return '\n                        <div class=\'blend-item ' + selected + '\' data-mode="' + blend + '">\n                            <div class="blend-item-view-container">\n                                <div class="blend-item-blend-view"  style=\'' + _this2.read('/blend/toString', layer, blend) + '\'></div>\n                                <div class="blend-item-text">' + blend + '</div>\n                            </div>\n                        </div>';
-            }).join('') + '</div>';
+                return "\n                        <div class='blend-item " + selected + "' data-mode=\"" + blend + "\">\n                            <div class=\"blend-item-view-container\">\n                                <div class=\"blend-item-blend-view\"  style='" + _this2.read('/blend/toString', layer, blend) + "'></div>\n                                <div class=\"blend-item-text\">" + blend + "</div>\n                            </div>\n                        </div>";
+            }).join('') + "</div>";
         }
     }, {
         key: 'load $mixBlendList',
@@ -12051,14 +12068,14 @@ var BlendList = function (_UIElement) {
             var list = this.read('/blend/list');
             var layer = this.read('/layer/get');
             var mixBlendMode = this.read('/layer/get', 'mixBlendMode');
-            return '<div>' + list.map(function (blend) {
+            return "<div>" + list.map(function (blend) {
 
                 var selected = blend == mixBlendMode ? 'selected' : '';
-                return '\n                        <div class=\'blend-item ' + selected + '\' data-mode="' + blend + '">\n                            <div class="blend-item-view-container">\n                                <div class="blend-item-blend-view"  style=\'' + _this3.read('/blend/toString', layer, '', blend) + '\'></div>\n                                <div class="blend-item-text">' + blend + '</div>\n                            </div>\n                        </div>';
-            }).join('') + '</div>';
+                return "\n                        <div class='blend-item " + selected + "' data-mode=\"" + blend + "\">\n                            <div class=\"blend-item-view-container\">\n                                <div class=\"blend-item-blend-view\"  style='" + _this3.read('/blend/toString', layer, '', blend) + "'></div>\n                                <div class=\"blend-item-text\">" + blend + "</div>\n                            </div>\n                        </div>";
+            }).join('') + "</div>";
         }
     }, {
-        key: 'refresh',
+        key: "refresh",
         value: function refresh() {
             this.load();
         }
@@ -12088,20 +12105,20 @@ var BlendList = function (_UIElement) {
         }
     }]);
     return BlendList;
-}(UIElement);
+}(BaseTab);
 
-var BlendControl = function (_UIElement) {
-    inherits(BlendControl, _UIElement);
+var ImageControl = function (_UIElement) {
+    inherits(ImageControl, _UIElement);
 
-    function BlendControl() {
-        classCallCheck(this, BlendControl);
-        return possibleConstructorReturn(this, (BlendControl.__proto__ || Object.getPrototypeOf(BlendControl)).apply(this, arguments));
+    function ImageControl() {
+        classCallCheck(this, ImageControl);
+        return possibleConstructorReturn(this, (ImageControl.__proto__ || Object.getPrototypeOf(ImageControl)).apply(this, arguments));
     }
 
-    createClass(BlendControl, [{
+    createClass(ImageControl, [{
         key: "template",
         value: function template() {
-            return " \n            <div class=\"control blend-control\">\n                <div class=\"left\">\n                    <BlendList></BlendList> \n                </div>\n                <div class=\"right\">\n                    <GradientView></GradientView>\n                </div>\n \n            </div>     \n        ";
+            return " \n            <div class=\"control image-control\">\n                <div class='top'>\n                    <GradientView></GradientView>                      \n                </div>\n                <div class='bottom'>\n                    <BlendList></BlendList>\n                </div>\n\n            </div>     \n        ";
         }
     }, {
         key: "components",
@@ -12109,7 +12126,7 @@ var BlendControl = function (_UIElement) {
             return { GradientView: GradientView, BlendList: BlendList };
         }
     }]);
-    return BlendControl;
+    return ImageControl;
 }(UIElement);
 
 var ControlTab = function (_BaseTab) {
@@ -12121,14 +12138,14 @@ var ControlTab = function (_BaseTab) {
     }
 
     createClass(ControlTab, [{
-        key: 'template',
+        key: "template",
         value: function template() {
-            return '\n            <div class="tab control-tab">\n                <div class="tab-header" ref="$header">\n                    <div class="tab-item selected" data-id="image">Images</div>\n                    <div class="tab-item" data-id="blend">Blend Modes</div>\n                    <div class="tab-item" data-id="filter">Filters</div>                    \n                </div>\n                <div class="tab-body" ref="$body">\n                    <div class="tab-content selected" data-id="image">\n                        <ImageControl></ImageControl>\n                    </div>\n                    \n                    <div class="tab-content" data-id="blend">\n                        <BlendControl></BlendControl>                        \n                    </div>\n                    <div class="tab-content" data-id="filter">\n                        <FilterControl></FilterControl>                        \n                    </div>\n                </div>\n            </div>\n        ';
+            return "\n            <div class=\"tab control-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"image\">Images</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"image\">\n                        <ImageControl></ImageControl>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
-        key: 'components',
+        key: "components",
         value: function components() {
-            return { ImageControl: ImageControl, BlendControl: BlendControl };
+            return { ImageControl: ImageControl };
         }
     }]);
     return ControlTab;
@@ -12151,13 +12168,13 @@ var XDImageEditor = function (_BaseImageEditor) {
     createClass(XDImageEditor, [{
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-top">\n                    <div class=\'layout-flow\'>                \n                        <ControlTab></ControlTab>\n                    </div>\n                </div>\n                <div class="layout-left">\n                    <div class=\'layout-flow\'>\n                        <LayerManagerTab></LayerManagerTab>                \n                    </div>\n                </div>\n                <div class="layout-right">\n                    <div class=\'layout-flow\'>\n                        <ColorTab></ColorTab>\n                        <ColorStepsTab></ColorStepsTab>\n                    </div>\n                </div>\n                <div class="layout-header">\n                    <h1>Image Editor</h1>\n                </div>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main">\n                <div class="layout-top">\n                    <div class=\'layout-flow\'>                \n                        <ImageControl></ImageControl>\n                    </div>\n                </div>\n                <div class="layout-left">\n                    <div class=\'layout-flow\'>\n                        <LayerManagerTab></LayerManagerTab>                \n                    </div>\n                </div>\n                <div class="layout-right">\n                    <div class=\'layout-flow\'>\n                        <ColorTab></ColorTab>\n                        <ColorStepsTab></ColorStepsTab>\n                    </div>\n                </div>\n                <div class="layout-header">\n                    <h1>Image Editor</h1>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                ColorTab: ColorTab, ColorStepsTab: ColorStepsTab, LayerManagerTab: LayerManagerTab, ControlTab: ControlTab
+                ColorTab: ColorTab, ColorStepsTab: ColorStepsTab, LayerManagerTab: LayerManagerTab, ControlTab: ControlTab, ImageControl: ImageControl
             };
         }
     }]);

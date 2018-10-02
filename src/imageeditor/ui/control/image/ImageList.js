@@ -5,16 +5,7 @@ export default class ImageList extends UIElement {
 
     template () { 
         return `
-            <div class='image-list-container'>
-                <div class="tools">                                
-                    <button type="button" ref="$createImageButton">+</button>
-                    <span class="divider">|</span>
-                    <button type="button" class="first" ref="$first" title="move layer to first">&lt;&lt;</button>                  
-                    <button type="button" class="prev" ref="$left" title="move layer to prev">&lt;</button>            
-                    <button type="button" class="next" ref="$right" title="move layer to next">&gt;</button>
-                    <button type="button" class="last" ref="$last" title="move layer to last">&gt;&gt;</button>
-                    
-                </div>            
+            <div class='image-list-container'> 
                 <div class="image-list" ref="$imageList"></div>
             </div>
         `
@@ -30,9 +21,6 @@ export default class ImageList extends UIElement {
                         <div class='image-item ${selected}' data-index="${index}">
                             <div class="image-item-view-container">
                                 <div class="image-item-view"  style='${this.read('/image/toString', image)}' ref="$image${index}"></div>
-                            </div>
-                            <div class="image-item-check" data-index="${index}">
-                                ${Icon.CHECK}
                             </div>
                             <div class="image-item-visible ${image.visible ? 'on' : ''}" data-index="${index}">
                                 ${Icon.VISIBILITY}

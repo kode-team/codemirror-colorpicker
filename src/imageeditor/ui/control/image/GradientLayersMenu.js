@@ -1,10 +1,14 @@
 import UIElement from '../../../../colorpicker/UIElement';
+import ImageMenu from './ImageMenu';
 
 export default class LayersMenu extends UIElement {
 
     template () {
         return ` 
             <div class='gradient-layers-menu'>
+                <div class="left">
+                    <ImageMenu></ImageMenu>
+                </div>
                 <div class="right">
                     <span class="divider">|</span>                    
                     <button type="button" ref="$stackView" class="stack-view" title="Stack View"></button>
@@ -14,6 +18,10 @@ export default class LayersMenu extends UIElement {
                 </div>
             </div>
         `
+    }
+
+    components () {
+        return { ImageMenu }
     }
  
     refresh () {
@@ -25,26 +33,6 @@ export default class LayersMenu extends UIElement {
     }
 
     '@initLayer' () { this.refresh() }    
-
-    'click $left' (e) {
-        this.dispatch('/moveLayerToLeft')
-    }
-
-    'click $first' (e) {
-        this.dispatch('/moveLayerToFirst')
-    }    
-
-    'click $last' (e) {
-        this.dispatch('/moveLayerToLast')
-    }
-
-    'click $right' (e) {
-        this.dispatch('/moveLayerToRight')
-    }    
-
-    'click $delete' (e) {
-        this.dispatch('/removeLayer')
-    }
 
     'click $show' (e) {
         // TODO: 매끈하게 만들어봅시다. 

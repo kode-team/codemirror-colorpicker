@@ -1,16 +1,16 @@
 import UIElement from "../../../colorpicker/UIElement";
 import GradientView from "./image/GradientView";
-import ImageList from './image/ImageList';
+import BlendList from "./blend/BlendList";
 
 export default class ImageControl extends UIElement {
     template () {
         return ` 
             <div class="control image-control">
-                <div class="left">
-                    <ImageLIst></ImageList> 
-                </div>
-                <div class="right">
+                <div class='top'>
                     <GradientView></GradientView>                      
+                </div>
+                <div class='bottom'>
+                    <BlendList></BlendList>
                 </div>
 
             </div>     
@@ -18,6 +18,6 @@ export default class ImageControl extends UIElement {
    }  
 
    components () {
-       return { GradientView, ImageList }
+       return { GradientView, BlendList }
    }
 }

@@ -3,26 +3,36 @@ import GradientAngle from '../../view/GradientAngle'
 import GradientPosition from '../../view/GradientPosition' 
 import PredefinedLinearGradientAngle from '../../view/PredefinedLinearGradientAngle'
 import PredefinedRadialGradientPosition from '../../view/PredefinedRadialGradientPosition'
-import UIElement from '../../../../colorpicker/UIElement';
 import GradientType from './GradientType';
 import GradientLayersMenu from './GradientLayersMenu'; 
+import BaseTab from '../../BaseTab';
 
 
-export default class GradientView extends UIElement {
+export default class GradientView extends BaseTab {
 
     template () {
         return `
-            <div class='gradient-view'>
-                <GradientLayersMenu></GradientLayersMenu>
-                <div class="gradient-color-view-container"></div>
-                <div class="gradient-color-view" ref="$colorview"></div>
-                <div class="gradient-color-view" ref="$colorviewOnly"></div>
-                <GradientAngle></GradientAngle>   
-                <GradientPosition></GradientPosition>             
-                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
-                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
-                <GradientType></GradientType>                
+        <div class="tab editor-tab">
+            <div class="tab-header" ref="$header">
+                <div class="tab-item selected" data-id="editor">Editor</div>
             </div>
+            <div class="tab-body" ref="$body">
+                <div class="tab-content selected" data-id="editor">
+                    <div class='gradient-view'>
+                        <GradientLayersMenu></GradientLayersMenu>
+                        <div class="gradient-color-view-container"></div>
+                        <div class="gradient-color-view" ref="$colorview"></div>
+                        <div class="gradient-color-view" ref="$colorviewOnly"></div>
+                        <GradientAngle></GradientAngle>   
+                        <GradientPosition></GradientPosition>             
+                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
+                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
+                        <GradientType></GradientType>                
+                    </div>
+                </div>
+            </div>
+        </div>        
+
         `
     } 
 

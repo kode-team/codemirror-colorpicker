@@ -10,8 +10,8 @@ export default class LayerManagerTab extends BaseTab {
                 </div>
                 <div class="tab-body" ref="$body">
                     <div class="tab-content selected" data-id="layer">
-                        <GradientLayers></GradientLayers>
-                    </div>
+                        <GradientLayers></GradientLayers>                 
+                    </div> 
                 </div>
             </div>
         `

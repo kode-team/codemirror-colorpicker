@@ -3,6 +3,8 @@ import ColorTab from '../ui/ColorTab';
 import ColorStepsTab from '../ui/ColorStepsTab';
 import LayerManagerTab from '../ui/LayoutManagerTab';
 import ControlTab from '../ui/ControlTab'
+import ImageControl from '../ui/control/ImageControl';
+
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -21,7 +23,7 @@ export default class XDImageEditor extends BaseImageEditor {
             <div class="layout-main">
                 <div class="layout-top">
                     <div class='layout-flow'>                
-                        <ControlTab></ControlTab>
+                        <ImageControl></ImageControl>
                     </div>
                 </div>
                 <div class="layout-left">
@@ -44,7 +46,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
-            ColorTab, ColorStepsTab, LayerManagerTab, ControlTab
+            ColorTab, ColorStepsTab, LayerManagerTab, ControlTab, ImageControl
         }
     } 
 }

@@ -14,10 +14,12 @@ $layer-item-padding: 8px;
         display: block;
         position: absolute;
         left: 0px;
-        right: 0px;
+        width: 100px;
         top: 35px;
-        bottom: 12px;
-        overflow: auto; 
+        bottom: 0px;
+        overflow: auto;
+        border-right: 1px solid #ececec;        
+
         .gradient-item {
             display: flex;
             height: $layer-item-height;            
@@ -67,6 +69,7 @@ $layer-item-padding: 8px;
                 width: 25%;
                 text-align: center;
                 padding: $layer-item-padding;
+                display: none; 
 
                 svg {
                     display: none;
@@ -90,6 +93,7 @@ $layer-item-padding: 8px;
                     svg.on { display: inline-block; }
                     svg.off { display: none; }
                 }
+                display: none; 
             }
 
             .gradient-item-delete {
@@ -100,7 +104,8 @@ $layer-item-padding: 8px;
                 flex: 1 1 auto;  
                 padding: $layer-item-padding;                
                 width: 25%;
-                text-align: center;                
+                text-align: center;       
+                display: none;         
             }
 
             .gradient-item-view {
@@ -113,16 +118,19 @@ $layer-item-padding: 8px;
             }
         }
     }
+}
 
-    .tools {
-        display: inline-block;
-        position: absolute;
-        left: 5px;
-        right: 5px;
-        top: 5px;
-        height: 24px;
 
-        text-align: left;
+
+.tools {
+    display: inline-block;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    height: $button-size;
+
+    text-align: left;
 
 
 
@@ -133,52 +141,53 @@ $layer-item-padding: 8px;
     }
 
 
-        button {
-            appearance: none;
-            width: $button-size;
-            height: $button-size;
-            box-sizing: border-box;
-            border: 1px solid #ececec;
-            vertical-align: middle;
-            font-size: 15px;
-            font-weight: bold;
-            font-family: serif, sans-serif;
-            line-height: 1.6;
-            cursor: pointer;
-            outline: none;
-            position: relative;
-        }
-
-        button {
-            cursor: pointer; 
-            outline: none;
-
-
-            &.first, &.last {
-                letter-spacing: -2px;
-            }
-    
-            &.del {
-                overflow: hidden;
-                &:after, &:before {
-                    content: '';
-                    width: 80%;
-                    height: 1px;
-                    position: absolute;
-                    left: 50%;
-                    top: 50%;
-                    transform-origin: center center;
-                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                    border-top: 1px solid black;
-                    box-sizing: border-box;
-                }
-    
-                &:after {
-                    transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                }
-            }            
-    
-        }
+    button {
+        appearance: none;
+        width: $button-size;
+        height: $button-size;
+        box-sizing: border-box;
+        border: 1px solid #ececec;
+        vertical-align: middle;
+        font-size: 15px;
+        font-weight: bold;
+        font-family: serif, sans-serif;
+        line-height: 1.6;
+        cursor: pointer;
+        outline: none;
+        position: relative;
     }
 
+    button {
+        cursor: pointer;
+        outline: none;
+
+
+        &.first,
+        &.last {
+            letter-spacing: -2px;
+        }
+
+        &.del {
+            overflow: hidden;
+
+            &:after,
+            &:before {
+                content: '';
+                width: 80%;
+                height: 1px;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform-origin: center center;
+                transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                border-top: 1px solid black;
+                box-sizing: border-box;
+            }
+
+            &:after {
+                transform: translateX(-50%) translateY(-50%) rotate(135deg);
+            }
+        }
+
+    }
 }

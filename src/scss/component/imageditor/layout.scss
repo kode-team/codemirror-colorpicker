@@ -3,6 +3,7 @@ $pointer-color: rgba(#ececec, 0.8);
 $gutter: 8px;
 $tool-size: 50px;
 $right-size: 250px;
+$left-size: 300px;
 
 .layout-main {
     position: absolute;
@@ -13,7 +14,7 @@ $right-size: 250px;
 
     .layout-top {
         position: absolute;
-        left: $right-size;
+        left: $left-size;
         right: $right-size;
         top: $tool-size;
         bottom: $gutter;
@@ -33,7 +34,7 @@ $right-size: 250px;
     .layout-left {
         position: absolute;
         left: 0px;
-        width: $right-size;
+        width: $left-size;
         top: $tool-size;
         bottom: $gutter;
         // background-color: rgba(gray, 0.5);
@@ -42,7 +43,7 @@ $right-size: 250px;
 
     .layout-body {
         position: absolute;
-        left: $right-size;
+        left: $left-size;
         right: $right-size;
         top: $tool-size * 3; 
         bottom: $tool-size;
@@ -71,12 +72,12 @@ $right-size: 250px;
 
     .layout-footer {
         position: absolute;
-        left: $right-size;
+        left: $left-size;
         right: $right-size;
         height: $tool-size;
         bottom: 0px;
         z-index: 0; 
-        overflow: hidden;
+        overflow: hidden; 
         border-top: 1px solid #ececec;        
     }
 
@@ -105,7 +106,7 @@ $right-size: 250px;
             margin-top: 0px;
         }
 
-        > .layout-manager-tab, .control-tab, .blend-row {
+        > .layout-manager-tab, .control-tab, .blend-row, .image-control {
             flex: 1 1 auto;  
             height: auto;
         }
@@ -113,6 +114,8 @@ $right-size: 250px;
         > .blend-row {
             margin-top: 0px;
         }
+
+
 
     }
 
