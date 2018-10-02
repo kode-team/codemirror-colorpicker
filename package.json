@@ -1,6 +1,6 @@
 {
   "name": "codemirror-colorpicker",
-  "version": "1.9.34",
+  "version": "2.0.0",
   "description": "simple colorpicker used anywhere",
   "main": "./dist/codemirror-colorpicker.js",
   "scripts": {

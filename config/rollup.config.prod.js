@@ -12,8 +12,8 @@ export default [{
     file: 'dist/' + packageJSON.name + '.min.js',
     format: 'iife',
     globals: {
-      "codemirror" : "CodeMirror"
-    },
+      "codemirror" : "window.CodeMirror"
+    }, 
     external: ['codemirror']
   },
   name: 'CodeMirrorColorPicker',  

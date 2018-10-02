@@ -1,7 +1,6 @@
 import {
     parseParamNumber,
-    pixel,
-    colorMatrix
+    pixel
 } from '../functions'
 
 /*

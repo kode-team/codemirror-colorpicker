@@ -1,8 +1,6 @@
 import Event from '../../util/Event'
 import UIElement from '../UIElement';
 
-const source = 'chromedevtool-information';
-
 export default class ColorInformation extends UIElement {
 
     template () {
@@ -94,7 +92,7 @@ export default class ColorInformation extends UIElement {
         this.$el.addClass(next_format);
         this.format = next_format;
 
-        this.$store.dispatch('/changeFormat', this.format);
+        this.dispatch('/changeFormat', this.format);
     }
     
     getFormat () {
@@ -110,7 +108,7 @@ export default class ColorInformation extends UIElement {
     }        
 
     changeRgbColor () {
-        this.$store.dispatch('/changeColor', {
+        this.dispatch('/changeColor', {
             type: 'rgb',
             r : this.refs.$rgb_r.int(),
             g : this.refs.$rgb_g.int(),
@@ -121,7 +119,7 @@ export default class ColorInformation extends UIElement {
     }
 
     changeHslColor () {
-        this.$store.dispatch('/changeColor', {
+        this.dispatch('/changeColor', {
             type: 'hsl',
             h : this.refs.$hsl_h.int(),
             s : this.refs.$hsl_s.int(),
@@ -131,10 +129,8 @@ export default class ColorInformation extends UIElement {
         })        
     }    
 
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
+    '@changeColor' () {
+        this.refresh()
     }
 
     '@initColor' () { this.refresh() }    
@@ -159,7 +155,7 @@ export default class ColorInformation extends UIElement {
         var code = this.refs.$hexCode.val();
     
         if(code.charAt(0) == '#' && code.length == 7) {
-            this.$store.dispatch('/changeColor', code, source)
+            this.dispatch('/changeColor', code, source)
         }
     }
     
@@ -182,7 +178,7 @@ export default class ColorInformation extends UIElement {
     }    
 
     setHexInput () {
-        this.refs.$hexCode.val(this.$store.dispatch('/toHEX'));
+        this.refs.$hexCode.val(this.dispatch('/toHEX'));
     }
 
     refresh () {

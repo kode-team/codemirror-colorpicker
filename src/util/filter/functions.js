@@ -336,7 +336,7 @@ export function makePrebuildUserFilterList (arr) {
     
     $p[$pi] = $r; $p[$pi+1] = $g; $p[$pi+2] = $b; $p[$pi+3] = $a;
     `
-
+    
     const userFunction = new Function('$p', '$pi', '$rc', FunctionCode)
 
     return function ($pixels, $pixelIndex) {

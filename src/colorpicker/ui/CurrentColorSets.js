@@ -15,8 +15,8 @@ export default class CurrentColorSets extends UIElement {
     }    
     
     'load $colorSetsColorList' () {
-        const currentColorSets  = this.$store.dispatch('/getCurrentColorSets')
-        const colors  = this.$store.dispatch('/getCurrentColors')
+        const currentColorSets  = this.read('/getCurrentColorSets')
+        const colors  = this.read('/getCurrentColors')
 
         return `
             <div class="current-color-sets">
@@ -37,7 +37,8 @@ export default class CurrentColorSets extends UIElement {
 
 
     addColor (color) {
-        this.$store.dispatch('/addCurrentColor', color);
+        this.dispatch('/addCurrentColor', color);
+        this.refresh();
     }
 
     '@changeCurrentColorSets' () {
@@ -45,12 +46,12 @@ export default class CurrentColorSets extends UIElement {
     }
 
     'click $colorSetsChooseButton' (e) {
-        this.$store.emit('toggleColorChooser');
+        this.emit('toggleColorChooser');
     }
 
     'contextmenu $colorSetsColorList' (e) {
         e.preventDefault();
-        const currentColorSets  = this.$store.dispatch('/getCurrentColorSets')
+        const currentColorSets  = this.read('/getCurrentColorSets')
 
         if (!currentColorSets.edit) {
             return; 
@@ -63,18 +64,18 @@ export default class CurrentColorSets extends UIElement {
         if ($item) {
             const index = parseInt($item.attr('data-index'));
 
-            this.$store.emit('showContextMenu', e, index);
+            this.emit('showContextMenu', e, index);
         } else {
-            this.$store.emit('showContextMenu', e);            
+            this.emit('showContextMenu', e);            
         }
     }
 
     'click $colorSetsColorList .add-color-item' (e) {
-        this.addColor(this.$store.dispatch('/toColor'));
+        this.addColor(this.dispatch('/toColor'));
     }
 
     'click $colorSetsColorList .color-item'  (e) {
-        this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
+        this.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
     }
 
 }

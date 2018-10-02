@@ -1,0 +1,128 @@
+$pointer-color: rgba(#ececec, 0.8);
+
+$gutter: 8px;
+$tool-size: 50px;
+$right-size: 250px;
+
+.layout-main {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px; 
+
+    .layout-top {
+        position: absolute;
+        left: $right-size;
+        right: $right-size;
+        top: $tool-size;
+        bottom: $gutter;
+        z-index: 1;         
+    }
+
+    .layout-right {
+        position: absolute;
+        width: $right-size;
+        right: 0px;
+        top: $tool-size;
+        bottom: $gutter;
+        overflow: auto;
+        z-index: 1;         
+    }
+
+    .layout-left {
+        position: absolute;
+        left: 0px;
+        width: $right-size;
+        top: $tool-size;
+        bottom: $gutter;
+        // background-color: rgba(gray, 0.5);
+        z-index: 1; 
+    }    
+
+    .layout-body {
+        position: absolute;
+        left: $right-size;
+        right: $right-size;
+        top: $tool-size * 3; 
+        bottom: $tool-size;
+        z-index: 0; 
+        overflow: hidden;
+    }
+
+    .layout-header {
+        position: absolute;
+        left: 0px;
+        right: $gutter;
+        height: $tool-size;
+        top: 0px; 
+        z-index: 0; 
+        overflow: hidden;
+    }
+
+
+    .layout-footer {
+        position: absolute;
+        left: $right-size;
+        right: $right-size;
+        height: $tool-size;
+        bottom: 0px;
+        z-index: 0; 
+        overflow: hidden;
+        border-top: 1px solid #ececec;        
+    }
+
+    .layout-flow {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        padding: 0px 5px;
+
+        &.padding-0 {
+            padding: 0px;
+        }
+
+        > *:not(:first-child) {
+            flex: 1 1 auto;
+            margin-top: 4px;
+        }
+
+        > *:first-child {
+            flex: none;
+            height: 290px;
+            margin-top: 0px;
+        }
+
+        > .layout-manager-tab, .control-tab, .blend-row {
+            flex: 1 1 auto;  
+            height: auto;
+        }
+
+        > .blend-row {
+            margin-top: 0px;
+        }
+
+    }
+
+}
+
+@import './tab-ui.scss';
+@import './colorpicker-ui.scss';
+@import './layers.scss';
+@import './layers-menu.scss';
+@import './view.scss';        
+@import './image-info.scss';
+@import './steps.scss';
+@import './image-tool.scss';
+@import './drag-angle.scss';
+@import './drag-position.scss';
+@import './gradient-tools.scss';
+@import './manager.scss';
+@import './image-control.scss';
+@import './images.scss';
+@import './blend-control.scss';
+@import './blends.scss';

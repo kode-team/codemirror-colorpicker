@@ -1,0 +1,20 @@
+.colorpicker-layer {
+    .codemirror-colorpicker {
+        background-color: transparent;
+        width: 100%;
+        border:0px;
+        box-shadow: none;
+        .colorpicker-body {
+            .information, .colorsets, .color-chooser, .colorsets-contextmenu {
+                display: none;
+            }
+    
+            .wheel {
+                border: 0px;
+                background-color: transparent;
+            }
+        }
+
+    }
+
+}

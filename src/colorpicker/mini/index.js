@@ -1,23 +1,26 @@
 import BaseColorPicker from '../BaseColorPicker'
 
-import ColorControl from './ColorControl'
-import ColorPalette from '../ui/ColorPalette'
+import Hue from '../ui/control/Hue';
+import Opacity from '../ui/control/Opacity'
+import Palette from '../ui/ColorPalette'
 
 export default class MiniColorPicker extends BaseColorPicker {
 
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div>
-                <div target="control"></div>
+                <Palette></Palette>
+                <div class="control">
+                    <Hue></Hue>
+                    <Opacity></Opacity>
+                </div>
             </div>
         `
     } 
 
     components() {
         return { 
-            palette: ColorPalette,  
-            control: ColorControl
+            Hue, Opacity, Palette
         }
     }
 

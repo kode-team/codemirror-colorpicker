@@ -1,0 +1,184 @@
+$pointer-color: rgba(#ececec, 0.8);
+$direction-border: 2px solid $pointer-color;
+$layer-item-height: 50px;
+$button-size: 24px;
+$layer-item-padding: 8px;
+
+.image-list-container {
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+
+    .image-list {
+        display: block;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 35px;
+        bottom: 12px;
+        overflow: auto; 
+        .image-item {
+            display: flex;
+            height: $layer-item-height;            
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #dedede;
+            border-top: 0px;
+            padding: 5px;
+
+            &:first-child {
+                border-top: 1px solid #dedede;
+            }
+
+            svg {
+                pointer-events: none;
+            }
+
+            &.selected {
+                background-color: #dedede;                
+                .image-item-check {
+                    svg {
+                        display: inline-block; 
+                    }
+                }
+            }
+
+            .image-item-view-container {
+                position: relative; 
+                @include transparent-background();
+                pointer-events: none;
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                flex: 1 1 auto;  
+                padding: 14px;
+                width: 25%;
+            }
+
+            .image-item-check {
+                position: relative; 
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                flex: 1 1 auto;  
+                width: 25%;
+                text-align: center;
+                padding: $layer-item-padding;
+
+                svg {
+                    display: none;
+                }
+            }
+
+            .image-item-visible {
+                position: relative; 
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                flex: 1 1 auto;  
+                width: 25%;
+                text-align: center;       
+                padding: $layer-item-padding;
+
+                svg.on { display: none; }
+                svg.off { display: inline-block; }                
+
+                &.on {
+                    svg.on { display: inline-block; }
+                    svg.off { display: none; }
+                }
+            }
+
+            .image-item-delete {
+                position: relative; 
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                flex: 1 1 auto;  
+                padding: $layer-item-padding;                
+                width: 25%;
+                text-align: center;                
+            }
+
+            .image-item-view {
+                pointer-events: none;                
+                position: absolute; 
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: 0px; 
+            }
+        }
+    }
+
+    .tools {
+        display: inline-block;
+        position: absolute;
+        left: 5px;
+        right: 5px;
+        top: 5px;
+        height: 24px;
+
+        text-align: left;
+
+
+
+    .divider {
+        color: rgba(0, 0, 0, 0);
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+
+        button {
+            appearance: none;
+            width: $button-size;
+            height: $button-size;
+            box-sizing: border-box;
+            border: 1px solid #ececec;
+            vertical-align: middle;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: serif, sans-serif;
+            line-height: 1.6;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+        }
+
+        button {
+            cursor: pointer; 
+            outline: none;
+
+
+            &.first, &.last {
+                letter-spacing: -2px;
+            }
+    
+            &.del {
+                overflow: hidden;
+                &:after, &:before {
+                    content: '';
+                    width: 80%;
+                    height: 1px;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform-origin: center center;
+                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                    border-top: 1px solid black;
+                    box-sizing: border-box;
+                }
+    
+                &:after {
+                    transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                }
+            }            
+    
+        }
+    }
+
+}

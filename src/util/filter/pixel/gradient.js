@@ -1,13 +1,12 @@
 import Color from '../../Color'
 import {
-    clamp,
     pixel
 } from '../functions'
 /**
  * F.gradient('red', 'blue', 'yellow', 'white', 10)
  * F.gradient('red, blue, yellow, white, 10')
  */
-export default function gradient () {
+export default function gradient () { 
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
 

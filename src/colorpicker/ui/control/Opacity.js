@@ -1,18 +1,14 @@
 
 import Color from '../../../util/Color'
-import Event from '../../../util/Event'
 import BaseSlider from '../../BaseSlider';
-
-const source = 'chromedevtool-control-Opacity';
 
 export default class Opacity extends BaseSlider {
 
-    constructor (opt) {
-        super(opt);
+    initialize () {
+        super.initialize()
 
         this.minValue = 0;
-        this.maxValue = 1; 
-        this.source = 'opacity-control'
+        this.maxValue = 1;         
     }
 
     template () {
@@ -40,10 +36,6 @@ export default class Opacity extends BaseSlider {
         rgb.a = 1;
         var end = Color.format(rgb, 'rgb');
     
-        this.setOpacityColorBarBackground(start, end);
-    }
-
-    setOpacityColorBarBackground(start, end) {
         this.refs.$colorbar.css('background',  'linear-gradient(to right, ' + start + ', ' + end + ')');
     }
 

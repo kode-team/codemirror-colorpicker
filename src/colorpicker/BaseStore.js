@@ -1,3 +1,5 @@
+import { debounce } from "../util/functions/func";
+
 export default class BaseStore {
     constructor (opt) {
         this.callbacks = [] 
@@ -12,8 +14,8 @@ export default class BaseStore {
     }
 
     initializeModule () {
-        this.modules.forEach(Module => {
-            var instance = new Module(this);
+        this.modules.forEach(ModuleClass => {
+            var instance = this.addModule(ModuleClass);
         })
     }
 
@@ -21,26 +23,28 @@ export default class BaseStore {
         this.actions[action] = { context, callback: context[action] };
     }
 
-    dispatch (action) {
-        var args = [...arguments]; 
-        var action = args.shift();
-
+    dispatch (action, ...opts) {
         var m = this.actions[action];
 
         if (m) {
-            return m.callback.apply(m.context, [this, ...args]);
+            return m.callback.apply(m.context, [this, ...opts]);
         }
     }
 
-    module (ModuleObject) {
-        // this.action()
+    read (action, ...opts) {
+        return this.dispatch(action, ...opts)
     }
 
-    on (event, callback) {
-        this.callbacks.push({ event, callback })
+    addModule (ModuleClass) {
+        return new ModuleClass(this)
     }
 
-    off (event, callback) {
+    on (event, originalCallback, context, delay = 0) {
+        var callback = delay > 0 ? debounce(originalCallback, delay) : originalCallback;
+        this.callbacks.push({ event, callback, context, originalCallback })
+    }
+
+    off (event, originalCallback) {
 
         if (arguments.length == 0) {
             this.callbacks = [] 
@@ -50,7 +54,7 @@ export default class BaseStore {
             })
         } else if (arguments.length == 2) {
             this.callbacks = this.callbacks.filter(f => {
-                return f.event != event && f.callback != callback 
+                return !(f.event == event && f.originalCallback == originalCallback)
             })
         }
 
@@ -63,7 +67,7 @@ export default class BaseStore {
         this.callbacks.filter(f => {
             return (f.event == event)
         }).forEach(f => {
-            if (f && typeof f.callback == 'function') {
+            if (f && typeof f.callback == 'function' && f.context.source != this.source) {
                 f.callback(...args);
             }
         })

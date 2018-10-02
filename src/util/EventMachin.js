@@ -1,11 +1,23 @@
 import Event from './Event'
 import Dom from './Dom'
 import State from './State'
+import { debounce } from './functions/func';
 
-const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|touch(start|move|end)|key(down|up|press)|contextmenu|change|input)/ig;
+const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt)/ig;
 const CHECK_LOAD_PATTERN = /^load (.*)/ig;
+const CHECK_FUNCTION_PATTERN = /^([^ \t]*)(\((.*)\))?$/ig;
 const EVENT_SAPARATOR = ' '
+const EVENT_NAME_SAPARATOR = ':'
 const META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
+const PREDEFINED_EVENT_NAMES = {
+  'pointerstart': 'mousedown:touchstart',
+  'pointermove': 'mousemove:touchmove',
+  'pointerend': 'mouseup:touchend',
+  'ttingttong': 'click',
+  'tt': 'click'
+}
+
+//  'mousedown.debounce(300)
 
 export default class EventMachin {
 
@@ -17,36 +29,30 @@ export default class EventMachin {
   }
 
   /**
-   * 자식으로 사용할 컴포넌트를 생성해준다. 
-   * 생성 시점에 $store 객체가 자동으로 공유된다. 
-   * 모든 데이타는 $store 기준으로 작성한다. 
-   */
-  newChildComponents () {
-    const childKeys = Object.keys(this.childComponents)
-    childKeys.forEach(key => {
-      const Component = this.childComponents[key]
-
-      this[key] = new Component(this);
-    })
-  }
-
-  /**
    * 부모가 정의한 template 과  그 안에서 동작하는 자식 컴포넌트들을 다 합쳐서 
    * 최종 element 를 만들어준다. 
    * 
    * 그리고 자동으로 load 되어질게 있으면 로드 해준다. 
    */
-  render () {
+  render ($container) {
     // 1. 나의 template 을 만들어내고  
     this.$el = this.parseTemplate(this.template())
-    this.refs.$el = this.$el;         
+    this.refs.$el = this.$el;   
+
+    if ($container) $container.html(this.$el)
 
     // 개별 객체 셋팅하고 
-    this.parseTarget()
+    this.parseComponent()
 
     // 데이타 로드 하고 
     this.load()    
 
+
+    this.afterRender();
+  }
+
+  afterRender () {
+    
   }
  
   /**
@@ -63,14 +69,18 @@ export default class EventMachin {
    * @param {*} html 
    */
   parseTemplate (html) {
-    const $el = new Dom("div").html(html).firstChild()
-
+    // 모든 element 는 root element 가 하나여야 한다. 
+    const $el = new Dom("div").html(html).firstChild()  
     // ref element 정리 
-    var refs = $el.findAll('[ref]');
 
-    [...refs].forEach(node => {
-      const name = node.getAttribute('ref')
-      this.refs[name] = new Dom(node);
+    if ($el.attr('ref')) {
+      this.refs[$el.attr('ref')] = $el; 
+    }
+    var refs = $el.$$('[ref]');
+
+    [...refs].forEach($dom => {
+      const name = $dom.attr('ref')
+      this.refs[name] = $dom;
     })
 
     return $el; 
@@ -79,34 +89,52 @@ export default class EventMachin {
   /**
    * target 으로 지정된 자식 컴포넌트를 대체해준다.
    */
-  parseTarget () {
+  parseComponent () {
     const $el = this.$el; 
-    const targets = $el.findAll('[target]');
+    Object.keys(this.childComponents).forEach(ComponentName => {
+      const Component = this.childComponents[ComponentName]
+      const targets = $el.$$(`${ComponentName.toLowerCase()}`);
 
-    [...targets].forEach(node => {
-      const targetComponentName = node.getAttribute('target')
-      const refName = node.getAttribute('ref') || targetComponentName
+      [...targets].forEach($dom => {
 
-      var Component = this.childComponents[targetComponentName]
-      var instance = new Component(this);
-      this[refName] = instance
-      this.refs[refName] = instance.$el
-
-      if (instance) {
-        instance.render()
-        $el.replace(node, instance.$el.el)                
-      }
+        let props = {};
+        
+        [...$dom.el.attributes].filter(t => {
+          return ['ref'].indexOf(t.nodeName) < 0 
+        }).forEach(t => {
+          props[t.nodeName] = t.nodeValue 
+        })
+  
+        const refName = $dom.attr('ref') || ComponentName
+  
+        if (refName) {
+        
+          if (Component) { 
+            var instance = new Component(this, props);
+            this[refName] = instance
+            this.refs[refName] = instance.$el
+      
+            if (instance) {
+              instance.render()
+  
+              $dom.replace(instance.$el)
+            }
+          }
+  
+        }
+  
+  
+      })
     })
   }
 
   // load function이 정의된 객체는 load 를 실행해준다. 
   load () {
-    
     this.filterProps(CHECK_LOAD_PATTERN).forEach(callbackName => {
       const elName = callbackName.split('load ')[1]
-
       if (this.refs[elName]) { 
-        this.refs[elName].html(this.parseTemplate(this[callbackName].call(this)))
+        var html = this.parseTemplate(this[callbackName].call(this));
+        this.refs[elName].html(html)
       }
     })
   }
@@ -182,10 +210,30 @@ export default class EventMachin {
     });
   }
 
+  getEventNames (eventName) {
+    let results = [] 
+
+    eventName.split(EVENT_NAME_SAPARATOR).forEach(e => {
+      var arr = (PREDEFINED_EVENT_NAMES[e] || e).split(EVENT_NAME_SAPARATOR)
+
+      results.push(...arr)
+    })
+
+    return results; 
+  }
+
   parseEvent (key) {
     let arr = key.split(EVENT_SAPARATOR) ;
 
-    this.bindingEvent(arr,this[key].bind(this));
+    var eventNames =  this.getEventNames(arr[0])
+
+    var params = arr.slice(1)
+    var callback = this[key].bind(this)
+    
+    eventNames.forEach(eventName => {
+      var eventInfo = [eventName, ...params]
+      this.bindingEvent(eventInfo, callback);
+    })
   }
 
   getDefaultDomElement (dom) {
@@ -204,6 +252,11 @@ export default class EventMachin {
     return el;
   }
 
+  /* magic check method  */ 
+  self (e) {  // e.target 이 delegate 대상인지 체크 
+    return e.delegateTarget == e.target; 
+  }
+
   getDefaultEventObject (eventName) {
     let arr = eventName.split('.');
     const realEventName = arr.shift();
@@ -220,9 +273,16 @@ export default class EventMachin {
     const checkMethodList = arr.filter(code => {
       return !!this[code];
     });
+
+    // const delay = arr.filter(code => {
+    //   return (+code) + '' == code
+    // })
+
+    // const debounce = delay.length ? +delay[0] : 0;   // 0 은 debounce 하지 않음 . 
     
     arr = arr.filter(code => {
-      return checkMethodList.includes(code) === false; 
+      return checkMethodList.includes(code) === false 
+            // && delay.includes(code) === false; 
     }).map(code => {
       return code.toLowerCase() 
     });
@@ -234,6 +294,7 @@ export default class EventMachin {
       isAlt,
       isMeta,
       codes : arr,
+      debounce,
       checkMethodList: checkMethodList
     }
   }
@@ -274,18 +335,21 @@ export default class EventMachin {
   }
 
   checkEventType (e, eventObject ) {
-    var onlyControl = e.ctrlKey ? eventObject.isControl : true;
-    var onlyShift = e.shiftKey ? eventObject.isShift : true; 
-    var onlyAlt = e.altKey ? eventObject.isAlt : true; 
-    var onlyMeta = e.metaKey ? eventObject.isMeta : true; 
+    var onlyControl = eventObject.isControl ? e.ctrlKey : true;
+    var onlyShift = eventObject.isShift ? e.shiftKey : true; 
+    var onlyAlt = eventObject.isAlt ? e.altKey : true; 
+    var onlyMeta = eventObject.isMeta ? e.metaKey : true; 
 
+    // 특정 keycode 를 가지고 있는지 체크 
+    // keyup.pagedown  이라고 정의하면 pagedown 키를 눌렀을때만 동작 함 
     var hasKeyCode = true; 
     if (eventObject.codes.length) {
       hasKeyCode = eventObject.codes.includes(e.code.toLowerCase()) || eventObject.codes.includes(e.key.toLowerCase());
     }
 
+    // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
     var isAllCheck = true;  
-    if (eventObject.checkMethodList.length) {  // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
+    if (eventObject.checkMethodList.length) {  
       isAllCheck = eventObject.checkMethodList.every(method => {
         return this[method].call(this, e);
       });
@@ -295,18 +359,24 @@ export default class EventMachin {
   }
 
   makeCallback ( eventObject, callback) {
+
+    if (eventObject.debounce) {
+      callback = debounce(callback, eventObject.debounce)
+    }
+
     if (eventObject.delegate) {
       return (e) => {
+        const delegateTarget = this.matchPath(e.target || e.srcElement, eventObject.delegate);
 
-        if (this.checkEventType(e, eventObject)) {
-          const delegateTarget = this.matchPath(e.target || e.srcElement, eventObject.delegate);
-  
-          if (delegateTarget) { // delegate target 이 있는 경우만 callback 실행 
-            e.delegateTarget = delegateTarget;
-            e.$delegateTarget = new Dom(delegateTarget);
+        if (delegateTarget) { // delegate target 이 있는 경우만 callback 실행 
+          e.delegateTarget = delegateTarget;
+          e.$delegateTarget = new Dom(delegateTarget);
+
+          if (this.checkEventType(e, eventObject)) {
             return callback(e);
           } 
-        }
+
+        } 
 
       }
     }  else {

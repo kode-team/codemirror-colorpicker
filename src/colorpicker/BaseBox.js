@@ -1,16 +1,7 @@
-
-import Event from '../util/Event'
 import UIElement from './UIElement';
 
 export default class BaseBox extends UIElement {
 
-    constructor (opt) {
-        super(opt)
-
-        this.source = 'base-box'
-    }
-
- 
     refresh () {
         
     }
@@ -21,44 +12,25 @@ export default class BaseBox extends UIElement {
 
     /** push change event  */
     changeColor (opt) {
-        this.$store.dispatch('/changeColor',Object.assign({
-            source: this.source
-        }, opt || {}))
+        this.dispatch('/changeColor', opt || {})
     }
 
     // Event Bindings 
-    'mouseup document' (e) { 
+    'pointerend document' (e) { 
         this.onDragEnd(e);
     }
 
-    'mousemove document' (e) {
+    'pointermove document' (e) {
         this.onDragMove(e);
     }
 
-    'mousedown $bar' (e) {
+    'pointerstart $bar' (e) {
         e.preventDefault();
         this.isDown = true; 
     }
     
-    'mousedown $container' (e) {
+    'pointerstart $container' (e) {
         this.isDown = true 
-        this.onDragStart(e);
-    }
-
-    'touchend document' (e) {
-        this.onDragEnd(e);
-    }
-
-    'touchmove document' (e) {
-        this.onDragMove(e);
-    }
-
-    'touchstart $bar' (e) {
-        e.preventDefault();
-        this.isDown = true; 
-    }    
-
-    'touchstart $container' (e) {
         this.onDragStart(e);
     }
 
@@ -80,10 +52,8 @@ export default class BaseBox extends UIElement {
     }
 
 
-    '@changeColor' (sourceType) {
-        if (this.source != sourceType) {
-            this.refresh()
-        }
+    '@changeColor' () {
+        this.refresh()
     }
 
     '@initColor' () { this.refresh() }    

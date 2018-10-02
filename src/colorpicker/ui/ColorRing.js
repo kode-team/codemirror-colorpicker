@@ -3,14 +3,13 @@ import { caculateAngle } from '../../util/functions/math';
 
 export default class ColorRing extends ColorWheel {
 
-    constructor (opt) {
-        super(opt)
+    initialize () {
+        super.initialize()
 
         this.width = 214;
         this.height = 214;
         this.thinkness = 16; 
-        this.half_thinkness = this.thinkness / 2 
-        this.source = 'colorring'
+        this.half_thinkness = this.thinkness / 2      
     }
 
     template () {
@@ -52,10 +51,8 @@ export default class ColorRing extends ColorWheel {
         
 
         // set drag pointer position 
-        this.refs.$drag_pointer.css({
-            left: (x - minX) + 'px',
-            top: (y - minY) + 'px' 
-        });
+        this.refs.$drag_pointer.px('left', x - minX);
+        this.refs.$drag_pointer.px('top', y - minY);
 
         if (!isEvent) {
             this.changeColor({

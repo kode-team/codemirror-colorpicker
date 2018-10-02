@@ -1,35 +1,40 @@
 import BaseColorPicker from '../BaseColorPicker'
 
-import ColorControl from './ColorControl'
-import ColorInformation from '../ui/ColorInformation'
-import ColorPalette from '../ui/ColorPalette'
+import Information from '../ui/ColorInformation'
+import Palette from '../ui/ColorPalette'
 import ColorSetsChooser from '../ui/ColorSetsChooser'
 import CurrentColorSets from '../ui/CurrentColorSets'
-import CurrentColorSetsContextMenu from '../ui/CurrentColorSetsContextMenu'
+import ContextMenu from '../ui/CurrentColorSetsContextMenu'
+import Hue from '../ui/control/VerticalHue'
+import Opacity from '../ui/control/VerticalOpacity'
 
 export default class XDColorPicker extends BaseColorPicker {
 
-    template () {
+    template () { 
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div> 
-                <div target="control"></div>
-                <div target="information"></div>
-                <div target="currentColorSets"></div>
-                <div target="colorSetsChooser"></div>
-                <div target="contextMenu"></div>
+                <palette></palette> 
+                <div class="control">
+                    <Hue></Hue>
+                    <Opacity></Opacity>
+                </div>
+                <information></information>
+                <currentColorSets></currentColorSets>
+                <colorSetsChooser></colorSetsChooser>
+                <contextMenu></contextMenu>
             </div>
         `
     }
 
     components() {
         return { 
-            palette: ColorPalette,  
-            control: ColorControl,
-            information: ColorInformation,
-            currentColorSets: CurrentColorSets,
-            colorSetsChooser: ColorSetsChooser,
-            contextMenu: CurrentColorSetsContextMenu
+            Hue,
+            Opacity,
+            Palette,  
+            Information,
+            CurrentColorSets,
+            ColorSetsChooser,
+            ContextMenu
         }
     }
 

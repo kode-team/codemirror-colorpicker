@@ -4,12 +4,10 @@ import BaseBox from './BaseBox';
 
 export default class BaseSlider extends BaseBox {
 
-    constructor (opt) {
-        super(opt)
-
+    initialize () {
+        super.initialize()
         this.minValue = 0   // min domain value 
         this.maxValue = 1   // max domain value 
-        this.source = 'base-slider'
     }
 
     /* slider container's min and max position */
@@ -32,7 +30,7 @@ export default class BaseSlider extends BaseBox {
     }    
 
     getMaxDist () {
-        return this.state.get('$container.width');
+        return this.refs.$container.width();
     }
 
     /** get dist for position value */

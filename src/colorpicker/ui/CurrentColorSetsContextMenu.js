@@ -16,10 +16,8 @@ export default class CurrentColorSetsContextMenu extends UIElement {
     show (e, index) {
         const $event = Event.pos(e);
 
-        this.$el.css({
-            top: ($event.clientY - 10) + 'px',
-            left: $event.clientX + 'px' 
-        });
+        this.$el.px('top', $event.clientY - 10)
+        this.$el.px('left', $event.clientX)
         this.$el.addClass('show');
         this.selectedColorIndex = index; 
 
@@ -38,13 +36,13 @@ export default class CurrentColorSetsContextMenu extends UIElement {
     runCommand (command) {
         switch(command) {
         case 'remove-color': 
-            this.$store.dispatch('/removeCurrentColor', this.selectedColorIndex);        
+            this.dispatch('/removeCurrentColor', this.selectedColorIndex);        
             break;
         case 'remove-all-to-the-right': 
-            this.$store.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);        
+            this.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);        
             break;
         case 'clear-palette': 
-            this.$store.dispatch('/clearPalette');
+            this.dispatch('/clearPalette');
             break;
         }
     }

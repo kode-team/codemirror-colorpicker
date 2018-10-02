@@ -1,20 +1,32 @@
 import EventMachin from "../util/EventMachin";
+import { uuid } from '../util/functions/math'
 
 const CHECK_STORE_EVENT_PATTERN = /^@/
 
 class UIElement extends EventMachin {
-    constructor (opt) {
+    constructor (opt, props) {
         super(opt)
 
         this.opt = opt || {};
+        this.parent = this.opt;
+        this.props = props || {}
+        this.source = uuid()
+
+        window[this.source] = this; 
 
         if (opt && opt.$store) {
             this.$store = opt.$store
         }
 
-        this.initialize();
+        this.created();
 
+        this.initialize();
+        
         this.initializeStoreEvent();
+    }
+
+    created() {
+
     }
 
     /**
@@ -32,7 +44,7 @@ class UIElement extends EventMachin {
             const event = arr.join('@');
 
             this.storeEvents[event] = this[key].bind(this)
-            this.$store.on(event, this.storeEvents[event]);
+            this.$store.on(event, this.storeEvents[event], this);
         });
     }
 
@@ -41,6 +53,21 @@ class UIElement extends EventMachin {
             this.$store.off(event, this.storeEvents[event])
         })
     }
+
+    read (...args) {
+        return this.$store.read(...args)
+    }
+
+    dispatch (...args) {
+        this.$store.source = this.source ; 
+        return this.$store.dispatch(...args)
+    }
+
+    emit (...args) {
+        this.$store.source = this.source ; 
+        this.$store.emit(...args);
+    }
+
 }
 
 export default UIElement 

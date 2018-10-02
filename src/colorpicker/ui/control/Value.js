@@ -1,15 +1,12 @@
-
-import Event from '../../../util/Event'
 import BaseSlider from '../../BaseSlider';
 
 export default class Value extends BaseSlider {
 
-    constructor (opt) {
-        super(opt)
+    initialize () {
+        super.initialize()
 
-        this.minValue = 0
-        this.maxValue = 1 
-        this.source = 'value-control'
+        this.minValue = 0;
+        this.maxValue = 1; 
     }
 
     template () {
@@ -23,7 +20,7 @@ export default class Value extends BaseSlider {
     }
 
     setBackgroundColor () {
-        this.refs.$container.css("background-color", this.$store.dispatch('/toRGB'));
+        this.refs.$container.css("background-color", this.dispatch('/toRGB'));
     }
 
 

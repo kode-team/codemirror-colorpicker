@@ -153,8 +153,19 @@ function caculateAngle(rx, ry) {
     return radianToDegree(Math.atan2(ry, rx));
 }
 
+function uuid() {
+    var dt = new Date().getTime();
+    var uuid = 'xxxxzxxx-xxxx-45xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (dt + Math.random() * 16) % 16 | 0;
+        dt = Math.floor(dt / 16);
+        return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);
+    });
+    return uuid;
+}
+
 var math = {
     round: round,
+    uuid: uuid,
     radianToDegree: radianToDegree,
     degreeToRadian: degreeToRadian,
     getXInCircle: getXInCircle,
@@ -2291,14 +2302,14 @@ function gradient$1() {
     });
 
     return pixel(function () {
-        var colorIndex = clamp$1(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
-        var newColorIndex = clamp$1(Math.floor(colorIndex * ($scale / 256)));
+        var colorIndex = clamp(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
+        var newColorIndex = clamp(Math.floor(colorIndex * ($scale / 256)));
         var color = $colors[newColorIndex];
 
         $r = color.r;
         $g = color.g;
         $b = color.b;
-        $a = clamp$1(Math.floor(color.a * 256));
+        $a = clamp(Math.floor(color.a * 256));
     }, {}, { $colors: $colors, $scale: $scale });
 }
 
@@ -5578,7 +5589,26 @@ var image = {
     histogramToPoints: histogramToPoints
 };
 
-var Color$1 = _extends({}, formatter, math, mixin, parser, fromYCrCb, fromRGB, fromCMYK, fromHSV, fromHSL, fromLAB, image);
+function debounce(callback, delay) {
+
+    var t = undefined;
+
+    return function (cm, e) {
+        if (t) {
+            clearTimeout(t);
+        }
+
+        t = setTimeout(function () {
+            callback(cm, e);
+        }, delay || 300);
+    };
+}
+
+var func = {
+    debounce: debounce
+};
+
+var Color$1 = _extends({}, formatter, math, mixin, parser, fromYCrCb, fromRGB, fromCMYK, fromHSV, fromHSL, fromLAB, image, func);
 
 var hue_color = [{ rgb: '#ff0000', start: .0 }, { rgb: '#ffff00', start: .17 }, { rgb: '#00ff00', start: .33 }, { rgb: '#00ffff', start: .50 }, { rgb: '#0000ff', start: .67 }, { rgb: '#ff00ff', start: .83 }, { rgb: '#ff0000', start: 1 }];
 
@@ -5675,6 +5705,11 @@ var Dom = function () {
             return this;
         }
     }, {
+        key: 'is',
+        value: function is(checkElement) {
+            return this.el === (checkElement.el || checkElement);
+        }
+    }, {
         key: 'closest',
         value: function closest(cls) {
 
@@ -5698,7 +5733,10 @@ var Dom = function () {
     }, {
         key: 'removeClass',
         value: function removeClass(cls) {
-            this.el.className = (' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' ').trim();
+
+            if (this.el.className) {
+                this.el.className = (' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' ').trim();
+            }
 
             return this;
         }
@@ -5724,10 +5762,21 @@ var Dom = function () {
     }, {
         key: 'toggleClass',
         value: function toggleClass(cls) {
-            if (this.hasClass(cls)) {
-                this.removeClass(cls);
+            var isForce = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+
+            if (arguments.length == 2) {
+                if (isForce) {
+                    this.addClass(cls);
+                } else {
+                    this.removeClass(cls);
+                }
             } else {
-                this.addClass(cls);
+                if (this.hasClass(cls)) {
+                    this.removeClass(cls);
+                } else {
+                    this.addClass(cls);
+                }
             }
         }
     }, {
@@ -5748,9 +5797,22 @@ var Dom = function () {
             return this.el.querySelector(selector);
         }
     }, {
+        key: '$',
+        value: function $(selector) {
+            var node = this.find(selector);
+            return node ? new Dom(node) : null;
+        }
+    }, {
         key: 'findAll',
         value: function findAll(selector) {
             return this.el.querySelectorAll(selector);
+        }
+    }, {
+        key: '$$',
+        value: function $$(selector) {
+            return [].concat(toConsumableArray(this.findAll(selector))).map(function (node) {
+                return new Dom(node);
+            });
         }
     }, {
         key: 'empty',
@@ -5789,8 +5851,12 @@ var Dom = function () {
         }
     }, {
         key: 'text',
-        value: function text() {
-            return this.el.textContent;
+        value: function text(value) {
+            if (arguments.length == 0) {
+                return this.el.textContent;
+            } else {
+                this.el.textContent = value;
+            }
         }
     }, {
         key: 'css',
@@ -5824,6 +5890,11 @@ var Dom = function () {
             return parseInt(this.css(key));
         }
     }, {
+        key: 'px',
+        value: function px(key, value) {
+            return this.css(key, value + 'px');
+        }
+    }, {
         key: 'offset',
         value: function offset() {
             var rect = this.el.getBoundingClientRect();
@@ -5832,6 +5903,16 @@ var Dom = function () {
                 top: rect.top + Dom.getScrollTop(),
                 left: rect.left + Dom.getScrollLeft()
             };
+        }
+    }, {
+        key: 'offsetLeft',
+        value: function offsetLeft() {
+            return this.offset().left;
+        }
+    }, {
+        key: 'offsetTop',
+        value: function offsetTop() {
+            return this.offset().top;
         }
     }, {
         key: 'position',
@@ -5933,8 +6014,15 @@ var Dom = function () {
         }
     }, {
         key: 'toggle',
-        value: function toggle() {
-            if (this.css('display') == 'none') {
+        value: function toggle(isForce) {
+
+            var currentHide = this.css('display') == 'none';
+
+            if (arguments.length == 1) {
+                currentHide = isForce;
+            }
+
+            if (currentHide) {
                 return this.show();
             } else {
                 return this.hide();
@@ -5997,11 +6085,42 @@ var Dom = function () {
             return new Dom(this.el.firstElementChild);
         }
     }, {
+        key: 'children',
+        value: function children() {
+            var element = this.el.firstElementChild;
+
+            if (!element) {
+                return [];
+            }
+
+            var results = [];
+
+            do {
+                results.push(new Dom(element));
+                element = element.nextElementSibling;
+            } while (element);
+
+            return results;
+        }
+    }, {
+        key: 'childLength',
+        value: function childLength() {
+            return this.el.children.length;
+        }
+    }, {
         key: 'replace',
-        value: function replace(oldElement, newElement) {
-            this.el.replaceChild(newElement, oldElement);
+        value: function replace(newElement) {
+
+            this.el.parentNode.replaceChild(newElement.el || newElement, this.el);
 
             return this;
+        }
+    }, {
+        key: 'checked',
+        value: function checked() {
+            var isChecked = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+            this.el.checked = isChecked;
         }
     }], [{
         key: 'getScrollTop',
@@ -6224,15 +6343,26 @@ var DELEGATE_SPLIT = '.';
 
 var State = function () {
   function State(masterObj) {
+    var _this = this;
+
     var settingObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, State);
 
 
     this.masterObj = masterObj;
     this.settingObj = settingObj;
+
+    window.addEventListener('resize', debounce(function () {
+      _this.initialize();
+    }, 300));
   }
 
   createClass(State, [{
+    key: 'initialize',
+    value: function initialize() {
+      this.settingObj = {};
+    }
+  }, {
     key: 'set',
     value: function set$$1(key, value) {
       var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
@@ -6280,11 +6410,21 @@ var State = function () {
   return State;
 }();
 
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|enter|leave)|touch(start|move|end)|key(down|up|press)|contextmenu|change|input)/ig;
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt)/ig;
 var CHECK_LOAD_PATTERN = /^load (.*)/ig;
 var EVENT_SAPARATOR = ' ';
+var EVENT_NAME_SAPARATOR = ':';
 var META_KEYS = ['Control', 'Shift', 'Alt', 'Meta'];
+var PREDEFINED_EVENT_NAMES = {
+  'pointerstart': 'mousedown:touchstart',
+  'pointermove': 'mousemove:touchmove',
+  'pointerend': 'mouseup:touchend',
+  'ttingttong': 'click',
+  'tt': 'click'
 
+  //  'mousedown.debounce(300)
+
+};
 var EventMachin = function () {
   function EventMachin() {
     classCallCheck(this, EventMachin);
@@ -6296,45 +6436,33 @@ var EventMachin = function () {
   }
 
   /**
-   * 자식으로 사용할 컴포넌트를 생성해준다. 
-   * 생성 시점에 $store 객체가 자동으로 공유된다. 
-   * 모든 데이타는 $store 기준으로 작성한다. 
+   * 부모가 정의한 template 과  그 안에서 동작하는 자식 컴포넌트들을 다 합쳐서 
+   * 최종 element 를 만들어준다. 
+   * 
+   * 그리고 자동으로 load 되어질게 있으면 로드 해준다. 
    */
 
 
   createClass(EventMachin, [{
-    key: 'newChildComponents',
-    value: function newChildComponents() {
-      var _this = this;
-
-      var childKeys = Object.keys(this.childComponents);
-      childKeys.forEach(function (key) {
-        var Component = _this.childComponents[key];
-
-        _this[key] = new Component(_this);
-      });
-    }
-
-    /**
-     * 부모가 정의한 template 과  그 안에서 동작하는 자식 컴포넌트들을 다 합쳐서 
-     * 최종 element 를 만들어준다. 
-     * 
-     * 그리고 자동으로 load 되어질게 있으면 로드 해준다. 
-     */
-
-  }, {
     key: 'render',
-    value: function render() {
+    value: function render($container) {
       // 1. 나의 template 을 만들어내고  
       this.$el = this.parseTemplate(this.template());
       this.refs.$el = this.$el;
 
+      if ($container) $container.html(this.$el);
+
       // 개별 객체 셋팅하고 
-      this.parseTarget();
+      this.parseComponent();
 
       // 데이타 로드 하고 
       this.load();
+
+      this.afterRender();
     }
+  }, {
+    key: 'afterRender',
+    value: function afterRender() {}
 
     /**
      * 자식 컴포넌트로 사용될 객체 정의 
@@ -6356,16 +6484,20 @@ var EventMachin = function () {
   }, {
     key: 'parseTemplate',
     value: function parseTemplate(html) {
-      var _this2 = this;
+      var _this = this;
 
+      // 모든 element 는 root element 가 하나여야 한다. 
       var $el = new Dom("div").html(html).firstChild();
-
       // ref element 정리 
-      var refs = $el.findAll('[ref]');
 
-      [].concat(toConsumableArray(refs)).forEach(function (node) {
-        var name = node.getAttribute('ref');
-        _this2.refs[name] = new Dom(node);
+      if ($el.attr('ref')) {
+        this.refs[$el.attr('ref')] = $el;
+      }
+      var refs = $el.$$('[ref]');
+
+      [].concat(toConsumableArray(refs)).forEach(function ($dom) {
+        var name = $dom.attr('ref');
+        _this.refs[name] = $dom;
       });
 
       return $el;
@@ -6376,26 +6508,42 @@ var EventMachin = function () {
      */
 
   }, {
-    key: 'parseTarget',
-    value: function parseTarget() {
-      var _this3 = this;
+    key: 'parseComponent',
+    value: function parseComponent() {
+      var _this2 = this;
 
       var $el = this.$el;
-      var targets = $el.findAll('[target]');
+      Object.keys(this.childComponents).forEach(function (ComponentName) {
+        var Component = _this2.childComponents[ComponentName];
+        var targets = $el.$$('' + ComponentName.toLowerCase());
 
-      [].concat(toConsumableArray(targets)).forEach(function (node) {
-        var targetComponentName = node.getAttribute('target');
-        var refName = node.getAttribute('ref') || targetComponentName;
+        [].concat(toConsumableArray(targets)).forEach(function ($dom) {
 
-        var Component = _this3.childComponents[targetComponentName];
-        var instance = new Component(_this3);
-        _this3[refName] = instance;
-        _this3.refs[refName] = instance.$el;
+          var props = {};
 
-        if (instance) {
-          instance.render();
-          $el.replace(node, instance.$el.el);
-        }
+          [].concat(toConsumableArray($dom.el.attributes)).filter(function (t) {
+            return ['ref'].indexOf(t.nodeName) < 0;
+          }).forEach(function (t) {
+            props[t.nodeName] = t.nodeValue;
+          });
+
+          var refName = $dom.attr('ref') || ComponentName;
+
+          if (refName) {
+
+            if (Component) {
+              var instance = new Component(_this2, props);
+              _this2[refName] = instance;
+              _this2.refs[refName] = instance.$el;
+
+              if (instance) {
+                instance.render();
+
+                $dom.replace(instance.$el);
+              }
+            }
+          }
+        });
       });
     }
 
@@ -6404,13 +6552,13 @@ var EventMachin = function () {
   }, {
     key: 'load',
     value: function load() {
-      var _this4 = this;
+      var _this3 = this;
 
       this.filterProps(CHECK_LOAD_PATTERN).forEach(function (callbackName) {
         var elName = callbackName.split('load ')[1];
-
-        if (_this4.refs[elName]) {
-          _this4.refs[elName].html(_this4.parseTemplate(_this4[callbackName].call(_this4)));
+        if (_this3.refs[elName]) {
+          var html = _this3.parseTemplate(_this3[callbackName].call(_this3));
+          _this3.refs[elName].html(html);
         }
       });
     }
@@ -6433,14 +6581,14 @@ var EventMachin = function () {
   }, {
     key: 'initializeEvent',
     value: function initializeEvent() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.initializeEventMachin();
 
       // 자식 이벤트도 같이 초기화 한다. 
       // 그래서 이 메소드는 부모에서 한번만 불려도 된다. 
       Object.keys(this.childComponents).forEach(function (key) {
-        if (_this5[key]) _this5[key].initializeEvent();
+        if (_this4[key]) _this4[key].initializeEvent();
       });
     }
 
@@ -6452,13 +6600,13 @@ var EventMachin = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.destroyEventMachin();
       // this.refs = {} 
 
       Object.keys(this.childComponents).forEach(function (key) {
-        if (_this6[key]) _this6[key].destroy();
+        if (_this5[key]) _this5[key].destroy();
       });
     }
   }, {
@@ -6502,11 +6650,34 @@ var EventMachin = function () {
       });
     }
   }, {
+    key: 'getEventNames',
+    value: function getEventNames(eventName) {
+      var results = [];
+
+      eventName.split(EVENT_NAME_SAPARATOR).forEach(function (e) {
+        var arr = (PREDEFINED_EVENT_NAMES[e] || e).split(EVENT_NAME_SAPARATOR);
+
+        results.push.apply(results, toConsumableArray(arr));
+      });
+
+      return results;
+    }
+  }, {
     key: 'parseEvent',
     value: function parseEvent(key) {
+      var _this6 = this;
+
       var arr = key.split(EVENT_SAPARATOR);
 
-      this.bindingEvent(arr, this[key].bind(this));
+      var eventNames = this.getEventNames(arr[0]);
+
+      var params = arr.slice(1);
+      var callback = this[key].bind(this);
+
+      eventNames.forEach(function (eventName) {
+        var eventInfo = [eventName].concat(toConsumableArray(params));
+        _this6.bindingEvent(eventInfo, callback);
+      });
     }
   }, {
     key: 'getDefaultDomElement',
@@ -6524,6 +6695,15 @@ var EventMachin = function () {
       }
 
       return el;
+    }
+
+    /* magic check method  */
+
+  }, {
+    key: 'self',
+    value: function self(e) {
+      // e.target 이 delegate 대상인지 체크 
+      return e.delegateTarget == e.target;
     }
   }, {
     key: 'getDefaultEventObject',
@@ -6546,8 +6726,15 @@ var EventMachin = function () {
         return !!_this7[code];
       });
 
+      // const delay = arr.filter(code => {
+      //   return (+code) + '' == code
+      // })
+
+      // const debounce = delay.length ? +delay[0] : 0;   // 0 은 debounce 하지 않음 . 
+
       arr = arr.filter(function (code) {
         return checkMethodList.includes(code) === false;
+        // && delay.includes(code) === false; 
       }).map(function (code) {
         return code.toLowerCase();
       });
@@ -6559,6 +6746,7 @@ var EventMachin = function () {
         isAlt: isAlt,
         isMeta: isMeta,
         codes: arr,
+        debounce: debounce,
         checkMethodList: checkMethodList
       };
     }
@@ -6614,19 +6802,21 @@ var EventMachin = function () {
     value: function checkEventType(e, eventObject) {
       var _this8 = this;
 
-      var onlyControl = e.ctrlKey ? eventObject.isControl : true;
-      var onlyShift = e.shiftKey ? eventObject.isShift : true;
-      var onlyAlt = e.altKey ? eventObject.isAlt : true;
-      var onlyMeta = e.metaKey ? eventObject.isMeta : true;
+      var onlyControl = eventObject.isControl ? e.ctrlKey : true;
+      var onlyShift = eventObject.isShift ? e.shiftKey : true;
+      var onlyAlt = eventObject.isAlt ? e.altKey : true;
+      var onlyMeta = eventObject.isMeta ? e.metaKey : true;
 
+      // 특정 keycode 를 가지고 있는지 체크 
+      // keyup.pagedown  이라고 정의하면 pagedown 키를 눌렀을때만 동작 함 
       var hasKeyCode = true;
       if (eventObject.codes.length) {
         hasKeyCode = eventObject.codes.includes(e.code.toLowerCase()) || eventObject.codes.includes(e.key.toLowerCase());
       }
 
+      // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
       var isAllCheck = true;
       if (eventObject.checkMethodList.length) {
-        // 체크 메소드들은 모든 메소드를 다 적용해야한다. 
         isAllCheck = eventObject.checkMethodList.every(function (method) {
           return _this8[method].call(_this8, e);
         });
@@ -6639,16 +6829,20 @@ var EventMachin = function () {
     value: function makeCallback(eventObject, callback) {
       var _this9 = this;
 
+      if (eventObject.debounce) {
+        callback = debounce(callback, eventObject.debounce);
+      }
+
       if (eventObject.delegate) {
         return function (e) {
+          var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
 
-          if (_this9.checkEventType(e, eventObject)) {
-            var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
+          if (delegateTarget) {
+            // delegate target 이 있는 경우만 callback 실행 
+            e.delegateTarget = delegateTarget;
+            e.$delegateTarget = new Dom(delegateTarget);
 
-            if (delegateTarget) {
-              // delegate target 이 있는 경우만 callback 실행 
-              e.delegateTarget = delegateTarget;
-              e.$delegateTarget = new Dom(delegateTarget);
+            if (_this9.checkEventType(e, eventObject)) {
               return callback(e);
             }
           }
@@ -6696,16 +6890,23 @@ var CHECK_STORE_EVENT_PATTERN = /^@/;
 var UIElement = function (_EventMachin) {
     inherits(UIElement, _EventMachin);
 
-    function UIElement(opt) {
+    function UIElement(opt, props) {
         classCallCheck(this, UIElement);
 
         var _this = possibleConstructorReturn(this, (UIElement.__proto__ || Object.getPrototypeOf(UIElement)).call(this, opt));
 
         _this.opt = opt || {};
+        _this.parent = _this.opt;
+        _this.props = props || {};
+        _this.source = uuid();
+
+        window[_this.source] = _this;
 
         if (opt && opt.$store) {
             _this.$store = opt.$store;
         }
+
+        _this.created();
 
         _this.initialize();
 
@@ -6713,16 +6914,19 @@ var UIElement = function (_EventMachin) {
         return _this;
     }
 
-    /**
-     * initialize store event 
-     * 
-     * you can define '@xxx' method(event) in UIElement 
-     * 
-     * 
-     */
-
-
     createClass(UIElement, [{
+        key: 'created',
+        value: function created() {}
+
+        /**
+         * initialize store event 
+         * 
+         * you can define '@xxx' method(event) in UIElement 
+         * 
+         * 
+         */
+
+    }, {
         key: 'initializeStoreEvent',
         value: function initializeStoreEvent() {
             var _this2 = this;
@@ -6734,7 +6938,7 @@ var UIElement = function (_EventMachin) {
                 var event = arr.join('@');
 
                 _this2.storeEvents[event] = _this2[key].bind(_this2);
-                _this2.$store.on(event, _this2.storeEvents[event]);
+                _this2.$store.on(event, _this2.storeEvents[event], _this2);
             });
         }
     }, {
@@ -6745,6 +6949,29 @@ var UIElement = function (_EventMachin) {
             Object.keys(this.storeEvents).forEach(function (event) {
                 _this3.$store.off(event, _this3.storeEvents[event]);
             });
+        }
+    }, {
+        key: 'read',
+        value: function read() {
+            var _$store;
+
+            return (_$store = this.$store).read.apply(_$store, arguments);
+        }
+    }, {
+        key: 'dispatch',
+        value: function dispatch() {
+            var _$store2;
+
+            this.$store.source = this.source;
+            return (_$store2 = this.$store).dispatch.apply(_$store2, arguments);
+        }
+    }, {
+        key: 'emit',
+        value: function emit() {
+            var _$store3;
+
+            this.$store.source = this.source;
+            (_$store3 = this.$store).emit.apply(_$store3, arguments);
         }
     }]);
     return UIElement;
@@ -6844,7 +7071,7 @@ var ColorManager = function (_BaseModule) {
     }, {
         key: '/toColor',
         value: function toColor($store, type) {
-            type = type || $store.format;
+            type = (type || $store.format).toLowerCase();
 
             if (type == 'rgb') {
                 return $store.dispatch('/toRGB');
@@ -6887,49 +7114,62 @@ var BaseStore = function () {
     }
 
     createClass(BaseStore, [{
-        key: 'initialize',
+        key: "initialize",
         value: function initialize() {
             this.initializeModule();
         }
     }, {
-        key: 'initializeModule',
+        key: "initializeModule",
         value: function initializeModule() {
             var _this = this;
 
-            this.modules.forEach(function (Module) {
-                var instance = new Module(_this);
+            this.modules.forEach(function (ModuleClass) {
+                var instance = _this.addModule(ModuleClass);
             });
         }
     }, {
-        key: 'action',
+        key: "action",
         value: function action(_action, context) {
             this.actions[_action] = { context: context, callback: context[_action] };
         }
     }, {
-        key: 'dispatch',
+        key: "dispatch",
         value: function dispatch(action) {
-            var args = [].concat(Array.prototype.slice.call(arguments));
-            var action = args.shift();
-
             var m = this.actions[action];
 
             if (m) {
-                return m.callback.apply(m.context, [this].concat(toConsumableArray(args)));
+                for (var _len = arguments.length, opts = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                    opts[_key - 1] = arguments[_key];
+                }
+
+                return m.callback.apply(m.context, [this].concat(opts));
             }
         }
     }, {
-        key: 'module',
-        value: function module(ModuleObject) {
-            // this.action()
+        key: "read",
+        value: function read(action) {
+            for (var _len2 = arguments.length, opts = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                opts[_key2 - 1] = arguments[_key2];
+            }
+
+            return this.dispatch.apply(this, [action].concat(opts));
         }
     }, {
-        key: 'on',
-        value: function on(event, callback) {
-            this.callbacks.push({ event: event, callback: callback });
+        key: "addModule",
+        value: function addModule(ModuleClass) {
+            return new ModuleClass(this);
         }
     }, {
-        key: 'off',
-        value: function off(event, callback) {
+        key: "on",
+        value: function on(event, originalCallback, context) {
+            var delay = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+            var callback = delay > 0 ? debounce(originalCallback, delay) : originalCallback;
+            this.callbacks.push({ event: event, callback: callback, context: context, originalCallback: originalCallback });
+        }
+    }, {
+        key: "off",
+        value: function off(event, originalCallback) {
 
             if (arguments.length == 0) {
                 this.callbacks = [];
@@ -6939,20 +7179,22 @@ var BaseStore = function () {
                 });
             } else if (arguments.length == 2) {
                 this.callbacks = this.callbacks.filter(function (f) {
-                    return f.event != event && f.callback != callback;
+                    return !(f.event == event && f.originalCallback == originalCallback);
                 });
             }
         }
     }, {
-        key: 'emit',
+        key: "emit",
         value: function emit() {
+            var _this2 = this;
+
             var args = [].concat(Array.prototype.slice.call(arguments));
             var event = args.shift();
 
             this.callbacks.filter(function (f) {
                 return f.event == event;
             }).forEach(function (f) {
-                if (f && typeof f.callback == 'function') {
+                if (f && typeof f.callback == 'function' && f.context.source != _this2.source) {
                     f.callback.apply(f, toConsumableArray(args));
                 }
             });
@@ -6964,36 +7206,38 @@ var BaseStore = function () {
 var BaseColorPicker = function (_UIElement) {
     inherits(BaseColorPicker, _UIElement);
 
-    function BaseColorPicker(opt) {
+    function BaseColorPicker() {
         classCallCheck(this, BaseColorPicker);
-
-        var _this = possibleConstructorReturn(this, (BaseColorPicker.__proto__ || Object.getPrototypeOf(BaseColorPicker)).call(this, opt));
-
-        _this.isColorPickerShow = false;
-        _this.isShortCut = false;
-        _this.hideDelay = +(typeof _this.opt.hideDeplay == 'undefined' ? 2000 : _this.opt.hideDelay);
-        _this.timerCloseColorPicker;
-        _this.autoHide = _this.opt.autoHide || true;
-        _this.outputFormat = _this.opt.outputFormat;
-        _this.$checkColorPickerClass = _this.checkColorPickerClass.bind(_this);
-
-        return _this;
+        return possibleConstructorReturn(this, (BaseColorPicker.__proto__ || Object.getPrototypeOf(BaseColorPicker)).apply(this, arguments));
     }
 
     createClass(BaseColorPicker, [{
+        key: 'created',
+        value: function created() {
+            this.isColorPickerShow = false;
+            this.isShortCut = false;
+            this.hideDelay = +(typeof this.opt.hideDeplay == 'undefined' ? 2000 : this.opt.hideDelay);
+            this.timerCloseColorPicker;
+            this.autoHide = this.opt.autoHide || true;
+            this.outputFormat = this.opt.outputFormat;
+            this.$checkColorPickerClass = this.checkColorPickerClass.bind(this);
+        }
+    }, {
         key: 'initialize',
         value: function initialize() {
             var _this2 = this;
+
+            var modules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
             this.$body = null;
             this.$root = null;
 
             this.$store = new BaseStore({
-                modules: [ColorManager, ColorSetsList]
+                modules: [ColorManager, ColorSetsList].concat(toConsumableArray(modules))
             });
 
             this.callbackChange = function () {
-                _this2.callbackColorValue();
+                _this2.callbackChangeValue();
             };
 
             this.colorpickerShowCallback = function () {};
@@ -7024,11 +7268,9 @@ var BaseColorPicker = function (_UIElement) {
 
             this.$root.append(this.$arrow);
 
-            this.$store.dispatch('/setUserPalette', this.opt.colorSets);
+            this.dispatch('/setUserPalette', this.opt.colorSets);
 
-            this.render();
-
-            this.$root.append(this.$el);
+            this.render(this.$root);
 
             this.initColorWithoutChangeEvent(this.opt.color);
 
@@ -7038,7 +7280,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'initColorWithoutChangeEvent',
         value: function initColorWithoutChangeEvent(color) {
-            this.$store.dispatch('/initColor', color);
+            this.dispatch('/initColor', color);
         }
 
         /** 
@@ -7096,7 +7338,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'initColor',
         value: function initColor(newColor, format) {
-            this.$store.dispatch('/changeColor', newColor, format);
+            this.dispatch('/changeColor', newColor, format);
         }
 
         /**
@@ -7113,7 +7355,7 @@ var BaseColorPicker = function (_UIElement) {
                 this.$root.remove(); // not empty 
                 this.isColorPickerShow = false;
 
-                this.callbackHideColorValue();
+                this.callbackHideValue();
             }
         }
 
@@ -7127,7 +7369,7 @@ var BaseColorPicker = function (_UIElement) {
         value: function setColorsInPalette() {
             var colors = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-            this.$store.dispatch('/setCurrentColorAll', colors);
+            this.dispatch('/setCurrentColorAll', colors);
         }
 
         /**
@@ -7141,7 +7383,7 @@ var BaseColorPicker = function (_UIElement) {
         value: function setUserPalette() {
             var list = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-            this.$store.dispatch('/setUserPalette', list);
+            this.dispatch('/setUserPalette', list);
         }
 
         /**
@@ -7181,7 +7423,7 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'getColor',
         value: function getColor(type) {
-            return this.$store.dispatch('/toColor', type);
+            return this.dispatch('/toColor', type);
         }
     }, {
         key: 'definePositionForArrow',
@@ -7264,8 +7506,8 @@ var BaseColorPicker = function (_UIElement) {
             // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
         }
     }, {
-        key: 'callbackColorValue',
-        value: function callbackColorValue(color) {
+        key: 'callbackChangeValue',
+        value: function callbackChangeValue(color) {
             color = color || this.getCurrentColor();
 
             if (typeof this.opt.onChange == 'function') {
@@ -7277,8 +7519,8 @@ var BaseColorPicker = function (_UIElement) {
             }
         }
     }, {
-        key: 'callbackHideColorValue',
-        value: function callbackHideColorValue(color) {
+        key: 'callbackHideValue',
+        value: function callbackHideValue(color) {
             color = color || this.getCurrentColor();
             if (typeof this.opt.onHide == 'function') {
                 this.opt.onHide.call(this, color);
@@ -7291,14 +7533,15 @@ var BaseColorPicker = function (_UIElement) {
     }, {
         key: 'getCurrentColor',
         value: function getCurrentColor() {
-            return this.$store.dispatch('/toColor', this.outputFormat);
+            return this.dispatch('/toColor', this.outputFormat);
         }
     }, {
         key: 'checkColorPickerClass',
         value: function checkColorPickerClass(el) {
-            var hasColorView = new Dom(el).closest('codemirror-colorview');
-            var hasColorPicker = new Dom(el).closest('codemirror-colorpicker');
-            var hasCodeMirror = new Dom(el).closest('CodeMirror');
+            var $el = new Dom(el);
+            var hasColorView = $el.closest('codemirror-colorview');
+            var hasColorPicker = $el.closest('codemirror-colorpicker');
+            var hasCodeMirror = $el.closest('CodeMirror');
             var IsInHtml = el.nodeName == 'HTML';
 
             return !!(hasColorPicker || hasColorView || hasCodeMirror);
@@ -7315,8 +7558,8 @@ var BaseColorPicker = function (_UIElement) {
         value: function initializeStoreEvent() {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'initializeStoreEvent', this).call(this);
 
-            this.$store.on('changeColor', this.callbackChange);
-            this.$store.on('changeFormat', this.callbackChange);
+            this.$store.on('changeColor', this.callbackChange, this);
+            this.$store.on('changeFormat', this.callbackChange, this);
         }
     }, {
         key: 'destroy',
@@ -7353,13 +7596,9 @@ var BaseColorPicker = function (_UIElement) {
 var BaseBox = function (_UIElement) {
     inherits(BaseBox, _UIElement);
 
-    function BaseBox(opt) {
+    function BaseBox() {
         classCallCheck(this, BaseBox);
-
-        var _this = possibleConstructorReturn(this, (BaseBox.__proto__ || Object.getPrototypeOf(BaseBox)).call(this, opt));
-
-        _this.source = 'base-box';
-        return _this;
+        return possibleConstructorReturn(this, (BaseBox.__proto__ || Object.getPrototypeOf(BaseBox)).apply(this, arguments));
     }
 
     createClass(BaseBox, [{
@@ -7374,54 +7613,31 @@ var BaseBox = function (_UIElement) {
     }, {
         key: 'changeColor',
         value: function changeColor(opt) {
-            this.$store.dispatch('/changeColor', Object.assign({
-                source: this.source
-            }, opt || {}));
+            this.dispatch('/changeColor', opt || {});
         }
 
         // Event Bindings 
 
     }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
             this.onDragEnd(e);
         }
     }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
             this.onDragMove(e);
         }
     }, {
-        key: 'mousedown $bar',
-        value: function mousedown$bar(e) {
+        key: 'pointerstart $bar',
+        value: function pointerstart$bar(e) {
             e.preventDefault();
             this.isDown = true;
         }
     }, {
-        key: 'mousedown $container',
-        value: function mousedown$container(e) {
+        key: 'pointerstart $container',
+        value: function pointerstart$container(e) {
             this.isDown = true;
-            this.onDragStart(e);
-        }
-    }, {
-        key: 'touchend document',
-        value: function touchendDocument(e) {
-            this.onDragEnd(e);
-        }
-    }, {
-        key: 'touchmove document',
-        value: function touchmoveDocument(e) {
-            this.onDragMove(e);
-        }
-    }, {
-        key: 'touchstart $bar',
-        value: function touchstart$bar(e) {
-            e.preventDefault();
-            this.isDown = true;
-        }
-    }, {
-        key: 'touchstart $container',
-        value: function touchstart$container(e) {
             this.onDragStart(e);
         }
     }, {
@@ -7447,10 +7663,8 @@ var BaseBox = function (_UIElement) {
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (this.source != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -7464,21 +7678,22 @@ var BaseBox = function (_UIElement) {
 var BaseSlider = function (_BaseBox) {
     inherits(BaseSlider, _BaseBox);
 
-    function BaseSlider(opt) {
+    function BaseSlider() {
         classCallCheck(this, BaseSlider);
-
-        var _this = possibleConstructorReturn(this, (BaseSlider.__proto__ || Object.getPrototypeOf(BaseSlider)).call(this, opt));
-
-        _this.minValue = 0; // min domain value 
-        _this.maxValue = 1; // max domain value 
-        _this.source = 'base-slider';
-        return _this;
+        return possibleConstructorReturn(this, (BaseSlider.__proto__ || Object.getPrototypeOf(BaseSlider)).apply(this, arguments));
     }
 
-    /* slider container's min and max position */
-
-
     createClass(BaseSlider, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(BaseSlider.prototype.__proto__ || Object.getPrototypeOf(BaseSlider.prototype), 'initialize', this).call(this);
+            this.minValue = 0; // min domain value 
+            this.maxValue = 1; // max domain value 
+        }
+
+        /* slider container's min and max position */
+
+    }, {
         key: 'getMinMaxPosition',
         value: function getMinMaxPosition() {
             var min = this.getMinPosition();
@@ -7506,7 +7721,7 @@ var BaseSlider = function (_BaseBox) {
     }, {
         key: 'getMaxDist',
         value: function getMaxDist() {
-            return this.state.get('$container.width');
+            return this.refs.$container.width();
         }
 
         /** get dist for position value */
@@ -7595,18 +7810,20 @@ var BaseSlider = function (_BaseBox) {
 var Value = function (_BaseSlider) {
     inherits(Value, _BaseSlider);
 
-    function Value(opt) {
+    function Value() {
         classCallCheck(this, Value);
-
-        var _this = possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).call(this, opt));
-
-        _this.minValue = 0;
-        _this.maxValue = 1;
-        _this.source = 'value-control';
-        return _this;
+        return possibleConstructorReturn(this, (Value.__proto__ || Object.getPrototypeOf(Value)).apply(this, arguments));
     }
 
     createClass(Value, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(Value.prototype.__proto__ || Object.getPrototypeOf(Value.prototype), 'initialize', this).call(this);
+
+            this.minValue = 0;
+            this.maxValue = 1;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n            <div class="value">\n                <div ref="$container" class="value-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
@@ -7614,7 +7831,7 @@ var Value = function (_BaseSlider) {
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor() {
-            this.refs.$container.css("background-color", this.$store.dispatch('/toRGB'));
+            this.refs.$container.css("background-color", this.dispatch('/toRGB'));
         }
     }, {
         key: 'refresh',
@@ -7646,18 +7863,20 @@ var Value = function (_BaseSlider) {
 var Opacity = function (_BaseSlider) {
     inherits(Opacity, _BaseSlider);
 
-    function Opacity(opt) {
+    function Opacity() {
         classCallCheck(this, Opacity);
-
-        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
-
-        _this.minValue = 0;
-        _this.maxValue = 1;
-        _this.source = 'opacity-control';
-        return _this;
+        return possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).apply(this, arguments));
     }
 
     createClass(Opacity, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(Opacity.prototype.__proto__ || Object.getPrototypeOf(Opacity.prototype), 'initialize', this).call(this);
+
+            this.minValue = 0;
+            this.maxValue = 1;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
@@ -7679,11 +7898,6 @@ var Opacity = function (_BaseSlider) {
             rgb.a = 1;
             var end = Color$1.format(rgb, 'rgb');
 
-            this.setOpacityColorBarBackground(start, end);
-        }
-    }, {
-        key: 'setOpacityColorBarBackground',
-        value: function setOpacityColorBarBackground(start, end) {
             this.refs.$colorbar.css('background', 'linear-gradient(to right, ' + start + ', ' + end + ')');
         }
     }, {
@@ -7706,49 +7920,33 @@ var Opacity = function (_BaseSlider) {
     return Opacity;
 }(BaseSlider);
 
-var source = 'macos-control';
+var ColorView = function (_UIElement) {
+    inherits(ColorView, _UIElement);
 
-var ColorControl = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    function ColorView() {
+        classCallCheck(this, ColorView);
+        return possibleConstructorReturn(this, (ColorView.__proto__ || Object.getPrototypeOf(ColorView)).apply(this, arguments));
     }
 
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Value: Value, Opacity: Opacity };
-        }
-    }, {
+    createClass(ColorView, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+            return '<div class="color"></div>';
         }
     }, {
         key: 'setBackgroundColor',
         value: function setBackgroundColor() {
-            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
+            this.refs.$el.css("background-color", this.read('/toRGB'));
         }
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.setColorUI();
             this.setBackgroundColor();
         }
     }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Value.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -7756,26 +7954,27 @@ var ColorControl = function (_UIElement) {
             this.refresh();
         }
     }]);
-    return ColorControl;
+    return ColorView;
 }(UIElement);
 
 var ColorWheel = function (_UIElement) {
     inherits(ColorWheel, _UIElement);
 
-    function ColorWheel(opt) {
+    function ColorWheel() {
         classCallCheck(this, ColorWheel);
-
-        var _this = possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).call(this, opt));
-
-        _this.width = 214;
-        _this.height = 214;
-        _this.thinkness = 0;
-        _this.half_thinkness = 0;
-        _this.source = 'colorwheel';
-        return _this;
+        return possibleConstructorReturn(this, (ColorWheel.__proto__ || Object.getPrototypeOf(ColorWheel)).apply(this, arguments));
     }
 
     createClass(ColorWheel, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(ColorWheel.prototype.__proto__ || Object.getPrototypeOf(ColorWheel.prototype), 'initialize', this).call(this);
+            this.width = 214;
+            this.height = 214;
+            this.thinkness = 0;
+            this.half_thinkness = 0;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n        <div class="wheel">\n            <canvas class="wheel-canvas" ref="$colorwheel" ></canvas>\n            <div class="wheel-canvas" ref="$valuewheel" ></div>\n            <div class="drag-pointer" ref="$drag_pointer"></div>\n        </div>\n        ';
@@ -7796,9 +7995,7 @@ var ColorWheel = function (_UIElement) {
         key: 'renderValue',
         value: function renderValue() {
             var value = 1 - this.$store.hsv.v;
-            this.refs.$valuewheel.css({
-                'background-color': 'rgba(0, 0, 0, ' + value + ')'
-            });
+            this.refs.$valuewheel.css('background-color', 'rgba(0, 0, 0, ' + value + ')');
         }
     }, {
         key: 'renderWheel',
@@ -7811,7 +8008,8 @@ var ColorWheel = function (_UIElement) {
             var context = $canvas.el.getContext('2d');
             $canvas.el.width = width;
             $canvas.el.height = height;
-            $canvas.css({ width: width + 'px', height: height + 'px' });
+            $canvas.px('width', width);
+            $canvas.px('height', height);
 
             var img = context.getImageData(0, 0, width, height);
             var pixels = img.data;
@@ -7876,7 +8074,8 @@ var ColorWheel = function (_UIElement) {
 
             $canvas.el.width = width;
             $canvas.el.height = height;
-            $canvas.css({ width: width + 'px', height: height + 'px' });
+            $canvas.px('width', width);
+            $canvas.px('height', height);
 
             var $wheelCanvas = this.renderWheel(width, height);
 
@@ -7906,10 +8105,10 @@ var ColorWheel = function (_UIElement) {
             var height = this.state.get('$el.height');
             var radius = this.state.get('$colorwheel.width') / 2;
 
-            var minX = this.refs.$el.offset().left;
+            var minX = this.state.get('$el.offsetLeft');
             var centerX = minX + width / 2;
 
-            var minY = this.refs.$el.offset().top;
+            var minY = this.state.get('$el.offsetTop');
             var centerY = minY + height / 2;
 
             return { minX: minX, minY: minY, width: width, height: height, radius: radius, centerX: centerX, centerY: centerY };
@@ -7946,10 +8145,8 @@ var ColorWheel = function (_UIElement) {
             var saturation = Math.min(Math.sqrt(d) / radius, 1);
 
             // set drag pointer position 
-            this.refs.$drag_pointer.css({
-                left: x - minX + 'px',
-                top: y - minY + 'px'
-            });
+            this.refs.$drag_pointer.px('left', x - minX);
+            this.refs.$drag_pointer.px('top', y - minY);
 
             if (!isEvent) {
                 this.changeColor({
@@ -7962,16 +8159,12 @@ var ColorWheel = function (_UIElement) {
     }, {
         key: 'changeColor',
         value: function changeColor(opt) {
-            this.$store.dispatch('/changeColor', Object.assign({
-                source: this.source
-            }, opt || {}));
+            this.dispatch('/changeColor', opt || {});
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (this.source != sourceType) {
-                this.refresh(true);
-            }
+        value: function changeColor() {
+            this.refresh(true);
         }
     }, {
         key: '@initColor',
@@ -7982,59 +8175,32 @@ var ColorWheel = function (_UIElement) {
         // Event Bindings 
 
     }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
             this.isDown = false;
         }
     }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
             if (this.isDown) {
                 this.setHueColor(e);
             }
         }
     }, {
-        key: 'mousedown $drag_pointer',
-        value: function mousedown$drag_pointer(e) {
+        key: 'pointerstart $drag_pointer',
+        value: function pointerstart$drag_pointer(e) {
             e.preventDefault();
             this.isDown = true;
         }
     }, {
-        key: 'mousedown $el',
-        value: function mousedown$el(e) {
-            this.isDown = true;
-            this.setHueColor(e);
-        }
-    }, {
-        key: 'touchend document',
-        value: function touchendDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'touchmove document',
-        value: function touchmoveDocument(e) {
-            if (this.isDown) {
-                this.setHueColor(e);
-            }
-        }
-    }, {
-        key: 'touchstart $drag_pointer',
-        value: function touchstart$drag_pointer(e) {
-            e.preventDefault();
-            this.isDown = true;
-        }
-    }, {
-        key: 'touchstart $el',
-        value: function touchstart$el(e) {
-            e.preventDefault();
+        key: 'pointerstart $el',
+        value: function pointerstart$el(e) {
             this.isDown = true;
             this.setHueColor(e);
         }
     }]);
     return ColorWheel;
 }(UIElement);
-
-var source$2 = 'chromedevtool-information';
 
 var ColorInformation = function (_UIElement) {
     inherits(ColorInformation, _UIElement);
@@ -8088,7 +8254,7 @@ var ColorInformation = function (_UIElement) {
             this.$el.addClass(next_format);
             this.format = next_format;
 
-            this.$store.dispatch('/changeFormat', this.format);
+            this.dispatch('/changeFormat', this.format);
         }
     }, {
         key: 'getFormat',
@@ -8108,33 +8274,31 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'changeRgbColor',
         value: function changeRgbColor() {
-            this.$store.dispatch('/changeColor', {
+            this.dispatch('/changeColor', {
                 type: 'rgb',
                 r: this.refs.$rgb_r.int(),
                 g: this.refs.$rgb_g.int(),
                 b: this.refs.$rgb_b.int(),
                 a: this.refs.$rgb_a.float(),
-                source: source$2
+                source: source
             });
         }
     }, {
         key: 'changeHslColor',
         value: function changeHslColor() {
-            this.$store.dispatch('/changeColor', {
+            this.dispatch('/changeColor', {
                 type: 'hsl',
                 h: this.refs.$hsl_h.int(),
                 s: this.refs.$hsl_s.int(),
                 l: this.refs.$hsl_l.int(),
                 a: this.refs.$hsl_a.float(),
-                source: source$2
+                source: source
             });
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$2 != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -8194,7 +8358,7 @@ var ColorInformation = function (_UIElement) {
             var code = this.refs.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.$store.dispatch('/changeColor', code, source$2);
+                this.dispatch('/changeColor', code, source);
             }
         }
     }, {
@@ -8221,7 +8385,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'setHexInput',
         value: function setHexInput() {
-            this.refs.$hexCode.val(this.$store.dispatch('/toHEX'));
+            this.refs.$hexCode.val(this.dispatch('/toHEX'));
         }
     }, {
         key: 'refresh',
@@ -8272,7 +8436,7 @@ var ColorSetsChooser = function (_UIElement) {
         key: 'load $colorsetsList',
         value: function load$colorsetsList() {
             // colorsets 
-            var colorSets = this.$store.dispatch('/getColorSetsList');
+            var colorSets = this.read('/getColorSetsList');
 
             return '\n            <div>\n                ' + colorSets.map(function (element, index) {
                 return '\n                        <div class="colorsets-item" data-colorsets-index="' + index + '" >\n                            <h1 class="title">' + element.name + '</h1>\n                            <div class="items">\n                                <div>\n                                    ' + element.colors.filter(function (color, i) {
@@ -8312,7 +8476,7 @@ var ColorSetsChooser = function (_UIElement) {
 
                 var index = parseInt($item.attr(DATA_COLORSETS_INDEX));
 
-                this.$store.dispatch('/setCurrentColorSets', index);
+                this.dispatch('/setCurrentColorSets', index);
 
                 this.hide();
             }
@@ -8344,8 +8508,8 @@ var CurrentColorSets = function (_UIElement) {
     }, {
         key: 'load $colorSetsColorList',
         value: function load$colorSetsColorList() {
-            var currentColorSets = this.$store.dispatch('/getCurrentColorSets');
-            var colors = this.$store.dispatch('/getCurrentColors');
+            var currentColorSets = this.read('/getCurrentColorSets');
+            var colors = this.read('/getCurrentColors');
 
             return '\n            <div class="current-color-sets">\n            ' + colors.map(function (color, i) {
                 return '<div class="color-item" title="' + color + '" data-index="' + i + '" data-color="' + color + '">\n                    <div class="empty"></div>\n                    <div class="color-view" style="background-color: ' + color + '"></div>\n                </div>';
@@ -8359,7 +8523,8 @@ var CurrentColorSets = function (_UIElement) {
     }, {
         key: 'addColor',
         value: function addColor(color) {
-            this.$store.dispatch('/addCurrentColor', color);
+            this.dispatch('/addCurrentColor', color);
+            this.refresh();
         }
     }, {
         key: '@changeCurrentColorSets',
@@ -8369,13 +8534,13 @@ var CurrentColorSets = function (_UIElement) {
     }, {
         key: 'click $colorSetsChooseButton',
         value: function click$colorSetsChooseButton(e) {
-            this.$store.emit('toggleColorChooser');
+            this.emit('toggleColorChooser');
         }
     }, {
         key: 'contextmenu $colorSetsColorList',
         value: function contextmenu$colorSetsColorList(e) {
             e.preventDefault();
-            var currentColorSets = this.$store.dispatch('/getCurrentColorSets');
+            var currentColorSets = this.read('/getCurrentColorSets');
 
             if (!currentColorSets.edit) {
                 return;
@@ -8388,20 +8553,20 @@ var CurrentColorSets = function (_UIElement) {
             if ($item) {
                 var index = parseInt($item.attr('data-index'));
 
-                this.$store.emit('showContextMenu', e, index);
+                this.emit('showContextMenu', e, index);
             } else {
-                this.$store.emit('showContextMenu', e);
+                this.emit('showContextMenu', e);
             }
         }
     }, {
         key: 'click $colorSetsColorList .add-color-item',
         value: function click$colorSetsColorListAddColorItem(e) {
-            this.addColor(this.$store.dispatch('/toColor'));
+            this.addColor(this.dispatch('/toColor'));
         }
     }, {
         key: 'click $colorSetsColorList .color-item',
         value: function click$colorSetsColorListColorItem(e) {
-            this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
+            this.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
         }
     }]);
     return CurrentColorSets;
@@ -8425,10 +8590,8 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
         value: function show(e, index) {
             var $event = Event.pos(e);
 
-            this.$el.css({
-                top: $event.clientY - 10 + 'px',
-                left: $event.clientX + 'px'
-            });
+            this.$el.px('top', $event.clientY - 10);
+            this.$el.px('left', $event.clientX);
             this.$el.addClass('show');
             this.selectedColorIndex = index;
 
@@ -8448,13 +8611,13 @@ var CurrentColorSetsContextMenu = function (_UIElement) {
         value: function runCommand(command) {
             switch (command) {
                 case 'remove-color':
-                    this.$store.dispatch('/removeCurrentColor', this.selectedColorIndex);
+                    this.dispatch('/removeCurrentColor', this.selectedColorIndex);
                     break;
                 case 'remove-all-to-the-right':
-                    this.$store.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);
+                    this.dispatch('/removeCurrentColorToTheRight', this.selectedColorIndex);
                     break;
                 case 'clear-palette':
-                    this.$store.dispatch('/clearPalette');
+                    this.dispatch('/clearPalette');
                     break;
             }
         }
@@ -8486,18 +8649,18 @@ var MacOSColorPicker = function (_BaseColorPicker) {
     createClass(MacOSColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="colorwheel"></div>\n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>                \n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <ColorWheel></ColorWheel>\n                <div class="control">\n                    <Value></Value>\n                    <Opacity></Opacity>\n                    <div class="empty"></div>\n                    <ColorView></ColorView>\n                </div>\n                <Information></Information>\n                <CurrentColorSets></CurrentColorSets>\n                <ColorSetsChooser></ColorSetsChooser>\n                <ContextMenu></ContextMenu>                \n            </div> \n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                colorwheel: ColorWheel,
-                control: ColorControl,
-                information: ColorInformation,
-                currentColorSets: CurrentColorSets,
-                colorSetsChooser: ColorSetsChooser,
-                contextMenu: CurrentColorSetsContextMenu
+                Value: Value, Opacity: Opacity, ColorView: ColorView,
+                ColorWheel: ColorWheel,
+                Information: ColorInformation,
+                CurrentColorSets: CurrentColorSets,
+                ColorSetsChooser: ColorSetsChooser,
+                ContextMenu: CurrentColorSetsContextMenu
             };
         }
     }]);
@@ -8507,18 +8670,19 @@ var MacOSColorPicker = function (_BaseColorPicker) {
 var Hue = function (_BaseSlider) {
     inherits(Hue, _BaseSlider);
 
-    function Hue(opt) {
+    function Hue() {
         classCallCheck(this, Hue);
-
-        var _this = possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).call(this, opt));
-
-        _this.minValue = 0;
-        _this.maxValue = 360;
-        _this.source = 'hue-control';
-        return _this;
+        return possibleConstructorReturn(this, (Hue.__proto__ || Object.getPrototypeOf(Hue)).apply(this, arguments));
     }
 
     createClass(Hue, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(Hue.prototype.__proto__ || Object.getPrototypeOf(Hue.prototype), 'initialize', this).call(this);
+            this.minValue = 0;
+            this.maxValue = 360;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
@@ -8544,61 +8708,6 @@ var Hue = function (_BaseSlider) {
     }]);
     return Hue;
 }(BaseSlider);
-
-var source$3 = 'chromedevtool-control';
-
-var ColorControl$2 = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
-    }
-
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Hue: Hue, Opacity: Opacity };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor() {
-            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-            this.setBackgroundColor();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Hue.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$3 != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
-    }]);
-    return ColorControl;
-}(UIElement);
-
-var source$4 = 'chromedevtool-palette';
 
 var ColorPalette = function (_UIElement) {
     inherits(ColorPalette, _UIElement);
@@ -8628,17 +8737,18 @@ var ColorPalette = function (_UIElement) {
         value: function caculateSV() {
             var pos = this.drag_pointer_pos || { x: 0, y: 0 };
 
-            var width = this.state.get('$el.width');
-            var height = this.state.get('$el.height');
+            var width = this.$el.width();
+            var height = this.$el.height();
+
+            // console.log(width, height, this.$el.size());
 
             var s = pos.x / width;
             var v = (height - pos.y) / height;
 
-            this.$store.dispatch('/changeColor', {
+            this.dispatch('/changeColor', {
                 type: 'hsv',
                 s: s,
-                v: v,
-                source: source$4
+                v: v
             });
         }
     }, {
@@ -8647,20 +8757,18 @@ var ColorPalette = function (_UIElement) {
             var x = this.state.get('$el.width') * this.$store.hsv.s,
                 y = this.state.get('$el.height') * (1 - this.$store.hsv.v);
 
-            this.refs.$drag_pointer.css({
-                left: x + "px",
-                top: y + "px"
-            });
+            this.refs.$drag_pointer.px('left', x);
+            this.refs.$drag_pointer.px('top', y);
 
             this.drag_pointer_pos = { x: x, y: y };
 
-            this.setBackgroundColor(this.$store.dispatch('/getHueColor'));
+            this.setBackgroundColor(this.dispatch('/getHueColor'));
         }
     }, {
         key: 'setMainColor',
         value: function setMainColor(e) {
             // e.preventDefault();
-            var pos = this.$el.offset(); // position for screen
+            var pos = this.state.get('$el.offset');
             var w = this.state.get('$el.contentWidth');
             var h = this.state.get('$el.contentHeight');
 
@@ -8671,10 +8779,8 @@ var ColorPalette = function (_UIElement) {
 
             if (y < 0) y = 0;else if (y > h) y = h;
 
-            this.refs.$drag_pointer.css({
-                left: x + 'px',
-                top: y + 'px'
-            });
+            this.refs.$drag_pointer.px('left', x);
+            this.refs.$drag_pointer.px('top', y);
 
             this.drag_pointer_pos = { x: x, y: y };
 
@@ -8682,10 +8788,8 @@ var ColorPalette = function (_UIElement) {
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$4 != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -8693,50 +8797,26 @@ var ColorPalette = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
             this.isDown = false;
         }
     }, {
-        key: 'mousemove document',
-        value: function mousemoveDocument(e) {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
             if (this.isDown) {
                 this.setMainColor(e);
             }
         }
     }, {
-        key: 'mousedown',
-        value: function mousedown(e) {
+        key: 'pointerstart',
+        value: function pointerstart(e) {
             this.isDown = true;
             this.setMainColor(e);
         }
     }, {
-        key: 'mouseup',
-        value: function mouseup(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'touchend document',
-        value: function touchendDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'touchmove document',
-        value: function touchmoveDocument(e) {
-            if (this.isDown) {
-                this.setMainColor(e);
-            }
-        }
-    }, {
-        key: 'touchstart',
-        value: function touchstart(e) {
-            e.preventDefault();
-            this.isDown = true;
-            this.setMainColor(e);
-        }
-    }, {
-        key: 'touchend',
-        value: function touchend(e) {
+        key: 'pointerend',
+        value: function pointerend(e) {
             this.isDown = false;
         }
     }]);
@@ -8754,70 +8834,23 @@ var ChromeDevToolColorPicker = function (_BaseColorPicker) {
     createClass(ChromeDevToolColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div> \n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <Palette></Palette> \n                <div class="control">\n                    <Hue></Hue>\n                    <Opacity></Opacity>\n                    <div class="empty"></div>\n                    <ColorView></ColorView>\n                </div>\n                <Information></Information>\n                <CurrentColorSets></CurrentColorSets>\n                <ColorSetsChooser></ColorSetsChooser>\n                <ContextMenu></ContextMenu>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                palette: ColorPalette,
-                control: ColorControl$2,
-                information: ColorInformation,
-                currentColorSets: CurrentColorSets,
-                colorSetsChooser: ColorSetsChooser,
-                contextMenu: CurrentColorSetsContextMenu
+                Hue: Hue, Opacity: Opacity, ColorView: ColorView,
+                Palette: ColorPalette,
+                Information: ColorInformation,
+                CurrentColorSets: CurrentColorSets,
+                ColorSetsChooser: ColorSetsChooser,
+                ContextMenu: CurrentColorSetsContextMenu
             };
         }
     }]);
     return ChromeDevToolColorPicker;
 }(BaseColorPicker);
-
-var source$5 = 'mini-control';
-
-var ColorControl$4 = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
-    }
-
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Hue: Hue, Opacity: Opacity };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Hue.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$5 != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
-    }]);
-    return ColorControl;
-}(UIElement);
 
 var MiniColorPicker = function (_BaseColorPicker) {
     inherits(MiniColorPicker, _BaseColorPicker);
@@ -8830,14 +8863,13 @@ var MiniColorPicker = function (_BaseColorPicker) {
     createClass(MiniColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div>\n                <div target="control"></div>\n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <Palette></Palette>\n                <div class="control">\n                    <Hue></Hue>\n                    <Opacity></Opacity>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                palette: ColorPalette,
-                control: ColorControl$4
+                Hue: Hue, Opacity: Opacity, Palette: ColorPalette
             };
         }
     }]);
@@ -8847,22 +8879,18 @@ var MiniColorPicker = function (_BaseColorPicker) {
 var VerticalSlider = function (_BaseSlider) {
     inherits(VerticalSlider, _BaseSlider);
 
-    function VerticalSlider(opt) {
+    function VerticalSlider() {
         classCallCheck(this, VerticalSlider);
-
-        var _this = possibleConstructorReturn(this, (VerticalSlider.__proto__ || Object.getPrototypeOf(VerticalSlider)).call(this, opt));
-
-        _this.source = 'vertical-slider';
-        return _this;
+        return possibleConstructorReturn(this, (VerticalSlider.__proto__ || Object.getPrototypeOf(VerticalSlider)).apply(this, arguments));
     }
-
-    /** get max height for vertical slider */
-
 
     createClass(VerticalSlider, [{
         key: 'getMaxDist',
+
+
+        /** get max height for vertical slider */
         value: function getMaxDist() {
-            return this.state.get('$container.height');
+            return this.refs.$container.height();
         }
 
         /** set mouse pointer for vertical slider */
@@ -8870,7 +8898,7 @@ var VerticalSlider = function (_BaseSlider) {
     }, {
         key: 'setMousePosition',
         value: function setMousePosition(y) {
-            this.refs.$bar.css({ top: y + 'px' });
+            this.refs.$bar.px('top', y);
         }
 
         /** get mouse position by pageY for vertical slider */
@@ -8927,18 +8955,19 @@ var VerticalSlider = function (_BaseSlider) {
 var VerticalHue = function (_VerticalSlider) {
     inherits(VerticalHue, _VerticalSlider);
 
-    function VerticalHue(opt) {
+    function VerticalHue() {
         classCallCheck(this, VerticalHue);
-
-        var _this = possibleConstructorReturn(this, (VerticalHue.__proto__ || Object.getPrototypeOf(VerticalHue)).call(this, opt));
-
-        _this.minValue = 0;
-        _this.maxValue = 360;
-        _this.source = 'vertical-hue-control';
-        return _this;
+        return possibleConstructorReturn(this, (VerticalHue.__proto__ || Object.getPrototypeOf(VerticalHue)).apply(this, arguments));
     }
 
     createClass(VerticalHue, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(VerticalHue.prototype.__proto__ || Object.getPrototypeOf(VerticalHue.prototype), 'initialize', this).call(this);
+            this.minValue = 0;
+            this.maxValue = 360;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n            <div class="hue">\n                <div ref="$container" class="hue-container">\n                    <div ref="$bar" class="drag-bar"></div>\n                </div>\n            </div>\n        ';
@@ -8965,19 +8994,15 @@ var VerticalHue = function (_VerticalSlider) {
     return VerticalHue;
 }(VerticalSlider);
 
-var Opacity$2 = function (_VerticalSlider) {
-    inherits(Opacity, _VerticalSlider);
+var VerticalOpacity = function (_VerticalSlider) {
+    inherits(VerticalOpacity, _VerticalSlider);
 
-    function Opacity(opt) {
-        classCallCheck(this, Opacity);
-
-        var _this = possibleConstructorReturn(this, (Opacity.__proto__ || Object.getPrototypeOf(Opacity)).call(this, opt));
-
-        _this.source = 'vertical-opacity-control';
-        return _this;
+    function VerticalOpacity() {
+        classCallCheck(this, VerticalOpacity);
+        return possibleConstructorReturn(this, (VerticalOpacity.__proto__ || Object.getPrototypeOf(VerticalOpacity)).apply(this, arguments));
     }
 
-    createClass(Opacity, [{
+    createClass(VerticalOpacity, [{
         key: 'template',
         value: function template() {
             return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
@@ -8985,7 +9010,7 @@ var Opacity$2 = function (_VerticalSlider) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            get(Opacity.prototype.__proto__ || Object.getPrototypeOf(Opacity.prototype), 'refresh', this).call(this);
+            get(VerticalOpacity.prototype.__proto__ || Object.getPrototypeOf(VerticalOpacity.prototype), 'refresh', this).call(this);
             this.setOpacityColorBar();
         }
     }, {
@@ -9018,55 +9043,8 @@ var Opacity$2 = function (_VerticalSlider) {
             });
         }
     }]);
-    return Opacity;
+    return VerticalOpacity;
 }(VerticalSlider);
-
-var source$6 = 'mini-control';
-
-var ColorControl$6 = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
-    }
-
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Hue: VerticalHue, Opacity: Opacity$2 };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '<div class="control"><div target="Hue" ></div><div target="Opacity" ></div></div>';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Hue.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$6 != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
-    }]);
-    return ColorControl;
-}(UIElement);
 
 var MiniColorPicker$2 = function (_BaseColorPicker) {
     inherits(MiniColorPicker, _BaseColorPicker);
@@ -9079,90 +9057,40 @@ var MiniColorPicker$2 = function (_BaseColorPicker) {
     createClass(MiniColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div><div target="control"></div>\n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <Palette></Palette><div class="control"><Hue></Hue><Opacity></Opacity></div>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                palette: ColorPalette,
-                control: ColorControl$6
+                Hue: VerticalHue,
+                Opacity: VerticalOpacity,
+                Palette: ColorPalette
             };
         }
     }]);
     return MiniColorPicker;
 }(BaseColorPicker);
 
-var source$7 = 'macos-control';
-
-var ColorControl$8 = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
-    }
-
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Value: Value, Opacity: Opacity };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'setBackgroundColor',
-        value: function setBackgroundColor() {
-            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-            this.setBackgroundColor();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Value.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$7 != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
-    }]);
-    return ColorControl;
-}(UIElement);
-
 var ColorRing = function (_ColorWheel) {
     inherits(ColorRing, _ColorWheel);
 
-    function ColorRing(opt) {
+    function ColorRing() {
         classCallCheck(this, ColorRing);
-
-        var _this = possibleConstructorReturn(this, (ColorRing.__proto__ || Object.getPrototypeOf(ColorRing)).call(this, opt));
-
-        _this.width = 214;
-        _this.height = 214;
-        _this.thinkness = 16;
-        _this.half_thinkness = _this.thinkness / 2;
-        _this.source = 'colorring';
-        return _this;
+        return possibleConstructorReturn(this, (ColorRing.__proto__ || Object.getPrototypeOf(ColorRing)).apply(this, arguments));
     }
 
     createClass(ColorRing, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(ColorRing.prototype.__proto__ || Object.getPrototypeOf(ColorRing.prototype), 'initialize', this).call(this);
+
+            this.width = 214;
+            this.height = 214;
+            this.thinkness = 16;
+            this.half_thinkness = this.thinkness / 2;
+        }
+    }, {
         key: 'template',
         value: function template() {
             return '\n        <div class="wheel" data-type="ring">\n            <canvas class="wheel-canvas" ref="$colorwheel" ></canvas>\n            <div class="drag-pointer" ref="$drag_pointer"></div>\n        </div>\n        ';
@@ -9206,10 +9134,8 @@ var ColorRing = function (_ColorWheel) {
             }
 
             // set drag pointer position 
-            this.refs.$drag_pointer.css({
-                left: x - minX + 'px',
-                top: y - minY + 'px'
-            });
+            this.refs.$drag_pointer.px('left', x - minX);
+            this.refs.$drag_pointer.px('top', y - minY);
 
             if (!isEvent) {
                 this.changeColor({
@@ -9222,7 +9148,6 @@ var ColorRing = function (_ColorWheel) {
     return ColorRing;
 }(ColorWheel);
 
-// import ColorWheel from '../ui/ColorWheel'
 var RingColorPicker = function (_BaseColorPicker) {
     inherits(RingColorPicker, _BaseColorPicker);
 
@@ -9234,71 +9159,26 @@ var RingColorPicker = function (_BaseColorPicker) {
     createClass(RingColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="colorring"></div>\n                <div target="palette"></div> \n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <ColorRing></ColorRing>\n                <Palette></Palette> \n                <div class="control">\n                    <Value></Value>\n                    <Opacity></Opacity>\n                    <div class="empty"></div>\n                    <ColorView></ColorView>\n                </div>\n                <Information></Information>\n                <CurrentColorSets></CurrentColorSets>\n                <ColorSetsChooser></ColorSetsChooser>\n                <ContextMenu></ContextMenu>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                colorring: ColorRing,
-                palette: ColorPalette,
-                control: ColorControl$8,
-                information: ColorInformation,
-                currentColorSets: CurrentColorSets,
-                colorSetsChooser: ColorSetsChooser,
-                contextMenu: CurrentColorSetsContextMenu
+                Value: Value,
+                Opacity: Opacity,
+                ColorView: ColorView,
+                ColorRing: ColorRing,
+                Palette: ColorPalette,
+                Information: ColorInformation,
+                CurrentColorSets: CurrentColorSets,
+                ColorSetsChooser: ColorSetsChooser,
+                ContextMenu: CurrentColorSetsContextMenu
             };
         }
     }]);
     return RingColorPicker;
 }(BaseColorPicker);
-
-var source$8 = 'xd-control';
-
-var ColorControl$10 = function (_UIElement) {
-    inherits(ColorControl, _UIElement);
-
-    function ColorControl() {
-        classCallCheck(this, ColorControl);
-        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
-    }
-
-    createClass(ColorControl, [{
-        key: 'components',
-        value: function components() {
-            return { Hue: VerticalHue, Opacity: Opacity$2 };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.setColorUI();
-        }
-    }, {
-        key: 'setColorUI',
-        value: function setColorUI() {
-            this.Hue.setColorUI();
-            this.Opacity.setColorUI();
-        }
-    }, {
-        key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$8 != sourceType) {
-                this.refresh();
-            }
-        }
-    }, {
-        key: '@initColor',
-        value: function initColor() {
-            this.refresh();
-        }
-    }]);
-    return ColorControl;
-}(UIElement);
 
 var XDColorPicker = function (_BaseColorPicker) {
     inherits(XDColorPicker, _BaseColorPicker);
@@ -9311,18 +9191,19 @@ var XDColorPicker = function (_BaseColorPicker) {
     createClass(XDColorPicker, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div> \n                <div target="control"></div>\n                <div target="information"></div>\n                <div target="currentColorSets"></div>\n                <div target="colorSetsChooser"></div>\n                <div target="contextMenu"></div>\n            </div>\n        ';
+            return '\n            <div class=\'colorpicker-body\'>\n                <palette></palette> \n                <div class="control">\n                    <Hue></Hue>\n                    <Opacity></Opacity>\n                </div>\n                <information></information>\n                <currentColorSets></currentColorSets>\n                <colorSetsChooser></colorSetsChooser>\n                <contextMenu></contextMenu>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-                palette: ColorPalette,
-                control: ColorControl$10,
-                information: ColorInformation,
-                currentColorSets: CurrentColorSets,
-                colorSetsChooser: ColorSetsChooser,
-                contextMenu: CurrentColorSetsContextMenu
+                Hue: VerticalHue,
+                Opacity: VerticalOpacity,
+                Palette: ColorPalette,
+                Information: ColorInformation,
+                CurrentColorSets: CurrentColorSets,
+                ColorSetsChooser: ColorSetsChooser,
+                ContextMenu: CurrentColorSetsContextMenu
             };
         }
     }]);
@@ -9354,7 +9235,2762 @@ var ColorPicker = {
     MacOSColorPicker: MacOSColorPicker,
     RingColorPicker: RingColorPicker,
     MiniColorPicker: MiniColorPicker,
-    MiniVerticalColorPicker: MiniColorPicker$2
+    MiniVerticalColorPicker: MiniColorPicker$2,
+    XDColorPicker: XDColorPicker
+};
+
+var defaultObject = {
+    color: 'rgba(0, 0, 0, 0)',
+    percent: 0,
+    selected: false
+};
+
+var isUndefined$1 = function isUndefined(value) {
+    return typeof value == 'undefined' || value == null;
+};
+
+var INIT_COLOR_SOURCE = 'colorstep';
+
+var ColorStepManager = function (_BaseModule) {
+    inherits(ColorStepManager, _BaseModule);
+
+    function ColorStepManager() {
+        classCallCheck(this, ColorStepManager);
+        return possibleConstructorReturn(this, (ColorStepManager.__proto__ || Object.getPrototypeOf(ColorStepManager)).apply(this, arguments));
+    }
+
+    createClass(ColorStepManager, [{
+        key: '/colorstep/create',
+        value: function colorstepCreate($store, obj) {
+            if (obj) {
+                obj = $store.read('/clone', obj);
+            } else {
+                obj = $store.read('/clone', defaultObject);
+            }
+
+            return obj;
+        }
+    }, {
+        key: '/colorstep/initColor',
+        value: function colorstepInitColor($store, color) {
+            $store.dispatch('/tool/setColorSource', INIT_COLOR_SOURCE);
+            $store.dispatch('/tool/changeColor', color);
+        }
+    }, {
+        key: '/colorstep/colorSource',
+        value: function colorstepColorSource($store) {
+            return INIT_COLOR_SOURCE;
+        }
+    }, {
+        key: '/colorstep/current',
+        value: function colorstepCurrent($store, index) {
+            if (!isUndefined$1(index)) {
+                return $store.read('/colorstep/list')[index] || $store.read('/colorstep/create');
+            } else {
+                return $store.read('/colorstep/list').filter(function (item) {
+                    return !!item.selected;
+                })[0];
+            }
+        }
+    }, {
+        key: '/colorstep/currentIndex',
+        value: function colorstepCurrentIndex($store, index) {
+            if (isUndefined$1(index)) {
+                return $store.read('/colorstep/list').map(function (step, index) {
+                    return { step: step, index: index };
+                }).filter(function (item) {
+                    return !!item.step.selected;
+                })[0].index;
+            } else {
+                return index;
+            }
+        }
+
+        // 이미지 얻어오기 
+
+    }, {
+        key: '/colorstep/get',
+        value: function colorstepGet($store, colorStepOrKey, key) {
+
+            var current = $store.read('/colorstep/current');
+            if (arguments.length == 1) {
+                return current;
+            } else if (arguments.length == 2) {
+                if (!isUndefined$1(current[colorStepOrKey])) {
+                    return current[colorStepOrKey];
+                }
+            } else if (arguments.length == 3) {
+                if (colorStepOrKey && !isUndefined$1(colorStepOrKey[key])) {
+                    return colorStepOrKey[key];
+                } else if (!isUndefined$1(current[key])) {
+                    return current[key];
+                }
+            }
+        }
+
+        // 이미지 리스트 얻어오기 
+
+    }, {
+        key: '/colorstep/list',
+        value: function colorstepList($store, imageIndex) {
+            var image = $store.read('/image/current', imageIndex);
+
+            if (image) {
+                return image.colorsteps || [];
+            }
+
+            return [];
+        }
+
+        // 이미지 변경하기 
+
+    }, {
+        key: '/colorstep/change',
+        value: function colorstepChange($store, newColorStep, index) {
+            // 현재 image 설정 
+            // 현재 layer 설정 
+            $store.dispatch('/colorstep/set', newColorStep, index);
+
+            $store.emit('changeLayer');
+        }
+
+        // 이미지 설정하기 , 이벤트 까지 
+
+    }, {
+        key: '/colorstep/set',
+        value: function colorstepSet($store, newColorStep, index) {
+            var current = $store.read('/colorstep/current', index);
+            Object.assign(current, newColorStep);
+        }
+    }, {
+        key: '/colorstep/select',
+        value: function colorstepSelect($store, selectedIndex) {
+            var colorsteps = $store.read('/colorstep/list');
+
+            colorsteps.forEach(function (step, index) {
+                step.selected = selectedIndex === index;
+            });
+
+            $store.dispatch('/colorstep/setAll', colorsteps);
+        }
+    }, {
+        key: '/colorstep/setStep',
+        value: function colorstepSetStep($store, color, percent, index) {
+            var current = $store.read('/colorstep/current', index);
+
+            if (typeof color != 'undefined') {
+                current.color = color;
+            }
+
+            if (typeof percent != 'undefined') {
+                current.percent = percent;
+            }
+
+            var colorsteps = $store.read('/colorstep/list');
+
+            $store.dispatch('/colorstep/setStepAll', colorsteps);
+        }
+    }, {
+        key: '/colorstep/setAll',
+        value: function colorstepSetAll($store) {
+            var colorsteps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+            $store.dispatch('/image/change', { colorsteps: colorsteps });
+        }
+    }, {
+        key: '/colorstep/add',
+        value: function colorstepAdd($store, percent) {
+            var steps = [].concat(toConsumableArray($store.read('/colorstep/list')));
+
+            if (!steps.length) {
+                var color = 'rgba(0, 0, 0, 1)';
+                $store.dispatch('/colorstep/setAll', [{ color: 'rgba(0, 0, 0, 1)', percent: percent }, { color: 'rgba(0, 0, 0, 0)', percent: 100 }]);
+                return;
+            }
+
+            if (percent < steps[0].percent) {
+                var color = steps[0].color;
+                $store.dispatch('/colorstep/setAll', [{ color: color, percent: percent }].concat(toConsumableArray(steps)));
+                return;
+            }
+
+            if (steps[steps.length - 1].percent < percent) {
+                var color = steps[steps.length - 1].color;
+                $store.dispatch('/colorstep/setAll', [].concat(toConsumableArray(steps), [{ color: color, percent: percent }]));
+                return;
+            }
+
+            for (var i = 0, len = steps.length - 1; i < len; i++) {
+                var step = steps[i];
+                var nextStep = steps[i + 1];
+
+                if (step.percent <= percent && percent <= nextStep.percent) {
+                    var color = Color$1.mix(step.color, nextStep.color, (percent - step.percent) / (nextStep.percent - step.percent), 'rgb');
+
+                    steps.splice(i + 1, 0, { color: color, percent: percent });
+
+                    $store.dispatch('/colorstep/setAll', steps);
+                    break;
+                }
+            }
+        }
+    }, {
+        key: '/colorstep/remove',
+        value: function colorstepRemove($store, index) {
+            var colorsteps = $store.read('/colorstep/list');
+            index = $store.read('/colorstep/currentIndex', index);
+
+            if (colorsteps[index]) {
+                colorsteps.splice(index, 1);
+
+                if (colorsteps.length - 1 > index) {
+                    colorsteps[index].selected = true;
+                }
+
+                $store.emit('initLayer');
+            }
+        }
+    }]);
+    return ColorStepManager;
+}(BaseModule);
+
+var DEFINED_ANGLES = {
+    'to top': 0,
+    'to top right': 45,
+    'to right': 90,
+    'to bottom right': 135,
+    'to bottom': 180,
+    'to bottom left': 225,
+    'to left': 270,
+    'to top left': 315
+
+};
+
+var DEFINED_DIRECTIONS = {
+    '0': 'to top',
+    '45': 'to top right',
+    '90': 'to right',
+    '135': 'to bottom right',
+    '180': 'to bottom',
+    '225': 'to bottom left',
+    '270': 'to left',
+    '315': 'to top left'
+};
+
+var DEFINED_POSITIONS = {
+    'center': true,
+    'top': true,
+    'left': true,
+    'right': true,
+    'bottom': true
+};
+
+var defaultObject$1 = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [],
+    radialType: 'circle',
+    radialPosition: 'center',
+    visible: true,
+    backgroundRepeat: null,
+    backgroundSize: null,
+    backgroundOrigin: null,
+    backgroundPosition: null,
+    backgroundColor: null,
+    backgroundAttachment: null,
+    backgroundClip: null
+};
+
+var isUndefined$2 = function isUndefined(value) {
+    return typeof value == 'undefined' || value == null;
+};
+
+var ImageManager = function (_BaseModule) {
+    inherits(ImageManager, _BaseModule);
+
+    function ImageManager() {
+        classCallCheck(this, ImageManager);
+        return possibleConstructorReturn(this, (ImageManager.__proto__ || Object.getPrototypeOf(ImageManager)).apply(this, arguments));
+    }
+
+    createClass(ImageManager, [{
+        key: 'id',
+        value: function id() {
+            return 'image';
+        }
+    }, {
+        key: '/image/create',
+        value: function imageCreate($store, obj) {
+            if (obj) {
+                obj = $store.read('/clone', obj);
+            } else {
+                obj = $store.read('/clone', defaultObject$1);
+            }
+
+            return obj;
+        }
+    }, {
+        key: '/image/current',
+        value: function imageCurrent($store, index) {
+            if (!isUndefined$2(index)) {
+                return $store.read('/image/list')[index] || $store.read('/image/create');
+            } else {
+                return $store.read('/image/list').filter(function (item) {
+                    return !!item.selected;
+                })[0];
+            }
+        }
+    }, {
+        key: '/image/currentIndex',
+        value: function imageCurrentIndex($store, index) {
+            if (isUndefined$2(index)) {
+                return $store.read('/image/list').map(function (image, index) {
+                    return { image: image, index: index };
+                }).filter(function (item) {
+                    return !!item.image.selected;
+                })[0].index;
+            } else {
+                return index;
+            }
+        }
+
+        // 이미지 얻어오기 
+
+    }, {
+        key: '/image/get',
+        value: function imageGet($store, imageOrKey, key) {
+
+            if (arguments.length == 1) {
+                return $store.read('/image/current');
+            } else if (arguments.length == 2) {
+                var current = $store.read('/image/current');
+                if (current && !isUndefined$2(current[imageOrKey])) {
+                    return current[imageOrKey];
+                }
+            } else if (arguments.length == 3) {
+                var current = $store.read('/image/current');
+                if (imageOrKey && !isUndefined$2(imageOrKey[key])) {
+                    return imageOrKey[key];
+                } else if (current && !isUndefined$2(current[key])) {
+                    return current[key];
+                }
+            }
+        }
+
+        // 이미지 리스트 얻어오기 
+
+    }, {
+        key: '/image/list',
+        value: function imageList($store) {
+            return $store.read('/layer/get', 'images') || [];
+        }
+
+        // 이미지 변경하기 
+
+    }, {
+        key: '/image/change',
+        value: function imageChange($store, newImage, index) {
+            // 현재 image 설정 
+            // 현재 layer 설정 
+            $store.dispatch('/image/set', newImage, index);
+        }
+
+        // 이미지 설정하기 , 이벤트 까지 
+
+    }, {
+        key: '/image/set',
+        value: function imageSet($store, newImage, index) {
+
+            var current = $store.read('/image/current', index);
+            current = Object.assign({}, current, newImage);
+
+            var currentIndex = $store.read('/image/currentIndex', index);
+
+            $store.dispatch('/layer/set/image', current, currentIndex);
+        }
+    }, {
+        key: '/image/setAngle',
+        value: function imageSetAngle($store) {
+            var angle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+            angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : +angle % 360;
+
+            $store.dispatch('/image/change', { angle: angle });
+        }
+    }, {
+        key: '/image/setRadialPosition',
+        value: function imageSetRadialPosition($store) {
+            var radialPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+            $store.dispatch('/image/change', { radialPosition: radialPosition });
+        }
+    }, {
+        key: '/image/setRadialType',
+        value: function imageSetRadialType($store) {
+            var radialType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+            $store.dispatch('/image/change', { radialType: radialType });
+        }
+    }, {
+        key: '/image/select',
+        value: function imageSelect($store, selectedIndex) {
+            var images = $store.read('/image/list');
+
+            images.forEach(function (image, index) {
+                image.selected = index === selectedIndex;
+            });
+
+            $store.dispatch('/layer/change', { images: images });
+        }
+    }, {
+        key: '/image/add',
+        value: function imageAdd($store) {
+            var newImage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+
+            var images = $store.read('/clone', $store.read('/layer/get', 'images') || []);
+
+            images.forEach(function (img) {
+                img.selected = false;
+            });
+
+            if (newImage) {
+                images.push(newImage);
+            } else {
+                var current = $store.read('/image/current') || $store.read('/image/create');
+                images.push($store.read('/clone', current));
+            }
+
+            images[images.length - 1].selected = true;
+
+            $store.dispatch('/layer/change', { images: images });
+        }
+    }, {
+        key: '/image/remove',
+        value: function imageRemove($store, index) {
+            var images = $store.read('/layer/get', 'images');
+            index = $store.read('/image/currentIndex', index);
+
+            if (images[index]) {
+                images.splice(index, 1);
+
+                if (images.length - 1 > index) {
+                    images[index].selected = true;
+                }
+
+                $store.emit('initLayer');
+            }
+        }
+    }, {
+        key: '/image/right',
+        value: function imageRight($store, index) {
+            var images = $store.read('/image/list');
+            var currentIndex = $store.read('/image/currentIndex', index);
+            var nextIndex = (currentIndex + 1) % images.length;
+
+            $store.dispatch('/image/swap', currentIndex, nextIndex);
+        }
+    }, {
+        key: '/image/last',
+        value: function imageLast($store, index) {
+            var images = $store.read('/image/list');
+            var currentIndex = $store.read('/image/currentIndex', index);
+            var nextIndex = images.length - 1;
+
+            $store.dispatch('/image/swap', currentIndex, nextIndex);
+        }
+    }, {
+        key: '/image/left',
+        value: function imageLeft($store, index) {
+            var images = $store.read('/image/list');
+            var currentIndex = $store.read('/image/currentIndex', index);
+            var prevIndex = currentIndex - 1;
+
+            if (prevIndex < -1) {
+                prevIndex = images.length - 1;
+            }
+
+            $store.dispatch('/image/swap', currentIndex, prevIndex);
+        }
+    }, {
+        key: '/image/first',
+        value: function imageFirst($store, index) {
+            var currentIndex = $store.read('/image/currentIndex', index);
+            var prevIndex = 0;
+
+            $store.dispatch('/image/swap', currentIndex, prevIndex);
+        }
+    }, {
+        key: '/image/swap',
+        value: function imageSwap($store, startIndex, endIndex) {
+            var images = $store.read('/image/list');
+
+            if (images[endIndex]) {
+                var current = images[startIndex];
+                images[startIndex] = images[endIndex];
+                images[endIndex] = current;
+
+                $store.dispatch('/layer/change', { images: images });
+            }
+        }
+    }, {
+        key: '/image/isLinearType',
+        value: function imageIsLinearType($store) {
+            return ['linear', 'repeating-linear'].includes($store.read('/image/get', 'type'));
+        }
+    }, {
+        key: '/image/isRadialType',
+        value: function imageIsRadialType($store) {
+            return ['radial', 'repeating-radial'].includes($store.read('/image/get', 'type'));
+        }
+    }, {
+        key: '/image/isImageType',
+        value: function imageIsImageType($store) {
+            return ['image'].includes($store.read('/image/get', 'type'));
+        }
+    }, {
+        key: '/image/angle',
+        value: function imageAngle($store) {
+            var angle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+            return DEFINED_ANGLES[angle] || angle || $store.read('/image/get', 'angle');
+        }
+    }, {
+        key: '/image/radialPosition',
+        value: function imageRadialPosition($store) {
+            var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+            return position || $store.read('/image/get', 'radialPosition');
+        }
+    }, {
+        key: '/image/toCSS',
+        value: function imageToCSS($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            image = image || $store.read('/image/get');
+
+            var results = {};
+            var backgroundImage = $store.read('/image/toImageString', image);
+
+            if (backgroundImage) {
+                results['background-image'] = backgroundImage; // size, position, origin, attachment and etc 
+            }
+
+            return results;
+        }
+    }, {
+        key: '/image/toString',
+        value: function imageToString($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            image = image || $store.read('/image/get');
+            var obj = $store.read('/image/toCSS', image);
+
+            return Object.keys(obj).map(function (key) {
+                return key + ': ' + obj[key] + ';';
+            }).join(' ');
+        }
+    }, {
+        key: '/image/toImageString',
+        value: function imageToImageString($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            var type = $store.read('/image/get', image, 'type');
+
+            if (type == 'linear' || type == 'repeating-linear') {
+                return $store.read('/image/toLinear', image);
+            } else if (type == 'radial' || type == 'repeating-radial') {
+                return $store.read('/image/toRadial', image);
+            } else if (type == 'image') {
+                return $store.read('/image/toImage', image);
+            }
+        }
+    }, {
+        key: '/image/toItemString',
+        value: function imageToItemString($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
+
+            if (!image) return '';
+
+            var colorsteps = $store.read('/image/get', image, 'colorsteps');
+
+            if (!colorsteps) return '';
+
+            var colors = [].concat(toConsumableArray(colorsteps));
+
+            if (!colors.length) return '';
+
+            colors.sort(function (a, b) {
+                if (a.percent == b.percent) return 0;
+                return a.percent > b.percent ? 1 : -1;
+            });
+
+            colors = colors.map(function (f) {
+                return f.color + ' ' + f.percent + '%';
+            }).join(',');
+
+            return colors;
+        }
+    }, {
+        key: '/image/toLinear',
+        value: function imageToLinear($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var colors = $store.read('/image/toItemString', image);
+
+            if (colors == '') return '';
+
+            var opt = '';
+            var angle = $store.read('/image/get', image, 'angle');
+            var gradientType = $store.read('/image/get', image, 'type');
+
+            opt = angle;
+
+            if (typeof opt === 'number') {
+                opt = DEFINED_DIRECTIONS['' + opt] || opt;
+            }
+
+            if (typeof opt === 'number') {
+                opt = opt > 360 ? opt % 360 : opt;
+
+                opt = opt + 'deg';
+            }
+
+            return gradientType + '-gradient(' + opt + ', ' + colors + ')';
+        }
+    }, {
+        key: '/image/toLinearRight',
+        value: function imageToLinearRight($store) {
+            return $store.read('/image/toLinear', { type: 'linear', angle: 'to right' });
+        }
+    }, {
+        key: '/image/toRadial',
+        value: function imageToRadial($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var colors = $store.read('/image/toItemString', image);
+
+            if (colors == '') return '';
+            var opt = '';
+            var radialType = $store.read('/image/get', image, 'radialType');
+            var radialPosition = $store.read('/image/get', image, 'radialPosition');
+            var gradientType = $store.read('/image/get', image, 'type');
+
+            radialPosition = DEFINED_POSITIONS[radialPosition] ? radialPosition : radialPosition.join(' ');
+
+            opt = radialPosition ? radialType + ' at ' + radialPosition : radialType;
+
+            return gradientType + '-gradient(' + opt + ', ' + colors + ')';
+        }
+    }, {
+        key: '/image/toImage',
+        value: function imageToImage($store) {
+            var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            var url = $store.read('/image/get', image, 'url') || '';
+
+            if (url) {
+                return 'url(' + url + ')';
+            }
+
+            return null;
+        }
+    }]);
+    return ImageManager;
+}(BaseModule);
+
+var defaultObject$2 = {
+    name: '',
+    backgroundColor: '',
+    backgroundBlendMode: '',
+    mixBlendMode: '',
+    selected: true,
+    visible: true,
+    images: [],
+    filters: []
+};
+
+var isUndefined$3 = function isUndefined(value) {
+    return typeof value == 'undefined' || value == null;
+};
+
+var LayerManager = function (_BaseModule) {
+    inherits(LayerManager, _BaseModule);
+
+    function LayerManager() {
+        classCallCheck(this, LayerManager);
+        return possibleConstructorReturn(this, (LayerManager.__proto__ || Object.getPrototypeOf(LayerManager)).apply(this, arguments));
+    }
+
+    createClass(LayerManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(LayerManager.prototype.__proto__ || Object.getPrototypeOf(LayerManager.prototype), 'initialize', this).call(this);
+
+            this.$store.layers = [];
+        }
+
+        // 이미지 리스트 얻어오기 
+
+    }, {
+        key: '/layer/list',
+        value: function layerList($store) {
+            return $store.layers || [];
+        }
+    }, {
+        key: '/layer/create',
+        value: function layerCreate($store, obj) {
+            if (obj) {
+                obj = $store.read('/clone', obj);
+            } else {
+                obj = $store.read('/clone', defaultObject$2);
+            }
+
+            return obj;
+        }
+    }, {
+        key: '/layer/current',
+        value: function layerCurrent($store, index) {
+            if (!isUndefined$3(index)) {
+                return $store.read('/layer/list')[index] || $store.read('/layer/create');
+            } else {
+
+                var selectedList = $store.read('/layer/list').filter(function (item) {
+                    return !!item.selected;
+                });
+
+                if (selectedList.length) {
+                    return selectedList[0];
+                } else {
+                    if ($store.layers[0]) {
+                        $store.layers[0].selected = true;
+                    }
+
+                    return $store.layers[0] || $store.read('/layer/create');
+                }
+            }
+        }
+    }, {
+        key: '/layer/currentIndex',
+        value: function layerCurrentIndex($store, index) {
+            if (isUndefined$3(index)) {
+                var selectedList = $store.read('/layer/list').map(function (layer, i) {
+                    return { layer: layer, index: i };
+                }).filter(function (item) {
+                    return !!item.layer.selected;
+                });
+
+                return selectedList.length ? selectedList[0].index : 0;
+            } else {
+                return index;
+            }
+        }
+
+        // 레이어 얻어오기 
+
+    }, {
+        key: '/layer/get',
+        value: function layerGet($store, layerOrKey, key) {
+
+            var current = $store.read('/layer/current');
+            if (arguments.length == 1) {
+                return current;
+            } else if (arguments.length == 2) {
+                if (!isUndefined$3(current[layerOrKey])) {
+                    return current[layerOrKey];
+                }
+            } else if (arguments.length == 3) {
+                if (layerOrKey && !isUndefined$3(layerOrKey[key])) {
+                    return layerOrKey[key];
+                } else if (!isUndefined$3(current[key])) {
+                    return current[key];
+                }
+            }
+        }
+
+        // 이미지 변경하기 
+
+    }, {
+        key: '/layer/change',
+        value: function layerChange($store, newLayer, index) {
+            // 현재 image 설정 
+            // 현재 layer 설정 
+            $store.dispatch('/layer/set', newLayer, index);
+
+            $store.emit('changeLayer');
+        }
+    }, {
+        key: '/layer/toggle/visible',
+        value: function layerToggleVisible($store, index) {
+            var visible = $store.read('/layer/current', index).visible;
+
+            $store.dispatch('/layer/change', { visible: !visible }, index);
+        }
+
+        // 이미지 설정하기 , 이벤트 까지 
+
+    }, {
+        key: '/layer/set',
+        value: function layerSet($store, newLayer, index) {
+            var current = $store.read('/layer/current', index);
+            current = Object.assign({}, current, newLayer);
+
+            var currentIndex = $store.read('/layer/currentIndex', index);
+            $store.layers[currentIndex] = current;
+        }
+    }, {
+        key: '/layer/remove',
+        value: function layerRemove($store, index) {
+            var layers = $store.layers;
+            index = $store.read('/layer/currentIndex', index);
+
+            if (layers[index]) {
+                layers.splice(index, 1);
+
+                $store.dispatch('/layer/select', index);
+            }
+        }
+    }, {
+        key: '/layer/set/image',
+        value: function layerSetImage($store, image, imageIndex) {
+            var current = $store.read('/layer/current');
+
+            current.images[imageIndex] = $store.read('/clone', image);
+
+            $store.dispatch('/layer/change', current);
+        }
+    }, {
+        key: '/layer/select',
+        value: function layerSelect($store, selectedIndex) {
+            var list = $store.read('/layer/list');
+
+            list.forEach(function (layer, index) {
+                layer.selected = index === selectedIndex;
+            });
+
+            $store.emit('changeLayer');
+        }
+    }, {
+        key: '/layer/add',
+        value: function layerAdd($store) {
+            var newLayer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            $store.layers.push($store.read('/layer/create', newLayer || $store.read('/layer/current')));
+
+            $store.dispatch('/layer/select', $store.layers.length - 1);
+        }
+    }, {
+        key: '/layer/toString',
+        value: function layerToString($store, layer) {
+
+            layer = layer || $store.read('/layer/current');
+
+            var obj = $store.read('/layer/toCSS', layer) || {};
+
+            return Object.keys(obj).map(function (key) {
+                return key + ': ' + obj[key] + ';';
+            }).join(' ');
+        }
+    }, {
+        key: '/layer/toImageCSS',
+        value: function layerToImageCSS($store, layer) {
+            layer = layer || $store.read('/layer/get');
+
+            var results = {};
+            layer.images.forEach(function (image) {
+                var css = $store.read('/image/toCSS', image);
+
+                Object.keys(css).forEach(function (key) {
+                    if (!results[key]) {
+                        results[key] = [];
+                    }
+
+                    results[key].push(css[key]);
+                });
+            });
+
+            Object.keys(results).forEach(function (key) {
+                if (Array.isArray(results[key])) {
+                    results[key] = results[key].join(', ');
+                }
+            });
+
+            return results;
+        }
+    }, {
+        key: '/layer/toCSS',
+        value: function layerToCSS($store) {
+            var layer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            layer = layer || $store.read('/layer/get');
+
+            var css = {};
+
+            if (layer.backgroundColor) {
+                css['background-color'] = layer.backgroundColor;
+            }
+
+            if (layer.backgroundBlendMode) {
+                css['background-blend-mode'] = layer.backgroundBlendMode || "";
+            }
+
+            if (layer.mixBlendMode) {
+                css['mix-blend-mode'] = layer.mixBlendMode || "";
+            }
+
+            var results = Object.assign(css, $store.read('/layer/toImageCSS', layer));
+
+            var realCSS = {};
+            Object.keys(results).filter(function (key) {
+                return !!results[key];
+            }).forEach(function (key) {
+                realCSS[key] = results[key];
+            });
+
+            return realCSS;
+        }
+    }]);
+    return LayerManager;
+}(BaseModule);
+
+var ToolManager = function (_BaseModule) {
+    inherits(ToolManager, _BaseModule);
+
+    function ToolManager() {
+        classCallCheck(this, ToolManager);
+        return possibleConstructorReturn(this, (ToolManager.__proto__ || Object.getPrototypeOf(ToolManager)).apply(this, arguments));
+    }
+
+    createClass(ToolManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(ToolManager.prototype.__proto__ || Object.getPrototypeOf(ToolManager.prototype), 'initialize', this).call(this);
+
+            this.$store.tool = {
+                color: '',
+                colorSource: '',
+                'guide.only': false,
+                'guide.angle': true,
+                'guide.position': true
+            };
+        }
+    }, {
+        key: '/clone',
+        value: function clone($store, object) {
+            return JSON.parse(JSON.stringify(object));
+        }
+    }, {
+        key: '/tool/setColorSource',
+        value: function toolSetColorSource($store, colorSource) {
+            $store.tool.colorSource = colorSource;
+        }
+    }, {
+        key: '/tool/colorSource',
+        value: function toolColorSource($store) {
+            return $store.tool.colorSource;
+        }
+    }, {
+        key: '/tool/changeColor',
+        value: function toolChangeColor($store, color) {
+            $store.tool.color = color;
+
+            $store.emit('changeColor');
+        }
+    }, {
+        key: '/tool/set',
+        value: function toolSet($store, key, value) {
+            $store.tool[key] = value;
+
+            $store.emit('changeTool');
+        }
+    }, {
+        key: '/tool/get',
+        value: function toolGet($store, key, defaultValue) {
+            return typeof $store.tool[key] == 'undefined' ? defaultValue : $store.tool[key];
+        }
+    }, {
+        key: '/tool/toggle',
+        value: function toolToggle($store, key, isForce) {
+            if (typeof isForce == 'undefined') {
+                $store.tool[key] = !$store.tool[key];
+            } else {
+                $store.tool[key] = isForce;
+            }
+
+            $store.emit('changeTool');
+        }
+    }]);
+    return ToolManager;
+}(BaseModule);
+
+var blend_list = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity'];
+
+var BlendManager = function (_BaseModule) {
+    inherits(BlendManager, _BaseModule);
+
+    function BlendManager() {
+        classCallCheck(this, BlendManager);
+        return possibleConstructorReturn(this, (BlendManager.__proto__ || Object.getPrototypeOf(BlendManager)).apply(this, arguments));
+    }
+
+    createClass(BlendManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(BlendManager.prototype.__proto__ || Object.getPrototypeOf(BlendManager.prototype), 'initialize', this).call(this);
+
+            this.$store.blendMode = '';
+        }
+    }, {
+        key: '/blend/list',
+        value: function blendList($store) {
+            return blend_list;
+        }
+    }, {
+        key: '/blend/select',
+        value: function blendSelect($store, backgroundBlendMode) {
+
+            if (!blend_list.includes(backgroundBlendMode)) {
+                backgroundBlendMode = '';
+            }
+
+            $store.dispatch('/layer/change', { backgroundBlendMode: backgroundBlendMode });
+        }
+    }, {
+        key: '/blend/select/mix',
+        value: function blendSelectMix($store, mixBlendMode) {
+
+            if (!blend_list.includes(mixBlendMode)) {
+                mixBlendMode = '';
+            }
+
+            $store.dispatch('/layer/change', { mixBlendMode: mixBlendMode });
+        }
+    }, {
+        key: '/blend/toString',
+        value: function blendToString($store, layer) {
+            var backgroundBlend = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+            var mixBlend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
+            return $store.read('/layer/toString', Object.assign({}, layer, {
+                backgroundBlendMode: backgroundBlend,
+                mixBlendMode: mixBlend
+            }));
+        }
+    }]);
+    return BlendManager;
+}(BaseModule);
+
+var sample1 = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: 'red', percent: 0 }, { color: 'blue', percent: 10 }, { color: 'yellow', percent: 40 }, { color: 'green', percent: 60 }, { color: 'magenta', percent: 80 }, { color: 'black', percent: 100 }]
+};
+
+var gradegray = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#bdc3c7', percent: 0 }, { color: '#2c3e50', percent: 100 }]
+};
+
+var piggypink = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#ee9ca7', percent: 0 }, { color: '#ffdde1', percent: 100 }]
+};
+
+var coolblues = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#2193b0', percent: 0 }, { color: '#6dd5ed', percent: 100 }]
+};
+
+var megatron = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#C6FFDD', percent: 0 }, { color: '#FBD786', percent: 50 }, { color: '#f7797d', percent: 100 }]
+};
+
+var jshine = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#12c2e9', percent: 0 }, { color: '#c471ed', percent: 50 }, { color: '#f7797d', percent: 100 }]
+};
+
+var darkocean = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#373B44', percent: 0 }, { color: '#4286f4', percent: 100 }]
+};
+
+var yoda = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#FF0099', percent: 0 }, { color: '#493240', percent: 100 }]
+};
+
+var liberty = {
+    type: 'linear',
+    angle: 90,
+    colorsteps: [{ color: '#200122', percent: 0 }, { color: '#6f0000', percent: 100 }]
+};
+
+var silence = {
+    type: 'linear',
+    angle: 340,
+    colorsteps: [{ color: '#b721ff', percent: 0 }, { color: '#21d4fd', percent: 100 }]
+};
+
+var circle = {
+    type: 'radial',
+    radialPosition: 'center',
+    radialType: 'circle',
+    colorsteps: [{ color: 'white', percent: 0 }, { color: 'black', percent: 50 }]
+};
+
+var circle2 = {
+    type: 'repeating-radial',
+    radialPosition: 'top',
+    radialType: 'circle',
+    colorsteps: [{ color: 'white', percent: 0 }, { color: 'rgb(255,82,2)', percent: 9 }]
+};
+
+var gradientList = [sample1, gradegray, piggypink, coolblues, megatron, jshine, darkocean, yoda, liberty, silence, circle, circle2];
+
+var GradientManager = function (_BaseModule) {
+    inherits(GradientManager, _BaseModule);
+
+    function GradientManager() {
+        classCallCheck(this, GradientManager);
+        return possibleConstructorReturn(this, (GradientManager.__proto__ || Object.getPrototypeOf(GradientManager)).apply(this, arguments));
+    }
+
+    createClass(GradientManager, [{
+        key: '/gradient/list/sample',
+        value: function gradientListSample($store) {
+            return gradientList.map(function (it) {
+                return Object.assign({}, $store.read('/image/create'), it);
+            });
+        }
+    }, {
+        key: '/gradient/select',
+        value: function gradientSelect($store, index) {
+            var obj = $store.read('/gradient/list/sample')[index];
+
+            if (obj) {
+                $store.read('/image/change', obj);
+            }
+        }
+    }]);
+    return GradientManager;
+}(BaseModule);
+
+var ModuleList = [ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager];
+
+var BaseImageEditor = function (_UIElement) {
+    inherits(BaseImageEditor, _UIElement);
+
+    function BaseImageEditor() {
+        classCallCheck(this, BaseImageEditor);
+        return possibleConstructorReturn(this, (BaseImageEditor.__proto__ || Object.getPrototypeOf(BaseImageEditor)).apply(this, arguments));
+    }
+
+    createClass(BaseImageEditor, [{
+        key: 'initialize',
+        value: function initialize() {
+            var modules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            this.$body = null;
+            this.$root = null;
+
+            this.$store = new BaseStore({
+                modules: [].concat(toConsumableArray(ModuleList), toConsumableArray(modules))
+            });
+
+            this.$body = new Dom(this.getContainer());
+            this.$root = new Dom('div', 'imageeditor');
+
+            this.$body.append(this.$root);
+
+            if (this.opt.type) {
+                // to change css style
+                this.$root.addClass(this.opt.type);
+            }
+
+            this.render(this.$root);
+
+            // 이벤트 연결 
+            this.initializeEvent();
+        }
+    }, {
+        key: 'getContainer',
+        value: function getContainer() {
+            return this.opt.container || document.body;
+        }
+    }]);
+    return BaseImageEditor;
+}(UIElement);
+
+var BaseTab = function (_UIElement) {
+    inherits(BaseTab, _UIElement);
+
+    function BaseTab() {
+        classCallCheck(this, BaseTab);
+        return possibleConstructorReturn(this, (BaseTab.__proto__ || Object.getPrototypeOf(BaseTab)).apply(this, arguments));
+    }
+
+    createClass(BaseTab, [{
+        key: 'template',
+        value: function template() {
+            return '\n        <div class="tab">\n            <div class="tab-header" ref="$header">\n                <div class="tab-item selected" data-id="1">1</div>\n                <div class="tab-item" data-id="2">2</div>\n            </div>\n            <div class="tab-body" ref="$body">\n                <div class="tab-content selected" data-id="1"></div>\n                <div class="tab-content" data-id="2"></div>\n            </div>\n        </div>\n        ';
+        }
+    }, {
+        key: 'isNotSelectedTab',
+        value: function isNotSelectedTab(e) {
+            return !e.$delegateTarget.hasClass('selected');
+        }
+    }, {
+        key: 'click.isNotSelectedTab $header .tab-item',
+        value: function clickIsNotSelectedTab$headerTabItem(e) {
+            this.selectTab(e.$delegateTarget.attr('data-id'));
+        }
+    }, {
+        key: 'selectTab',
+        value: function selectTab(id) {
+
+            this.refs.$header.children().forEach(function ($dom) {
+                $dom.toggleClass('selected', $dom.attr('data-id') == id);
+            });
+
+            this.refs.$body.children().forEach(function ($dom) {
+                $dom.toggleClass('selected', $dom.attr('data-id') == id);
+            });
+        }
+    }]);
+    return BaseTab;
+}(UIElement);
+
+var ColorPickerLayer = function (_UIElement) {
+    inherits(ColorPickerLayer, _UIElement);
+
+    function ColorPickerLayer() {
+        classCallCheck(this, ColorPickerLayer);
+        return possibleConstructorReturn(this, (ColorPickerLayer.__proto__ || Object.getPrototypeOf(ColorPickerLayer)).apply(this, arguments));
+    }
+
+    createClass(ColorPickerLayer, [{
+        key: 'afterRender',
+        value: function afterRender() {
+            var _this2 = this;
+
+            var defaultColor = this.read('/getSelectedColor');
+            this.colorPicker = ColorPicker.create({
+                type: 'ring',
+                position: 'inline',
+                container: this.$el.el,
+                color: defaultColor,
+                onChange: function onChange(c) {
+                    _this2.changeColor(c);
+                }
+            });
+
+            setTimeout(function () {
+                _this2.colorPicker.dispatch('/initColor', defaultColor);
+            }, 100);
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '<div class=\'colorpicker-layer\'> </div>';
+        }
+    }, {
+        key: 'changeColor',
+        value: function changeColor(color) {
+            this.dispatch('/tool/changeColor', color);
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor() {
+            this.colorPicker.initColorWithoutChangeEvent(this.read('/tool/get', 'color'));
+        }
+    }]);
+    return ColorPickerLayer;
+}(UIElement);
+
+var ColorTab = function (_BaseTab) {
+    inherits(ColorTab, _BaseTab);
+
+    function ColorTab() {
+        classCallCheck(this, ColorTab);
+        return possibleConstructorReturn(this, (ColorTab.__proto__ || Object.getPrototypeOf(ColorTab)).apply(this, arguments));
+    }
+
+    createClass(ColorTab, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class=\"tab color-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"color\">Color</div>\n                    <div class=\"tab-item\" data-id=\"swatch\">Swatch</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"color\">\n                        <ColorPicker></ColorPicker>\n                    </div>\n                    <div class=\"tab-content\" data-id=\"swatch\"></div>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { ColorPicker: ColorPickerLayer };
+        }
+    }]);
+    return ColorTab;
+}(BaseTab);
+
+var GradientInfo = function (_UIElement) {
+    inherits(GradientInfo, _UIElement);
+
+    function GradientInfo() {
+        classCallCheck(this, GradientInfo);
+        return possibleConstructorReturn(this, (GradientInfo.__proto__ || Object.getPrototypeOf(GradientInfo)).apply(this, arguments));
+    }
+
+    createClass(GradientInfo, [{
+        key: 'template',
+        value: function template() {
+            return ' \n            <div class=\'gradient-info\'>\n                <div class="form-item" ref="$colorsteps">\n\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $colorsteps',
+        value: function load$colorsteps() {
+
+            var colorsteps = this.read('/colorstep/list');
+
+            if (this.read('/image/isImageType')) {
+                colorsteps = [];
+            }
+
+            return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step, index) {
+                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" ref="$colorStep' + index + '-background"></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\' data-index="' + index + '" ref="$colorStep' + index + '-code" />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"  data-index="' + index + '" ref="$colorStep' + index + '-percent" />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\' data-index="' + index + '">&times;</button>\n                                </div>\n                            </div>\n                        ';
+            }).join('') + '\n                </div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.updateStepInfo();
+        }
+    }, {
+        key: 'updateStepInfo',
+        value: function updateStepInfo() {
+            var _this2 = this;
+
+            var colorsteps = this.read('/colorstep/list');
+
+            if (this.read('/image/isImageType')) {
+                colorsteps = [];
+            }
+
+            if (colorsteps.length != this.refs.$stepList.childLength()) {
+                this.refresh();
+            } else {
+                colorsteps.forEach(function (step, index) {
+                    _this2.refs['$colorStep' + index + '-background'].css('background-color', step.color);
+                    _this2.refs['$colorStep' + index + '-code'].val(step.color);
+                    _this2.refs['$colorStep' + index + '-percent'].val(step.percent);
+                });
+            }
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'input $colorsteps input.code',
+        value: function input$colorstepsInputCode(e) {
+            var color = e.$delegateTarget.val();
+            var index = e.$delegateTarget.attr('data-index');
+
+            this.dispatch('/colorstep/setStep', color, undefined, index);
+        }
+    }, {
+        key: 'input $colorsteps input.percent',
+        value: function input$colorstepsInputPercent(e) {
+            var percent = e.$delegateTarget.val();
+            var index = e.$delegateTarget.attr('data-index');
+
+            this.dispatch('/colorstep/setStep', undefined, percent, index);
+        }
+    }, {
+        key: 'click $colorsteps .remove-step',
+        value: function click$colorstepsRemoveStep(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/colorstep/remove', index);
+            this.emit('initLayer');
+        }
+    }]);
+    return GradientInfo;
+}(UIElement);
+
+var GradientSteps = function (_UIElement) {
+    inherits(GradientSteps, _UIElement);
+
+    function GradientSteps() {
+        classCallCheck(this, GradientSteps);
+        return possibleConstructorReturn(this, (GradientSteps.__proto__ || Object.getPrototypeOf(GradientSteps)).apply(this, arguments));
+    }
+
+    createClass(GradientSteps, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'gradient-steps\'>\n                <div class="hue-container"></div>            \n                <div class="hue" ref="$steps"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'getStepPosition',
+        value: function getStepPosition(percent) {
+            var _getMinMax = this.getMinMax(),
+                min = _getMinMax.min,
+                max = _getMinMax.max;
+
+            var left = this.refs.$steps.offset().left;
+
+            min -= left;
+            max -= left;
+
+            return min + (max - min) * (percent / 100);
+        }
+
+        // load 후에 이벤트를 재설정 해야한다. 
+
+    }, {
+        key: 'load $steps',
+        value: function load$steps() {
+            var _this2 = this;
+
+            var list = this.read('/colorstep/list');
+            return '<div class=\'step-list\' ref="$stepList">\n                    ' + list.map(function (step) {
+                return '\n                            <div \n                                class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                                data-color="' + step.color + '" \n                                data-percent="' + step.percent + '" \n                                style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                            ></div>\n                        ';
+            }).join('') + '\n                </div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            if (!this.read('/image/isImageType')) {
+                this.load();
+                this.setColorUI();
+            }
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.setBackgroundColor();
+
+            // this.$el.toggle(!this.read('/image/isImageType'))
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+            this.refs.$stepList.css('background-image', this.read('/image/toLinearRight'));
+        }
+    }, {
+        key: 'getStepList',
+        value: function getStepList() {
+            return this.refs.$steps.$$('.step');
+        }
+    }, {
+        key: 'refreshStep',
+        value: function refreshStep() {
+            var colorSteps = this.getStepList().map(function ($dom) {
+                return {
+                    color: $dom.attr('data-color'),
+                    percent: +$dom.attr('data-percent'),
+                    selected: $dom.hasClass('selected')
+                };
+            });
+
+            this.dispatch('/colorstep/setAll', colorSteps);
+            this.setColorUI();
+        }
+
+        /* slide 영역 min,max 구하기  */
+
+    }, {
+        key: 'getMinMax',
+        value: function getMinMax() {
+            var min = this.state.get('$steps.offsetLeft');
+            var width = this.state.get('$steps.width');
+            var max = min + width;
+
+            return { min: min, max: max, width: width };
+        }
+
+        /* 현재 위치 구하기  */
+
+    }, {
+        key: 'getCurrent',
+        value: function getCurrent(e) {
+            var _getMinMax2 = this.getMinMax(),
+                min = _getMinMax2.min,
+                max = _getMinMax2.max;
+
+            var _Event$posXY = Event.posXY(e),
+                x = _Event$posXY.x;
+
+            var current = Math.min(Math.max(min, x), max);
+
+            return current;
+        }
+
+        /**
+         * 마우스 이벤트로 현재 위치 및 percent 설정, 전체  gradient 리프레쉬 
+         * 
+         * @param {*} e 
+         */
+
+    }, {
+        key: 'refreshColorUI',
+        value: function refreshColorUI(e) {
+            var _getMinMax3 = this.getMinMax(),
+                min = _getMinMax3.min,
+                max = _getMinMax3.max;
+
+            var current = this.getCurrent(e);
+
+            if (this.currentStep) {
+                var posX = Math.max(min, current);
+                this.currentStep.px('left', posX - this.state.get('$steps.offsetLeft'));
+
+                var percent = Math.floor((current - min) / (max - min) * 100);
+
+                this.currentStep.attr('data-percent', percent);
+
+                this.refreshStep();
+            }
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor() {
+
+            if (this.read('/image/isImageType')) return;
+            if (this.read('/tool/colorSource') != this.read('/colorstep/colorSource')) return;
+
+            this.currentStep = this.currentStep || this.getStepList()[0];
+
+            if (this.currentStep) {
+                var rgb = this.read('/tool/get', 'color');
+                this.currentStep.attr('data-color', rgb);
+                this.currentStep.css('background-color', rgb);
+                this.currentStep.css('border-color', rgb);
+                this.refreshStep();
+            }
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'checkTarget',
+        value: function checkTarget(e) {
+            return this.refs.$stepList.is(e.target);
+        }
+
+        // 이미 선언된 메소드를 사용하여 메타 데이타로 쓴다. 
+        // checkTarget 이라는 메소드가 true 를 리턴해줘야 아래 이벤트는 실행된다. 
+
+    }, {
+        key: 'click.checkTarget $steps',
+        value: function clickCheckTarget$steps(e) {
+            this.addStep(e);
+        }
+    }, {
+        key: 'removeStep',
+        value: function removeStep(e) {
+            e.$delegateTarget.remove();
+            this.refreshStep();
+        }
+    }, {
+        key: 'addStep',
+        value: function addStep(e) {
+            var _getMinMax4 = this.getMinMax(),
+                min = _getMinMax4.min,
+                max = _getMinMax4.max;
+
+            var current = this.getCurrent(e);
+
+            var percent = Math.floor((current - min) / (max - min) * 100);
+
+            this.dispatch('/colorstep/add', percent);
+            this.refresh();
+        }
+    }, {
+        key: 'updateSelectedStep',
+        value: function updateSelectedStep(e) {
+
+            var selectedUI = this.refs.$steps.$('.selected');
+
+            if (selectedUI) {
+                selectedUI.removeClass('selected');
+            }
+
+            this.currentStep = e.$delegateTarget;
+            this.currentStep.addClass('selected');
+        }
+    }, {
+        key: 'initColor',
+        value: function initColor(color) {
+            this.dispatch('/colorstep/initColor', color);
+        }
+    }, {
+        key: 'click.Shift $steps .step',
+        value: function clickShift$stepsStep(e) {
+            this.removeStep(e);
+        }
+    }, {
+        key: 'click $steps .step',
+        value: function click$stepsStep(e) {
+            this.updateSelectedStep(e);
+            this.initColor(this.currentStep.attr('data-color'));
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.onDragEnd(e);
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            this.onDragMove(e);
+        }
+    }, {
+        key: 'pointerstart $steps .step',
+        value: function pointerstart$stepsStep(e) {
+            e.preventDefault();
+            if (!this.isDown) {
+                this.onDragStart(e);
+            }
+        }
+    }, {
+        key: 'onDragStart',
+        value: function onDragStart(e) {
+
+            this.isDown = true;
+            this.currentStep = e.$delegateTarget;
+
+            if (this.currentStep) {
+
+                this.updateSelectedStep(e);
+                this.initColor(this.currentStep.attr('data-color'));
+            }
+        }
+    }, {
+        key: 'onDragMove',
+        value: function onDragMove(e) {
+            if (this.isDown) {
+                this.refreshColorUI(e);
+                this.refs.$stepList.addClass('mode-drag');
+            }
+        }
+
+        /* called when mouse is ended move  */
+
+    }, {
+        key: 'onDragEnd',
+        value: function onDragEnd(e) {
+            this.isDown = false;
+            this.refs.$stepList.removeClass('mode-drag');
+        }
+    }]);
+    return GradientSteps;
+}(UIElement);
+
+var ColorStepsTab = function (_BaseTab) {
+    inherits(ColorStepsTab, _BaseTab);
+
+    function ColorStepsTab() {
+        classCallCheck(this, ColorStepsTab);
+        return possibleConstructorReturn(this, (ColorStepsTab.__proto__ || Object.getPrototypeOf(ColorStepsTab)).apply(this, arguments));
+    }
+
+    createClass(ColorStepsTab, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class=\"tab color-steps-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"colorstep\">Color Steps</div>\n                    <div class=\"tab-item\" data-id=\"image\">Image</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"colorstep\">\n                        <GradientSteps></GradientSteps>\n                        <GradientInfo></GradientInfo>\n                    </div>\n                    <div class=\"tab-content\" data-id=\"image\">\n                        <ImageForm></ImageForm>\n                    </div>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { GradientInfo: GradientInfo, GradientSteps: GradientSteps };
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            var isImageType = this.read('/image/isImageType');
+
+            this.selectTab(isImageType ? 'image' : 'colorstep');
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: "@initLayer",
+        value: function initLayer() {
+            this.refresh();
+        }
+    }]);
+    return ColorStepsTab;
+}(BaseTab);
+
+var VISIBILITY = "<svg class='on' xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"none\" d=\"M0 0h24v24H0V0z\"/><path d=\"M12 4C7 4 2.73 7.11 1 11.5 2.73 15.89 7 19 12 19s9.27-3.11 11-7.5C21.27 7.11 17 4 12 4zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z\"/></svg>";
+var VISIBILITY_OFF = "<svg class='off' xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"none\" d=\"M0 0h24v24H0V0zm0 0h24v24H0V0zm0 0h24v24H0V0zm0 0h24v24H0V0z\"/><path d=\"M12 6.5c2.76 0 5 2.24 5 5 0 .51-.1 1-.24 1.46l3.06 3.06c1.39-1.23 2.49-2.77 3.18-4.53C21.27 7.11 17 4 12 4c-1.27 0-2.49.2-3.64.57l2.17 2.17c.47-.14.96-.24 1.47-.24zM2.71 3.16c-.39.39-.39 1.02 0 1.41l1.97 1.97C3.06 7.83 1.77 9.53 1 11.5 2.73 15.89 7 19 12 19c1.52 0 2.97-.3 4.31-.82l2.72 2.72c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L4.13 3.16c-.39-.39-1.03-.39-1.42 0zM12 16.5c-2.76 0-5-2.24-5-5 0-.77.18-1.5.49-2.14l1.57 1.57c-.03.18-.06.37-.06.57 0 1.66 1.34 3 3 3 .2 0 .38-.03.57-.07L14.14 16c-.65.32-1.37.5-2.14.5zm2.97-5.33c-.15-1.4-1.25-2.49-2.64-2.64l2.64 2.64z\"/></svg>";
+var DELETE = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"none\" d=\"M0 0h24v24H0V0z\"/><path d=\"M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v10zM9 9h6c.55 0 1 .45 1 1v8c0 .55-.45 1-1 1H9c-.55 0-1-.45-1-1v-8c0-.55.45-1 1-1zm6.5-5l-.71-.71c-.18-.18-.44-.29-.7-.29H9.91c-.26 0-.52.11-.7.29L8.5 4H6c-.55 0-1 .45-1 1s.45 1 1 1h12c.55 0 1-.45 1-1s-.45-1-1-1h-2.5z\"/></svg>";
+var CHECK = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"none\" d=\"M0 0h24v24H0V0z\"/><path d=\"M9 16.2l-3.5-3.5c-.39-.39-1.01-.39-1.4 0-.39.39-.39 1.01 0 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L20.3 7.7c.39-.39.39-1.01 0-1.4-.39-.39-1.01-.39-1.4 0L9 16.2z\"/></svg>";
+
+var Icon = {
+    VISIBILITY: VISIBILITY,
+    VISIBILITY_OFF: VISIBILITY_OFF,
+    DELETE: DELETE,
+    CHECK: CHECK
+};
+
+var GradientLayers = function (_UIElement) {
+    inherits(GradientLayers, _UIElement);
+
+    function GradientLayers() {
+        classCallCheck(this, GradientLayers);
+        return possibleConstructorReturn(this, (GradientLayers.__proto__ || Object.getPrototypeOf(GradientLayers)).apply(this, arguments));
+    }
+
+    createClass(GradientLayers, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'gradient-layers\'>\n                <div class="tools">                                \n                    <button type="button" ref="$createLayerButton">+</button>\n                    <span class="divider">|</span>\n                    <button type="button" class="first" ref="$first" title="move layer to first">&lt;&lt;</button>                  \n                    <button type="button" class="prev" ref="$left" title="move layer to prev">&lt;</button>            \n                    <button type="button" class="next" ref="$right" title="move layer to next">&gt;</button>\n                    <button type="button" class="last" ref="$last" title="move layer to last">&gt;&gt;</button>\n                    \n                </div>            \n                <div class="layer-list" ref="$layerList"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $layerList',
+        value: function load$layerList() {
+            var _this2 = this;
+
+            var list = this.read('/layer/list');
+
+            return '<div>' + list.map(function (layer, index) {
+
+                var selected = layer.selected ? 'selected' : '';
+                return '\n                        <div class=\'gradient-item ' + selected + '\' data-index="' + index + '">\n                            <div class="gradient-item-view-container">\n                                <div class="gradient-item-view"  style=\'' + _this2.read('/layer/toString', layer) + '\' ref="$layer' + index + '"></div>\n                            </div>\n                            <div class="gradient-item-check" data-index="' + index + '">\n                                ' + Icon.CHECK + '\n                            </div>\n                            <div class="gradient-item-visible ' + (layer.visible ? 'on' : '') + '" data-index="' + index + '">\n                                ' + Icon.VISIBILITY + '\n                                ' + Icon.VISIBILITY_OFF + '\n                            </div>                            \n                            <div class="gradient-item-delete" data-index="' + index + '">\n                                ' + Icon.DELETE + '\n                            </div>\n                        </div>';
+            }).join('') + '</div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            var _this3 = this;
+
+            if (this.refs.$layer0) {
+
+                var list = this.read('/layer/list');
+
+                list.forEach(function (layer, index) {
+                    _this3.refs['$layer' + index].css(_this3.read('/layer/toCSS', layer));
+                });
+            } else {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $createLayerButton',
+        value: function click$createLayerButton(e) {
+            this.dispatch('/layer/add');
+            this.refresh();
+        }
+    }, {
+        key: 'click $layerList .gradient-item-visible',
+        value: function click$layerListGradientItemVisible(e) {
+            this.dispatch('/layer/toggle/visible', +e.$delegateTarget.attr('data-index'));
+
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $layerList .gradient-item',
+        value: function clickSelf$layerListGradientItem(e) {
+
+            this.dispatch('/layer/select', +e.$delegateTarget.attr('data-index'));
+
+            this.refresh();
+        }
+    }]);
+    return GradientLayers;
+}(UIElement);
+
+var LayersMenu = function (_UIElement) {
+    inherits(LayersMenu, _UIElement);
+
+    function LayersMenu() {
+        classCallCheck(this, LayersMenu);
+        return possibleConstructorReturn(this, (LayersMenu.__proto__ || Object.getPrototypeOf(LayersMenu)).apply(this, arguments));
+    }
+
+    createClass(LayersMenu, [{
+        key: 'template',
+        value: function template() {
+            return ' \n            <div class=\'gradient-layers-menu\'>\n                <div class=\'left\'>\n                    <h1>Image Editor</h1>\n                </div>\n                <div class="right">\n                    <span class="divider">|</span>                    \n                    <button type="button" ref="$stackView" class="stack-view" title="Stack View"></button>\n                    <button type="button" ref="$onlyView" class="only-view" title="Only View"></button>\n                    <span class="divider">|</span>\n                    <button type="button" ref="$showAngle" class=\'show-angle\' title="Show angle guide"></button>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            // this.refs.$show.toggleClass('selected', this.dispatch('/getGradientLayerVisible'))
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $left',
+        value: function click$left(e) {
+            this.dispatch('/moveLayerToLeft');
+        }
+    }, {
+        key: 'click $first',
+        value: function click$first(e) {
+            this.dispatch('/moveLayerToFirst');
+        }
+    }, {
+        key: 'click $last',
+        value: function click$last(e) {
+            this.dispatch('/moveLayerToLast');
+        }
+    }, {
+        key: 'click $right',
+        value: function click$right(e) {
+            this.dispatch('/moveLayerToRight');
+        }
+    }, {
+        key: 'click $delete',
+        value: function click$delete(e) {
+            this.dispatch('/removeLayer');
+        }
+    }, {
+        key: 'click $show',
+        value: function click$show(e) {
+            // TODO: 매끈하게 만들어봅시다. 
+            var isVisible = this.refs.$show.hasClass('selected');
+            this.dispatch('/setLayerVisible', isVisible);
+            this.refresh();
+        }
+    }, {
+        key: 'click $showPosition',
+        value: function click$showPosition(e) {
+            this.dispatch('/tool/toggle', 'guide.position');
+        }
+    }, {
+        key: 'click $showAngle',
+        value: function click$showAngle(e) {
+            this.dispatch('/tool/toggle', 'guide.angle');
+        }
+    }, {
+        key: 'click $onlyView',
+        value: function click$onlyView(e) {
+            this.dispatch('/tool/set', 'guide.only', true);
+        }
+    }, {
+        key: 'click $stackView',
+        value: function click$stackView(e) {
+            this.dispatch('/tool/set', 'guide.only', false);
+        }
+    }]);
+    return LayersMenu;
+}(UIElement);
+
+var LayerManagerTab = function (_BaseTab) {
+    inherits(LayerManagerTab, _BaseTab);
+
+    function LayerManagerTab() {
+        classCallCheck(this, LayerManagerTab);
+        return possibleConstructorReturn(this, (LayerManagerTab.__proto__ || Object.getPrototypeOf(LayerManagerTab)).apply(this, arguments));
+    }
+
+    createClass(LayerManagerTab, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class=\"tab layout-manager-tab\">\n                <div class=\"tab-header\" ref=\"$header\">\n                    <div class=\"tab-item selected\" data-id=\"layer\">Layer</div>\n                </div>\n                <div class=\"tab-body\" ref=\"$body\">\n                    <div class=\"tab-content selected\" data-id=\"layer\">\n                        <GradientLayers></GradientLayers>\n                    </div>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { GradientLayers: GradientLayers, GradientLayersMenu: LayersMenu };
+        }
+    }]);
+    return LayerManagerTab;
+}(BaseTab);
+
+var PredefinedRadialGradientAngle = function (_UIElement) {
+    inherits(PredefinedRadialGradientAngle, _UIElement);
+
+    function PredefinedRadialGradientAngle() {
+        classCallCheck(this, PredefinedRadialGradientAngle);
+        return possibleConstructorReturn(this, (PredefinedRadialGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientAngle)).apply(this, arguments));
+    }
+
+    createClass(PredefinedRadialGradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="predefined-angluar-group">\n                <button ref="$center" type="button" data-value="center" title="center"><span class=\'circle\'></span></button>            \n                <select class="radial-type-list" ref="$select">\n                    <option value="circle">circle</option>\n                    <option value="ellipse">ellipse</option>\n                    <option value="closest-side">closest-side</option> \n                    <option value="closest-corner">closest-corner</option>\n                    <option value="farthest-side">farthest-side</option>\n                    <option value="farthest-corner">farthest-corner</option>                    \n                </select>\n            </div>\n        ';
+        }
+    }, {
+        key: 'change $select',
+        value: function change$select(e) {
+            this.dispatch('/image/change', { radialType: this.refs.$select.val() });
+        }
+    }, {
+        key: 'click $center',
+        value: function click$center(e) {
+            this.dispatch('/image/change', { radialPosition: 'center' });
+        }
+    }]);
+    return PredefinedRadialGradientAngle;
+}(UIElement);
+
+var GradientType = function (_UIElement) {
+    inherits(GradientType, _UIElement);
+
+    function GradientType() {
+        classCallCheck(this, GradientType);
+        return possibleConstructorReturn(this, (GradientType.__proto__ || Object.getPrototypeOf(GradientType)).apply(this, arguments));
+    }
+
+    createClass(GradientType, [{
+        key: 'components',
+        value: function components() {
+            return { PredefinedRadialGradientAngle: PredefinedRadialGradientAngle };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n        <div class=\'gradient-tools\'>\n            <div class=\'gradient-type\' ref="$gradientType">\n                <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                    <div class="m1"></div>\n                    <div class="m2"></div>\n                    <div class="m3"></div>\n                </div>\n            </div>\n            <div ref="$angular" class=\'gradient-angular linear\'>\n                <div class="gradient-angular-item radial">\n                    <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>\n                </div>\n                <div class="gradient-angular-item image">\n                    \n                </div>                \n            </div>\n        </div>\n\n          \n        ';
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            // this.setLayerTypeUI()
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.setLayerTypeUI();
+        }
+    }, {
+        key: 'setLayerTypeUI',
+        value: function setLayerTypeUI(type) {
+
+            type = type || this.read('/image/get', 'type');
+
+            this.refs.$linear.toggleClass('selected', type == 'linear');
+            this.refs.$radial.toggleClass('selected', type == 'radial');
+            this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
+            this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
+            this.refs.$image.toggleClass('selected', type == 'image');
+
+            this.refs.$angular.toggleClass('linear', this.read('/image/isLinearType'));
+            this.refs.$angular.toggleClass('radial', this.read('/image/isRadialType'));
+            this.refs.$angular.toggleClass('image', this.read('/image/isImageType'));
+        }
+    }, {
+        key: 'click $gradientType .gradient-item',
+        value: function click$gradientTypeGradientItem(e) {
+
+            var type = e.$delegateTarget.attr('data-type');
+
+            this.dispatch('/image/change', { type: type });
+
+            this.setLayerTypeUI(type);
+        }
+    }]);
+    return GradientType;
+}(UIElement);
+
+var GradientSampleList = function (_UIElement) {
+    inherits(GradientSampleList, _UIElement);
+
+    function GradientSampleList() {
+        classCallCheck(this, GradientSampleList);
+        return possibleConstructorReturn(this, (GradientSampleList.__proto__ || Object.getPrototypeOf(GradientSampleList)).apply(this, arguments));
+    }
+
+    createClass(GradientSampleList, [{
+        key: 'template',
+        value: function template() {
+            var _this2 = this;
+
+            var list = this.read('/gradient/list/sample');
+
+            return '\n        <div class="gradient-sample-list">\n                 ' + list.map(function (it, index) {
+                return '<div class=\'gradient-sample-item\' style=\'' + _this2.read('/image/toString', it) + '\' data-index="' + index + '"></div>';
+            }).join('') + '\n        </div>\n        ';
+        }
+    }, {
+        key: 'click $el .gradient-sample-item',
+        value: function click$elGradientSampleItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+
+            this.dispatch('/gradient/select', index);
+        }
+    }]);
+    return GradientSampleList;
+}(UIElement);
+
+var GradientAngle = function (_UIElement) {
+    inherits(GradientAngle, _UIElement);
+
+    function GradientAngle() {
+        classCallCheck(this, GradientAngle);
+        return possibleConstructorReturn(this, (GradientAngle.__proto__ || Object.getPrototypeOf(GradientAngle)).apply(this, arguments));
+    }
+
+    createClass(GradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="drag-angle">\n                <div ref="$angleText" class="angle-text"></div>\n                <div ref="$dragPointer" class="drag-pointer"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+
+            if (this.isShow()) {
+                this.$el.show();
+
+                this.refreshUI();
+            } else {
+                this.$el.hide();
+            }
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.read('/image/isLinearType') && this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: 'getCurrentXY',
+        value: function getCurrentXY(e, angle, radius, centerX, centerY) {
+            return e ? Event.posXY(e) : getXYInCircle(angle, radius, centerX, centerY);
+        }
+    }, {
+        key: 'getRectangle',
+        value: function getRectangle() {
+            var width = this.state.get('$el.width');
+            var height = this.state.get('$el.height');
+            var radius = Math.floor(width / 2 * 0.7);
+
+            var _state$get = this.state.get('$el.offset'),
+                left = _state$get.left,
+                top = _state$get.top;
+
+            var minX = left;
+            var minY = top;
+            var centerX = minX + width / 2;
+            var centerY = minY + height / 2;
+
+            return { minX: minX, minY: minY, width: width, height: height, radius: radius, centerX: centerX, centerY: centerY };
+        }
+    }, {
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+            return this.read('/image/get', 'angle') - 90;
+        }
+    }, {
+        key: 'refreshAngleText',
+        value: function refreshAngleText(angleText) {
+            this.refs.$angleText.text(angleText + ' °');
+        }
+    }, {
+        key: 'refreshUI',
+        value: function refreshUI(e) {
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                radius = _getRectangle.radius,
+                centerX = _getRectangle.centerX,
+                centerY = _getRectangle.centerY;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue(), radius, centerX, centerY),
+                x = _getCurrentXY.x,
+                y = _getCurrentXY.y;
+
+            var rx = x - centerX,
+                ry = y - centerY,
+                angle = caculateAngle(rx, ry);
+
+            {
+                var _getCurrentXY2 = this.getCurrentXY(null, angle, radius, centerX, centerY),
+                    x = _getCurrentXY2.x,
+                    y = _getCurrentXY2.y;
+            }
+
+            // set drag pointer position 
+            this.refs.$dragPointer.px('left', x - minX);
+            this.refs.$dragPointer.px('top', y - minY);
+
+            var lastAngle = Math.round(angle + 90) % 360;
+
+            this.refreshAngleText(lastAngle);
+
+            if (e) {
+                this.dispatch('/image/setAngle', lastAngle);
+            }
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.$el.toggle(this.isShow());
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            if (this.isDown) {
+                this.refreshUI(e);
+            }
+        }
+    }, {
+        key: 'pointerstart $drag_pointer',
+        value: function pointerstart$drag_pointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'pointerstart $el',
+        value: function pointerstart$el(e) {
+            this.isDown = true;
+            this.refreshUI(e);
+        }
+    }]);
+    return GradientAngle;
+}(UIElement);
+
+var DEFINE_POSITIONS = {
+    'center': ['center', 'center'],
+    'right': ['right', 'center'],
+    'top': ['center', 'top'],
+    'left': ['left', 'center'],
+    'bottom': ['center', 'bottom']
+};
+
+var GradientPosition = function (_UIElement) {
+    inherits(GradientPosition, _UIElement);
+
+    function GradientPosition() {
+        classCallCheck(this, GradientPosition);
+        return possibleConstructorReturn(this, (GradientPosition.__proto__ || Object.getPrototypeOf(GradientPosition)).apply(this, arguments));
+    }
+
+    createClass(GradientPosition, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="drag-position">\n                <div ref="$dragPointer" class="drag-pointer"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+
+            if (this.isShow()) {
+                this.$el.show();
+
+                this.refreshUI();
+            } else {
+                this.$el.hide();
+            }
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return !this.dispatch('/image/isLinearType') && this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: 'getCurrentXY',
+        value: function getCurrentXY(e, position) {
+
+            if (e) {
+                var xy = Event.posXY(e);
+
+                return [xy.x, xy.y];
+            }
+
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                maxX = _getRectangle.maxX,
+                maxY = _getRectangle.maxY,
+                width = _getRectangle.width,
+                height = _getRectangle.height;
+
+            var p = position;
+            if (typeof p == 'string' && DEFINE_POSITIONS[p]) {
+                p = DEFINE_POSITIONS[p];
+            } else if (typeof p === 'string') {
+                p = p.split(' ');
+            }
+
+            p = p.map(function (item, index) {
+                if (item == 'center') {
+                    if (index == 0) {
+                        return minX + width / 2;
+                    } else if (index == 1) {
+                        return minY + height / 2;
+                    }
+                } else if (item === 'left') {
+                    return minX;
+                } else if (item === 'right') {
+                    return maxX;
+                } else if (item === 'top') {
+                    return minY;
+                } else if (item === 'bottom') {
+                    return maxY;
+                } else {
+                    if (index == 0) {
+                        return minX * width * (+item / 100);
+                    } else if (index == 1) {
+                        return minY * height * (+item / 100);
+                    }
+                }
+            });
+
+            return p;
+        }
+    }, {
+        key: 'getRectangle',
+        value: function getRectangle() {
+            var width = this.state.get('$el.width');
+            var height = this.state.get('$el.height');
+            var minX = this.state.get('$el.offsetLeft');
+            var minY = this.state.get('$el.offsetTop');
+
+            var maxX = minX + width;
+            var maxY = minY + height;
+
+            return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, width: width, height: height };
+        }
+    }, {
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+            return this.read('/image/get', 'radialPosition') || '';
+        }
+    }, {
+        key: 'refreshUI',
+        value: function refreshUI(e) {
+            var _getRectangle2 = this.getRectangle(),
+                minX = _getRectangle2.minX,
+                minY = _getRectangle2.minY,
+                maxX = _getRectangle2.maxX,
+                maxY = _getRectangle2.maxY,
+                width = _getRectangle2.width,
+                height = _getRectangle2.height;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue()),
+                _getCurrentXY2 = slicedToArray(_getCurrentXY, 2),
+                x = _getCurrentXY2[0],
+                y = _getCurrentXY2[1];
+
+            x = Math.max(Math.min(maxX, x), minX);
+            y = Math.max(Math.min(maxY, y), minY);
+
+            var left = x - minX;
+            var top = y - minY;
+
+            this.refs.$dragPointer.px('left', left);
+            this.refs.$dragPointer.px('top', top);
+
+            if (e) {
+                this.dispatch('/image/setRadialPosition', [Math.floor(left / width * 100) + '%', Math.floor(top / height * 100) + '%']);
+            }
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.$el.toggle(this.isShow());
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            if (this.isDown) {
+                this.refreshUI(e);
+            }
+        }
+    }, {
+        key: 'pointerstart $dragPointer',
+        value: function pointerstart$dragPointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'pointerstart $el',
+        value: function pointerstart$el(e) {
+            this.isDown = true;
+            this.refreshUI(e);
+        }
+    }, {
+        key: 'dblclick $dragPointer',
+        value: function dblclick$dragPointer(e) {
+            e.preventDefault();
+            this.dispatch('/image/setRadialPosition', 'center');
+            this.refreshUI();
+        }
+    }]);
+    return GradientPosition;
+}(UIElement);
+
+var PredefinedLinearGradientAngle = function (_UIElement) {
+    inherits(PredefinedLinearGradientAngle, _UIElement);
+
+    function PredefinedLinearGradientAngle() {
+        classCallCheck(this, PredefinedLinearGradientAngle);
+        return possibleConstructorReturn(this, (PredefinedLinearGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedLinearGradientAngle)).apply(this, arguments));
+    }
+
+    createClass(PredefinedLinearGradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="predefined-angluar-group">\n                <button type="button" data-value="to right"></button>                          \n                <button type="button" data-value="to left"></button>                                                  \n                <button type="button" data-value="to top"></button>                            \n                <button type="button" data-value="to bottom"></button>                                        \n                <button type="button" data-value="to top right"></button>                                \n                <button type="button" data-value="to bottom right"></button>                                    \n                <button type="button" data-value="to bottom left"></button>\n                <button type="button" data-value="to top left"></button>\n            </div>\n        ';
+        }
+    }, {
+        key: 'click $el button',
+        value: function click$elButton(e) {
+            this.dispatch('/image/setAngle', e.$delegateTarget.attr('data-value'));
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.dispatch('/image/isLinearType') && this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.refresh();
+        }
+    }]);
+    return PredefinedLinearGradientAngle;
+}(UIElement);
+
+var PredefinedRadialGradientPosition = function (_UIElement) {
+    inherits(PredefinedRadialGradientPosition, _UIElement);
+
+    function PredefinedRadialGradientPosition() {
+        classCallCheck(this, PredefinedRadialGradientPosition);
+        return possibleConstructorReturn(this, (PredefinedRadialGradientPosition.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientPosition)).apply(this, arguments));
+    }
+
+    createClass(PredefinedRadialGradientPosition, [{
+        key: 'template',
+        value: function template() {
+            return ' \n            <div class="predefined-angluar-group radial-position">\n                <button type="button" data-value="top"></button>                          \n                <button type="button" data-value="left"></button>                                                  \n                <button type="button" data-value="bottom"></button>                            \n                <button type="button" data-value="right"></button>                                        \n            </div>\n        ';
+        }
+    }, {
+        key: 'click $el button',
+        value: function click$elButton(e) {
+            this.dispatch('/image/change', { radialPosition: e.$delegateTarget.attr('data-value') });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return !this.dispatch('/image/isLinearType') && this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.refresh();
+        }
+    }]);
+    return PredefinedRadialGradientPosition;
+}(UIElement);
+
+var GradientView = function (_UIElement) {
+    inherits(GradientView, _UIElement);
+
+    function GradientView() {
+        classCallCheck(this, GradientView);
+        return possibleConstructorReturn(this, (GradientView.__proto__ || Object.getPrototypeOf(GradientView)).apply(this, arguments));
+    }
+
+    createClass(GradientView, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'gradient-view\'>\n                <div class="gradient-color-view-container"></div>\n                <div class="gradient-color-view" ref="$colorview"></div>\n                <div class="gradient-color-view" ref="$colorviewOnly"></div>\n                <GradientAngle></GradientAngle>   \n                <GradientPosition></GradientPosition>             \n                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return { GradientAngle: GradientAngle, GradientPosition: GradientPosition, PredefinedLinearGradientAngle: PredefinedLinearGradientAngle, PredefinedRadialGradientPosition: PredefinedRadialGradientPosition };
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setBackgroundColor();
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+
+            if (this.read('/tool/get', 'guide.only')) {
+                this.refs.$colorview.hide();
+                this.refs.$colorviewOnly.show();
+                this.refs.$colorviewOnly.css(this.read('/image/toCSS'));
+            } else {
+                this.refs.$colorviewOnly.hide();
+                this.refs.$colorview.show();
+                this.refs.$colorview.css(this.read('/layer/toCSS'));
+            }
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.refresh();
+        }
+    }]);
+    return GradientView;
+}(UIElement);
+
+var ImageList = function (_UIElement) {
+    inherits(ImageList, _UIElement);
+
+    function ImageList() {
+        classCallCheck(this, ImageList);
+        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
+    }
+
+    createClass(ImageList, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='image-list-container'>\n                <div class=\"tools\">                                \n                    <button type=\"button\" ref=\"$createImageButton\">+</button>\n                    <span class=\"divider\">|</span>\n                    <button type=\"button\" class=\"first\" ref=\"$first\" title=\"move layer to first\">&lt;&lt;</button>                  \n                    <button type=\"button\" class=\"prev\" ref=\"$left\" title=\"move layer to prev\">&lt;</button>            \n                    <button type=\"button\" class=\"next\" ref=\"$right\" title=\"move layer to next\">&gt;</button>\n                    <button type=\"button\" class=\"last\" ref=\"$last\" title=\"move layer to last\">&gt;&gt;</button>\n                    \n                </div>            \n                <div class=\"image-list\" ref=\"$imageList\"></div>\n            </div>\n        ";
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            var _this2 = this;
+
+            var list = this.read('/image/list');
+
+            return "<div>" + list.map(function (image, index) {
+
+                var selected = image.selected ? 'selected' : '';
+                return "\n                        <div class='image-item " + selected + "' data-index=\"" + index + "\">\n                            <div class=\"image-item-view-container\">\n                                <div class=\"image-item-view\"  style='" + _this2.read('/image/toString', image) + "' ref=\"$image" + index + "\"></div>\n                            </div>\n                            <div class=\"image-item-check\" data-index=\"" + index + "\">\n                                " + Icon.CHECK + "\n                            </div>\n                            <div class=\"image-item-visible " + (image.visible ? 'on' : '') + "\" data-index=\"" + index + "\">\n                                " + Icon.VISIBILITY + "\n                                " + Icon.VISIBILITY_OFF + "\n                            </div>                            \n                            <div class=\"image-item-delete\" data-index=\"" + index + "\">\n                                " + Icon.DELETE + "\n                            </div>\n                        </div>";
+            }).join('') + "</div>";
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $createImageButton',
+        value: function click$createImageButton(e) {
+            this.dispatch('/image/add');
+            this.refresh();
+        }
+    }, {
+        key: 'click $imageList .image-item-visible',
+        value: function click$imageListImageItemVisible(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/image/toggle/visible', +index);
+
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $imageList .image-item',
+        value: function clickSelf$imageListImageItem(e) {
+            var index = e.$delegateTarget.attr('data-index');
+            this.dispatch('/image/select', +index);
+
+            this.refresh();
+        }
+    }]);
+    return ImageList;
+}(UIElement);
+
+var ImageControl = function (_UIElement) {
+    inherits(ImageControl, _UIElement);
+
+    function ImageControl() {
+        classCallCheck(this, ImageControl);
+        return possibleConstructorReturn(this, (ImageControl.__proto__ || Object.getPrototypeOf(ImageControl)).apply(this, arguments));
+    }
+
+    createClass(ImageControl, [{
+        key: "template",
+        value: function template() {
+            return " \n            <div class=\"control image-control\">\n                <div class=\"left\">\n                    <ImageLIst></ImageList> \n                </div>\n                <div class=\"right\">\n                    <GradientSampleList></GradientSampleList>                \n                    <GradientType></GradientType>\n                    <GradientView></GradientView>                      \n                </div>\n\n            </div>     \n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { GradientType: GradientType, GradientView: GradientView, GradientSampleList: GradientSampleList, ImageList: ImageList };
+        }
+    }]);
+    return ImageControl;
+}(UIElement);
+
+var BlendList = function (_UIElement) {
+    inherits(BlendList, _UIElement);
+
+    function BlendList() {
+        classCallCheck(this, BlendList);
+        return possibleConstructorReturn(this, (BlendList.__proto__ || Object.getPrototypeOf(BlendList)).apply(this, arguments));
+    }
+
+    createClass(BlendList, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'blend-list-container\'>\n                <div class=\'layout-flow padding-0\'>\n                    <div class=\'blend-row\'>\n                        <div class="blend-mode-title">Background</div>\n                        <div class="blend-list" ref="$blendList"></div>\n                    </div>\n                    <div class=\'blend-row\'>\n                        <div class="blend-mode-title">Mix</div>\n                        <div class="blend-list" ref="$mixBlendList"></div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $blendList',
+        value: function load$blendList() {
+            var _this2 = this;
+
+            var list = this.read('/blend/list');
+            var layer = this.read('/layer/get');
+            var backgroundBlendMode = this.read('/layer/get', 'backgroundBlendMode');
+            return '<div>' + list.map(function (blend) {
+
+                var selected = blend == backgroundBlendMode ? 'selected' : '';
+                return '\n                        <div class=\'blend-item ' + selected + '\' data-mode="' + blend + '">\n                            <div class="blend-item-view-container">\n                                <div class="blend-item-view"  style=\'' + _this2.read('/blend/toString', layer, '') + '\'></div>\n                                <div class="blend-item-blend-view"  style=\'' + _this2.read('/blend/toString', layer, blend) + '\'></div>\n                                <div class="blend-item-text">' + blend + '</div>\n                            </div>\n                        </div>';
+            }).join('') + '</div>';
+        }
+    }, {
+        key: 'load $mixBlendList',
+        value: function load$mixBlendList() {
+            var _this3 = this;
+
+            var list = this.read('/blend/list');
+            var layer = this.read('/layer/get');
+            var mixBlendMode = this.read('/layer/get', 'mixBlendMode');
+            return '<div>' + list.map(function (blend) {
+
+                var selected = blend == mixBlendMode ? 'selected' : '';
+                return '\n                        <div class=\'blend-item ' + selected + '\' data-mode="' + blend + '">\n                            <div class="blend-item-view-container">\n                                <div class="blend-item-view"  style=\'' + _this3.read('/blend/toString', layer, '', '') + '\'></div>\n                                <div class="blend-item-blend-view"  style=\'' + _this3.read('/blend/toString', layer, '', blend) + '\'></div>\n                                <div class="blend-item-text">' + blend + '</div>\n                            </div>\n                        </div>';
+            }).join('') + '</div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeLayer',
+        value: function changeLayer() {
+            this.refresh();
+        }
+    }, {
+        key: '@initLayer',
+        value: function initLayer() {
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $blendList .blend-item',
+        value: function clickSelf$blendListBlendItem(e) {
+            this.dispatch('/blend/select', e.$delegateTarget.attr('data-mode'));
+
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $mixBlendList .blend-item',
+        value: function clickSelf$mixBlendListBlendItem(e) {
+            this.dispatch('/blend/select/mix', e.$delegateTarget.attr('data-mode'));
+
+            this.refresh();
+        }
+    }]);
+    return BlendList;
+}(UIElement);
+
+var BlendControl = function (_UIElement) {
+    inherits(BlendControl, _UIElement);
+
+    function BlendControl() {
+        classCallCheck(this, BlendControl);
+        return possibleConstructorReturn(this, (BlendControl.__proto__ || Object.getPrototypeOf(BlendControl)).apply(this, arguments));
+    }
+
+    createClass(BlendControl, [{
+        key: "template",
+        value: function template() {
+            return " \n            <div class=\"control blend-control\">\n                <div class=\"left\">\n                    <BlendList></BlendList> \n                </div>\n                <div class=\"right\">\n                    <GradientView></GradientView>\n                </div>\n \n            </div>     \n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { GradientView: GradientView, BlendList: BlendList };
+        }
+    }]);
+    return BlendControl;
+}(UIElement);
+
+var ControlTab = function (_BaseTab) {
+    inherits(ControlTab, _BaseTab);
+
+    function ControlTab() {
+        classCallCheck(this, ControlTab);
+        return possibleConstructorReturn(this, (ControlTab.__proto__ || Object.getPrototypeOf(ControlTab)).apply(this, arguments));
+    }
+
+    createClass(ControlTab, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="tab control-tab">\n                <div class="tab-header" ref="$header">\n                    <div class="tab-item selected" data-id="image">Images</div>\n                    <div class="tab-item" data-id="blend">Blend Modes</div>\n                    <div class="tab-item" data-id="filter">Filters</div>                    \n                </div>\n                <div class="tab-body" ref="$body">\n                    <div class="tab-content selected" data-id="image">\n                        <ImageControl></ImageControl>\n                    </div>\n                    \n                    <div class="tab-content" data-id="blend">\n                        <BlendControl></BlendControl>                        \n                    </div>\n                    <div class="tab-content" data-id="filter">\n                        <FilterControl></FilterControl>                        \n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return { ImageControl: ImageControl, BlendControl: BlendControl };
+        }
+    }]);
+    return ControlTab;
+}(BaseTab);
+
+var XDImageEditor = function (_BaseImageEditor) {
+    inherits(XDImageEditor, _BaseImageEditor);
+
+    function XDImageEditor(opt, props) {
+        classCallCheck(this, XDImageEditor);
+
+        var _this = possibleConstructorReturn(this, (XDImageEditor.__proto__ || Object.getPrototypeOf(XDImageEditor)).call(this, opt, props));
+
+        _this.dispatch('/layer/add');
+
+        _this.emit('initLayer');
+        return _this;
+    }
+
+    createClass(XDImageEditor, [{
+        key: 'template',
+        value: function template() {
+            return '\n\n            <div class="layout-main">\n                <div class="layout-top">\n                    <div class=\'layout-flow\'>                \n                        <ControlTab></ControlTab>\n                    </div>\n                </div>\n                <div class="layout-left">\n                    <div class=\'layout-flow\'>\n                        <LayerManagerTab></LayerManagerTab>                \n                    </div>\n                </div>\n                <div class="layout-right">\n                    <div class=\'layout-flow\'>\n                        <ColorTab></ColorTab>\n                        <ColorStepsTab></ColorStepsTab>\n                    </div>\n                </div>\n                <div class="layout-header">\n                    <GradientLayersMenu></GradientLayersMenu>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                ColorTab: ColorTab, ColorStepsTab: ColorStepsTab, LayerManagerTab: LayerManagerTab, GradientLayersMenu: LayersMenu, ControlTab: ControlTab
+            };
+        }
+    }]);
+    return XDImageEditor;
+}(BaseImageEditor);
+
+var ImageEditor = {
+    createImageEditor: function createImageEditor() {
+        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { type: 'xd' };
+
+        switch (opts.type) {
+            default:
+                return new XDImageEditor(opts);
+        }
+    },
+
+    ImageEditor: XDImageEditor
 };
 
 var colorpicker_class = 'codemirror-colorview';
@@ -9404,7 +12040,7 @@ function onScroll(cm) {
     cm.state.colorpicker.close_color_picker();
 }
 
-function debounce(callback, delay) {
+function debounce$1(callback, delay) {
 
     var t = undefined;
 
@@ -9428,7 +12064,7 @@ function has_class(el, cls) {
     }
 }
 
-var ColorView = function () {
+var ColorView$2 = function () {
     function ColorView(cm, opt) {
         classCallCheck(this, ColorView);
 
@@ -9474,7 +12110,7 @@ var ColorView = function () {
             this.cm.getWrapperElement().addEventListener('paste', this.onPasteCallback);
 
             if (this.is_edit_mode()) {
-                this.cm.on('scroll', debounce(onScroll, 50));
+                this.cm.on('scroll', debounce$1(onScroll, 50));
             }
         }
     }, {
@@ -9771,7 +12407,7 @@ var ColorView = function () {
     return ColorView;
 }();
 
-if (CodeMirror) {
+if (window.CodeMirror) {
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
         if (old && old != CodeMirror.Init) {
@@ -9784,12 +12420,12 @@ if (CodeMirror) {
         }
 
         if (val) {
-            cm.state.colorpicker = new ColorView(cm, val);
+            cm.state.colorpicker = new ColorView$2(cm, val);
         }
     });
 }
 
-var index = _extends({}, Util, ColorPicker);
+var index = _extends({}, Util, ColorPicker, ImageEditor);
 
 return index;
 

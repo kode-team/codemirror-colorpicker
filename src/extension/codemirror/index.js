@@ -2,7 +2,7 @@ import CodeMirror from 'codemirror'
 import CodeMirrorColorView from './colorview' 
 
 
-if (CodeMirror) {
+if (window.CodeMirror) {
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
         if (old && old != CodeMirror.Init) {

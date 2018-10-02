@@ -1,5 +1,4 @@
 import {
-    parseParamNumber,
     pixel
 } from '../functions'
 

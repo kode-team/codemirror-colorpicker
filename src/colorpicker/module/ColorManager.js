@@ -84,7 +84,7 @@ export default class ColorManager extends BaseModule {
     }
 
     '/toColor' ($store, type) {
-        type = type || $store.format; 
+        type = (type || $store.format).toLowerCase(); 
 
         if (type == 'rgb') {
             return $store.dispatch('/toRGB')

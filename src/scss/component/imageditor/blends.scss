@@ -1,0 +1,106 @@
+$pointer-color: rgba(#ececec, 0.8);
+$direction-border: 2px solid $pointer-color;
+$layer-item-height: 50px;
+$button-size: 24px;
+$layer-item-padding: 8px;
+
+.blend-row {
+    position: relative;
+}
+
+.blend-list-container {
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+
+    .blend-mode-title {
+        display: block;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        height: 30px;
+        font-size: 12px;
+        padding:10px;
+        box-sizing: border-box;
+        background-color: #ececec;
+    }
+
+    .blend-list {
+        display: block;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 30px;
+        bottom: 0px;
+        overflow: auto; 
+        box-sizing: border-box;
+        border-bottom: 1px solid #ececec;
+        .blend-item {
+            display: flex;
+            height: $layer-item-height;            
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #dedede;
+            padding: 5px;
+
+            &:first-child {
+                border-top: 1px solid #dedede;
+            }
+
+            &.selected {
+                background-color: #dedede;                
+                
+            }
+
+            .blend-item-view-container {
+                position: relative; 
+                @include transparent-background();
+                pointer-events: none;
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                flex: 1 1 auto;  
+                padding: 14px;
+                width: 25%;
+            }
+
+            .blend-item-view {
+                pointer-events: none;                
+                position: absolute; 
+                left: 0px;
+                right: 50%;
+                bottom: 0px;
+                top: 0px; 
+            }
+
+            .blend-item-blend-view {
+                pointer-events: none;                
+                position: absolute; 
+                left: 50%;
+                right: 0px;
+                bottom: 0px;
+                top: 0px; 
+            }
+
+            .blend-item-text {
+                pointer-events: none;                
+                position: absolute; 
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: 0px; 
+                color: white;
+                padding: 10px;
+                font-size: 13px;
+                text-shadow: 0px 3px 4px black;                
+            }
+        }
+    }
+
+
+
+}

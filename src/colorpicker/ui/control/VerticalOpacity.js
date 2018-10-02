@@ -1,15 +1,8 @@
 
 import Color from '../../../util/Color'
-import Event from '../../../util/Event'
 import VerticalSlider from '../../VerticalSlider';
 
-export default class Opacity extends VerticalSlider {
-
-    constructor (opt) {
-        super(opt)
-
-        this.source = 'vertical-opacity-control'
-    }
+export default class VerticalOpacity extends VerticalSlider {
 
     template () {
         return `

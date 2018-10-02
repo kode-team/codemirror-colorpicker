@@ -206,7 +206,6 @@ export function parse(str) {
 
 }
 
-
 export function parseGradient (colors) {
     if (typeof colors == 'string') {
         colors = convertMatchesArray(colors);

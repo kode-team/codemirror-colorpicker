@@ -1,0 +1,57 @@
+.image-control {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+
+    > .left {
+        position: absolute;
+        width: 180px;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        box-sizing: border-box;
+        border-right: 1px solid #ececec;
+    }
+
+    > .right {
+        position: absolute;        
+        left: 180px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px; 
+
+        .gradient-sample-list {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            top: 0px;
+            height: 100px;
+            box-sizing: border-box;
+            padding: 10px;
+
+            .gradient-sample-item {
+                display: inline-block;
+                vertical-align: middle;
+                width: 34px;
+                height: 34px;
+                border: 3px solid #ececec;
+                cursor: pointer;
+                position: relative;
+                margin: 2px;
+            }
+
+
+       }
+
+       .gradient-tools {
+           position: absolute;
+           left: 0px;
+           bottom: 30px;
+           right: 0px;
+           height: 30px;
+       }
+    }
+
+}

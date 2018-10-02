@@ -1,35 +1,42 @@
 import BaseColorPicker from '../BaseColorPicker'
 
-import ColorControl from './ColorControl'
-import ColorInformation from '../ui/ColorInformation'
-import ColorPalette from '../ui/ColorPalette'
+import Hue from '../ui/control/Hue';
+import Opacity from '../ui/control/Opacity'
+import ColorView from '../ui/control/ColorView'
+import Information from '../ui/ColorInformation'
+import Palette from '../ui/ColorPalette'
 import ColorSetsChooser from '../ui/ColorSetsChooser'
 import CurrentColorSets from '../ui/CurrentColorSets'
-import CurrentColorSetsContextMenu from '../ui/CurrentColorSetsContextMenu'
+import ContextMenu from '../ui/CurrentColorSetsContextMenu'
 
 export default class ChromeDevToolColorPicker extends BaseColorPicker {
 
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="palette"></div> 
-                <div target="control"></div>
-                <div target="information"></div>
-                <div target="currentColorSets"></div>
-                <div target="colorSetsChooser"></div>
-                <div target="contextMenu"></div>
+                <Palette></Palette> 
+                <div class="control">
+                    <Hue></Hue>
+                    <Opacity></Opacity>
+                    <div class="empty"></div>
+                    <ColorView></ColorView>
+                </div>
+                <Information></Information>
+                <CurrentColorSets></CurrentColorSets>
+                <ColorSetsChooser></ColorSetsChooser>
+                <ContextMenu></ContextMenu>
             </div>
         `
     }
 
     components() {
         return { 
-            palette: ColorPalette,  
-            control: ColorControl,
-            information: ColorInformation,
-            currentColorSets: CurrentColorSets,
-            colorSetsChooser: ColorSetsChooser,
-            contextMenu: CurrentColorSetsContextMenu
+            Hue, Opacity, ColorView, 
+            Palette,  
+            Information,
+            CurrentColorSets,
+            ColorSetsChooser,
+            ContextMenu
         }
     }
 

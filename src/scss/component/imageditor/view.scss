@@ -1,0 +1,266 @@
+$pointer-color: rgba(#ececec, 0.8);
+$direction-border: 2px solid $pointer-color;
+$guide-border-hover-color: rgba(0 , 0, 0, 0.2);
+
+.gradient-view {
+    position: absolute;
+    width: 400px;
+    height: 300px;    
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    border: 1px solid $guide-border-hover-color;
+    
+    &.drag-over {
+        > * {
+            display: none;
+        } 
+
+        .dropzone {
+            z-index: 100;
+            background-color: yellow;
+            pointer-events: none;            
+            display: block;
+        }
+    }
+
+    .dropzone,
+    .gradient-color-view,
+    .gradient-color-view-container {
+        width: 400px;
+        height: 300px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        pointer-events: none;
+    }
+
+    .dropzone {
+        display: none;
+    }
+
+    .gradient-color-view-container {
+        @include transparent-background();
+
+    }
+
+
+    .predefined-angluar-group {
+        display: inline-block;
+        text-align: center;
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        pointer-events: none;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+
+        button {
+            pointer-events: all;
+            padding: 0px;
+            margin: 1px;
+            background-color: transparent;
+            border: 0px;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            position: absolute;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+
+            &:hover {
+                border-color: $guide-border-hover-color; 
+
+                &:after {
+                    border-color: $guide-border-hover-color; 
+                }
+            }
+
+            &:after {
+                content: "";
+                position: absolute;
+                display: inline-block;
+                width: 15px;
+                height: 15px;                
+            }
+
+            /* linear */
+            &[data-value='to top'] {
+                top: 0px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-top: $direction-border;
+
+                &:after {
+                    border-top: $direction-border;
+                    top: -8px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+            }
+
+            &[data-value='to top right'] {
+                top: 0px;
+                right: 0px;
+                border-top: $direction-border;
+                border-right: $direction-border;
+
+                &:after {
+                    border-top: $direction-border;
+                    border-right: $direction-border;
+                    top: -8px;
+                    right: -8px;
+                }
+            }
+
+            &[data-value='to right'] {
+                top: 50%;
+                right: 0px;
+                transform: translateY(-50%);
+                border-right: $direction-border;
+
+                &:after {
+                    border-right: $direction-border;
+                    top: 50%;
+                    right: -8px;
+                    transform: translateY(-50%);
+                }
+            }
+
+            &[data-value='to bottom right'] {
+                bottom: 0px;
+                right: 0px;
+                border-right: $direction-border;
+                border-bottom: $direction-border;
+
+                &:after {
+                    border-bottom: $direction-border;
+                    border-right: $direction-border;
+                    bottom: -8px;
+                    right: -8px;
+                }                
+            }
+
+            &[data-value='to bottom'] {
+                bottom: 0px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-bottom: $direction-border;
+
+                &:after {
+                    border-bottom: $direction-border;
+                    left: 50%;
+                    bottom: -8px;
+                    transform: translateX(-50%);
+                }                
+            }
+
+            &[data-value='to bottom left'] {
+                left: 0px;
+                bottom: 0px;
+                border-left: $direction-border;
+                border-bottom: $direction-border;
+
+                &:after {
+                    border-bottom: $direction-border;
+                    border-left: $direction-border;
+                    bottom: -8px;
+                    left: -8px;
+                }                  
+            }
+
+            &[data-value='to left'] {
+                top: 50%;
+                left: 0px;
+                transform: translateY(-50%);
+                border-left: $direction-border;
+
+                &:after {
+                    border-left: $direction-border;
+                    top: 50%;
+                    left: -8px;
+                    transform: translateY(-50%);
+                }                                
+            }
+
+            &[data-value='to top left'] {
+                top: 0px;
+                left: 0px;
+                border-left: $direction-border;
+                border-top: $direction-border;
+
+                &:after {
+                    border-top: $direction-border;
+                    border-left: $direction-border;
+                    top: -8px;
+                    left: -8px;
+                }                                
+            }
+
+            /* radial */ 
+            &[data-value='top'] {
+                top: 0px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-top: $direction-border;
+
+                &:after {
+                    border-top: $direction-border;
+                    top: -8px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }                
+            }
+
+            &[data-value='right'] {
+                top: 50%;
+                right: 0px;
+                transform: translateY(-50%);
+                border-right: $direction-border;
+
+
+                &:after {
+                    border-right: $direction-border;
+                    top: 50%;
+                    right: -8px;
+                    transform: translateY(-50%);
+                }                
+            }
+
+            &[data-value='bottom'] {
+                bottom: 0px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-bottom: $direction-border;
+
+                &:after {
+                    border-bottom: $direction-border;
+                    left: 50%;
+                    bottom: -8px;
+                    transform: translateX(-50%);
+                }                 
+            }
+
+            &[data-value='left'] {
+                top: 50%;
+                left: 0px;
+                transform: translateY(-50%);
+                border-left: $direction-border;
+
+
+                &:after {
+                    border-left: $direction-border;
+                    top: 50%;
+                    left: -8px;
+                    transform: translateY(-50%);
+                }                              
+            }
+        }
+    }
+
+}

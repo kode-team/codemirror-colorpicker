@@ -1,8 +1,6 @@
 import UIElement from '../UIElement';
 import Event from '../../util/Event'
 
-const source = 'chromedevtool-palette';
-
 export default class ColorPalette extends UIElement {
 
     template () {
@@ -28,17 +26,18 @@ export default class ColorPalette extends UIElement {
     caculateSV () {
         var pos = this.drag_pointer_pos || { x : 0, y : 0 };
 
-        var width = this.state.get('$el.width');
-        var height = this.state.get('$el.height');
+        var width = this.$el.width();
+        var height = this.$el.height();
+
+        // console.log(width, height, this.$el.size());
 
         var s = (pos.x / width);
         var v = ((height - pos.y) / height);
 
-        this.$store.dispatch('/changeColor', {
+        this.dispatch('/changeColor', {
             type: 'hsv',
             s,
-            v,
-            source
+            v
         })        
     }
 
@@ -46,20 +45,18 @@ export default class ColorPalette extends UIElement {
         var  x = this.state.get('$el.width') * this.$store.hsv.s, 
         y = this.state.get('$el.height') * ( 1 - this.$store.hsv.v );
     
-        this.refs.$drag_pointer.css({
-            left : x + "px",
-            top : y + "px"
-        });
+        this.refs.$drag_pointer.px('left', x);
+        this.refs.$drag_pointer.px('top', y);
     
         this.drag_pointer_pos = { x , y };
 
-        this.setBackgroundColor(this.$store.dispatch('/getHueColor'))
+        this.setBackgroundColor(this.dispatch('/getHueColor'))
     }
 
 
     setMainColor(e) {
         // e.preventDefault();
-        var pos = this.$el.offset();         // position for screen
+        var pos = this.state.get('$el.offset')
         var w = this.state.get('$el.contentWidth');
         var h = this.state.get('$el.contentHeight');
 
@@ -72,62 +69,37 @@ export default class ColorPalette extends UIElement {
         if (y < 0) y = 0;
         else if (y > h) y = h;
     
-        this.refs.$drag_pointer.css({
-            left: x  + 'px',
-            top: y + 'px'
-        });
+        this.refs.$drag_pointer.px('left', x)
+        this.refs.$drag_pointer.px('top', y)
     
         this.drag_pointer_pos = { x , y }
 
         this.caculateSV()
     }    
 
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
+    '@changeColor' () {
+        this.refresh()
     }
 
     '@initColor' () { this.refresh() }    
 
-    'mouseup document' (e) {
+    'pointerend document' (e) {
         this.isDown = false; 
     }    
 
-    'mousemove document' (e) {
+    'pointermove document' (e) {
         if (this.isDown) {
             this.setMainColor(e);
         }
     }
 
-    mousedown (e) {
+    'pointerstart' (e) {
         this.isDown = true; 
         this.setMainColor(e);
     }
     
-    mouseup (e) {
+    'pointerend' (e) {
         this.isDown = false; 
     }
-
-
-    'touchend document' (e) {
-        this.isDown = false; 
-    }    
-
-    'touchmove document' (e) {
-        if (this.isDown) {
-            this.setMainColor(e);
-        }
-    }
-
-    touchstart (e) {
-        e.preventDefault()
-        this.isDown = true; 
-        this.setMainColor(e);
-    }
-    
-    touchend (e) {
-        this.isDown = false; 
-    }    
 
 }

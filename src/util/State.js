@@ -1,3 +1,5 @@
+import { debounce } from "./functions/func";
+
 const DELEGATE_SPLIT = '.';
 
 export default class State {
@@ -5,6 +7,14 @@ export default class State {
 
     this.masterObj = masterObj;
     this.settingObj = settingObj; 
+
+    window.addEventListener('resize', debounce(() => {
+      this.initialize()
+    }, 300))
+  }
+
+  initialize () {
+    this.settingObj = {} 
   }
 
   set (key, value, defaultValue = undefined) {

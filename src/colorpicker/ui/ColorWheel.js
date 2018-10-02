@@ -7,14 +7,12 @@ import { getXYInCircle, caculateAngle } from '../../util/functions/math';
 
 export default class ColorWheel extends UIElement {
 
-    constructor (opt) {
-        super(opt)
-
+    initialize () {
+        super.initialize();
         this.width = 214;
         this.height = 214;
         this.thinkness = 0; 
-        this.half_thinkness = 0         
-        this.source = 'colorwheel'
+        this.half_thinkness = 0            
     }
 
     template () {
@@ -40,14 +38,11 @@ export default class ColorWheel extends UIElement {
 
     renderValue () {
         var value = (1 - (this.$store.hsv.v) );
-        this.refs.$valuewheel.css({
-            'background-color': `rgba(0, 0, 0, ${value})`
-        })
+        this.refs.$valuewheel.css('background-color', `rgba(0, 0, 0, ${value})`)
     }
 
 
     renderWheel (width, height) {
-
 
         if (this.width && !width) width = this.width;
         if (this.height && !height) height = this.height;        
@@ -56,7 +51,8 @@ export default class ColorWheel extends UIElement {
         const context = $canvas.el.getContext('2d')
         $canvas.el.width = width;
         $canvas.el.height = height; 
-        $canvas.css({ width: width + 'px', height: height + 'px' })
+        $canvas.px('width', width)
+        $canvas.px('height', height)
 
         var img = context.getImageData(0, 0, width, height);
         var pixels = img.data;
@@ -113,13 +109,14 @@ export default class ColorWheel extends UIElement {
         const context = $canvas.el.getContext('2d')
 
         let [width, height] = $canvas.size()
-
+        
         if (this.width && !width) width = this.width;
         if (this.height && !height) height = this.height;
 
         $canvas.el.width = width;
         $canvas.el.height = height; 
-        $canvas.css({ width: width + 'px', height: height + 'px' })
+        $canvas.px('width', width)
+        $canvas.px('height', height)
 
         var $wheelCanvas = this.renderWheel(width, height)
 
@@ -145,10 +142,10 @@ export default class ColorWheel extends UIElement {
         var height = this.state.get('$el.height');  
         var radius = this.state.get('$colorwheel.width') / 2;  
 
-        var minX = this.refs.$el.offset().left;
+        var minX = this.state.get('$el.offsetLeft');
         var centerX = minX + width / 2;
 
-        var minY = this.refs.$el.offset().top;
+        var minY = this.state.get('$el.offsetTop');
         var centerY = minY + height / 2;
 
         return { minX, minY, width, height, radius,  centerX, centerY }
@@ -178,10 +175,8 @@ export default class ColorWheel extends UIElement {
         var saturation = Math.min(Math.sqrt(d) / radius, 1)
 
         // set drag pointer position 
-        this.refs.$drag_pointer.css({
-            left: (x - minX) + 'px',
-            top: (y - minY) + 'px' 
-        });
+        this.refs.$drag_pointer.px('left', x - minX);
+        this.refs.$drag_pointer.px('top', y - minY);
 
         if (!isEvent) {
             this.changeColor({
@@ -193,59 +188,34 @@ export default class ColorWheel extends UIElement {
     }
 
     changeColor (opt) {
-        this.$store.dispatch('/changeColor',Object.assign({
-            source: this.source
-        }, opt || {}))
+        this.dispatch('/changeColor',opt || {})
     }
 
-    '@changeColor' (sourceType) {
-        if (this.source != sourceType) {
-            this.refresh(true);
-        }
+    '@changeColor' () {
+        this.refresh(true);
     }
 
     '@initColor' () { this.refresh(true) }    
 
     // Event Bindings 
-    'mouseup document' (e) {
+    'pointerend document' (e) {
         this.isDown = false ;
     }
 
-    'mousemove document' (e) {
+    'pointermove document' (e) {
         if (this.isDown) {
             this.setHueColor(e);
         }
     }
 
-    'mousedown $drag_pointer' (e) {
+    'pointerstart $drag_pointer' (e) {
         e.preventDefault();
         this.isDown = true; 
     }
 
-    'mousedown $el' (e) {
+    'pointerstart $el' (e) {
         this.isDown = true; 
         this.setHueColor(e);        
-    }    
-
-    'touchend document' (e) {
-        this.isDown = false ;
-    }
-
-    'touchmove document' (e) {
-        if (this.isDown) {
-            this.setHueColor(e);
-        }
-    }
-
-    'touchstart $drag_pointer' (e) {
-        e.preventDefault();
-        this.isDown = true; 
-    }
-
-    'touchstart $el' (e) {
-        e.preventDefault()
-        this.isDown = true; 
-        this.setHueColor(e);        
-    }        
+    }     
 }
  

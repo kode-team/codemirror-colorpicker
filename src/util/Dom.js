@@ -48,6 +48,10 @@ export default class Dom {
         return this; 
     }
 
+    is (checkElement) {
+        return this.el === (checkElement.el || checkElement);
+    }
+
     closest (cls) {
         
         var temp = this;
@@ -69,7 +73,10 @@ export default class Dom {
     }
     
     removeClass (cls) {
-        this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
+
+        if (this.el.className) {
+            this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
+        }
 
         return this; 
     }
@@ -93,12 +100,23 @@ export default class Dom {
     
     }
 
-    toggleClass (cls) {
-        if (this.hasClass(cls)) {
-            this.removeClass(cls);
+    toggleClass (cls, isForce = false) {
+
+        if (arguments.length == 2) {
+            if (isForce) {
+                this.addClass(cls)
+            } else {
+                this.removeClass(cls);
+            }
         } else {
-            this.addClass(cls);
+            if (this.hasClass(cls)) {
+                this.removeClass(cls);
+            } else {
+                this.addClass(cls);
+            }
         }
+
+
     }
     
     html (html) {
@@ -116,9 +134,20 @@ export default class Dom {
         return this.el.querySelector(selector)
     } 
 
+    $ (selector) {
+        var node = this.find(selector);
+        return node ? new Dom(node) : null; 
+    }
+
     findAll (selector) { 
         return this.el.querySelectorAll(selector)
     } 
+
+    $$ (selector) {
+        return [...this.findAll(selector)].map(node => {
+            return new Dom(node)
+        })
+    }
 
     
     empty () {
@@ -152,8 +181,13 @@ export default class Dom {
         return this;
     }
     
-    text () {
-        return this.el.textContent;
+    text (value) {
+        if (arguments.length == 0) {
+            return this.el.textContent;
+        } else {
+            this.el.textContent = value; 
+        }
+        
     }
     
     css (key, value) {
@@ -182,6 +216,10 @@ export default class Dom {
     cssInt (key) {
         return parseInt(this.css(key));
     }
+
+    px (key, value) {
+        return this.css(key, value + 'px')
+    }
     
     offset () {
         var rect = this.el.getBoundingClientRect();
@@ -190,6 +228,14 @@ export default class Dom {
             top: rect.top + Dom.getScrollTop(),
             left: rect.left + Dom.getScrollLeft()
         };
+    }
+
+    offsetLeft () {
+        return this.offset().left; 
+    }
+
+    offsetTop () {
+        return this.offset().top; 
     }
     
     position () {
@@ -279,8 +325,15 @@ export default class Dom {
         return this.css('display', 'none');
     }
 
-    toggle () {
-        if (this.css('display') == 'none') {
+    toggle (isForce) {
+
+        var currentHide = this.css('display') == 'none'
+
+        if (arguments.length == 1) {
+            currentHide = isForce
+        }
+
+        if (currentHide) {
             return this.show();
         } else {
             return this.hide();
@@ -332,10 +385,36 @@ export default class Dom {
         return new Dom(this.el.firstElementChild);
     }
 
-    replace (oldElement, newElement) {
-        this.el.replaceChild(newElement, oldElement);
+    children () {
+        var element = this.el.firstElementChild; 
+
+        if (!element) {
+            return [] 
+        }
+
+        var results = [] 
+
+        do {
+            results.push(new Dom(element));
+            element = element.nextElementSibling;
+        } while (element);
+
+        return results; 
+    }
+
+    childLength () {
+        return this.el.children.length;
+    }
+
+    replace (newElement) {
+
+        this.el.parentNode.replaceChild(newElement.el || newElement, this.el);
 
         return this; 
+    }
+
+    checked (isChecked = false) {
+        this.el.checked = isChecked;
     }
 }
 

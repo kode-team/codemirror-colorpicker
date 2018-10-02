@@ -2,12 +2,10 @@ import VerticalSlider from '../../VerticalSlider';
 
 export default class VerticalHue extends VerticalSlider {
 
-    constructor (opt) {
-        super(opt)
-
+    initialize () {
+        super.initialize()
         this.minValue = 0
         this.maxValue = 360 
-        this.source = 'vertical-hue-control'
     }
 
     template () {

@@ -2,12 +2,10 @@ import BaseSlider from '../../BaseSlider';
 
 export default class Hue extends BaseSlider {
 
-    constructor (opt) {
-        super(opt)
-
+    initialize () {
+        super.initialize()
         this.minValue = 0
         this.maxValue = 360
-        this.source = 'hue-control'
     }
 
     template () {

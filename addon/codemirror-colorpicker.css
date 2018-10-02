@@ -201,8 +201,8 @@
   .codemirror-colorpicker .colorpicker-body > .information {
     /*border-top: 1px solid #e8e8e8;*/
     position: relative;
-    -webkit-box-sizing: padding-box;
-            box-sizing: padding-box; }
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
     .codemirror-colorpicker .colorpicker-body > .information > input {
       position: absolute;
       font-size: 10px;
@@ -885,74 +885,6 @@
       width: 30px;
       height: 30px;
       border-radius: 2px; }
-  .codemirror-colorpicker.xd {
-    display: inline-block;
-    padding-top: 12px;
-    width: 245px; }
-    .codemirror-colorpicker.xd .color {
-      display: inline-block;
-      margin-left: 12px;
-      margin-bottom: 12px;
-      width: 170px;
-      height: 170px;
-      vertical-align: middle;
-      border-radius: 3px;
-      overflow: hidden;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      border: 1px solid #cecece; }
-      .codemirror-colorpicker.xd .color > .saturation > .value > .drag-pointer {
-        border: 2px solid white;
-        width: 7px;
-        height: 7px;
-        -webkit-box-shadow: 0 0 1px 0px black, inset 0 0 1px 0px black;
-                box-shadow: 0 0 1px 0px black, inset 0 0 1px 0px black; }
-    .codemirror-colorpicker.xd .control {
-      height: 170px;
-      padding: 0px;
-      vertical-align: middle;
-      display: inline-block;
-      margin-right: 12px;
-      margin-bottom: 12px; }
-      .codemirror-colorpicker.xd .control .hue, .codemirror-colorpicker.xd .control .opacity {
-        margin: 0px;
-        padding: 0px;
-        width: 13px;
-        display: inline-block;
-        vertical-align: middle;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-        border-radius: 3px;
-        margin-left: 8px; }
-      .codemirror-colorpicker.xd .control .hue > .hue-container {
-        border-radius: 0px;
-        overflow: hidden;
-        height: 100%;
-        background: -webkit-gradient(linear, left bottom, left top, from(#ff0000), color-stop(17%, #ffff00), color-stop(33%, #00ff00), color-stop(50%, #00ffff), color-stop(67%, #0000ff), color-stop(83%, #ff00ff), to(#ff0000));
-        background: linear-gradient(to top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }
-      .codemirror-colorpicker.xd .control .opacity > .opacity-container {
-        border-radius: 0px;
-        overflow: hidden;
-        height: 100%; }
-      .codemirror-colorpicker.xd .control .drag-bar, .codemirror-colorpicker.xd .control .drag-bar2 {
-        border: 0px;
-        background-color: transparent;
-        border: 2px solid white;
-        -webkit-box-shadow: 0 0 1px 0px black, inset 0 0 1px 0px black;
-                box-shadow: 0 0 1px 0px black, inset 0 0 1px 0px black;
-        width: 10px;
-        height: 10px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        -webkit-transform: none;
-                transform: none;
-        overflow: hidden;
-        left: 50%;
-        -webkit-transform: translateX(-50%) translateY(-50%);
-                transform: translateX(-50%) translateY(-50%); }
-    .codemirror-colorpicker.xd .information {
-      margin-top: 5px; }
 
 .colorsets-contextmenu {
   position: fixed;
@@ -976,3 +908,1281 @@
       color: white; }
   .colorsets-contextmenu.small .menu-item.small-hide {
     display: none; }
+
+.imageeditor {
+  width: 100%;
+  height: 100%;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  position: absolute;
+  left: 0px;
+  top: 0px; }
+  .imageeditor .layout-main {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px; }
+    .imageeditor .layout-main .layout-top {
+      position: absolute;
+      left: 250px;
+      right: 250px;
+      top: 50px;
+      bottom: 8px;
+      z-index: 1; }
+    .imageeditor .layout-main .layout-right {
+      position: absolute;
+      width: 250px;
+      right: 0px;
+      top: 50px;
+      bottom: 8px;
+      overflow: auto;
+      z-index: 1; }
+    .imageeditor .layout-main .layout-left {
+      position: absolute;
+      left: 0px;
+      width: 250px;
+      top: 50px;
+      bottom: 8px;
+      z-index: 1; }
+    .imageeditor .layout-main .layout-body {
+      position: absolute;
+      left: 250px;
+      right: 250px;
+      top: 150px;
+      bottom: 50px;
+      z-index: 0;
+      overflow: hidden; }
+    .imageeditor .layout-main .layout-header {
+      position: absolute;
+      left: 0px;
+      right: 8px;
+      height: 50px;
+      top: 0px;
+      z-index: 0;
+      overflow: hidden; }
+    .imageeditor .layout-main .layout-footer {
+      position: absolute;
+      left: 250px;
+      right: 250px;
+      height: 50px;
+      bottom: 0px;
+      z-index: 0;
+      overflow: hidden;
+      border-top: 1px solid #ececec; }
+    .imageeditor .layout-main .layout-flow {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      padding: 0px 5px; }
+      .imageeditor .layout-main .layout-flow.padding-0 {
+        padding: 0px; }
+      .imageeditor .layout-main .layout-flow > *:not(:first-child) {
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        margin-top: 4px; }
+      .imageeditor .layout-main .layout-flow > *:first-child {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        height: 290px;
+        margin-top: 0px; }
+      .imageeditor .layout-main .layout-flow > .layout-manager-tab, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row {
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        height: auto; }
+      .imageeditor .layout-main .layout-flow > .blend-row {
+        margin-top: 0px; }
+  .imageeditor .tab {
+    position: relative;
+    background-color: white; }
+    .imageeditor .tab .tab-header {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      height: 30px;
+      top: 0px;
+      display: block;
+      z-index: 1; }
+      .imageeditor .tab .tab-header .tab-item {
+        display: inline-block;
+        font-size: 12px;
+        text-align: center;
+        height: 100%;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        padding: 6px 4px;
+        cursor: pointer;
+        color: black;
+        margin-top: 4px;
+        border: 1px solid #dedede;
+        min-width: 50px; }
+        .imageeditor .tab .tab-header .tab-item:not(.selected) {
+          background-color: #dedede;
+          color: black; }
+        .imageeditor .tab .tab-header .tab-item.selected {
+          background-color: white;
+          border-bottom: 1px solid #ffffff; }
+    .imageeditor .tab .tab-body {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 33px;
+      bottom: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border: 1px solid #dedede; }
+      .imageeditor .tab .tab-body .tab-content {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        display: none;
+        overflow: auto; }
+        .imageeditor .tab .tab-body .tab-content.selected {
+          display: block; }
+  .imageeditor .colorpicker-layer .codemirror-colorpicker {
+    background-color: transparent;
+    width: 100%;
+    border: 0px;
+    -webkit-box-shadow: none;
+            box-shadow: none; }
+    .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .information, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-chooser, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets-contextmenu {
+      display: none; }
+    .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .wheel {
+      border: 0px;
+      background-color: transparent; }
+  .imageeditor .gradient-layers {
+    position: relative;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 5px; }
+    .imageeditor .gradient-layers .layer-list {
+      display: block;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 35px;
+      bottom: 12px;
+      overflow: auto; }
+      .imageeditor .gradient-layers .layer-list .gradient-item {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        height: 50px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #dedede;
+        border-top: 0px;
+        padding: 5px; }
+        .imageeditor .gradient-layers .layer-list .gradient-item:first-child {
+          border-top: 1px solid #dedede; }
+        .imageeditor .gradient-layers .layer-list .gradient-item svg {
+          pointer-events: none; }
+        .imageeditor .gradient-layers .layer-list .gradient-item.selected {
+          background-color: #dedede; }
+          .imageeditor .gradient-layers .layer-list .gradient-item.selected .gradient-item-check svg {
+            display: inline-block; }
+        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-view-container {
+          position: relative;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+          pointer-events: none;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          padding: 14px;
+          width: 25%; }
+        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-check {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          width: 25%;
+          text-align: center;
+          padding: 8px; }
+          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-check svg {
+            display: none; }
+        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          width: 25%;
+          text-align: center;
+          padding: 8px; }
+          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.on {
+            display: none; }
+          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.off {
+            display: inline-block; }
+          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible.on svg.on {
+            display: inline-block; }
+          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible.on svg.off {
+            display: none; }
+        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-delete {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          padding: 8px;
+          width: 25%;
+          text-align: center; }
+        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-view {
+          pointer-events: none;
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 0px; }
+    .imageeditor .gradient-layers .tools {
+      display: inline-block;
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 5px;
+      height: 24px;
+      text-align: left; }
+      .imageeditor .gradient-layers .tools .divider {
+        color: transparent;
+        margin-left: 10px;
+        margin-right: 10px; }
+      .imageeditor .gradient-layers .tools button {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        width: 24px;
+        height: 24px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #ececec;
+        vertical-align: middle;
+        font-size: 15px;
+        font-weight: bold;
+        font-family: serif, sans-serif;
+        line-height: 1.6;
+        cursor: pointer;
+        outline: none;
+        position: relative; }
+      .imageeditor .gradient-layers .tools button {
+        cursor: pointer;
+        outline: none; }
+        .imageeditor .gradient-layers .tools button.first, .imageeditor .gradient-layers .tools button.last {
+          letter-spacing: -2px; }
+        .imageeditor .gradient-layers .tools button.del {
+          overflow: hidden; }
+          .imageeditor .gradient-layers .tools button.del:after, .imageeditor .gradient-layers .tools button.del:before {
+            content: '';
+            width: 80%;
+            height: 1px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform-origin: center center;
+                    transform-origin: center center;
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+            border-top: 1px solid black;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box; }
+          .imageeditor .gradient-layers .tools button.del:after {
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(135deg); }
+  .imageeditor .gradient-layers-menu {
+    position: relative;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 10px 12px;
+    text-align: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex; }
+    .imageeditor .gradient-layers-menu > div {
+      -webkit-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1; }
+      .imageeditor .gradient-layers-menu > div h1 {
+        margin: 0px;
+        text-align: left;
+        font-size: 24px;
+        text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54); }
+    .imageeditor .gradient-layers-menu button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+      border: 0px;
+      background-color: white;
+      padding: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      vertical-align: middle; }
+    .imageeditor .gradient-layers-menu button {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      border: 1px solid black; }
+      .imageeditor .gradient-layers-menu button.first, .imageeditor .gradient-layers-menu button.last {
+        letter-spacing: -2px; }
+      .imageeditor .gradient-layers-menu button.del {
+        overflow: hidden; }
+        .imageeditor .gradient-layers-menu button.del:after, .imageeditor .gradient-layers-menu button.del:before {
+          content: '';
+          width: 80%;
+          height: 1px;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          -webkit-transform-origin: center center;
+                  transform-origin: center center;
+          -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                  transform: translateX(-50%) translateY(-50%) rotate(45deg);
+          border-top: 1px solid black;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+        .imageeditor .gradient-layers-menu button.del:after {
+          -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                  transform: translateX(-50%) translateY(-50%) rotate(135deg); }
+    .imageeditor .gradient-layers-menu .divider {
+      color: transparent;
+      margin-left: 10px;
+      margin-right: 10px; }
+    .imageeditor .gradient-layers-menu button {
+      cursor: pointer;
+      outline: none; }
+      .imageeditor .gradient-layers-menu button.stack-view {
+        position: relative;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid black;
+        background-color: white;
+        box-sizing: border-box; }
+        .imageeditor .gradient-layers-menu button.stack-view:after {
+          border: 1px solid black;
+          background-color: white;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          display: inline-block;
+          content: "";
+          top: -5px;
+          left: -5px; }
+        .imageeditor .gradient-layers-menu button.stack-view:before {
+          border: 1px solid black;
+          background-color: white;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          top: -3px;
+          left: -3px;
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          display: inline-block;
+          content: ""; }
+      .imageeditor .gradient-layers-menu button.only-view {
+        position: relative;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid black;
+        background-color: gray;
+        box-sizing: border-box; }
+      .imageeditor .gradient-layers-menu button.show-angle {
+        position: relative;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px dashed black;
+        background-color: white;
+        box-sizing: border-box; }
+        .imageeditor .gradient-layers-menu button.show-angle:before {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          display: inline-block;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          border: 1px solid black;
+          background-color: white;
+          box-sizing: border-box;
+          border-radius: 50%;
+          left: 50%;
+          top: 50%;
+          -webkit-transform: translateX(-50%) translateY(-50%);
+                  transform: translateX(-50%) translateY(-50%); }
+        .imageeditor .gradient-layers-menu button.show-angle:after {
+          position: absolute;
+          content: "";
+          left: 50%;
+          top: 50%;
+          -webkit-transform: translateX(50%) translateY(-50%);
+                  transform: translateX(50%) translateY(-50%);
+          width: 2px;
+          height: 2px;
+          background-color: black; }
+  .imageeditor .gradient-view {
+    position: absolute;
+    width: 400px;
+    height: 300px;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+    border: 1px solid rgba(0, 0, 0, 0.2); }
+    .imageeditor .gradient-view.drag-over > * {
+      display: none; }
+    .imageeditor .gradient-view.drag-over .dropzone {
+      z-index: 100;
+      background-color: yellow;
+      pointer-events: none;
+      display: block; }
+    .imageeditor .gradient-view .dropzone,
+    .imageeditor .gradient-view .gradient-color-view,
+    .imageeditor .gradient-view .gradient-color-view-container {
+      width: 400px;
+      height: 300px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      pointer-events: none; }
+    .imageeditor .gradient-view .dropzone {
+      display: none; }
+    .imageeditor .gradient-view .gradient-color-view-container {
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+    .imageeditor .gradient-view .predefined-angluar-group {
+      display: inline-block;
+      text-align: center;
+      position: absolute;
+      width: 90%;
+      height: 90%;
+      pointer-events: none;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%); }
+      .imageeditor .gradient-view .predefined-angluar-group button {
+        pointer-events: all;
+        padding: 0px;
+        margin: 1px;
+        background-color: transparent;
+        border: 0px;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        outline: none;
+        cursor: pointer;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        position: absolute;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        /* linear */
+        /* radial */ }
+        .imageeditor .gradient-view .predefined-angluar-group button:hover {
+          border-color: rgba(0, 0, 0, 0.2); }
+          .imageeditor .gradient-view .predefined-angluar-group button:hover:after {
+            border-color: rgba(0, 0, 0, 0.2); }
+        .imageeditor .gradient-view .predefined-angluar-group button:after {
+          content: "";
+          position: absolute;
+          display: inline-block;
+          width: 15px;
+          height: 15px; }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top'] {
+          top: 0px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          border-top: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top']:after {
+            border-top: 2px solid rgba(236, 236, 236, 0.8);
+            top: -8px;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+                    transform: translateX(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top right'] {
+          top: 0px;
+          right: 0px;
+          border-top: 2px solid rgba(236, 236, 236, 0.8);
+          border-right: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top right']:after {
+            border-top: 2px solid rgba(236, 236, 236, 0.8);
+            border-right: 2px solid rgba(236, 236, 236, 0.8);
+            top: -8px;
+            right: -8px; }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to right'] {
+          top: 50%;
+          right: 0px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-right: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to right']:after {
+            border-right: 2px solid rgba(236, 236, 236, 0.8);
+            top: 50%;
+            right: -8px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom right'] {
+          bottom: 0px;
+          right: 0px;
+          border-right: 2px solid rgba(236, 236, 236, 0.8);
+          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom right']:after {
+            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+            border-right: 2px solid rgba(236, 236, 236, 0.8);
+            bottom: -8px;
+            right: -8px; }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom'] {
+          bottom: 0px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom']:after {
+            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+            left: 50%;
+            bottom: -8px;
+            -webkit-transform: translateX(-50%);
+                    transform: translateX(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom left'] {
+          left: 0px;
+          bottom: 0px;
+          border-left: 2px solid rgba(236, 236, 236, 0.8);
+          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom left']:after {
+            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+            border-left: 2px solid rgba(236, 236, 236, 0.8);
+            bottom: -8px;
+            left: -8px; }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to left'] {
+          top: 50%;
+          left: 0px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-left: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to left']:after {
+            border-left: 2px solid rgba(236, 236, 236, 0.8);
+            top: 50%;
+            left: -8px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top left'] {
+          top: 0px;
+          left: 0px;
+          border-left: 2px solid rgba(236, 236, 236, 0.8);
+          border-top: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top left']:after {
+            border-top: 2px solid rgba(236, 236, 236, 0.8);
+            border-left: 2px solid rgba(236, 236, 236, 0.8);
+            top: -8px;
+            left: -8px; }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='top'] {
+          top: 0px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          border-top: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='top']:after {
+            border-top: 2px solid rgba(236, 236, 236, 0.8);
+            top: -8px;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+                    transform: translateX(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='right'] {
+          top: 50%;
+          right: 0px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-right: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='right']:after {
+            border-right: 2px solid rgba(236, 236, 236, 0.8);
+            top: 50%;
+            right: -8px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='bottom'] {
+          bottom: 0px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='bottom']:after {
+            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+            left: 50%;
+            bottom: -8px;
+            -webkit-transform: translateX(-50%);
+                    transform: translateX(-50%); }
+        .imageeditor .gradient-view .predefined-angluar-group button[data-value='left'] {
+          top: 50%;
+          left: 0px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          border-left: 2px solid rgba(236, 236, 236, 0.8); }
+          .imageeditor .gradient-view .predefined-angluar-group button[data-value='left']:after {
+            border-left: 2px solid rgba(236, 236, 236, 0.8);
+            top: 50%;
+            left: -8px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%); }
+  .imageeditor .gradient-info {
+    position: absolute;
+    left: 5px;
+    top: 50px;
+    right: 5px;
+    bottom: 5px;
+    overflow: auto; }
+    .imageeditor .gradient-info .form-item {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      font-size: 12px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      margin: 2px 0px; }
+      .imageeditor .gradient-info .form-item > label {
+        display: inline-block; }
+      .imageeditor .gradient-info .form-item > * {
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1; }
+        .imageeditor .gradient-info .form-item > * input, .imageeditor .gradient-info .form-item > * select {
+          width: 100px; }
+      .imageeditor .gradient-info .form-item .color-step {
+        display: block;
+        padding: 1px;
+        color: #333; }
+        .imageeditor .gradient-info .form-item .color-step > * {
+          display: inline-block;
+          vertical-align: middle; }
+        .imageeditor .gradient-info .form-item .color-step input {
+          width: 40px; }
+        .imageeditor .gradient-info .form-item .color-step .tools {
+          text-align: right; }
+          .imageeditor .gradient-info .form-item .color-step .tools button {
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            -webkit-transform: scale(1.2);
+                    transform: scale(1.2);
+            border: 0px;
+            background-color: transparent;
+            padding: 0px 2px; }
+        .imageeditor .gradient-info .form-item .color-step input[type=text] {
+          width: 100px; }
+        .imageeditor .gradient-info .form-item .color-step input[type=number] {
+          -webkit-appearance: none;
+             -moz-appearance: none;
+                  appearance: none;
+          border: 1px solid #ececec; }
+        .imageeditor .gradient-info .form-item .color-step .color-view {
+          width: 20px;
+          height: 20px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          position: relative;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+          border: 1px solid #ececec; }
+          .imageeditor .gradient-info .form-item .color-step .color-view .color-view-item {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            top: 0px; }
+  .imageeditor .gradient-steps {
+    position: absolute;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    height: 30px;
+    left: 10px;
+    top: 10px;
+    right: 10px; }
+    .imageeditor .gradient-steps .hue-container {
+      width: 100%;
+      height: 16px;
+      margin-top: -1px;
+      left: -1px;
+      right: -1px;
+      position: absolute;
+      z-index: 0;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+    .imageeditor .gradient-steps .hue {
+      position: relative;
+      padding: 0px;
+      margin: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      cursor: pointer;
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+      .imageeditor .gradient-steps .hue > .step-list {
+        position: relative;
+        width: 100%;
+        cursor: copy;
+        height: 14px;
+        z-index: 1; }
+        .imageeditor .gradient-steps .hue > .step-list.mode-drag {
+          cursor: pointer; }
+      .imageeditor .gradient-steps .hue .drag-bar {
+        border: 0px;
+        background-color: transparent;
+        border: 2px solid white;
+        -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+        width: 10px;
+        height: 10px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        -webkit-transform: none;
+                transform: none;
+        border-radius: 50%;
+        display: inline-block;
+        left: 0px;
+        top: 17px;
+        -webkit-transform: translateX(-50%);
+                transform: translateX(-50%);
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        z-index: 0; }
+        .imageeditor .gradient-steps .hue .drag-bar.selected {
+          z-index: 1; }
+          .imageeditor .gradient-steps .hue .drag-bar.selected:after {
+            display: none;
+            content: "";
+            position: absolute;
+            width: 1px;
+            height: 17px;
+            background-color: rgba(0, 0, 0, 0.3);
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            bottom: 8px;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+                    transform: translateX(-50%); }
+  .imageeditor .image-tool {
+    position: relative;
+    height: 30px;
+    margin-bottom: 10px;
+    background-color: yellow; }
+  .imageeditor .drag-angle {
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    border-radius: 50%;
+    border: 2px solid rgba(236, 236, 236, 0.5);
+    border-style: dashed;
+    overflow: hidden;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%); }
+    .imageeditor .drag-angle .drag-pointer {
+      position: absolute;
+      width: 12px;
+      cursor: pointer;
+      height: 12px;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      border-radius: 50%;
+      background-color: rgba(236, 236, 236, 0.8);
+      -webkit-box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32);
+              box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32); }
+    .imageeditor .drag-angle .angle-text {
+      position: absolute;
+      display: inline-block;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      color: rgba(236, 236, 236, 0.9);
+      text-shadow: 1px 1px #a7a7a7; }
+  .imageeditor .drag-position {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+    .imageeditor .drag-position .drag-pointer {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.8);
+      -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32);
+              box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32); }
+  .imageeditor .gradient-tools {
+    position: relative;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    display: block;
+    padding: 5px; }
+    .imageeditor .gradient-tools .gradient-type {
+      display: inline-block;
+      vertical-align: top; }
+      .imageeditor .gradient-tools .gradient-type .gradient-item {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 3px solid #ececec;
+        cursor: pointer;
+        position: relative; }
+        .imageeditor .gradient-tools .gradient-type .gradient-item:first-child {
+          margin-right: 1px; }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.selected {
+          border-color: black; }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.linear {
+          background-image: -webkit-gradient(linear, left top, right top, from(black), to(gray));
+          background-image: linear-gradient(to right, black, gray); }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.radial {
+          background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.repeating-linear {
+          background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.repeating-radial {
+          background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+        .imageeditor .gradient-tools .gradient-type .gradient-item.image {
+          overflow: hidden; }
+          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m1 {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-color: #0e4a2e;
+            top: 70%;
+            left: -20%;
+            -webkit-transform: rotate(45deg);
+                    transform: rotate(45deg); }
+          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m2 {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-color: #0eb32b;
+            top: 50%;
+            left: 40%;
+            -webkit-transform: rotate(45deg);
+                    transform: rotate(45deg); }
+          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m3 {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            position: absolute;
+            background-color: #ff8800;
+            top: 1px;
+            left: 1px; }
+    .imageeditor .gradient-tools .gradient-angular {
+      display: block;
+      -webkit-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+              user-select: none;
+      float: right;
+      overflow: auto; }
+      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.linear {
+        display: block; }
+      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.radial {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.image {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.linear {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.radial {
+        display: block; }
+      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.image {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.linear {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.radial {
+        display: none; }
+      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.image {
+        display: block; }
+      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.linear .predefined-angluar-group {
+        display: inline-block;
+        width: 142px;
+        text-align: center; }
+      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial .predefined-angluar-group select {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        padding: 5px 5px;
+        border: 0px;
+        background-color: white;
+        width: 110px;
+        outline: none;
+        height: 34px;
+        font-size: 15px; }
+      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial button {
+        padding: 0px;
+        margin: 1px;
+        background-color: transparent;
+        border: 0px;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        outline: none;
+        cursor: pointer;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        display: inline-block;
+        width: 8px;
+        height: 18px;
+        vertical-align: middle; }
+        .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial button[data-value='center'] {
+          background-image: radial-gradient(circle, black, #FFFFFF 50%); }
+  .imageeditor .gradient-manager {
+    height: 120px;
+    position: relative; }
+  .imageeditor .image-control {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px; }
+    .imageeditor .image-control > .left {
+      position: absolute;
+      width: 180px;
+      left: 0px;
+      top: 0px;
+      bottom: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-right: 1px solid #ececec; }
+    .imageeditor .image-control > .right {
+      position: absolute;
+      left: 180px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px; }
+      .imageeditor .image-control > .right .gradient-sample-list {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        height: 100px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        padding: 10px; }
+        .imageeditor .image-control > .right .gradient-sample-list .gradient-sample-item {
+          display: inline-block;
+          vertical-align: middle;
+          width: 34px;
+          height: 34px;
+          border: 3px solid #ececec;
+          cursor: pointer;
+          position: relative;
+          margin: 2px; }
+      .imageeditor .image-control > .right .gradient-tools {
+        position: absolute;
+        left: 0px;
+        bottom: 30px;
+        right: 0px;
+        height: 30px; }
+  .imageeditor .image-list-container {
+    position: relative;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 5px; }
+    .imageeditor .image-list-container .image-list {
+      display: block;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 35px;
+      bottom: 12px;
+      overflow: auto; }
+      .imageeditor .image-list-container .image-list .image-item {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        height: 50px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #dedede;
+        border-top: 0px;
+        padding: 5px; }
+        .imageeditor .image-list-container .image-list .image-item:first-child {
+          border-top: 1px solid #dedede; }
+        .imageeditor .image-list-container .image-list .image-item svg {
+          pointer-events: none; }
+        .imageeditor .image-list-container .image-list .image-item.selected {
+          background-color: #dedede; }
+          .imageeditor .image-list-container .image-list .image-item.selected .image-item-check svg {
+            display: inline-block; }
+        .imageeditor .image-list-container .image-list .image-item .image-item-view-container {
+          position: relative;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+          pointer-events: none;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          padding: 14px;
+          width: 25%; }
+        .imageeditor .image-list-container .image-list .image-item .image-item-check {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          width: 25%;
+          text-align: center;
+          padding: 8px; }
+          .imageeditor .image-list-container .image-list .image-item .image-item-check svg {
+            display: none; }
+        .imageeditor .image-list-container .image-list .image-item .image-item-visible {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          width: 25%;
+          text-align: center;
+          padding: 8px; }
+          .imageeditor .image-list-container .image-list .image-item .image-item-visible svg.on {
+            display: none; }
+          .imageeditor .image-list-container .image-list .image-item .image-item-visible svg.off {
+            display: inline-block; }
+          .imageeditor .image-list-container .image-list .image-item .image-item-visible.on svg.on {
+            display: inline-block; }
+          .imageeditor .image-list-container .image-list .image-item .image-item-visible.on svg.off {
+            display: none; }
+        .imageeditor .image-list-container .image-list .image-item .image-item-delete {
+          position: relative;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          padding: 8px;
+          width: 25%;
+          text-align: center; }
+        .imageeditor .image-list-container .image-list .image-item .image-item-view {
+          pointer-events: none;
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 0px; }
+    .imageeditor .image-list-container .tools {
+      display: inline-block;
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 5px;
+      height: 24px;
+      text-align: left; }
+      .imageeditor .image-list-container .tools .divider {
+        color: transparent;
+        margin-left: 10px;
+        margin-right: 10px; }
+      .imageeditor .image-list-container .tools button {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        width: 24px;
+        height: 24px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #ececec;
+        vertical-align: middle;
+        font-size: 15px;
+        font-weight: bold;
+        font-family: serif, sans-serif;
+        line-height: 1.6;
+        cursor: pointer;
+        outline: none;
+        position: relative; }
+      .imageeditor .image-list-container .tools button {
+        cursor: pointer;
+        outline: none; }
+        .imageeditor .image-list-container .tools button.first, .imageeditor .image-list-container .tools button.last {
+          letter-spacing: -2px; }
+        .imageeditor .image-list-container .tools button.del {
+          overflow: hidden; }
+          .imageeditor .image-list-container .tools button.del:after, .imageeditor .image-list-container .tools button.del:before {
+            content: '';
+            width: 80%;
+            height: 1px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform-origin: center center;
+                    transform-origin: center center;
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+            border-top: 1px solid black;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box; }
+          .imageeditor .image-list-container .tools button.del:after {
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(135deg); }
+  .imageeditor .blend-control {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px; }
+    .imageeditor .blend-control > .left {
+      position: absolute;
+      width: 180px;
+      left: 0px;
+      top: 0px;
+      bottom: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-right: 1px solid #ececec; }
+    .imageeditor .blend-control > .right {
+      position: absolute;
+      left: 190px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px; }
+  .imageeditor .blend-row {
+    position: relative; }
+  .imageeditor .blend-list-container {
+    position: relative;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 5px; }
+    .imageeditor .blend-list-container .blend-mode-title {
+      display: block;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      height: 30px;
+      font-size: 12px;
+      padding: 10px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      background-color: #ececec; }
+    .imageeditor .blend-list-container .blend-list {
+      display: block;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 30px;
+      bottom: 0px;
+      overflow: auto;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-bottom: 1px solid #ececec; }
+      .imageeditor .blend-list-container .blend-list .blend-item {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        height: 50px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid #dedede;
+        padding: 5px; }
+        .imageeditor .blend-list-container .blend-list .blend-item:first-child {
+          border-top: 1px solid #dedede; }
+        .imageeditor .blend-list-container .blend-list .blend-item.selected {
+          background-color: #dedede; }
+        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-view-container {
+          position: relative;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+          pointer-events: none;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto;
+          padding: 14px;
+          width: 25%; }
+        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-view {
+          pointer-events: none;
+          position: absolute;
+          left: 0px;
+          right: 50%;
+          bottom: 0px;
+          top: 0px; }
+        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-blend-view {
+          pointer-events: none;
+          position: absolute;
+          left: 50%;
+          right: 0px;
+          bottom: 0px;
+          top: 0px; }
+        .imageeditor .blend-list-container .blend-list .blend-item .blend-item-text {
+          pointer-events: none;
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 0px;
+          color: white;
+          padding: 10px;
+          font-size: 13px;
+          text-shadow: 0px 3px 4px black; }

@@ -1,7 +1,5 @@
 import {
-    parseParamNumber,
-    convolution,
-    weight
+    convolution
 } from '../util'
 
 export default function gaussianBlur5x () {

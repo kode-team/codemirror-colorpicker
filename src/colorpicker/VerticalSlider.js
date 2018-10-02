@@ -3,20 +3,14 @@ import BaseSlider from "./BaseSlider";
 
 export default class VerticalSlider extends BaseSlider {
 
-    constructor (opt) {
-        super(opt)
-
-        this.source = 'vertical-slider'
-    }
-
     /** get max height for vertical slider */
     getMaxDist () {
-        return this.state.get('$container.height');
+        return this.refs.$container.height();
     }
 
     /** set mouse pointer for vertical slider */
     setMousePosition (y) {
-        this.refs.$bar.css({ top : (y) + 'px' });
+        this.refs.$bar.px('top', y);
     }
 
     /** get mouse position by pageY for vertical slider */    

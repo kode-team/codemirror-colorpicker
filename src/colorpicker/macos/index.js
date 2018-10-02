@@ -1,36 +1,42 @@
 import BaseColorPicker from '../BaseColorPicker'
 
-import ColorControl from './ColorControl'
-
+import Value from '../ui/control/Value';
+import Opacity from '../ui/control/Opacity'
+import ColorView from '../ui/control/ColorView'
 import ColorWheel from '../ui/ColorWheel'
-import ColorInformation from '../ui/ColorInformation'
+import Information from '../ui/ColorInformation'
 import ColorSetsChooser from '../ui/ColorSetsChooser'
 import CurrentColorSets from '../ui/CurrentColorSets'
-import CurrentColorSetsContextMenu from '../ui/CurrentColorSetsContextMenu'
+import ContextMenu from '../ui/CurrentColorSetsContextMenu'
 
 export default class MacOSColorPicker extends BaseColorPicker {
- 
+  
     template () {
         return `
             <div class='colorpicker-body'>
-                <div target="colorwheel"></div>
-                <div target="control"></div>
-                <div target="information"></div>
-                <div target="currentColorSets"></div>
-                <div target="colorSetsChooser"></div>
-                <div target="contextMenu"></div>                
-            </div>
+                <ColorWheel></ColorWheel>
+                <div class="control">
+                    <Value></Value>
+                    <Opacity></Opacity>
+                    <div class="empty"></div>
+                    <ColorView></ColorView>
+                </div>
+                <Information></Information>
+                <CurrentColorSets></CurrentColorSets>
+                <ColorSetsChooser></ColorSetsChooser>
+                <ContextMenu></ContextMenu>                
+            </div> 
         `
     }
 
     components() {
         return { 
-            colorwheel: ColorWheel,  
-            control: ColorControl,
-            information: ColorInformation,
-            currentColorSets: CurrentColorSets,
-            colorSetsChooser: ColorSetsChooser,
-            contextMenu: CurrentColorSetsContextMenu
+            Value, Opacity, ColorView,
+            ColorWheel,  
+            Information,
+            CurrentColorSets,
+            ColorSetsChooser,
+            ContextMenu
         }
     }
 

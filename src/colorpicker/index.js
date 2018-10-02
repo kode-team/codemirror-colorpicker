@@ -29,5 +29,6 @@ export default {
     MacOSColorPicker,
     RingColorPicker,
     MiniColorPicker,
-    MiniVerticalColorPicker 
+    MiniVerticalColorPicker,
+    XDColorPicker
 }    
