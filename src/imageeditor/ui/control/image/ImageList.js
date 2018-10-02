@@ -41,7 +41,7 @@ export default class ImageList extends UIElement {
                             <div class="image-item-delete" data-index="${index}">
                                 ${Icon.DELETE}
                             </div>
-                        </div>`
+                        </div>` 
                 }).join('')}</div>`
     }
 
@@ -55,6 +55,14 @@ export default class ImageList extends UIElement {
 
     '@initLayer' () { this.refresh() }    
 
+    '@changeColor' (c) {
+        if (this.read('/image/get', 'type') == 'static') {
+            var color = this.read('/tool/get', 'color');
+            this.dispatch('/image/change', { color })
+            this.refresh();
+        }
+    }
+
     'click $createImageButton' (e) {
         this.dispatch('/image/add')
         this.refresh();
@@ -66,6 +74,13 @@ export default class ImageList extends UIElement {
 
         this.refresh();
     }
+
+    'click $imageList .image-item-delete' (e) {
+        var index = e.$delegateTarget.attr('data-index')
+        this.dispatch('/image/remove', +index);
+
+        this.refresh();
+    }    
 
     'click.self $imageList .image-item' (e) {
         var index = e.$delegateTarget.attr('data-index')

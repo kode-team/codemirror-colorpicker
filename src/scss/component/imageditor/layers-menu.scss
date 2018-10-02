@@ -3,22 +3,18 @@ $direction-border: 2px solid $pointer-color;
 $button-size: 12px * 2; 
 
 .gradient-layers-menu {
-    position: relative;
+    position: absolute;
+    top: -50px; 
+    width: 100%;
+    left: 0px;
     box-sizing: border-box;
-    padding: 10px 12px;
-    text-align: center;
+    padding: 10px 0px;
+    text-align: right;
     // background-color: #333;
     display: flex; 
 
-    > div {
-        flex: 1; 
-
-        h1 {
-            margin: 0px;
-            text-align: left;
-            font-size: 24px;
-            text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);        
-        }
+    > div { 
+        flex: 1;
     }
 
     button {

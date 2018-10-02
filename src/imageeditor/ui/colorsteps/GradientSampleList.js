@@ -1,7 +1,7 @@
-import UIElement from "../../../../colorpicker/UIElement";
+import UIElement from "../../../colorpicker/UIElement";
 
 export default class GradientSampleList extends UIElement  {
-
+ 
     template () {
 
         var list = this.read('/gradient/list/sample');
@@ -13,6 +13,10 @@ export default class GradientSampleList extends UIElement  {
                  }).join('')}
         </div>
         `  
+    }
+
+    '@changeLayer' () {
+        this.$el.toggle(this.read('/image/isGradientType'))
     }
 
     'click $el .gradient-sample-item' (e) {

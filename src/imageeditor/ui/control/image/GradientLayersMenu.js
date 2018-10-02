@@ -1,13 +1,10 @@
-import UIElement from '../../../colorpicker/UIElement';
+import UIElement from '../../../../colorpicker/UIElement';
 
 export default class LayersMenu extends UIElement {
 
     template () {
         return ` 
             <div class='gradient-layers-menu'>
-                <div class='left'>
-                    <h1>Image Editor</h1>
-                </div>
                 <div class="right">
                     <span class="divider">|</span>                    
                     <button type="button" ref="$stackView" class="stack-view" title="Stack View"></button>
@@ -18,7 +15,7 @@ export default class LayersMenu extends UIElement {
             </div>
         `
     }
-
+ 
     refresh () {
         // this.refs.$show.toggleClass('selected', this.dispatch('/getGradientLayerVisible'))
     }

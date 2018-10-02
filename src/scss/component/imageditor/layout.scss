@@ -58,6 +58,14 @@ $right-size: 250px;
         top: 0px; 
         z-index: 0; 
         overflow: hidden;
+
+        h1 {
+            padding: 10px;
+            margin: 0px;
+            text-align: left;
+            font-size: 24px;
+            text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);        
+        }
     }
 
 

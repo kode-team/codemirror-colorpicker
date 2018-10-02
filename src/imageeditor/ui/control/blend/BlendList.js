@@ -29,7 +29,6 @@ export default class BlendList extends UIElement {
                     return `
                         <div class='blend-item ${selected}' data-mode="${blend}">
                             <div class="blend-item-view-container">
-                                <div class="blend-item-view"  style='${this.read('/blend/toString', layer, '')}'></div>
                                 <div class="blend-item-blend-view"  style='${this.read('/blend/toString', layer, blend)}'></div>
                                 <div class="blend-item-text">${blend}</div>
                             </div>
@@ -47,7 +46,6 @@ export default class BlendList extends UIElement {
                     return `
                         <div class='blend-item ${selected}' data-mode="${blend}">
                             <div class="blend-item-view-container">
-                                <div class="blend-item-view"  style='${this.read('/blend/toString', layer, '', '')}'></div>
                                 <div class="blend-item-blend-view"  style='${this.read('/blend/toString', layer, '', blend)}'></div>
                                 <div class="blend-item-text">${blend}</div>
                             </div>

@@ -3,12 +3,8 @@ $pointer-color: rgba(#ececec, 0.8);
 
 .gradient-info {
     // background-color:#ececec;
-    position: absolute;
-    left: 5px;
-    top: 50px;
-    right: 5px;
-    bottom: 5px;
     overflow: auto;
+    height: 200px !important;
 
     .form-item {
         display: flex; 

@@ -2,7 +2,6 @@ import BaseImageEditor from '../BaseImageEditor';
 import ColorTab from '../ui/ColorTab';
 import ColorStepsTab from '../ui/ColorStepsTab';
 import LayerManagerTab from '../ui/LayoutManagerTab';
-import GradientLayersMenu from '../ui/layer/GradientLayersMenu'
 import ControlTab from '../ui/ControlTab'
 
 export default class XDImageEditor extends BaseImageEditor {
@@ -37,7 +36,7 @@ export default class XDImageEditor extends BaseImageEditor {
                     </div>
                 </div>
                 <div class="layout-header">
-                    <GradientLayersMenu></GradientLayersMenu>
+                    <h1>Image Editor</h1>
                 </div>
             </div>
         `
@@ -45,7 +44,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
-            ColorTab, ColorStepsTab, LayerManagerTab,GradientLayersMenu, ControlTab
+            ColorTab, ColorStepsTab, LayerManagerTab, ControlTab
         }
     } 
 }

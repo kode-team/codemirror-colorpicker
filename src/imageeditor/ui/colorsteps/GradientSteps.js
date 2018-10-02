@@ -123,8 +123,6 @@ export default class GradientSteps extends UIElement {
 
         this.currentStep = this.currentStep || this.getStepList()[0]
 
-
-
         if (this.currentStep) {
             var rgb = this.read('/tool/get', 'color');
             this.currentStep.attr('data-color', rgb);

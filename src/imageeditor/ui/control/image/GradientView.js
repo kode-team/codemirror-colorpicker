@@ -4,12 +4,16 @@ import GradientPosition from '../../view/GradientPosition'
 import PredefinedLinearGradientAngle from '../../view/PredefinedLinearGradientAngle'
 import PredefinedRadialGradientPosition from '../../view/PredefinedRadialGradientPosition'
 import UIElement from '../../../../colorpicker/UIElement';
+import GradientType from './GradientType';
+import GradientLayersMenu from './GradientLayersMenu'; 
+
 
 export default class GradientView extends UIElement {
 
     template () {
         return `
             <div class='gradient-view'>
+                <GradientLayersMenu></GradientLayersMenu>
                 <div class="gradient-color-view-container"></div>
                 <div class="gradient-color-view" ref="$colorview"></div>
                 <div class="gradient-color-view" ref="$colorviewOnly"></div>
@@ -17,12 +21,13 @@ export default class GradientView extends UIElement {
                 <GradientPosition></GradientPosition>             
                 <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
                 <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
+                <GradientType></GradientType>                
             </div>
         `
     } 
 
     components () {
-        return { GradientAngle, GradientPosition, PredefinedLinearGradientAngle, PredefinedRadialGradientPosition }
+        return { GradientAngle, GradientPosition, PredefinedLinearGradientAngle, PredefinedRadialGradientPosition, GradientType, GradientLayersMenu }
     }
 
     refresh () {

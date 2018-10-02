@@ -82,3 +82,87 @@ $pointer-color: rgba(#ececec, 0.8);
         }                    
     }
 }
+
+.gradient-list-layout {
+    position: absolute;
+    top: 50px !important;
+    left: 0px;
+    right: 0px;
+    bottom: 0px; 
+}
+
+
+.gradient-sample-list {
+
+    .gradient-sample-item {
+        display: inline-block;
+        vertical-align: middle;
+        width: 34px;
+        height: 34px;
+        border: 3px solid #ececec;
+        cursor: pointer;
+        position: relative;
+        margin: 2px;
+    }
+
+
+}
+
+
+.color-list {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+
+    .color-type {
+         position: absolute;
+         left: 0px;
+         right: 0px;
+         top: 0px;
+         height: 40px;
+
+         > div {
+             position: absolute;
+             left: 5px;
+             right: 5px;
+             bottom: 5px;
+             top: 5px;
+
+             select {
+                 appearance: none;
+                 position: absolute;
+                 left: 0px;
+                 right: 0px;
+                 bottom: 0px;
+                 top: 0px;
+                 padding: 5px;                 
+                 display: inline-block;
+                 border:0px;
+                 background-color: white;
+                 width: 100%;
+                 outline: none;
+             }
+         }
+    }
+
+    .color-sample-list {
+         position: absolute;
+         left: 0px;
+         right: 0px;
+         top: 45px;
+         bottom: 0px;
+         padding: 5px;
+         
+        .color-item {
+             display: inline-block;
+             vertical-align: middle;
+             width: 34px;
+             height: 34px;
+             cursor: pointer;
+             position: relative;
+             margin: 2px;
+        }
+    }
+}

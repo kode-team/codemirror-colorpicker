@@ -1,6 +1,4 @@
 import UIElement from "../../../colorpicker/UIElement";
-import GradientType from "./image/GradientType";
-import GradientSampleList from './image/GradientSampleList';
 import GradientView from "./image/GradientView";
 import ImageList from './image/ImageList';
 
@@ -12,8 +10,6 @@ export default class ImageControl extends UIElement {
                     <ImageLIst></ImageList> 
                 </div>
                 <div class="right">
-                    <GradientSampleList></GradientSampleList>                
-                    <GradientType></GradientType>
                     <GradientView></GradientView>                      
                 </div>
 
@@ -22,6 +18,6 @@ export default class ImageControl extends UIElement {
    }  
 
    components () {
-       return { GradientType, GradientView, GradientSampleList, ImageList }
+       return { GradientView, ImageList }
    }
 }

@@ -1,6 +1,5 @@
 import BaseTab from "./BaseTab";
 import GradientLayers from "./layer/GradientLayers";
-import GradientLayersMenu from "./layer/GradientLayersMenu";
 
 export default class LayerManagerTab extends BaseTab {
     template () {
@@ -19,6 +18,6 @@ export default class LayerManagerTab extends BaseTab {
     }
 
     components () {
-        return { GradientLayers, GradientLayersMenu }
+        return { GradientLayers }
     }
 }

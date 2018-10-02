@@ -25,8 +25,8 @@ $layer-item-padding: 8px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            border: 1px solid #dedede;
-            border-top: 0px;
+            border-bottom: 1px solid #dedede;
+            border-top: 0px; 
             padding: 5px;
 
             &:first-child {

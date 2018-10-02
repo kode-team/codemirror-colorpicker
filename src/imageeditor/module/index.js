@@ -4,6 +4,7 @@ import LayerManager from "./LayerManager";
 import ToolManager from "./ToolManager";
 import BlendManager from "./BlendManager";
 import GradientManager from "./GradientManager";
+import ColorManager from "./ColorManager";
 
 export default [
     ColorStepManager,
@@ -11,5 +12,6 @@ export default [
     LayerManager,
     ToolManager,
     BlendManager,
-    GradientManager
+    GradientManager,
+    ColorManager
 ] 

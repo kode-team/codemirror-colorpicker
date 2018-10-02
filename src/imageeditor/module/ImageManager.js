@@ -33,8 +33,9 @@ const DEFINED_POSITIONS = {
 
 
 const defaultObject = {
-    type: 'linear',
+    type: 'static',
     angle: 90,
+    color: 'red',
     colorsteps: [],
     radialType: 'circle',
     radialPosition: 'center',
@@ -118,7 +119,14 @@ export default class ImageManager extends BaseModule {
         // 현재 image 설정 
         // 현재 layer 설정 
         $store.dispatch('/image/set', newImage, index);
-    }        
+    }       
+
+    '/image/change/color' ($store, color) {
+        if ($store.read('/image/isStaticType')) {
+            $store.dispatch('/tool/changeColor', color)
+            $store.dispatch('/image/change', { color })
+        }
+    }
 
     // 이미지 설정하기 , 이벤트 까지 
     '/image/set' ($store, newImage, index) {
@@ -127,6 +135,19 @@ export default class ImageManager extends BaseModule {
         current = Object.assign({}, current, newImage)
 
         var currentIndex = $store.read('/image/currentIndex', index)
+
+
+        if (current.type == 'image' ) {  }
+        else if (current.type == 'static') { }
+        else {
+            // gradient type 일 때 colorsteps 이 없으면 자동으로 셋팅해준다. 
+            if (!current.colorsteps.length) {
+                current.colorsteps = [
+                    { color: 'red', percent: 0 },
+                    { color: 'black', percent: 100 }
+                ]
+            }
+        }
 
         $store.dispatch('/layer/set/image', current, currentIndex)
 
@@ -240,6 +261,10 @@ export default class ImageManager extends BaseModule {
         }
     }
 
+    '/image/isGradientType' ($store) {
+        return $store.read('/image/isLinearType') || $store.read('/image/isRadialType');
+    }
+
     '/image/isLinearType' ($store) {
         return ['linear', 'repeating-linear'].includes($store.read('/image/get', 'type'))
     }
@@ -251,6 +276,10 @@ export default class ImageManager extends BaseModule {
     '/image/isImageType' ($store) {
         return ['image'].includes($store.read('/image/get', 'type'))
     }
+
+    '/image/isStaticType' ($store) {
+        return ['static'].includes($store.read('/image/get', 'type'))
+    }    
 
     '/image/angle' ($store, angle = '') {
         return DEFINED_ANGLES[angle] || angle || $store.read('/image/get', 'angle');
@@ -281,7 +310,7 @@ export default class ImageManager extends BaseModule {
             return `${key}: ${obj[key]};`
         }).join(' ')
 
-    }
+    } 
 
     '/image/toImageString' ($store, image = null) {
         var type = $store.read('/image/get', image, 'type')
@@ -292,6 +321,8 @@ export default class ImageManager extends BaseModule {
             return $store.read('/image/toRadial', image)
         } else if (type == 'image' ) {
             return $store.read('/image/toImage', image)
+        } else if (type == 'static' ) {
+            return $store.read('/image/toStatic', image)
         }
     }
 
@@ -342,6 +373,17 @@ export default class ImageManager extends BaseModule {
         }
 
         return `${gradientType}-gradient(${opt}, ${colors})`
+    }
+
+    '/image/toStatic' ($store, image = {}) {
+        return $store.read('/image/toLinear', {
+            type: 'linear',
+            angle: 0,
+            colorsteps: [ 
+                { color: image.color, percent: 0} ,
+                { color: image.color, percent: 100} ,
+            ]
+        })
     }
 
     '/image/toLinearRight' ($store) {

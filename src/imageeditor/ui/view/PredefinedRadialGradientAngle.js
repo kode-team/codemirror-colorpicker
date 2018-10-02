@@ -5,7 +5,7 @@ export default class PredefinedRadialGradientAngle extends UIElement {
 
     template () { 
         return `
-            <div class="predefined-angluar-group">
+            <div class="inline-block">
                 <button ref="$center" type="button" data-value="center" title="center"><span class='circle'></span></button>            
                 <select class="radial-type-list" ref="$select">
                     <option value="circle">circle</option>

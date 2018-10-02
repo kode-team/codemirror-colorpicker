@@ -11,6 +11,7 @@ export default class GradientType extends UIElement {
         return `
         <div class='gradient-tools'>
             <div class='gradient-type' ref="$gradientType">
+                <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>
                 <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
                 <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
                 <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
@@ -36,7 +37,7 @@ export default class GradientType extends UIElement {
     }
 
     '@changeLayer' () {
-        // this.setLayerTypeUI()
+        this.setLayerTypeUI()
     }
 
     '@initLayer' () {
@@ -47,13 +48,14 @@ export default class GradientType extends UIElement {
 
         type = type || this.read('/image/get', 'type')
 
+        this.refs.$static.toggleClass('selected', type == 'static');
         this.refs.$linear.toggleClass('selected', type == 'linear');
         this.refs.$radial.toggleClass('selected', type == 'radial');
         this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
         this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
         this.refs.$image.toggleClass('selected', type == 'image');
 
-        this.refs.$angular.toggleClass('linear', this.read('/image/isLinearType'));
+        this.refs.$angular.toggleClass('linear', this.read('/image/isLinearType')); 
         this.refs.$angular.toggleClass('radial',  this.read('/image/isRadialType'));
         this.refs.$angular.toggleClass('image',  this.read('/image/isImageType'));
     }

@@ -1,10 +1,14 @@
 $typetool-size: 34px;
 
 .gradient-tools {
-    position: relative;
+    position: absolute;
     box-sizing: border-box;
     display:block;
-    padding: 5px;
+    padding: 5px 0px;
+    bottom: -60px;
+    left: 0px;
+    width: 100%;
+
     
     .gradient-type {
 
@@ -26,6 +30,10 @@ $typetool-size: 34px;
 
             &.selected {
                 border-color: black;
+            }
+
+            &.static {
+                background-image: linear-gradient(to right, #333, #333);
             }
 
             &.linear {
@@ -73,8 +81,8 @@ $typetool-size: 34px;
                     border-radius: 50%;
                     position: absolute;
                     background-color: rgb(255, 136, 0); 
-                    top: 1px;
-                    left: 1px;
+                    top: 3px;
+                    left: 3px;
                 }                           
                 
             }
@@ -82,10 +90,10 @@ $typetool-size: 34px;
     }
 
     .gradient-angular {
-        display: block;
+        display: inline-block;
         user-select: none;
-        float: right; 
-        overflow: auto;
+        float: right;
+        vertical-align: middle;
 
         &.linear {
             .gradient-angular-item.linear { display: block; }
@@ -118,7 +126,10 @@ $typetool-size: 34px;
 
             &.radial {
 
-                .predefined-angluar-group {
+                .inline-block {
+                    position: relative;
+                    display: inline-block;
+
                     select {
                         appearance: none;
                         display: inline-block;
@@ -130,6 +141,7 @@ $typetool-size: 34px;
                         outline: none;
                         height: $typetool-size;
                         font-size: 15px;
+                        height: 100%;
                     }
                 }
 
