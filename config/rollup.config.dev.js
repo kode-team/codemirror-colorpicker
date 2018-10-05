@@ -14,7 +14,7 @@ export default {
     file: 'addon/' + packageJSON.name + '.js',
     format: 'iife',
     globals: {
-      "codemirror" : "CodeMirror"
+      "codemirror" : "window.CodeMirror"
     },
     external: ['codemirror']
   },

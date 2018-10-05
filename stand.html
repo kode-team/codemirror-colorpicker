@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
+    <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
+    <meta property="og:title" content="ColorPicker for CodeMirror Addon" />
+    <meta property="og:description" content="Very Simple ColorPicker for CodeMirror" />
+    <meta property="og:url" content="https://easylogic.github.io/codemirror-colorpicker/" />
+    <meta property="og:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="https://easylogic.github.io/codemirror-colorpicker/">
+    <meta name="twitter:creator" content="@easylogic">
+    <meta name="twitter:title" content="ColorPicker for CodeMirror Addon">
+    <meta name="twitter:description" content="Very Simple ColorPicker for CodeMirror">
+    <meta name="twitter:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png">
+
+    <style type="text/css">
+    html, body {
+        padding:0px;
+        margin:0px;
+    }
+    h1.title {
+        margin-top:0px;
+        color: white;
+        padding: 50px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(255, 255, 255);
+    }
+
+    section {
+        background-color: rgb(29, 37, 43);
+        min-height: 900px;
+
+    }
+
+    section.main {
+        min-height: auto;
+    }
+
+    section.colorpicker-style-list {
+        background-color: rgb(247, 227, 213)
+    }
+
+    section.colorpicker-style-list > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: rgb(128, 198, 217);
+        padding: 70px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.colorpicker-style-list > div {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.colorpalette-area {
+        background-color: #584592;
+        position: relative;
+    }
+
+    section.colorpalette-area .circle.white {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 1px solid white;
+        left: 10px;
+        top: 50px;        
+        z-index: 0;
+    }
+
+
+    section.colorpalette-area:after {
+        position: absolute;
+        content: "";
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgb(246, 107, 107);
+        left: 150px;
+        bottom: 100px;        
+    }    
+
+
+    section.colorpalette-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: #e2cf32;
+        padding: 70px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.colorpalette-area > div:not(.circle) {
+        max-width: 920px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.colorpalette-area .area-item {
+        width: 300px;
+        box-sizing: border-box;
+        border:0px;
+        margin:0px;
+        display: inline-block;
+        height: 400px;
+        box-shadow: 0 0 0 0 rgba(213, 235, 255, 0.192);
+        vertical-align: middle;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    section.colorpalette-area .area-item .image-select-input {
+        padding: 5px 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: rgba(213, 235, 255, 0.192);
+    }
+
+    section.colorpalette-area .area-item  img{
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+
+
+    section.color-scale-area {
+        background-color: #80c6d9;
+        position: relative;
+    }
+
+    section.color-scale-area:before {
+        position: absolute;
+        content: "";
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background-color: rgb(226, 207, 50);
+        left: -250px;
+        top: 50%;
+        margin-top: -250px;
+    }
+
+    section.color-scale-area:after {
+        position: absolute;
+        content: "";
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgb(88, 69, 146);
+        left: 150px;
+        bottom: 100px;        
+    }
+
+    section.color-scale-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: white;
+        padding: 70px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.color-scale-area > div {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.color-scale-area .area-item {
+        width: 400px;
+        box-sizing: border-box;
+        border:0px;
+        margin:0px;
+        display: inline-block;
+        height: 400px;
+        box-shadow: 0 0 0 0 rgba(213, 235, 255, 0.192);
+        vertical-align: middle;
+        text-align: center;
+    }    
+
+    section.color-scale-area .area-item .daimond {
+        margin: 0 auto;
+    }
+
+
+    section.color-scale-template-area {
+        background-color: rgba(248, 107, 107, 0.1);
+    }
+
+    section.color-scale-template-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: #f7f7f7;
+        padding: 70px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.color-scale-template-area > div {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.color-scale-template-area h3 {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 10px;
+        text-align: center;
+    }        
+
+    section.color-scale-template-area > div .color-scale {
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+
+    section.color-gradient-template-area {
+        background-color: rgb(248, 107, 107);
+    }
+
+    section.color-gradient-template-area > h1 {
+        margin-top:0px;
+        margin-bottom:0px;
+        color: #f7f7f7;
+        padding: 70px;
+        text-align: center;
+        font-size: 50px;
+        text-shadow: 1px 1px 1px rgb(0, 0, 0);
+    }
+
+    section.color-gradient-template-area > div {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    section.color-gradient-template-area h3 {
+        max-width: 820px;
+        margin: 0 auto;
+        padding-bottom: 10px;
+        text-align: center;
+    }    
+
+    section.color-gradient-template-area > div .color-gradient {
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }    
+
+
+    .codemirror-area {
+        max-width: 800px;
+        height: 600px;
+        margin: 0 auto;
+    }
+    .CodeMirror {
+        border: 1px solid #eee;
+        height: 300px;
+    }
+
+    .color-scale {
+        display:flex;
+        max-width: 500px;
+        margin-bottom: 5px;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;            
+    }
+
+    .color-scale * {
+        flex: 1; 
+        height: 30px;
+        position: relative;        
+    }
+
+    .color-scale *:hover:after {
+        display: inline-block;
+        width: 100px;
+        text-align: center;
+        content: attr(title);
+        position:absolute;
+        left:50%;
+        bottom:100%;
+        background-color: black;
+        color: white;
+        transform:translateX(-50%);
+    }
+
+    .color-gradient {
+        display:flex;
+        max-width: 500px;
+        margin-bottom: 5px;
+        display: -webkit-flex; /* Safari */
+        -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+        display: flex;   
+        flex-wrap: wrap;   
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;                         
+    }
+
+
+    .color-gradient > * {
+        flex:1;
+        height: 30px;
+        position: relative;        
+    }
+
+    .color-gradient *:hover:after {
+        display: inline-block;
+        width: 100px;
+        text-align: center;
+        content: attr(title);
+        position:absolute;
+        left:50%;
+        bottom:100%;
+        background-color: black;
+        color: white;
+        transform:translateX(-50%);
+    }    
+
+    .daimond {
+        width: 300px;
+        height: 300px;
+        box-sizing:border-box;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .daimond .row {
+        flex: 1; 
+        display: flex;
+    }
+
+    .daimond .row .column {
+        flex: 1;
+        height: 100%;
+        position: relative;
+
+    }
+
+    .daimond .row .column:hover:after {
+        display: inline-block;
+        width: 100px;
+        text-align: center;
+        content: attr(title);
+        position:absolute;
+        left:50%;
+        bottom:100%;
+        background-color: black;
+        color: white;
+        transform:translateX(-50%);
+        pointer-events: none;
+    }
+
+    #image-palette .color-item {
+        display:inline-block;
+        width: 100px;
+        height: 100px;
+        padding: 40px 20px;        
+        box-sizing: border-box;
+    }
+
+    #image-palette .color-item:before {
+        content: attr(title);
+        color: black;
+        vertical-align: middle;
+
+        box-sizing: border-box;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    #image-palette {
+        max-width: 500px;
+    }
+
+    .colorpicker-type {
+        display: inline-block;
+        width: 270px;
+        vertical-align: top;
+    }
+
+    footer {
+        padding: 100px;
+        background-color: rgb(29, 37, 43);
+        color: #ececec;
+    }
+
+    footer .email  {
+        float: right;
+        color: rgba(252, 201, 34, 0.767);
+    }
+
+    .image-select-input > div {
+        padding-bottom: 2px;
+    }
+
+    #canvas-image canvas {
+        max-width: 300px;
+    }
+
+    </style>
+</head>
+<body>
+    <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+
+<section class="main">
+    <h1 class="title">
+        CodeMirror ColorPicker Standalone
+        <div>
+                <iframe src="https://ghbtns.com/github-btn.html?user=easylogic&repo=codemirror-colorpicker&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        </div>
+        
+    </h1>
+</section>
+
+<section class="colorpicker-style-list">
+<h1 >ColorPicker Style</h1>
+<div>
+    <div class="colorpicker-type">
+        <h3>Chrome Devtool Style</h3>
+        <div class="colorpicker-style" data-type="default"></div>
+    </div>
+    <div class="colorpicker-type">
+        <h3>Adobe XD Style</h3>
+        <div class="colorpicker-style" data-type="xd"></div>
+    </div>    
+    <div class="colorpicker-type">
+        <h3>Sketch Style</h3>
+        <div class="colorpicker-style" data-type="sketch"></div>
+    </div>
+    <div class="colorpicker-type">
+        <h3>MacOS Style</h3>
+        <div class="colorpicker-style" data-type="macos"></div>
+    </div>
+    <div class="colorpicker-type">
+        <h3>Ring Style</h3>
+        <div class="colorpicker-style" data-type="ring"></div>
+    </div>               
+
+    <div class="colorpicker-type">
+        <h3>Mini Style</h3>
+        <div class="colorpicker-style" data-type="mini"></div>
+    </div>    
+
+    <div class="colorpicker-type">
+        <h3>Mini Vertical Style</h3>
+        <div class="colorpicker-style" data-type="mini-vertical"></div>
+    </div>        
+     
+            
+    <!-- <div class="colorpicker-type">
+        <h3>Only Palette Style</h3>
+        <div class="colorpicker-style" data-type="palette"></div>
+    </div> -->
+    <pre><code class="javascript">{
+    colorpicker : {
+        type : 'palette' // or 'sketch',  default type is 'chromedevtool'
+    }    
+}</code></pre>  
+
+</div>
+
+</section>
+
+
+<section class="colorpalette-area">
+<h1> Image Filter </h1>    
+<div>
+    <div class="area-item">
+            <div class="image-select-input">
+                <input type="file" id="imageforfilter"  />
+                <div>
+                    <button type="button" onclick="view_histogram()">Histogram</button>
+                </div>                
+                <div>
+                    <button type="button" onclick="filter_image('brownie')">brownie</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image(['histogram', 'gray', [ [0, 0], [50, 90],  [ 100, 200] , [220, 240], [255, 255] ]])">histogram</button>
+                </div>                               
+                <div>
+                    <button type="button" onclick="filter_image('kodachrome')">kodachrome</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('polaroid')">polaroid</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('technicolor')">technicolor</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image('shift')">shift</button>
+                </div>               
+                <div>
+                    <button type="button" onclick="filter_image(['matrix',  1.1285582396593525,-0.3967382283601348,-0.03992559172921793,0,
+                    -0.16404339962244616,1.0835251566291304,-0.05498805115633132,0,
+                    -0.16786010706155763,-0.5603416277695248,0.6014850761964943,0,
+                    0,0,0,1])">matrix</button>
+                </div>                                                                                               
+                <div>
+                    <button type="button" onclick="filter_image('motionBlur')">motion blur</button>
+                </div>                                   
+                <div>
+                    <button type="button" onclick="filter_image('gaussian-blur-5x')">gaussian-blur 5x</button>
+                </div>                     
+                <div>
+                    <button type="button" onclick="filter_image('motionBlur3')">motion blur 3</button>
+                </div>                                                   
+                <div>
+                    <button type="button" onclick="filter_image(['brightness', +document.getElementById('brightness_value').value])">brightness</button>
+                    <input type="range" id="brightness_value" value="10" min="-100" max="100" step="1" />
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['sepia', +document.getElementById('sepia_value').value])">sepia</button>
+                    <input type="range" id="sepia_value" value="10" min="-100" max="100" step="1" />
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image(['threshold', +document.getElementById('threshold_value').value])">threshold</button>
+                    <input type="number" id="threshold_value" value="100" min="0" max="255" step="1" />
+                </div>                                                                  
+                <div>
+                    <button type="button" onclick="filter_image('sobel')">sobel</button>
+                </div>                       
+                <div>
+                    <button type="button" onclick="filter_image(['rotate', 150])">rotate 150</button>
+                    <button type="button" onclick="filter_image(['rotate', 75])">rotate 75</button>
+                    <button type="button" onclick="filter_image(['rotate', 10])">rotate 10</button>
+                    <button type="button" onclick="filter_image(['rotate', 90])">rotate 90</button> 
+                    <button type="button" onclick="filter_image(['rotate', 180])">rotate 180</button>
+                    <button type="button" onclick="filter_image(['rotate', 270])">rotate 270</button>
+                </div>                    
+                <div>
+                    <button type="button" onclick="filter_image(['filter', 'gradient(black, yellow 0.5, rgba(255, 0, 0, 0.5) 0.7, white, 100) invert(5)'])">parse</button>
+                </div>             
+                <div>
+                    <button type="button" onclick="filter_image('sharpen')">sharpen</button>
+                </div>   
+                <div>
+                    <button type="button" onclick="filter_image('emboss')">emboss</button>
+                </div>                                          
+                <div>
+                    <button type="button" onclick="filter_image(['vintage'])">vintage</button>
+                </div>          
+                <div>
+                    <button type="button" onclick="filter_image(['stack-blur', '100px'])">stack-blur(100px)</button>
+                </div>                                                    
+                <div>
+                    <button type="button" onclick="filter_image(['flipH'])">flipH</button>
+                </div>    
+                <div>
+                    <button type="button" onclick="filter_image(['flipV'])">flipV</button>
+                </div>                                  
+                <div>
+                        <button type="button" onclick="filter_image(['gradient', 'black, yellow'])">duotone(red, yellow)</button>
+                </div>                
+                <div>
+                    <button type="button" onclick="filter_image(['gradient', 'black, white, 20'])">duotone(black, white, 20)</button>
+                </div>                                
+                <div>
+                    <button type="button" onclick="filter_image(['grayscale', +document.getElementById('scale-value').value])">Gray</button>
+                    <input type="range" min="0" max="200" step="1" value="100" id="scale-value" />
+                </div>
+                <div>
+                    <button type="button" onclick="filter_image(['contrast', +document.getElementById('contrast-value').value])">Contrast</button>
+                    <input type="range" min="-128" max="128" step="1" value="100" id="contrast-value" />
+                </div>     
+                <div>
+                    <button type="button" onclick="filter_image(['saturation', +document.getElementById('saturation-value').value])">Saturation</button>
+                    <input type="range" min="0" max="100" step="1" value="100" id="saturation-value" />
+                </div>                                
+                <div>
+                    <button type="button" onclick="filter_image(['crop', 0, 0, 200, 200])">crop</button>
+                </div>                   
+                <div>
+                    <button type="button" onclick="filter_image(['invert', +document.getElementById('invert-value').value])">invert</button>
+                    <input type="range" min="0" max="100" step="1" value="100" id="invert-value" />
+                </div>                                
+                <div>
+                    <button type="button" onclick="filter_image(['solarize', +document.getElementById('solarize-r').value, +document.getElementById('solarize-g').value, +document.getElementById('solarize-b').value])">solarize</button>
+                    <input type="range" min="0" max="255" step="1" value="100" id="solarize-r" />
+                    <input type="range" min="0" max="255" step="1" value="100" id="solarize-g" />
+                    <input type="range" min="0" max="255" step="1" value="100" id="solarize-b" />
+                </div>                                                
+                <div>
+                    <button type="button" onclick="filter_image(['partial', {x:50,y:50,width:200,height:200}, 'invert(70) sepia sharpen gradient( white, black)'])">partial</button>
+                </div>                   
+
+                <div>
+                    <button type="button" onclick="filter_image(['noise', +document.getElementById('noise-value').value])">Noise</button>
+                    <input type="range" min="1" max="100" step="1" value="3" id="noise-value" />
+                </div>                   
+                <div>
+                    <button type="button" onclick="filter_image(['clip', +document.getElementById('clip-value').value])">Clip</button>
+                    <input type="range" min="1" max="100" step="1" value="3" id="clip-value" />
+                </div>                                   
+                <div>
+                    <button type="button" onclick="filter_image(['blur', +document.getElementById('blur-value').value])">blur</button>
+                    <input type="range" min="1" max="100" step="1" value="3" id="blur-value" />
+                </div>                     
+                                                                                                                     
+                                             
+            </div>            
+        
+    </div>
+    <div class="area-item">
+        <div class="image-palette">
+            <img id="sampled-image">
+        </div>
+    </div>        
+    <div class="area-item">
+        <div class="image-palette">
+            <img id="filtered-image" />
+            <div id="canvas-image"></div>
+        </div>
+    </div>    
+    <pre><code class="javascript"></code></pre>        
+</div>
+</section>
+
+<section class="colorpalette-area">
+<div class="circle white"></div>
+<div class="circle yellow"></div>
+<h1> Image Palette</h1>    
+<div>
+    <div class="area-item">
+            <div class="image-select-input">
+                <input type="file" id="image"  />
+                <input type="button" value="pick" onclick="generatePalette()" />
+            </div>            
+            <div>
+                    <img id="palette-image">
+            </div>
+        
+    </div>
+    <div class="area-item">
+        <div class="image-palette" id="image-palette">
+
+        </div>
+    </div>    
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+Color.ImageToRGB(blob, { maxWidth: 100 }, function (results) {
+    const colors = Color.palette(results, 16);   // k = 16 
+
+    console.log(colors);
+})</code></pre>        
+</div>
+</section>
+
+<section class="color-scale-area">
+<h1>Color Scales</h1>
+<div>
+    <div class="area-item">
+        <h2> Saturation Scale</h2>    
+        <div class="daimond" data-background-color="yellow" data-target='S'></div>
+    </div>
+    <div class="area-item">
+        <h2> Value Scale</h2>    
+        <div class="daimond" data-background-color="yellow" data-target='V'></div>
+    </div>  
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+var results = Color.scaleS(color, 100, 'hex');   // Saturation 
+var results2 = Color.scaleV(color, 100, 'hex');   // Value 
+</code></pre>          
+</div>
+</section>
+<section class="color-scale-template-area">
+<h1> Color Scales - Template </h1>
+<div>
+
+    <h3>parula</h3>
+    <div class="color-scale" data-colors="parula" data-count="20"></div>
+    <h3>hsv</h3>
+    
+    <div class="color-scale" data-colors="hsv" data-count="40"></div>
+    <h3>parula</h3>
+    
+    <div class="color-scale" data-colors="parula" data-count="20"></div>
+    <h3>jet</h3>
+    
+    <div class="color-scale" data-colors="jet" data-count="20"></div>
+    <h3>hot</h3>
+    
+    <div class="color-scale" data-colors="hot" data-count="20"></div>
+    <h3>pink</h3>
+    
+    <div class="color-scale" data-colors="pink" data-count="20"></div>
+    <h3>bone</h3>
+    
+    <div class="color-scale" data-colors="bone" data-count="20"></div>
+    <h3>copper</h3>
+    
+    <div class="color-scale" data-colors="copper" data-count="20"></div>
+    <h3>red,yellow,rgba(255, 0, 255, 0.5)</h3>
+    
+    <div class="color-scale" data-colors="red,yellow,rgba(255, 0, 255, 0.5)" data-count="20"></div>    
+    <h3>red,yellow</h3>
+    
+    <div class="color-scale" data-colors="red,yellow" data-count="50"></div>
+    <h3>red,blue</h3>
+    
+    <div class="color-scale" data-colors="red,blue" data-count="25"></div>
+    <h3>red,black</h3>    
+    <div class="color-scale" data-colors="red,black" data-count="105"></div>    
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+var colors = ['red', 'green', 'blue']
+var scaleColors = Color.scale(colors, count);
+var scaleColors = Color.scale('red,yellow,rgba(255, 0, 255, 0.5)', count);
+var scaleColors = Color.scale.parula(count);   // ['#352a87', '#0f5cdd', '#00b5a6', '#ffc337', '#fdff00']
+var scaleColors = Color.scale.jet(count);   // ['#00008f', '#0020ff', '#00ffff', '#51ff77', '#fdff00', '#ff0000', '#800000']
+var scaleColors = Color.scale.hsv(count);   // ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ff0000']
+var scaleColors = Color.scale.hot(count);   // ['#0b0000', '#ff0000', '#ffff00', '#ffffff']
+var scaleColors = Color.scale.pink(count);   // ['#1e0000', '#bd7b7b', '#e7e5b2', '#ffffff']
+var scaleColors = Color.scale.bone(count);   // ['#000000', '#4a4a68', '#a6c6c6', '#ffffff']
+var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623e', '#ffa167', '#ffc77f']
+</code></pre>      
+</div>
+
+</section>
+
+<section class="color-gradient-template-area">
+    <h1> Color Gradients - Template </h1>
+    <div>
+    
+        <h3>white, red 0.5, yellow - count 20</h3>
+        <div class="color-gradient" data-title="gradient" data-colors="rgba(255, 255, 255, 0.5), rgba(255, 0, 0, 0.1) 0.5, yellow" data-count="20"></div>
+        <h3>white, red 0.2, yellow - count 100</h3>        
+        <div class="color-gradient" data-title="gradient" data-colors="yellow, red 0.2, green 50%, yellow" data-count="100"></div>
+        <h3>white, red 0.2, yellow - count 100</h3>        
+        <div class="color-gradient" data-title="gradient" data-colors="white, red 0.2, yellow" data-count="100"></div>
+        <h3>white, red 0.2, blue 0.6, magenta 0.95, yellow - count 100</h3>        
+        <div class="color-gradient" data-title="gradient" data-colors="white, red 0.2, blue 0.6, magenta 0.95, yellow" data-count="100"></div>
+    </div>
+    <pre><code class="javascript">var Color = CodeMirrorColorPicker.Color;
+        var gradientColors = Color.graident("white, red 0.5, yellow", count);
+        var gradientColors = Color.graident(["white", "red 0.5" , "yellow"], count);
+        var gradientColors = Color.graident(["white", "red 50%" , "yellow"], count);
+        var gradientColors = Color.graident([['white'], ["red", 0.5] , ["yellow"]], count);
+        </code></pre>      
+</section>
+
+
+<section>
+<h1 class="title">Default Html Sample </h1>
+
+<div>
+    <button type="button" id="gray-scale" >gray scale</button><br />    
+    <button type="button" onclick="showColor(event)" data-color="green">green</a>
+</div>
+</section>
+
+<footer>
+    &copy; easylogic colorpicker - MIT license
+    <div class="email">cyberuls@gmail.com</div>
+</footer>
+
+<script type="text/javascript">
+    function generatePalette () {
+        var blob = document.getElementById('image').files[0];
+        var Color = CodeMirrorColorPicker.Color;
+        document.getElementById('palette-image').src = URL.createObjectURL(blob);
+
+        Color.ImageToRGB(blob, { maxWidth: 100 }, function (results) {
+            const colors = Color.palette(results, 16);
+
+            var fragment = document.createDocumentFragment();
+            for (var i = 0, len = colors.length; i < len; i++) {
+                var dom = document.createElement('div');
+                dom.classList.add('color-item');
+    
+
+                dom.setAttribute('title', colors[i]);
+                dom.style.backgroundColor =  colors[i];
+
+                fragment.appendChild(dom);
+            }
+
+            document.getElementById('image-palette').innerHTML = "";
+            document.getElementById('image-palette').appendChild(fragment);
+        })
+    }
+
+    function view_histogram () {
+        var args = Array.prototype.slice.call(arguments);
+        var file = document.getElementById('imageforfilter').files[0];
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        Color.ImageToHistogram(file, function (url) {
+            document.getElementById('filtered-image').src = url;
+        }, {red: true, green: true})
+    }
+
+    function filter_image (A, B, C) {
+        var args = Array.prototype.slice.call(arguments);
+        var file = document.getElementById('imageforfilter').files[0];
+        var ImageFilter = CodeMirrorColorPicker.ImageFilter;
+        document.getElementById('sampled-image').src = URL.createObjectURL(file);
+
+        Color.ImageToCanvas(file, ImageFilter.merge(args), function (canvas) {
+            document.getElementById("canvas-image").innerHTML = "" 
+            document.getElementById('canvas-image').appendChild(canvas)
+        })
+    }  
+
+    
+    function shuffle(a) {
+        var j, x, i;
+        for (i = a.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            x = a[i];
+            a[i] = a[j];
+            a[j] = x;
+        }
+    }
+    var colors = [ 'red', 'blue', 'white' ];
+
+    function showColor(event) {
+        var Color = CodeMirrorColorPicker.Color;
+        var colorpicker = new CodeMirrorColorPicker.ColorPicker();
+
+        var color = event.target.getAttribute('data-color');
+        var target = event.target;
+
+        colorpicker.show({
+            left : (target.offsetWidth + target.offsetLeft),
+            top : event.clientY,
+            hideDelay: 0
+        }, 'hsla(0,100%,54%,0.67)', function (newColor) {
+
+            var temp = Color.parse(newColor);
+            
+            var textColor = Color.format(Color.c(temp), 'hex');
+
+            target.style.backgroundColor = newColor;
+            target.style.color = textColor;
+            target.textContent = newColor;
+
+            var rgb = Color.RGBtoGray(temp);
+
+            var gray = Color.format(rgb, "hex")
+            document.getElementById('gray-scale').textContent = gray;
+            document.getElementById('gray-scale').style.backgroundColor = gray;
+
+        });
+    }
+
+    var Color = CodeMirrorColorPicker.Color;
+    var nodes = document.querySelectorAll(".color-scale");
+    for(var i = 0, len = nodes.length; i < len; i++) {
+        var item = nodes[i];
+
+        var colors = item.getAttribute('data-colors');
+        var count = +item.getAttribute('data-count');
+
+        if (colors.length && Color.scale[colors]) {
+            var scaleColors = Color.scale[colors](count);
+        } else {
+            var scaleColors = Color.scale(colors, count);
+        }
+
+        var fragment = document.createDocumentFragment();
+        for (var index = 0, scaleCount = scaleColors.length; index < scaleCount; index++) {
+            var dom = document.createElement('div');
+            dom.style.backgroundColor = scaleColors[index];
+            dom.setAttribute('title', (index+1) + "-" + scaleColors[index])
+            fragment.appendChild(dom);
+        }
+
+        item.appendChild(fragment);
+
+    }
+
+    var nodes = document.querySelectorAll(".color-gradient");
+    for(var i = 0, len = nodes.length; i < len; i++) {
+        var item = nodes[i];
+
+        var colors = item.getAttribute('data-colors');
+        var count = +item.getAttribute('data-count');
+
+        var scaleColors = Color.gradient(colors, count);
+
+        var fragment = document.createDocumentFragment();
+        for (var index = 0, scaleCount = scaleColors.length; index < scaleCount; index++) {
+            var dom = document.createElement('div');
+            dom.style.backgroundColor = scaleColors[index];
+            dom.setAttribute('title', (index+1) + "-" + scaleColors[index])
+            fragment.appendChild(dom);
+        }
+        item.appendChild(fragment);
+
+    }    
+
+    var nodes = document.querySelectorAll(".daimond");
+    for(var index = 0, len = nodes.length; index < len; index++) {
+        var item = nodes[index];
+        
+        var color = item.getAttribute('data-background-color');
+        var target = item.getAttribute('data-target');
+        item.style.backgroundColor = color;
+        
+        var results = Color['scale' + target](color, 100, 'hex');
+        var layerCount = 10; 
+
+        var fragment = document.createDocumentFragment();
+        for (var i = 0; i < layerCount; i++) {
+            var dom = document.createElement('div');
+            dom.classList.add('row');
+
+            for(var j = 0; j < layerCount; j++) {
+                var it = document.createElement('div');
+                it.classList.add('column');
+
+                it.setAttribute('title', results[i*layerCount + j]);
+                it.style.backgroundColor =  results[i*layerCount + j];
+
+                dom.appendChild(it);
+            }
+            fragment.appendChild(dom);
+        }
+
+        item.appendChild(fragment);
+    }
+
+
+    var Color = CodeMirrorColorPicker.Color;
+    var nodes = document.querySelectorAll(".colorpicker-style");
+    for(var i = 0, len = nodes.length; i < len; i++) {
+        var item = nodes[i];
+
+        var type = item.getAttribute('data-type');
+        var vertical = item.getAttribute('data-vertical');
+
+        var picker = new CodeMirrorColorPicker.create({
+            position: 'inline',
+            container: item,
+            type: type,
+            color: 'blue',
+            outputFormat: 'hex',    
+            hideDelay: 0,
+            onHide: function (c) {
+                console.log('hide', c)
+            },
+            onChange : function (c) {
+                console.log('change', c);
+            }
+        });
+/*
+        picker.setUserPalette([
+            {   name : "ttingttong",  
+                colors: [ 
+                    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5'
+                ]
+            },
+            { name : "Custom", "edit" : true, "colors" : [] },
+            { name: "Color Scale", "scale" : ['red', 'yellow', 'black' ], count : 5 }
+        ])
+*/
+    }
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>
