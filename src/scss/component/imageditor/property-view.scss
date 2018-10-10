@@ -6,15 +6,23 @@
     top: 0px;
     box-sizing: border-box;
     overflow: auto;
+    border-top: 1px solid #ececec;
+    border-left: 1px solid #ececec;
+    border-right: 1px solid #ececec;
 
     .property-item {
-        padding: 10px;
-        border: 1px solid #ececec;
+        padding: 5px;
+        border-bottom: 1px solid #ececec;
         font-size: 12px;
-        margin-bottom: 5px;
         overflow: hidden;
         
-        > div {
+        > .title {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 0px !important;
+        }
+
+        > .items > div {
             display: flex; 
 
             > label {

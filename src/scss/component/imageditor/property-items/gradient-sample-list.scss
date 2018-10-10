@@ -1,7 +1,7 @@
 
 &.sample-list {
     .gradient-sample-list {
-        min-height: 100px;
+        min-height: 50px;
         max-height: 200px;
         overflow: auto;
         box-sizing: border-box;
@@ -15,7 +15,7 @@
             height: 20px;
             cursor: pointer;
             position: relative;
-            margin: 2px;
+            margin: 3px;
         }
 
     }

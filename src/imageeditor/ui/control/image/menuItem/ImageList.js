@@ -1,21 +1,11 @@
 import UIElement from '../../../../../colorpicker/UIElement';
 
-import GradientLayersMenu from '../GradientLayersMenu';
-
 export default class ImageList extends UIElement {
-
-    components() {
-        return { GradientLayersMenu }
-    }
 
     template () {  
         return `
             <div class='images'>
-                <GradientLayersMenu></GradientLayersMenu>
-                <div class='image-tools'>
-                    <div class="tools" ref="$imagePreview">
-
-                    </div>            
+                <div class='image-tools'>   
                     <div class="image-list" ref="$imageList">
 
                     </div>
@@ -44,25 +34,6 @@ export default class ImageList extends UIElement {
             </div>
             `
     }       
-    
-    'load $imagePreview' () {
-        var item = this.read('/item/current/layer');
-
-        if (!item) return '';
-
-        var imageList = this.read('/item/filter/children', item.id, (item) => {
-            return item.selected;
-        });
-
-        var selected = !imageList.length ? 'selected' : ''
- 
-        return ` 
-            <div class='tree-item ${selected}' type='layer'>
-                <div class="item-view-container">
-                    <div class="item-view"  style='${this.read('/layer/toString', item, false)}'></div>
-                </div>
-            </div>`
-    }
 
     'load $imageList' () {
         var item = this.read('/item/current/layer');
@@ -97,20 +68,6 @@ export default class ImageList extends UIElement {
             this.dispatch('/item/select', id);
             this.refresh();
         }
-
-    }
-
-    'click $imagePreview .tree-item' (e) {
-        this.read('/item/current/layer', (layer) => {
-
-            this.read('/item/each/children', layer.id, (image) => {
-
-                image.selected = false; 
-            })
-
-            this.dispatch('/item/select', layer.id);
-            this.refresh()
-        });        
 
     }
 

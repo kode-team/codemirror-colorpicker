@@ -32,7 +32,7 @@ export default class ColorPickerLayer extends UIElement {
         if (!item) return; 
 
         if (this.read('/item/is/mode', 'layer')) {
-            item.color = color; 
+            item.style['background-color'] = color; 
             this.dispatch('/item/set', item)
         } else if (this.read('/item/is/mode', 'image')) {
             

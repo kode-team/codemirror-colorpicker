@@ -5,20 +5,30 @@ import ColorList from "./color-list/index";
 export default class GradientManager extends BaseModule {
 
  
-    '*/gradient/list/sample' ($store) {
-        var gradients = gradientList.map(it => {
-            return Object.assign({}, it)
-        });
+    '*/gradient/list/sample' ($store, type = 'all') {
 
-        var colors = ColorList.list['material'].map(color => {
-            return Object.assign({}, { type: 'static', color})
-        });
+        var results = [] 
 
-        return [...gradients, ...colors]
+        if (type == 'all') {
+            results.push(...gradientList.map(it => {
+                return Object.assign({}, it)
+            }));
+
+            results.push(...ColorList.list['material'].map(color => {
+                return Object.assign({}, { type: 'static', color})
+            }))
+
+        } else {
+            results.push(...ColorList.list['material'].map(color => {
+                return Object.assign({}, { type: 'static', color})
+            }))
+        }
+
+        return results;
     }
 
-    '/gradient/select' ($store, index) {
-        var obj = $store.read('/gradient/list/sample')[index] 
+    '/gradient/select' ($store, type, index) {
+        var obj = $store.read('/gradient/list/sample', type)[index] 
 
         if (obj) {
             var image = $store.read('/item/current/image')

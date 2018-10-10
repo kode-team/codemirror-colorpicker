@@ -8,12 +8,12 @@ $image-item-width: 100px;
 
 
     .image-tools {
-        padding: 10px 0px; 
+        padding: 5px; 
         position: absolute;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 40px;
+        top: 0px;
         display: flex; 
         flex-direction: row;
 
@@ -43,53 +43,6 @@ $image-item-width: 100px;
         }
     }    
 
-    .tools {
-        padding: 5px; 
-        height: $image-item-height + 10;
-        border-right: 1px solid #dedede;
-
-        button {
-            border: 1px solid #dedede;
-        }
-
-        .tree-item {
-            display: inline-block;
-            height: $image-item-height;            
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            border: 5px solid #dedede;  
-
-
-            &.selected {
-                border: 5px solid #333;
-            }
-
-
-
-            .item-view-container {
-                position: relative; 
-                // @include transparent-background();
-                pointer-events: none;
-                display: inline-block;
-                vertical-align: middle;
-                box-sizing: border-box;
-                height: $image-item-height;
-                width: $image-item-width;
-                border: 1px solid #ececec;
-
-                .item-view {
-                    position: absolute;
-                    top: 0px;
-                    left: 0px;
-                    right: 0px;
-                    bottom: 0px;
-                }
-            }
-
-        }
-    }    
-
     .add-tools {
         padding: 5px; 
         height: $image-item-height + 10;
@@ -100,9 +53,10 @@ $image-item-width: 100px;
     .image-list {
         overflow-x: auto;
         white-space: nowrap;
+        padding: 0px 5px;
 
         .menu-buttons {
-            padding: 10px;
+            padding: 5px 10px;
             display: inline-block;
             vertical-align: middle;
         }
@@ -114,7 +68,6 @@ $image-item-width: 100px;
             position: relative;
             overflow: hidden;
             border: 5px solid #dedede;  
-            margin: 5px;
             vertical-align: middle;
 
             &.selected {

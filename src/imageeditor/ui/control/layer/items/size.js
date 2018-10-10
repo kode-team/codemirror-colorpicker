@@ -4,18 +4,21 @@ export default class Size extends UIElement {
     template () {
         return `
             <div class='property-item size'>
-                <div>
-                    <label>Width</label>
+                <div class='title'>Dimesion</div>
+                <div class='items'>
                     <div>
-                        <input type='number' ref="$width"> <span>px</span>
+                        <label>Width</label>
+                        <div>
+                            <input type='number' ref="$width"> <span>px</span>
+                        </div>
                     </div>
+                    <div>
+                        <label>Height</label>
+                        <div>
+                            <input type='number' ref="$height"> <span>px</span>
+                        </div>
+                    </div>                
                 </div>
-                <div>
-                    <label>Height</label>
-                    <div>
-                        <input type='number' ref="$height"> <span>px</span>
-                    </div>
-                </div>                
             </div>
         `
     }

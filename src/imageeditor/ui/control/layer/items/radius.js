@@ -4,30 +4,33 @@ export default class Radius extends UIElement {
     template () {
         return `
             <div class='property-item radius'>
-                <div>
-                    <label>Top Left Radius</label>
+                <div class='title'>Radius</div>
+                <div class='items'>            
                     <div>
-                        <input type='number' ref="$topLeftRadius"> <span>px</span>
+                        <label>Top Left</label>
+                        <div>
+                            <input type='number' ref="$topLeftRadius"> <span>px</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Top Right</label>
+                        <div>
+                            <input type='number' ref="$topRightRadius"> <span>px</span>
+                        </div>
+                    </div>                
+                    <div>
+                        <label>Bottom Left</label>
+                        <div>
+                            <input type='number' ref="$bottomLeftRadius"> <span>px</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Bottom Right</label>
+                        <div>
+                            <input type='number' ref="$bottomRightRadius"> <span>px</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label>Top Right Radius</label>
-                    <div>
-                        <input type='number' ref="$topRightRadius"> <span>px</span>
-                    </div>
-                </div>                
-                <div>
-                    <label>Bottom Left Radius</label>
-                    <div>
-                        <input type='number' ref="$bottomLeftRadius"> <span>px</span>
-                    </div>
-                </div>
-                <div>
-                    <label>Bottom Right Radius</label>
-                    <div>
-                        <input type='number' ref="$bottomRightRadius"> <span>px</span>
-                    </div>
-                </div>                                
             </div>
         `
     }

@@ -58,7 +58,13 @@ export default class PredefinedLayerResizer extends UIElement {
         var y  = style.y
         var rotate = style.rotate; 
 
-        this.$el.css({ width, height, left: x, top: y, transform: `rotate(${rotate}deg)` })
+        
+
+        this.$el.css({ 
+            width, height, 
+            left: x, top: y, 
+            transform: this.read('/layer/make/transform', layer)
+        })
     }
 
     isShow () {

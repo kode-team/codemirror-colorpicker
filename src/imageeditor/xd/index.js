@@ -14,7 +14,7 @@ export default class XDImageEditor extends BaseImageEditor {
                 <div class="layout-header">
                     <h1>EASYLOGIc studio</h1>
                 </div>
-                <div class="layout-top">      
+                <div class="layout-left">      
                     <PageList></PageList>
                     <LayerList></LayerList>
                 </div>

@@ -8,32 +8,15 @@ export default class LayerView extends UIElement {
         return `
             <div class='property-view'>
                 <Name></Name>
-                <div class="property-item">
-                    <div class="gradient-view" ref="$gradientView"></div>
-                </div>
+                <ColorPickerPanel></ColorPickerPanel>
+                <ColorSampleList></ColorSampleList>
                 <size></size>
                 <position></position>
                 <radius></radius>
-                <rotate></rotate>
+                <transform></transform>
+                <transform3d></transform3d>
             </div> 
         `
-    }
-
-    refresh () {
-        this.setBackground()
-    }
-
-   
-    '@changeEditor' () {
-        this.refresh()
-    } 
-
-    setBackground() {
-        var layer = this.read('/item/current/layer');
-
-        if (layer) {
-            this.refs.$gradientView.el.style = this.read('/layer/toString', layer, false); 
-        }
     }
 
     components () {

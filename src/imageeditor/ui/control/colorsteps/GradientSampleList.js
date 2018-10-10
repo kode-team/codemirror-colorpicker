@@ -5,7 +5,7 @@ export default class GradientSampleList extends UIElement  {
     initialize () {
         super.initialize();
 
-        this.list = this.read('/gradient/list/sample'); 
+        this.list = this.read('/gradient/list/sample', this.props.type); 
     }
 
     template () {
@@ -22,7 +22,7 @@ export default class GradientSampleList extends UIElement  {
     'click $el .gradient-sample-item' (e) {
         var index = +e.$delegateTarget.attr('data-index')
 
-        this.dispatch('/gradient/select',  index );
+        this.dispatch('/gradient/select', this.props.type,  index );
     }
 
 

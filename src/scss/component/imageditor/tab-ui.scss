@@ -106,3 +106,55 @@ $tab-selected-color: #dedede;
         }
     }
 }
+
+.layer-menu-tab {
+
+    .blend-preview-item {
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        vertical-align: middle;
+
+        &.selected {
+            border-color: #000000;                
+            
+        }
+
+        .blend-item-view-container {
+            position: absolute; 
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            top: 0px;
+            @include transparent-background();
+            pointer-events: none;
+            display: inline-block;
+            vertical-align: middle;
+            box-sizing: border-box;
+            flex: 1 1 auto;  
+            // padding: 14px;
+        }
+
+        .blend-item-view {
+            pointer-events: none;                
+            position: absolute; 
+            left: 0px;
+            right: 50%;
+            bottom: 0px;
+            top: 0px; 
+        }
+
+        .blend-item-blend-view {
+            pointer-events: none;                
+            position: absolute; 
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            top: 0px; 
+        }
+
+    }
+}

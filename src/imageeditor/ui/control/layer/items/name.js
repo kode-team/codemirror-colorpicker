@@ -4,10 +4,12 @@ export default class Name extends UIElement {
     template () {
         return `
             <div class='property-item name'>
-                <div>
-                    <label>Name</label>
+                <div class='items'>            
                     <div>
-                        <input type='text' ref="$name"> 
+                        <label>Name</label>
+                        <div>
+                            <input type='text' ref="$name"> 
+                        </div>
                     </div>
                 </div>
             </div>

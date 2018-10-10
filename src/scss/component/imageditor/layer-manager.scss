@@ -7,13 +7,17 @@ $layer-item-padding: 4px;
 .layers {
     border-bottom: 1px solid #ececec;
     box-sizing: border-box;
-    position: relative;
-    height: 50px;
+    position: absolute;
+    left: 0px;
+    top: 150px;
+    right: 0px;
+    bottom: 0px;
+
 
     button {
         appearance: none;
         width: auto;
-        height: $button-size;
+        height: 20px;
         box-sizing: border-box;
         border: 1px solid #dedede;
         vertical-align: middle;
@@ -24,14 +28,36 @@ $layer-item-padding: 4px;
         pointer-events: all;
     }
 
+    > .title {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        height: 30px;
+        padding: 5px;
+        box-sizing: border-box;
+
+        h1 {
+            font-size: 15px;
+            float:left;
+            vertical-align: middle;
+            margin: 0px;
+        }
+        .tools {
+            float: right; 
+            vertical-align: middle;            
+        }
+    }    
+
     .layer-list {
         position: absolute;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 0px;
+        top: 30px;
         overflow: auto; 
-        padding: 3px;      
+        border-top: 1px solid #ececec;
+        box-sizing: border-box;
         
         button {
             display: inline-block;
@@ -49,17 +75,14 @@ $layer-item-padding: 4px;
         
         
         .tree-item {
-            display: inline-block;
-            height: $page-item-height;            
-            vertical-align: middle;
+            display: block;
+            height: 35px;            
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             padding: 5px;
-            min-width: 80px;
-            margin-right: 5px;
-            text-align: center;
+            border-bottom: 1px solid #ececec;
 
             &.selected {
                 background-color: #ececec;

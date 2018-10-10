@@ -5,7 +5,9 @@ export default class ColorStepsInfo extends UIElement {
     template () {
         return `
             <div class='property-item gradient-steps-info'>
-                <GradientInfo></GradientInfo>
+                <div class='items'>            
+                    <GradientInfo></GradientInfo>
+                </div>
             </div>
         ` 
     }

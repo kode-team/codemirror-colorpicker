@@ -5,6 +5,12 @@ export default class LayerList extends UIElement {
     template () { 
         return `
             <div class='layers'>
+                <div class='title'> 
+                    <h1>Layers</h1>
+                    <div class="tools">
+                        <button type="button" class='add-layer' ref="$addLayer">+</button>
+                    </div>
+                </div>             
                 <div class="layer-list" ref="$layerList"></div>
             </div>
         `
@@ -43,13 +49,9 @@ export default class LayerList extends UIElement {
             return '';
         }
 
-        var layerListString = this.read('/item/map/children', page.id, (item, index) => {
+        return this.read('/item/map/children', page.id, (item, index) => {
             return this.makeItemNode(item); 
-        }).join('')
-
-        layerListString += `<button type="button" class='add-layer'>+ Layer</button>`
-
-        return layerListString;
+        })
     }
 
     refresh () {
@@ -60,7 +62,7 @@ export default class LayerList extends UIElement {
         this.refresh()
     }
 
-    'click $layerList .add-layer' (e) {
+    'click $addLayer' (e) {
         this.read('/item/current/page', (page) => {
             this.dispatch('/item/add', 'layer', true, page.id)
             this.refresh();    

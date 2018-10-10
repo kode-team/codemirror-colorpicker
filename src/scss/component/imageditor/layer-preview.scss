@@ -1,0 +1,62 @@
+
+$layer-item-height: 140px;
+$layer-item-width: 140px;
+.layer-preview {
+
+    button {
+        border: 1px solid #dedede;
+    }
+
+    .tree-item {
+        display: inline-block;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;   
+        cursor: pointer;
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 5px solid #dedede;  
+
+
+        &.selected {
+            border: 5px solid #333;
+        }
+
+
+
+        .item-view-container {
+            @include transparent-background();
+            pointer-events: none;
+            display: inline-block;
+            vertical-align: middle;
+            box-sizing: border-box;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            top: 0px;
+            bottom:0px;
+
+            .item-view {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+            }
+
+            .item-view-background-color {
+                position: absolute;
+                left: 10px;
+                bottom: 10px;
+                width: 30px;
+                height: 30px;
+                border-radius: 5px;
+                box-sizing: border-box;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+            }
+        }
+
+    }
+}    

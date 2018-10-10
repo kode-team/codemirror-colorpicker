@@ -14,10 +14,30 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         left: 0px;
         right: 0px;
         top: 0px;
-        height: 210px;
+        height: 160px;
         z-index: 5;
 
+        .layer-preview {
+            position:absolute;
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            width: 160px;
+            box-sizing: border-box;
+            border: 1px solid #ececec;
+        }
+
+        .layer-menu-tab {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            bottom: 0px;
+            left: 170px;
+        }
+
         @import './images.scss';
+
+
     }
 
     .page-content {
@@ -25,7 +45,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 210px;
+        top: 170px;
         overflow: auto;
         background-color: #ececec;
     }
@@ -311,7 +331,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
         button {
             padding: 0px;
-            background-color: rgba($editor-line-color, 0.2);
+            background-color: rgba(white, 1);
             border: 1px solid $editor-line-color;
             appearance: none;
             outline: none;
@@ -322,9 +342,10 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             width: $editor-resizer-width;
             height: $editor-resizer-width;
             pointer-events: all;
+            border-radius: 50%;
 
             &:hover {
-                background-color: rgba($editor-line-color, 0.5);
+                background-color: rgba(white, 0.5);
             }
 
             /* linear */
@@ -423,7 +444,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         button {
             pointer-events: all;
             padding: 0px;
-            background-color: rgba($editor-line-color, 0.2);
+            background-color: rgba(white, 1);
             border: 1px solid $editor-line-color;
             appearance: none;
             outline: none;
@@ -433,10 +454,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             box-sizing: border-box;
             width: $editor-resizer-width;
             height: $editor-resizer-width;
-
-            &:hover {
-                background-color: rgba($editor-line-color, 0.5);
-            }
+            border-radius: 50%;             
 
             /* linear */
             &[data-value='to top'] {

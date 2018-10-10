@@ -6,7 +6,10 @@ export default class ColorSteps extends UIElement {
     template () {
         return `
             <div class='property-item gradient-steps'>
-                <GradientSteps></GradientSteps>
+                <div class='title'>Color Steps</div>
+                <div class='items'>            
+                    <GradientSteps></GradientSteps>
+                </div>
             </div>
         `
     }

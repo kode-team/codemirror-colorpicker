@@ -8,7 +8,9 @@ import PredefinedPageResizer from '../../view/PredefinedPageResizer';
 import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
 
 import LayerMenuTab from './LayerMenuTab'; 
+
 import { EDITOR_MODE_IMAGE_IMAGE, EDITOR_MODE_IMAGE_LINEAR, EDITOR_MODE_IMAGE_RADIAL, EDITOR_MODE_IMAGE_STATIC } from '../../../module/ItemManager';
+import LayerPreview from './menuItem/LayerPreview';
    
 
 export default class GradientView extends BaseTab {
@@ -29,6 +31,7 @@ export default class GradientView extends BaseTab {
                     <GradientAngle></GradientAngle>                    
                 </div>
                 <div class="page-menu">
+                    <LayerPreview></LayerPreview>
                     <LayerMenuTab></LayerMenuTab>
                 </div>
             </div>
@@ -44,7 +47,8 @@ export default class GradientView extends BaseTab {
             GradientLayersMenu,
             PredefinedPageResizer,
             PredefinedLayerResizer,
-            LayerMenuTab
+            LayerMenuTab,
+            LayerPreview
         }
     }
 
@@ -68,11 +72,11 @@ export default class GradientView extends BaseTab {
                 var image = this.read('/item/current/image')
 
                 if (image.parentId == item.id) {
-                    return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/image/toString', item, image)}'></div>`
+                    return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item, true, image)}'></div>`
                 }
             }
 
-            return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item)}'></div>`
+            return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item, true)}'></div>`
         });
     }
 

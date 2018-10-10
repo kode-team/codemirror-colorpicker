@@ -4,10 +4,12 @@ export default class Clip extends UIElement {
     template () {
         return `
             <div class='property-item hidden'>
-                <div>
-                    <label>Clip</label>
+                <div class='items'>            
                     <div>
-                        <input type='checkbox' ref="$check">
+                        <label>Clip</label>
+                        <div>
+                            <input type='checkbox' ref="$check">
+                        </div>
                     </div>
                 </div>
             </div>

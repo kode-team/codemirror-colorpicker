@@ -10,25 +10,28 @@ export default class ImageTypeSelect extends UIElement {
     template () {
         return `
         <div class='property-item gradient-tools'>
-            <div class='gradient-type' ref="$gradientType">
-                <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>
-                <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
-                <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
-                <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
-                <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>
-                <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">
-                    <div class="m1"></div>
-                    <div class="m2"></div>
-                    <div class="m3"></div>
+            <div class='title'>Image Types</div>
+            <div class='items'>        
+                <div class='gradient-type' ref="$gradientType">
+                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>
+                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
+                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
+                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
+                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>
+                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">
+                        <div class="m1"></div>
+                        <div class="m2"></div>
+                        <div class="m3"></div>
+                    </div>
                 </div>
-            </div>
-            <div ref="$angular" class='gradient-angular linear'>
-                <div class="gradient-angular-item radial">
-                    <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>
+                <div ref="$angular" class='gradient-angular linear'>
+                    <div class="gradient-angular-item radial">
+                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>
+                    </div>
+                    <div class="gradient-angular-item image">
+                        
+                    </div>                
                 </div>
-                <div class="gradient-angular-item image">
-                    
-                </div>                
             </div>
         </div>
 

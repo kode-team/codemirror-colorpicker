@@ -3,19 +3,23 @@ import UIElement from "../../../../../colorpicker/UIElement";
 export default class Position extends UIElement {
     template () {
         return `
+
             <div class='property-item position'>
-                <div>
-                    <label>X</label>
+                <div class='title'>Position</div>
+                <div class='items'>            
                     <div>
-                        <input type='number' ref="$x"> <span>px</span>
+                        <label>X</label>
+                        <div>
+                            <input type='number' ref="$x"> <span>px</span>
+                        </div>
                     </div>
+                    <div>
+                        <label>Y</label>
+                        <div>
+                            <input type='number' ref="$y"> <span>px</span>
+                        </div>
+                    </div>               
                 </div>
-                <div>
-                    <label>Y</label>
-                    <div>
-                        <input type='number' ref="$y"> <span>px</span>
-                    </div>
-                </div>                
             </div>
         `
     }

@@ -3,7 +3,7 @@ $pointer-color: rgba(#ececec, 0.8);
 $gutter: 8px;
 $tool-size: 50px;
 $right-size: 250px;
-$left-size: 300px;
+$left-size: 250px;
 
 .layout-main {
     position: absolute;
@@ -42,13 +42,15 @@ $left-size: 300px;
         // background-color: rgba(gray, 0.5);
         z-index: 1; 
         background-color: white; 
+        border-right: 1px solid #ececec;
+
     }    
 
     .layout-body {
         position: absolute;
-        left: 10px;
+        left: $left-size + 10;
         right: $right-size + 20px;
-        top: $tool-size * 3 + 10; 
+        top: $tool-size; 
         bottom: $tool-size;
         z-index: 0; 
         overflow: hidden;
@@ -93,33 +95,14 @@ $left-size: 300px;
         right: 0px;
         top: 0px;
         bottom: 0px;
-        padding: 0px 5px;
 
         &.padding-0 {
             padding: 0px;
         }
 
-        > *:not(:first-child) {
+        > * {
             flex: 1 1 auto;
-            margin-top: 4px;
         }
-
-        > *:first-child {
-            flex: none;
-            height: 290px;
-            margin-top: 0px;
-        }
-
-        > .pages, .control-tab, .blend-row, .image-control, .gradient-layers, .layer-menu-tab {
-            flex: 1 1 auto;  
-            height: auto;
-        }
-
-        > .blend-row {
-            margin-top: 0px;
-        }
-
-
 
     }
 
@@ -131,9 +114,9 @@ $left-size: 300px;
 @import './layer-manager.scss';
 @import './feature-manager.scss';
 @import './layers-menu.scss';
+@import './layer-preview.scss';
 @import './view.scss';        
 @import './drag-angle.scss';
 @import './drag-position.scss';
-@import './image-control.scss';
 @import './blends.scss';
 @import './property-view.scss';

@@ -945,16 +945,17 @@
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
-      width: 300px;
+      width: 250px;
       top: 50px;
       bottom: 8px;
       z-index: 1;
-      background-color: white; }
+      background-color: white;
+      border-right: 1px solid #ececec; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 10px;
+      left: 260px;
       right: 270px;
-      top: 160px;
+      top: 50px;
       bottom: 50px;
       z-index: 0;
       overflow: hidden; }
@@ -995,28 +996,13 @@
       left: 0px;
       right: 0px;
       top: 0px;
-      bottom: 0px;
-      padding: 0px 5px; }
+      bottom: 0px; }
       .imageeditor .layout-main .layout-flow.padding-0 {
         padding: 0px; }
-      .imageeditor .layout-main .layout-flow > *:not(:first-child) {
+      .imageeditor .layout-main .layout-flow > * {
         -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
-                flex: 1 1 auto;
-        margin-top: 4px; }
-      .imageeditor .layout-main .layout-flow > *:first-child {
-        -webkit-box-flex: 0;
-            -ms-flex: none;
-                flex: none;
-        height: 290px;
-        margin-top: 0px; }
-      .imageeditor .layout-main .layout-flow > .pages, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row, .imageeditor .layout-main .layout-flow .image-control, .imageeditor .layout-main .layout-flow .gradient-layers, .imageeditor .layout-main .layout-flow .layer-menu-tab {
-        -webkit-box-flex: 1;
-            -ms-flex: 1 1 auto;
-                flex: 1 1 auto;
-        height: auto; }
-      .imageeditor .layout-main .layout-flow > .blend-row {
-        margin-top: 0px; }
+                flex: 1 1 auto; }
   .imageeditor .tab {
     position: absolute;
     left: 0px;
@@ -1085,6 +1071,45 @@
     .imageeditor .tab.bottom > .tab-body {
       top: 0px;
       bottom: 30px; }
+  .imageeditor .layer-menu-tab .blend-preview-item {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle; }
+    .imageeditor .layer-menu-tab .blend-preview-item.selected {
+      border-color: #000000; }
+    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-view-container {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+      pointer-events: none;
+      display: inline-block;
+      vertical-align: middle;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      -webkit-box-flex: 1;
+          -ms-flex: 1 1 auto;
+              flex: 1 1 auto; }
+    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-view {
+      pointer-events: none;
+      position: absolute;
+      left: 0px;
+      right: 50%;
+      bottom: 0px;
+      top: 0px; }
+    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-blend-view {
+      pointer-events: none;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px; }
   .imageeditor .colorpicker-layer .codemirror-colorpicker {
     background-color: transparent;
     width: 100%;
@@ -1101,14 +1126,17 @@
     border-bottom: 1px solid #ececec;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    position: relative;
-    height: 50px; }
+    height: 150px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px; }
     .imageeditor .pages button {
       -webkit-appearance: none;
          -moz-appearance: none;
               appearance: none;
       width: auto;
-      height: 24px;
+      height: 20px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border: 1px solid #dedede;
@@ -1118,14 +1146,35 @@
       outline: none;
       position: relative;
       pointer-events: all; }
+    .imageeditor .pages > .title {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      height: 30px;
+      padding: 5px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .pages > .title h1 {
+        font-size: 15px;
+        float: left;
+        vertical-align: middle;
+        margin: 0px; }
+      .imageeditor .pages > .title .tools {
+        float: right;
+        vertical-align: middle; }
     .imageeditor .pages .page-list {
       position: absolute;
       left: 0px;
       right: 0px;
       bottom: 0px;
-      top: 0px;
-      overflow: auto;
-      padding: 3px; }
+      top: 30px;
+      overflow-x: auto;
+      padding: 8px;
+      white-space: nowrap;
+      border-top: 1px solid #ececec;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
       .imageeditor .pages .page-list button {
         display: inline-block;
         height: 30px;
@@ -1141,7 +1190,8 @@
         text-align: center; }
       .imageeditor .pages .page-list .tree-item {
         display: inline-block;
-        height: 30px;
+        height: 100px;
+        width: 80px;
         vertical-align: middle;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
@@ -1149,7 +1199,7 @@
         position: relative;
         overflow: hidden;
         padding: 5px;
-        min-width: 100px;
+        border: 1px solid #ececec;
         margin-right: 5px;
         text-align: center; }
         .imageeditor .pages .page-list .tree-item.selected {
@@ -1180,14 +1230,17 @@
     border-bottom: 1px solid #ececec;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    position: relative;
-    height: 50px; }
+    position: absolute;
+    left: 0px;
+    top: 150px;
+    right: 0px;
+    bottom: 0px; }
     .imageeditor .layers button {
       -webkit-appearance: none;
          -moz-appearance: none;
               appearance: none;
       width: auto;
-      height: 24px;
+      height: 20px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border: 1px solid #dedede;
@@ -1197,14 +1250,33 @@
       outline: none;
       position: relative;
       pointer-events: all; }
+    .imageeditor .layers > .title {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      height: 30px;
+      padding: 5px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .layers > .title h1 {
+        font-size: 15px;
+        float: left;
+        vertical-align: middle;
+        margin: 0px; }
+      .imageeditor .layers > .title .tools {
+        float: right;
+        vertical-align: middle; }
     .imageeditor .layers .layer-list {
       position: absolute;
       left: 0px;
       right: 0px;
       bottom: 0px;
-      top: 0px;
+      top: 30px;
       overflow: auto;
-      padding: 3px; }
+      border-top: 1px solid #ececec;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
       .imageeditor .layers .layer-list button {
         display: inline-block;
         height: 35px;
@@ -1219,18 +1291,15 @@
         margin-right: 5px;
         text-align: center; }
       .imageeditor .layers .layer-list .tree-item {
-        display: inline-block;
+        display: block;
         height: 35px;
-        vertical-align: middle;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
         overflow: hidden;
         padding: 5px;
-        min-width: 80px;
-        margin-right: 5px;
-        text-align: center; }
+        border-bottom: 1px solid #ececec; }
         .imageeditor .layers .layer-list .tree-item.selected {
           background-color: #ececec; }
           .imageeditor .layers .layer-list .tree-item.selected .item-tools {
@@ -1415,6 +1484,50 @@
             width: 2px;
             height: 2px;
             background-color: black; }
+  .imageeditor .layer-preview button {
+    border: 1px solid #dedede; }
+  .imageeditor .layer-preview .tree-item {
+    display: inline-block;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    cursor: pointer;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    overflow: hidden;
+    border: 5px solid #dedede; }
+    .imageeditor .layer-preview .tree-item.selected {
+      border: 5px solid #333; }
+    .imageeditor .layer-preview .tree-item .item-view-container {
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+      pointer-events: none;
+      display: inline-block;
+      vertical-align: middle;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px; }
+      .imageeditor .layer-preview .tree-item .item-view-container .item-view {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px; }
+      .imageeditor .layer-preview .tree-item .item-view-container .item-view-background-color {
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid rgba(0, 0, 0, 0.2); }
   .imageeditor .page-view {
     position: absolute;
     left: 0px;
@@ -1426,20 +1539,35 @@
       left: 0px;
       right: 0px;
       top: 0px;
-      height: 210px;
+      height: 160px;
       z-index: 5; }
+      .imageeditor .page-view .page-menu .layer-preview {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        width: 160px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #ececec; }
+      .imageeditor .page-view .page-menu .layer-menu-tab {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        left: 170px; }
       .imageeditor .page-view .page-menu .images {
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         position: relative;
         height: 100%; }
         .imageeditor .page-view .page-menu .images .image-tools {
-          padding: 10px 0px;
+          padding: 5px;
           position: absolute;
           left: 0px;
           right: 0px;
           bottom: 0px;
-          top: 40px;
+          top: 0px;
           display: -webkit-box;
           display: -ms-flexbox;
           display: flex;
@@ -1472,45 +1600,15 @@
             -webkit-box-flex: 1;
                 -ms-flex: 1 1 auto;
                     flex: 1 1 auto; }
-        .imageeditor .page-view .page-menu .images .tools {
-          padding: 5px;
-          height: 110px;
-          border-right: 1px solid #dedede; }
-          .imageeditor .page-view .page-menu .images .tools button {
-            border: 1px solid #dedede; }
-          .imageeditor .page-view .page-menu .images .tools .tree-item {
-            display: inline-block;
-            height: 100px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            border: 5px solid #dedede; }
-            .imageeditor .page-view .page-menu .images .tools .tree-item.selected {
-              border: 5px solid #333; }
-            .imageeditor .page-view .page-menu .images .tools .tree-item .item-view-container {
-              position: relative;
-              pointer-events: none;
-              display: inline-block;
-              vertical-align: middle;
-              -webkit-box-sizing: border-box;
-                      box-sizing: border-box;
-              height: 100px;
-              width: 100px;
-              border: 1px solid #ececec; }
-              .imageeditor .page-view .page-menu .images .tools .tree-item .item-view-container .item-view {
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                right: 0px;
-                bottom: 0px; }
         .imageeditor .page-view .page-menu .images .add-tools {
           padding: 5px;
           height: 110px; }
         .imageeditor .page-view .page-menu .images .image-list {
           overflow-x: auto;
-          white-space: nowrap; }
+          white-space: nowrap;
+          padding: 0px 5px; }
           .imageeditor .page-view .page-menu .images .image-list .menu-buttons {
-            padding: 10px;
+            padding: 5px 10px;
             display: inline-block;
             vertical-align: middle; }
           .imageeditor .page-view .page-menu .images .image-list .tree-item {
@@ -1520,7 +1618,6 @@
             position: relative;
             overflow: hidden;
             border: 5px solid #dedede;
-            margin: 5px;
             vertical-align: middle; }
             .imageeditor .page-view .page-menu .images .image-list .tree-item.selected {
               border: 5px solid #333; }
@@ -1577,7 +1674,7 @@
       left: 0px;
       right: 0px;
       bottom: 0px;
-      top: 210px;
+      top: 170px;
       overflow: auto;
       background-color: #ececec; }
     .imageeditor .page-view .gradient-color-view-container {
@@ -1804,7 +1901,7 @@
               box-sizing: border-box; }
       .imageeditor .page-view .predefined-page-resizer button {
         padding: 0px;
-        background-color: rgba(179, 179, 179, 0.2);
+        background-color: white;
         border: 1px solid #b3b3b3;
         -webkit-appearance: none;
            -moz-appearance: none;
@@ -1818,10 +1915,11 @@
         width: 10px;
         height: 10px;
         pointer-events: all;
+        border-radius: 50%;
         /* linear */
         /* linear */ }
         .imageeditor .page-view .predefined-page-resizer button:hover {
-          background-color: rgba(179, 179, 179, 0.5); }
+          background-color: rgba(255, 255, 255, 0.5); }
         .imageeditor .page-view .predefined-page-resizer button[data-value='to top'] {
           top: -6px;
           left: 50%;
@@ -1896,7 +1994,7 @@
       .imageeditor .page-view .predefined-layer-resizer button {
         pointer-events: all;
         padding: 0px;
-        background-color: rgba(95, 128, 222, 0.2);
+        background-color: white;
         border: 1px solid #5f80de;
         -webkit-appearance: none;
            -moz-appearance: none;
@@ -1909,9 +2007,8 @@
                 box-sizing: border-box;
         width: 10px;
         height: 10px;
+        border-radius: 50%;
         /* linear */ }
-        .imageeditor .page-view .predefined-layer-resizer button:hover {
-          background-color: rgba(95, 128, 222, 0.5); }
         .imageeditor .page-view .predefined-layer-resizer button[data-value='to top'] {
           top: -6px;
           left: 50%;
@@ -2070,26 +2167,6 @@
       background-color: rgba(255, 255, 255, 0.8);
       -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32);
               box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32); }
-  .imageeditor .image-control {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    top: 0px; }
-    .imageeditor .image-control > .top {
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      right: 0px;
-      bottom: 200px; }
-    .imageeditor .image-control > .bottom {
-      position: absolute;
-      left: 0px;
-      height: 200px;
-      right: 0px;
-      bottom: 0px; }
-  .imageeditor .editor-tab {
-    height: 100%; }
   .imageeditor .blend-row {
     position: relative; }
   .imageeditor .blend-list-tab {
@@ -2103,20 +2180,21 @@
       position: absolute;
       left: 0px;
       right: 0px;
-      top: 1px;
+      top: 0px;
       bottom: 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       overflow-x: auto;
-      white-space: nowrap; }
+      white-space: nowrap;
+      padding: 5px; }
       .imageeditor .blend-list-tab .blend-list .blend-item {
         display: inline-block;
-        height: 120px;
-        width: 120px;
+        height: 100px;
+        width: 100px;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        border: 2px solid #dedede;
+        border: 5px solid #dedede;
         margin: 2px; }
         .imageeditor .blend-list-tab .blend-list .blend-item.selected {
           border-color: #000000; }
@@ -2168,31 +2246,38 @@
     top: 0px;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    overflow: auto; }
+    overflow: auto;
+    border-top: 1px solid #ececec;
+    border-left: 1px solid #ececec;
+    border-right: 1px solid #ececec; }
     .imageeditor .property-view .property-item {
-      padding: 10px;
-      border: 1px solid #ececec;
+      padding: 5px;
+      border-bottom: 1px solid #ececec;
       font-size: 12px;
-      margin-bottom: 5px;
       overflow: hidden; }
-      .imageeditor .property-view .property-item > div {
+      .imageeditor .property-view .property-item > .title {
+        font-size: 12px;
+        font-weight: bold;
+        padding: 2px 0px !important; }
+      .imageeditor .property-view .property-item > .items > div {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex; }
-        .imageeditor .property-view .property-item > div > label {
+        .imageeditor .property-view .property-item > .items > div > label {
           width: 150px; }
-        .imageeditor .property-view .property-item > div > div {
+        .imageeditor .property-view .property-item > .items > div > div {
           display: -webkit-box;
           display: -ms-flexbox;
           display: flex; }
-          .imageeditor .property-view .property-item > div > div input[type=number], .imageeditor .property-view .property-item > div > div input[type=text], .imageeditor .property-view .property-item > div > div select {
+          .imageeditor .property-view .property-item > .items > div > div input[type=number], .imageeditor .property-view .property-item > .items > div > div input[type=text], .imageeditor .property-view .property-item > .items > div > div select {
             width: 80px; }
-          .imageeditor .property-view .property-item > div > div > span {
+          .imageeditor .property-view .property-item > .items > div > div > span {
             display: inline-block;
             width: 30px;
             margin-left: 10px; }
       .imageeditor .property-view .property-item.gradient-steps {
-        height: 30px; }
+        height: 45px;
+        padding: 10px; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
           position: relative;
           display: block; }
@@ -2314,7 +2399,7 @@
               position: relative;
               margin: 2px; }
       .imageeditor .property-view .property-item.sample-list .gradient-sample-list {
-        min-height: 100px;
+        min-height: 50px;
         max-height: 200px;
         overflow: auto;
         -webkit-box-sizing: border-box;
@@ -2328,7 +2413,7 @@
           height: 20px;
           cursor: pointer;
           position: relative;
-          margin: 2px; }
+          margin: 3px; }
       .imageeditor .property-view .property-item.gradient-steps-info .gradient-info {
         overflow: auto; }
         .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item {

@@ -6,7 +6,9 @@ export default class ColorPickerPanel extends UIElement {
     template () {
         return `
             <div class='property-item colorpicker'>
-                <ColorPicker></ColorPicker>
+                <div class='items'>            
+                    <ColorPicker></ColorPicker>
+                </div>
             </div>
         `
     }
