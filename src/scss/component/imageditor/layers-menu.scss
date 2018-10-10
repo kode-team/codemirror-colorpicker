@@ -3,158 +3,155 @@ $direction-border: 2px solid $pointer-color;
 $button-size: 12px * 2;
 
 .gradient-layers-menu {
-    position: absolute;
-    top: -50px;
-    width: 100%;
-    left: 0px;
     box-sizing: border-box;
-    padding: 10px 0px;
     text-align: right;
     // background-color: #333;
     display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    height: 40px;
 
-    >div {
-        flex: 1;
+    > div {
+        padding: 5px;
     }
 
-    >.left {
-        text-align: left;
+    > .right {
+        padding: 10px;
 
 
-    }
-
-    button {
-        appearance: none;
-        border: 0px;
-        background-color: white;
-        padding: 0px;
-        box-sizing: border-box;
-        vertical-align: middle;
-    }
-
-    button {
-        width: $button-size;
-        height: $button-size;
-        position: relative;
-        border: 1px solid black;
-
-        &.first,
-        &.last {
-            letter-spacing: -2px;
-        }
-
-        &.del {
-            overflow: hidden;
-
-            &:after,
-            &:before {
-                content: '';
-                width: 80%;
-                height: 1px;
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform-origin: center center;
-                transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                border-top: 1px solid black;
-                box-sizing: border-box;
-            }
-
-            &:after {
-                transform: translateX(-50%) translateY(-50%) rotate(135deg);
-            }
-        }
-    }
-
-
-    .divider {
-        color: rgba(0, 0, 0, 0);
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-
-    button {
-        cursor: pointer;
-        outline: none;
-
-        &.stack-view {
-            position: relative;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid black;
+        button {
+            appearance: none;
+            border: 0px;
             background-color: white;
+            padding: 0px;
             box-sizing: border-box;
-
-            &:after {
-                border: 1px solid black;
-                background-color: white;
-                box-sizing: border-box;
-                position: absolute;
-                width: $button-size;
-                height: $button-size;
-                display: inline-block;
-                content: "";
-                top: -5px;
-                left: -5px;
-            }
-
-            &:before {
-                border: 1px solid black;
-                background-color: white;
-                box-sizing: border-box;
-                top: -3px;
-                left: -3px;
-                position: absolute;
-                width: $button-size;
-                height: $button-size;
-                display: inline-block;
-                content: "";
-            }
-        }
-
-        &.only-view {
+            vertical-align: middle;
+            width: $button-size !important;
+            height: $button-size !important;
             position: relative;
-            display: inline-block;
-            box-sizing: border-box;
             border: 1px solid black;
-            background-color: gray;
-            box-sizing: border-box;
+
+            &.first,
+            &.last {
+                letter-spacing: -2px;
+            }
+
+            &.del {
+                overflow: hidden;
+
+                &:after,
+                &:before {
+                    content: '';
+                    width: 80%;
+                    height: 1px;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform-origin: center center;
+                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                    border-top: 1px solid black;
+                    box-sizing: border-box;
+                }
+
+                &:after {
+                    transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                }
+            }
         }
 
-        &.show-angle {
-            position: relative;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px dashed black;
-            background-color: white;
-            box-sizing: border-box;
 
-            &:before {
-                content: "";
-                position: absolute;
-                width: 10px;
-                height: 10px;
+        .divider {
+            color: rgba(0, 0, 0, 0);
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            outline: none;
+
+            &.stack-view {
+                position: relative;
                 display: inline-block;
                 box-sizing: border-box;
                 border: 1px solid black;
                 background-color: white;
                 box-sizing: border-box;
-                border-radius: 50%;
-                left: 50%;
-                top: 50%;
-                transform: translateX(-50%) translateY(-50%);
+
+                &:after {
+                    border: 1px solid black;
+                    background-color: white;
+                    box-sizing: border-box;
+                    position: absolute;
+                    width: $button-size;
+                    height: $button-size;
+                    display: inline-block;
+                    content: "";
+                    top: -5px;
+                    left: -5px;
+                }
+
+                &:before {
+                    border: 1px solid black;
+                    background-color: white;
+                    box-sizing: border-box;
+                    top: -3px;
+                    left: -3px;
+                    position: absolute;
+                    width: $button-size;
+                    height: $button-size;
+                    display: inline-block;
+                    content: "";
+                }
             }
 
-            &:after {
-                position: absolute;
-                content: "";
-                left: 50%;
-                top: 50%;
-                transform: translateX(50%) translateY(-50%);
-                width: 2px;
-                height: 2px;
-                background-color: black;
+            &.only-view {
+                position: relative;
+                display: inline-block;
+                box-sizing: border-box;
+                border: 1px solid black;
+                background-color: gray;
+                box-sizing: border-box;
+            }
+
+            &.show-angle {
+                position: relative;
+                display: inline-block;
+                box-sizing: border-box;
+                border: 1px dashed black;
+                background-color: white;
+                box-sizing: border-box;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 10px;
+                    height: 10px;
+                    display: inline-block;
+                    box-sizing: border-box;
+                    border: 1px solid black;
+                    background-color: white;
+                    box-sizing: border-box;
+                    border-radius: 50%;
+                    left: 50%;
+                    top: 50%;
+                    transform: translateX(-50%) translateY(-50%);
+                }
+
+                &:after {
+                    position: absolute;
+                    content: "";
+                    left: 50%;
+                    top: 50%;
+                    transform: translateX(50%) translateY(-50%);
+                    width: 2px;
+                    height: 2px;
+                    background-color: black;
+                }
             }
         }
     }
+
 }

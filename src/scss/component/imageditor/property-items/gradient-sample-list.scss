@@ -1,0 +1,22 @@
+
+&.sample-list {
+    .gradient-sample-list {
+        min-height: 100px;
+        max-height: 200px;
+        overflow: auto;
+        box-sizing: border-box;
+        text-align: left;
+        display: inline-block;
+    
+        .gradient-sample-item {
+            display: inline-block;
+            vertical-align: middle;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            position: relative;
+            margin: 2px;
+        }
+
+    }
+}

@@ -927,31 +927,34 @@
     bottom: 0px; }
     .imageeditor .layout-main .layout-top {
       position: absolute;
-      left: 300px;
-      right: 250px;
+      left: 0px;
+      right: 270px;
       top: 50px;
-      bottom: 8px;
-      z-index: 1; }
+      height: 100px;
+      z-index: 1;
+      border-right: 1px solid #ececec; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
+      right: 10px;
       width: 250px;
-      right: 0px;
       top: 50px;
-      bottom: 8px;
+      bottom: 58px;
       overflow: auto;
-      z-index: 1; }
+      z-index: 1;
+      background-color: white; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
       width: 300px;
       top: 50px;
       bottom: 8px;
-      z-index: 1; }
+      z-index: 1;
+      background-color: white; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 300px;
-      right: 250px;
-      top: 150px;
+      left: 10px;
+      right: 270px;
+      top: 160px;
       bottom: 50px;
       z-index: 0;
       overflow: hidden; }
@@ -962,7 +965,9 @@
       height: 50px;
       top: 0px;
       z-index: 0;
-      overflow: hidden; }
+      overflow: hidden;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
       .imageeditor .layout-main .layout-header h1 {
         padding: 10px;
         margin: 0px;
@@ -971,8 +976,8 @@
         text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54); }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 300px;
-      right: 250px;
+      left: 0px;
+      right: 0px;
       height: 50px;
       bottom: 0px;
       z-index: 0;
@@ -1005,7 +1010,7 @@
                 flex: none;
         height: 290px;
         margin-top: 0px; }
-      .imageeditor .layout-main .layout-flow > .layout-manager-tab, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row, .imageeditor .layout-main .layout-flow .image-control {
+      .imageeditor .layout-main .layout-flow > .pages, .imageeditor .layout-main .layout-flow .control-tab, .imageeditor .layout-main .layout-flow .blend-row, .imageeditor .layout-main .layout-flow .image-control, .imageeditor .layout-main .layout-flow .gradient-layers, .imageeditor .layout-main .layout-flow .layer-menu-tab {
         -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
                 flex: 1 1 auto;
@@ -1013,14 +1018,26 @@
       .imageeditor .layout-main .layout-flow > .blend-row {
         margin-top: 0px; }
   .imageeditor .tab {
-    position: relative;
-    background-color: white; }
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px; }
+    .imageeditor .tab.inner {
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px; }
+      .imageeditor .tab.inner .tab-header .tab-item {
+        border: 0px; }
+      .imageeditor .tab.inner .tab-body {
+        border: 0px; }
     .imageeditor .tab .tab-header {
       position: absolute;
       left: 0px;
       right: 0px;
       height: 30px;
-      top: 0px;
+      top: 1px;
       display: block;
       z-index: 1; }
       .imageeditor .tab .tab-header .tab-item {
@@ -1033,20 +1050,18 @@
         padding: 6px 4px;
         cursor: pointer;
         color: black;
-        margin-top: 4px;
         border: 1px solid #dedede;
         min-width: 50px; }
         .imageeditor .tab .tab-header .tab-item:not(.selected) {
-          background-color: #dedede;
+          background-color: white;
           color: black; }
         .imageeditor .tab .tab-header .tab-item.selected {
-          background-color: white;
-          border-bottom: 1px solid #ffffff; }
+          background-color: #dedede; }
     .imageeditor .tab .tab-body {
       position: absolute;
       left: 0px;
       right: 0px;
-      top: 33px;
+      top: 30px;
       bottom: 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
@@ -1061,6 +1076,15 @@
         overflow: auto; }
         .imageeditor .tab .tab-body .tab-content.selected {
           display: block; }
+    .imageeditor .tab.bottom > .tab-header {
+      top: auto;
+      bottom: 1px; }
+      .imageeditor .tab.bottom > .tab-header .tab-item.selected {
+        border-top: 1px solid #ffffff;
+        border-bottom: 1px solid #dedede; }
+    .imageeditor .tab.bottom > .tab-body {
+      top: 0px;
+      bottom: 30px; }
   .imageeditor .colorpicker-layer .codemirror-colorpicker {
     background-color: transparent;
     width: 100%;
@@ -1072,318 +1096,499 @@
     .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .wheel {
       border: 0px;
       background-color: transparent; }
-  .imageeditor .gradient-layers {
-    position: relative;
-    height: 100%;
+  .imageeditor .pages {
+    border-top: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    padding: 5px; }
-    .imageeditor .gradient-layers .layer-list {
-      display: block;
+    position: relative;
+    height: 50px; }
+    .imageeditor .pages button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+      width: auto;
+      height: 24px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border: 1px solid #dedede;
+      vertical-align: middle;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+      pointer-events: all; }
+    .imageeditor .pages .page-list {
       position: absolute;
       left: 0px;
-      width: 100px;
-      top: 35px;
+      right: 0px;
       bottom: 0px;
+      top: 0px;
       overflow: auto;
-      border-right: 1px solid #ececec; }
-      .imageeditor .gradient-layers .layer-list .gradient-item {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        height: 50px;
+      padding: 3px; }
+      .imageeditor .pages .page-list button {
+        display: inline-block;
+        height: 30px;
+        vertical-align: middle;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        border-bottom: 1px solid #dedede;
-        border-top: 0px;
-        padding: 5px; }
-        .imageeditor .gradient-layers .layer-list .gradient-item:first-child {
-          border-top: 1px solid #dedede; }
-        .imageeditor .gradient-layers .layer-list .gradient-item svg {
+        padding: 5px;
+        min-width: 80px;
+        margin-right: 5px;
+        text-align: center; }
+      .imageeditor .pages .page-list .tree-item {
+        display: inline-block;
+        height: 30px;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        padding: 5px;
+        min-width: 100px;
+        margin-right: 5px;
+        text-align: center; }
+        .imageeditor .pages .page-list .tree-item.selected {
+          background-color: #ececec; }
+          .imageeditor .pages .page-list .tree-item.selected .item-tools {
+            visibility: visible; }
+        .imageeditor .pages .page-list .tree-item .item-view-container {
+          position: relative;
+          pointer-events: none;
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          height: 100%;
+          width: 25px;
+          border: 1px solid #ececec; }
+          .imageeditor .pages .page-list .tree-item .item-view-container .item-view {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px; }
+        .imageeditor .pages .page-list .tree-item .item-title {
+          display: inline-block;
+          font-size: 12px;
           pointer-events: none; }
-        .imageeditor .gradient-layers .layer-list .gradient-item.selected {
-          background-color: #dedede; }
-          .imageeditor .gradient-layers .layer-list .gradient-item.selected .gradient-item-check svg {
-            display: inline-block; }
-        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-view-container {
+  .imageeditor .layers {
+    border-bottom: 1px solid #ececec;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    position: relative;
+    height: 50px; }
+    .imageeditor .layers button {
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+      width: auto;
+      height: 24px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border: 1px solid #dedede;
+      vertical-align: middle;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+      pointer-events: all; }
+    .imageeditor .layers .layer-list {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      overflow: auto;
+      padding: 3px; }
+      .imageeditor .layers .layer-list button {
+        display: inline-block;
+        height: 35px;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        padding: 5px;
+        min-width: 100px;
+        margin-right: 5px;
+        text-align: center; }
+      .imageeditor .layers .layer-list .tree-item {
+        display: inline-block;
+        height: 35px;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        padding: 5px;
+        min-width: 80px;
+        margin-right: 5px;
+        text-align: center; }
+        .imageeditor .layers .layer-list .tree-item.selected {
+          background-color: #ececec; }
+          .imageeditor .layers .layer-list .tree-item.selected .item-tools {
+            visibility: visible; }
+        .imageeditor .layers .layer-list .tree-item .item-view-container {
           position: relative;
           background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+          background-color: white;
+          -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+                  box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
           pointer-events: none;
           display: inline-block;
           vertical-align: middle;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          padding: 14px;
-          width: 25%; }
-        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-check {
+          height: 100%;
+          width: 25px;
+          border: 1px solid #ececec; }
+          .imageeditor .layers .layer-list .tree-item .item-view-container .item-view {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px; }
+        .imageeditor .layers .layer-list .tree-item .item-title {
+          display: inline-block;
+          font-size: 12px;
+          pointer-events: none; }
+  .imageeditor .feature-control {
+    position: absolute;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px; }
+    .imageeditor .feature-control .feature {
+      display: none;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .feature-control .feature.selected {
+        display: block; }
+    .imageeditor .feature-control .image-feature .color-tab {
+      bottom: auto;
+      height: 290px; }
+    .imageeditor .feature-control .image-feature .color-steps-tab {
+      top: 620px; }
+  .imageeditor .gradient-layers-menu {
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    text-align: right;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    height: 40px; }
+    .imageeditor .gradient-layers-menu > div {
+      padding: 5px; }
+    .imageeditor .gradient-layers-menu > .right {
+      padding: 10px; }
+      .imageeditor .gradient-layers-menu > .right button {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        border: 0px;
+        background-color: white;
+        padding: 0px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        vertical-align: middle;
+        width: 24px !important;
+        height: 24px !important;
+        position: relative;
+        border: 1px solid black; }
+        .imageeditor .gradient-layers-menu > .right button.first, .imageeditor .gradient-layers-menu > .right button.last {
+          letter-spacing: -2px; }
+        .imageeditor .gradient-layers-menu > .right button.del {
+          overflow: hidden; }
+          .imageeditor .gradient-layers-menu > .right button.del:after, .imageeditor .gradient-layers-menu > .right button.del:before {
+            content: '';
+            width: 80%;
+            height: 1px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform-origin: center center;
+                    transform-origin: center center;
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+            border-top: 1px solid black;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box; }
+          .imageeditor .gradient-layers-menu > .right button.del:after {
+            -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
+                    transform: translateX(-50%) translateY(-50%) rotate(135deg); }
+      .imageeditor .gradient-layers-menu > .right .divider {
+        color: transparent;
+        margin-left: 10px;
+        margin-right: 10px; }
+      .imageeditor .gradient-layers-menu > .right button {
+        cursor: pointer;
+        outline: none; }
+        .imageeditor .gradient-layers-menu > .right button.stack-view {
           position: relative;
           display: inline-block;
-          vertical-align: middle;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          width: 25%;
-          text-align: center;
-          padding: 8px;
-          display: none; }
-          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-check svg {
-            display: none; }
-        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible {
+          border: 1px solid black;
+          background-color: white;
+          box-sizing: border-box; }
+          .imageeditor .gradient-layers-menu > .right button.stack-view:after {
+            border: 1px solid black;
+            background-color: white;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            content: "";
+            top: -5px;
+            left: -5px; }
+          .imageeditor .gradient-layers-menu > .right button.stack-view:before {
+            border: 1px solid black;
+            background-color: white;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            top: -3px;
+            left: -3px;
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            content: ""; }
+        .imageeditor .gradient-layers-menu > .right button.only-view {
           position: relative;
           display: inline-block;
-          vertical-align: middle;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          width: 25%;
-          text-align: center;
-          padding: 8px;
-          display: none; }
-          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.on {
-            display: none; }
-          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible svg.off {
-            display: inline-block; }
-          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible.on svg.on {
-            display: inline-block; }
-          .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-visible.on svg.off {
-            display: none; }
-        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-delete {
+          border: 1px solid black;
+          background-color: gray;
+          box-sizing: border-box; }
+        .imageeditor .gradient-layers-menu > .right button.show-angle {
           position: relative;
           display: inline-block;
-          vertical-align: middle;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          padding: 8px;
-          width: 25%;
-          text-align: center;
-          display: none; }
-        .imageeditor .gradient-layers .layer-list .gradient-item .gradient-item-view {
-          pointer-events: none;
+          border: 1px dashed black;
+          background-color: white;
+          box-sizing: border-box; }
+          .imageeditor .gradient-layers-menu > .right button.show-angle:before {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border: 1px solid black;
+            background-color: white;
+            box-sizing: border-box;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translateX(-50%) translateY(-50%);
+                    transform: translateX(-50%) translateY(-50%); }
+          .imageeditor .gradient-layers-menu > .right button.show-angle:after {
+            position: absolute;
+            content: "";
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translateX(50%) translateY(-50%);
+                    transform: translateX(50%) translateY(-50%);
+            width: 2px;
+            height: 2px;
+            background-color: black; }
+  .imageeditor .page-view {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px; }
+    .imageeditor .page-view .page-menu {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      height: 210px;
+      z-index: 5; }
+      .imageeditor .page-view .page-menu .images {
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        position: relative;
+        height: 100%; }
+        .imageeditor .page-view .page-menu .images .image-tools {
+          padding: 10px 0px;
           position: absolute;
           left: 0px;
           right: 0px;
           bottom: 0px;
-          top: 0px; }
-  .imageeditor .tools {
-    display: inline-block;
-    position: absolute;
-    left: 5px;
-    right: 5px;
-    top: 5px;
-    height: 24px;
-    text-align: left; }
-    .imageeditor .tools .divider {
-      color: transparent;
-      margin-left: 10px;
-      margin-right: 10px; }
-    .imageeditor .tools button {
-      -webkit-appearance: none;
-         -moz-appearance: none;
-              appearance: none;
-      width: 24px;
-      height: 24px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      border: 1px solid #ececec;
-      vertical-align: middle;
-      font-size: 15px;
-      font-weight: bold;
-      font-family: serif, sans-serif;
-      line-height: 1.6;
-      cursor: pointer;
-      outline: none;
-      position: relative; }
-    .imageeditor .tools button {
-      cursor: pointer;
-      outline: none; }
-      .imageeditor .tools button.first, .imageeditor .tools button.last {
-        letter-spacing: -2px; }
-      .imageeditor .tools button.del {
-        overflow: hidden; }
-        .imageeditor .tools button.del:after, .imageeditor .tools button.del:before {
-          content: '';
-          width: 80%;
-          height: 1px;
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          -webkit-transform-origin: center center;
-                  transform-origin: center center;
-          -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                  transform: translateX(-50%) translateY(-50%) rotate(45deg);
-          border-top: 1px solid black;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box; }
-        .imageeditor .tools button.del:after {
-          -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                  transform: translateX(-50%) translateY(-50%) rotate(135deg); }
-  .imageeditor .gradient-layers-menu {
-    position: absolute;
-    top: -50px;
-    width: 100%;
-    left: 0px;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    padding: 10px 0px;
-    text-align: right;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex; }
-    .imageeditor .gradient-layers-menu > div {
-      -webkit-box-flex: 1;
-          -ms-flex: 1;
-              flex: 1; }
-    .imageeditor .gradient-layers-menu > .left {
-      text-align: left; }
-    .imageeditor .gradient-layers-menu button {
-      -webkit-appearance: none;
-         -moz-appearance: none;
-              appearance: none;
-      border: 0px;
-      background-color: white;
-      padding: 0px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      vertical-align: middle; }
-    .imageeditor .gradient-layers-menu button {
-      width: 24px;
-      height: 24px;
-      position: relative;
-      border: 1px solid black; }
-      .imageeditor .gradient-layers-menu button.first, .imageeditor .gradient-layers-menu button.last {
-        letter-spacing: -2px; }
-      .imageeditor .gradient-layers-menu button.del {
-        overflow: hidden; }
-        .imageeditor .gradient-layers-menu button.del:after, .imageeditor .gradient-layers-menu button.del:before {
-          content: '';
-          width: 80%;
-          height: 1px;
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          -webkit-transform-origin: center center;
-                  transform-origin: center center;
-          -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-                  transform: translateX(-50%) translateY(-50%) rotate(45deg);
-          border-top: 1px solid black;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box; }
-        .imageeditor .gradient-layers-menu button.del:after {
-          -webkit-transform: translateX(-50%) translateY(-50%) rotate(135deg);
-                  transform: translateX(-50%) translateY(-50%) rotate(135deg); }
-    .imageeditor .gradient-layers-menu .divider {
-      color: transparent;
-      margin-left: 10px;
-      margin-right: 10px; }
-    .imageeditor .gradient-layers-menu button {
-      cursor: pointer;
-      outline: none; }
-      .imageeditor .gradient-layers-menu button.stack-view {
-        position: relative;
-        display: inline-block;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid black;
-        background-color: white;
-        box-sizing: border-box; }
-        .imageeditor .gradient-layers-menu button.stack-view:after {
-          border: 1px solid black;
-          background-color: white;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          position: absolute;
-          width: 24px;
-          height: 24px;
-          display: inline-block;
-          content: "";
-          top: -5px;
-          left: -5px; }
-        .imageeditor .gradient-layers-menu button.stack-view:before {
-          border: 1px solid black;
-          background-color: white;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          top: -3px;
-          left: -3px;
-          position: absolute;
-          width: 24px;
-          height: 24px;
-          display: inline-block;
-          content: ""; }
-      .imageeditor .gradient-layers-menu button.only-view {
-        position: relative;
-        display: inline-block;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid black;
-        background-color: gray;
-        box-sizing: border-box; }
-      .imageeditor .gradient-layers-menu button.show-angle {
-        position: relative;
-        display: inline-block;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px dashed black;
-        background-color: white;
-        box-sizing: border-box; }
-        .imageeditor .gradient-layers-menu button.show-angle:before {
-          content: "";
-          position: absolute;
-          width: 10px;
-          height: 10px;
-          display: inline-block;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          border: 1px solid black;
-          background-color: white;
-          box-sizing: border-box;
-          border-radius: 50%;
-          left: 50%;
-          top: 50%;
-          -webkit-transform: translateX(-50%) translateY(-50%);
-                  transform: translateX(-50%) translateY(-50%); }
-        .imageeditor .gradient-layers-menu button.show-angle:after {
-          position: absolute;
-          content: "";
-          left: 50%;
-          top: 50%;
-          -webkit-transform: translateX(50%) translateY(-50%);
-                  transform: translateX(50%) translateY(-50%);
-          width: 2px;
-          height: 2px;
-          background-color: black; }
-  .imageeditor .gradient-view {
-    position: absolute;
-    width: 600px;
-    height: 400px;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translateX(-50%) translateY(-50%);
-            transform: translateX(-50%) translateY(-50%);
-    border: 1px solid rgba(0, 0, 0, 0.2); }
-    .imageeditor .gradient-view.drag-over > * {
+          top: 40px;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-orient: horizontal;
+          -webkit-box-direction: normal;
+              -ms-flex-direction: row;
+                  flex-direction: row; }
+          .imageeditor .page-view .page-menu .images .image-tools button {
+            display: inline-block;
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            width: 100px;
+            height: 100px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border: 1px solid #dedede;
+            vertical-align: middle;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            pointer-events: all; }
+          .imageeditor .page-view .page-menu .images .image-tools > .tools {
+            -webkit-box-flex: 0;
+                -ms-flex: none;
+                    flex: none;
+            width: 110px; }
+          .imageeditor .page-view .page-menu .images .image-tools .image-list {
+            -webkit-box-flex: 1;
+                -ms-flex: 1 1 auto;
+                    flex: 1 1 auto; }
+        .imageeditor .page-view .page-menu .images .tools {
+          padding: 5px;
+          height: 110px;
+          border-right: 1px solid #dedede; }
+          .imageeditor .page-view .page-menu .images .tools button {
+            border: 1px solid #dedede; }
+          .imageeditor .page-view .page-menu .images .tools .tree-item {
+            display: inline-block;
+            height: 100px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #dedede; }
+            .imageeditor .page-view .page-menu .images .tools .tree-item.selected {
+              border: 5px solid #333; }
+            .imageeditor .page-view .page-menu .images .tools .tree-item .item-view-container {
+              position: relative;
+              pointer-events: none;
+              display: inline-block;
+              vertical-align: middle;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              height: 100px;
+              width: 100px;
+              border: 1px solid #ececec; }
+              .imageeditor .page-view .page-menu .images .tools .tree-item .item-view-container .item-view {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                bottom: 0px; }
+        .imageeditor .page-view .page-menu .images .add-tools {
+          padding: 5px;
+          height: 110px; }
+        .imageeditor .page-view .page-menu .images .image-list {
+          overflow-x: auto;
+          white-space: nowrap; }
+          .imageeditor .page-view .page-menu .images .image-list .menu-buttons {
+            padding: 10px;
+            display: inline-block;
+            vertical-align: middle; }
+          .imageeditor .page-view .page-menu .images .image-list .tree-item {
+            display: inline-block;
+            height: 100px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #dedede;
+            margin: 5px;
+            vertical-align: middle; }
+            .imageeditor .page-view .page-menu .images .image-list .tree-item.selected {
+              border: 5px solid #333; }
+            .imageeditor .page-view .page-menu .images .image-list .tree-item:hover .item-tools {
+              display: inline-block; }
+            .imageeditor .page-view .page-menu .images .image-list .tree-item .item-view-container {
+              position: relative;
+              pointer-events: none;
+              display: inline-block;
+              vertical-align: middle;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              height: 100px;
+              width: 100px; }
+              .imageeditor .page-view .page-menu .images .image-list .tree-item .item-view-container .item-view {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                bottom: 0px; }
+            .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools {
+              position: absolute;
+              right: 0px;
+              top: 0px;
+              bottom: 0px;
+              left: 0px;
+              display: none;
+              padding: 5px;
+              pointer-events: none; }
+              .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button {
+                height: 24px;
+                width: 24px;
+                position: absolute;
+                display: inline-block;
+                border: 1px solid #dedede;
+                cursor: pointer;
+                pointer-events: all; }
+                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.copy-item {
+                  right: 0px;
+                  top: 50%;
+                  -webkit-transform: translateY(-50%);
+                          transform: translateY(-50%); }
+                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.left-item {
+                  left: 0px;
+                  bottom: 0px; }
+                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.right-item {
+                  right: 0px;
+                  bottom: 0px; }
+                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.delete-item {
+                  top: 0px;
+                  right: 0px; }
+    .imageeditor .page-view .page-content {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 210px;
+      overflow: auto;
+      background-color: #ececec; }
+    .imageeditor .page-view .gradient-color-view-container {
+      position: absolute;
+      top: 50px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
       display: none; }
-    .imageeditor .gradient-view.drag-over .dropzone {
-      z-index: 100;
-      background-color: yellow;
-      pointer-events: none;
-      display: block; }
-    .imageeditor .gradient-view .dropzone,
-    .imageeditor .gradient-view .gradient-color-view,
-    .imageeditor .gradient-view .gradient-color-view-container {
+    .imageeditor .page-view .gradient-color-view,
+    .imageeditor .page-view .gradient-color-view-container {
       width: 100%;
       height: 100%;
       position: absolute;
@@ -1391,24 +1596,33 @@
       top: 50%;
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
-      pointer-events: none; }
-    .imageeditor .gradient-view .dropzone {
+      background-color: white;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+    .imageeditor .page-view .gradient-color-view .layer {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%; }
+    .imageeditor .page-view .dropzone {
       display: none; }
-    .imageeditor .gradient-view .gradient-color-view-container {
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
-    .imageeditor .gradient-view .predefined-angluar-group {
-      display: inline-block;
+    .imageeditor .page-view .gradient-color-view-container {
+      -webkit-box-shadow: 8px 9px 20px -5px #777;
+              box-shadow: 8px 9px 20px -5px #777; }
+    .imageeditor .page-view .predefined-angluar-group {
+      display: none;
       text-align: center;
       position: absolute;
-      width: 90%;
-      height: 90%;
       pointer-events: none;
+      bottom: 20px;
+      width: 200px;
+      height: 200px;
       left: 50%;
-      top: 50%;
-      -webkit-transform: translateX(-50%) translateY(-50%);
-              transform: translateX(-50%) translateY(-50%); }
-      .imageeditor .gradient-view .predefined-angluar-group button {
-        pointer-events: all;
+      -webkit-transform: translateX(-50%);
+              transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.2); }
+      .imageeditor .page-view .predefined-angluar-group button {
         padding: 0px;
         margin: 1px;
         background-color: transparent;
@@ -1424,397 +1638,427 @@
         display: inline-block;
         width: 20px;
         height: 20px;
+        pointer-events: all;
         /* linear */
         /* radial */ }
-        .imageeditor .gradient-view .predefined-angluar-group button:hover {
+        .imageeditor .page-view .predefined-angluar-group button:hover {
           border-color: rgba(0, 0, 0, 0.2); }
-          .imageeditor .gradient-view .predefined-angluar-group button:hover:after {
+          .imageeditor .page-view .predefined-angluar-group button:hover:after {
             border-color: rgba(0, 0, 0, 0.2); }
-        .imageeditor .gradient-view .predefined-angluar-group button:after {
+        .imageeditor .page-view .predefined-angluar-group button:after {
           content: "";
           position: absolute;
           display: inline-block;
           width: 15px;
           height: 15px; }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top'] {
-          top: 0px;
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to top'] {
+          top: 10px;
           left: 50%;
           -webkit-transform: translateX(-50%);
                   transform: translateX(-50%);
-          border-top: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top']:after {
-            border-top: 2px solid rgba(236, 236, 236, 0.8);
+          border-top: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to top']:after {
+            border-top: 2px solid rgba(15, 114, 207, 0.8);
             top: -8px;
             left: 50%;
             -webkit-transform: translateX(-50%);
                     transform: translateX(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top right'] {
-          top: 0px;
-          right: 0px;
-          border-top: 2px solid rgba(236, 236, 236, 0.8);
-          border-right: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top right']:after {
-            border-top: 2px solid rgba(236, 236, 236, 0.8);
-            border-right: 2px solid rgba(236, 236, 236, 0.8);
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to top right'] {
+          top: 10px;
+          right: 10px;
+          border-top: 2px solid rgba(15, 114, 207, 0.8);
+          border-right: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to top right']:after {
+            border-top: 2px solid rgba(15, 114, 207, 0.8);
+            border-right: 2px solid rgba(15, 114, 207, 0.8);
             top: -8px;
             right: -8px; }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to right'] {
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to right'] {
           top: 50%;
-          right: 0px;
+          right: 10px;
           -webkit-transform: translateY(-50%);
                   transform: translateY(-50%);
-          border-right: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to right']:after {
-            border-right: 2px solid rgba(236, 236, 236, 0.8);
+          border-right: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to right']:after {
+            border-right: 2px solid rgba(15, 114, 207, 0.8);
             top: 50%;
             right: -8px;
             -webkit-transform: translateY(-50%);
                     transform: translateY(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom right'] {
-          bottom: 0px;
-          right: 0px;
-          border-right: 2px solid rgba(236, 236, 236, 0.8);
-          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom right']:after {
-            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
-            border-right: 2px solid rgba(236, 236, 236, 0.8);
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom right'] {
+          bottom: 10px;
+          right: 10px;
+          border-right: 2px solid rgba(15, 114, 207, 0.8);
+          border-bottom: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom right']:after {
+            border-bottom: 2px solid rgba(15, 114, 207, 0.8);
+            border-right: 2px solid rgba(15, 114, 207, 0.8);
             bottom: -8px;
             right: -8px; }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom'] {
-          bottom: 0px;
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom'] {
+          bottom: 10px;
           left: 50%;
           -webkit-transform: translateX(-50%);
                   transform: translateX(-50%);
-          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom']:after {
-            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+          border-bottom: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom']:after {
+            border-bottom: 2px solid rgba(15, 114, 207, 0.8);
             left: 50%;
             bottom: -8px;
             -webkit-transform: translateX(-50%);
                     transform: translateX(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom left'] {
-          left: 0px;
-          bottom: 0px;
-          border-left: 2px solid rgba(236, 236, 236, 0.8);
-          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to bottom left']:after {
-            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
-            border-left: 2px solid rgba(236, 236, 236, 0.8);
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom left'] {
+          left: 10px;
+          bottom: 10px;
+          border-left: 2px solid rgba(15, 114, 207, 0.8);
+          border-bottom: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to bottom left']:after {
+            border-bottom: 2px solid rgba(15, 114, 207, 0.8);
+            border-left: 2px solid rgba(15, 114, 207, 0.8);
             bottom: -8px;
             left: -8px; }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to left'] {
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to left'] {
           top: 50%;
-          left: 0px;
+          left: 10px;
           -webkit-transform: translateY(-50%);
                   transform: translateY(-50%);
-          border-left: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to left']:after {
-            border-left: 2px solid rgba(236, 236, 236, 0.8);
+          border-left: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to left']:after {
+            border-left: 2px solid rgba(15, 114, 207, 0.8);
             top: 50%;
             left: -8px;
             -webkit-transform: translateY(-50%);
                     transform: translateY(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top left'] {
-          top: 0px;
-          left: 0px;
-          border-left: 2px solid rgba(236, 236, 236, 0.8);
-          border-top: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='to top left']:after {
-            border-top: 2px solid rgba(236, 236, 236, 0.8);
-            border-left: 2px solid rgba(236, 236, 236, 0.8);
+        .imageeditor .page-view .predefined-angluar-group button[data-value='to top left'] {
+          top: 10px;
+          left: 10px;
+          border-left: 2px solid rgba(15, 114, 207, 0.8);
+          border-top: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='to top left']:after {
+            border-top: 2px solid rgba(15, 114, 207, 0.8);
+            border-left: 2px solid rgba(15, 114, 207, 0.8);
             top: -8px;
             left: -8px; }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='top'] {
-          top: 0px;
+        .imageeditor .page-view .predefined-angluar-group button[data-value='top'] {
+          top: 10px;
           left: 50%;
           -webkit-transform: translateX(-50%);
                   transform: translateX(-50%);
-          border-top: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='top']:after {
-            border-top: 2px solid rgba(236, 236, 236, 0.8);
+          border-top: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='top']:after {
+            border-top: 2px solid rgba(15, 114, 207, 0.8);
             top: -8px;
             left: 50%;
             -webkit-transform: translateX(-50%);
                     transform: translateX(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='right'] {
+        .imageeditor .page-view .predefined-angluar-group button[data-value='right'] {
           top: 50%;
-          right: 0px;
+          right: 10px;
           -webkit-transform: translateY(-50%);
                   transform: translateY(-50%);
-          border-right: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='right']:after {
-            border-right: 2px solid rgba(236, 236, 236, 0.8);
+          border-right: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='right']:after {
+            border-right: 2px solid rgba(15, 114, 207, 0.8);
             top: 50%;
             right: -8px;
             -webkit-transform: translateY(-50%);
                     transform: translateY(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='bottom'] {
-          bottom: 0px;
+        .imageeditor .page-view .predefined-angluar-group button[data-value='bottom'] {
+          bottom: 10px;
           left: 50%;
           -webkit-transform: translateX(-50%);
                   transform: translateX(-50%);
-          border-bottom: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='bottom']:after {
-            border-bottom: 2px solid rgba(236, 236, 236, 0.8);
+          border-bottom: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='bottom']:after {
+            border-bottom: 2px solid rgba(15, 114, 207, 0.8);
             left: 50%;
             bottom: -8px;
             -webkit-transform: translateX(-50%);
                     transform: translateX(-50%); }
-        .imageeditor .gradient-view .predefined-angluar-group button[data-value='left'] {
+        .imageeditor .page-view .predefined-angluar-group button[data-value='left'] {
           top: 50%;
-          left: 0px;
+          left: 10px;
           -webkit-transform: translateY(-50%);
                   transform: translateY(-50%);
-          border-left: 2px solid rgba(236, 236, 236, 0.8); }
-          .imageeditor .gradient-view .predefined-angluar-group button[data-value='left']:after {
-            border-left: 2px solid rgba(236, 236, 236, 0.8);
+          border-left: 2px solid rgba(15, 114, 207, 0.8); }
+          .imageeditor .page-view .predefined-angluar-group button[data-value='left']:after {
+            border-left: 2px solid rgba(15, 114, 207, 0.8);
             top: 50%;
             left: -8px;
             -webkit-transform: translateY(-50%);
                     transform: translateY(-50%); }
-  .imageeditor .gradient-info {
-    overflow: auto;
-    height: 200px !important; }
-    .imageeditor .gradient-info .form-item {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      font-size: 12px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      margin: 2px 0px; }
-      .imageeditor .gradient-info .form-item > label {
-        display: inline-block; }
-      .imageeditor .gradient-info .form-item > * {
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1; }
-        .imageeditor .gradient-info .form-item > * input, .imageeditor .gradient-info .form-item > * select {
-          width: 100px; }
-      .imageeditor .gradient-info .form-item .color-step {
-        display: block;
-        padding: 1px;
-        color: #333; }
-        .imageeditor .gradient-info .form-item .color-step > * {
-          display: inline-block;
-          vertical-align: middle; }
-        .imageeditor .gradient-info .form-item .color-step input {
-          width: 40px; }
-        .imageeditor .gradient-info .form-item .color-step .tools {
-          text-align: right; }
-          .imageeditor .gradient-info .form-item .color-step .tools button {
-            -webkit-appearance: none;
-               -moz-appearance: none;
-                    appearance: none;
-            -webkit-transform: scale(1.2);
-                    transform: scale(1.2);
-            border: 0px;
-            background-color: transparent;
-            padding: 0px 2px; }
-        .imageeditor .gradient-info .form-item .color-step input[type=text] {
-          width: 100px; }
-        .imageeditor .gradient-info .form-item .color-step input[type=number] {
-          -webkit-appearance: none;
-             -moz-appearance: none;
-                  appearance: none;
-          border: 1px solid #ececec; }
-        .imageeditor .gradient-info .form-item .color-step .color-view {
-          width: 20px;
-          height: 20px;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          position: relative;
-          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-          border: 1px solid #ececec; }
-          .imageeditor .gradient-info .form-item .color-step .color-view .color-view-item {
-            position: absolute;
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-            top: 0px; }
-  .imageeditor .gradient-steps {
-    position: absolute;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    height: 30px;
-    left: 10px;
-    top: 10px;
-    right: 10px; }
-    .imageeditor .gradient-steps .hue-container {
+    .imageeditor .page-view .predefined-page-resizer {
+      display: none;
+      text-align: center;
+      pointer-events: none;
+      position: absolute;
       width: 100%;
-      height: 16px;
-      margin-top: -1px;
-      left: -1px;
-      right: -1px;
-      position: absolute;
-      z-index: 0;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
-    .imageeditor .gradient-steps .hue {
-      position: relative;
-      padding: 0px;
-      margin: 0px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      cursor: pointer;
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
-      .imageeditor .gradient-steps .hue > .step-list {
-        position: relative;
-        width: 100%;
-        cursor: copy;
-        height: 14px;
-        z-index: 1; }
-        .imageeditor .gradient-steps .hue > .step-list.mode-drag {
-          cursor: pointer; }
-      .imageeditor .gradient-steps .hue .drag-bar {
-        border: 0px;
-        background-color: transparent;
-        border: 2px solid white;
-        -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
-                box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
-        width: 10px;
-        height: 10px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        -webkit-transform: none;
-                transform: none;
-        border-radius: 50%;
-        display: inline-block;
-        left: 0px;
-        top: 17px;
-        -webkit-transform: translateX(-50%);
-                transform: translateX(-50%);
-        position: absolute;
-        background-color: rgba(255, 255, 255, 0.8);
-        cursor: pointer;
-        z-index: 0; }
-        .imageeditor .gradient-steps .hue .drag-bar.selected {
-          z-index: 1; }
-          .imageeditor .gradient-steps .hue .drag-bar.selected:after {
-            display: none;
-            content: "";
-            position: absolute;
-            width: 1px;
-            height: 17px;
-            background-color: rgba(0, 0, 0, 0.3);
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-            bottom: 8px;
-            left: 50%;
-            -webkit-transform: translateX(-50%);
-                    transform: translateX(-50%); }
-  .imageeditor .gradient-list-layout {
-    position: absolute;
-    top: 50px !important;
-    left: 0px;
-    right: 0px;
-    bottom: 0px; }
-  .imageeditor .gradient-sample-list .gradient-sample-item {
-    display: inline-block;
-    vertical-align: middle;
-    width: 34px;
-    height: 34px;
-    border: 3px solid #ececec;
-    cursor: pointer;
-    position: relative;
-    margin: 2px; }
-  .imageeditor .color-list {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    top: 0px; }
-    .imageeditor .color-list .color-type {
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      height: 40px; }
-      .imageeditor .color-list .color-type > div {
-        position: absolute;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        top: 5px; }
-        .imageeditor .color-list .color-type > div select {
-          -webkit-appearance: none;
-             -moz-appearance: none;
-                  appearance: none;
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px;
-          padding: 5px;
-          display: inline-block;
-          border: 0px;
-          background-color: white;
-          width: 100%;
-          outline: none; }
-    .imageeditor .color-list .color-sample-list {
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 45px;
-      bottom: 0px;
-      padding: 5px; }
-      .imageeditor .color-list .color-sample-list .color-item {
-        display: inline-block;
-        vertical-align: middle;
-        width: 34px;
-        height: 34px;
-        cursor: pointer;
-        position: relative;
-        margin: 2px; }
-  .imageeditor .image-tool {
-    position: relative;
-    height: 30px;
-    margin-bottom: 10px;
-    background-color: yellow; }
-  .imageeditor .drag-angle {
-    display: inline-block;
-    width: 150px;
-    height: 150px;
-    position: absolute;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    border-radius: 50%;
-    border: 2px solid rgba(236, 236, 236, 0.5);
-    border-style: dashed;
-    overflow: hidden;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translateX(-50%) translateY(-50%);
-            transform: translateX(-50%) translateY(-50%); }
-    .imageeditor .drag-angle .drag-pointer {
-      position: absolute;
-      width: 12px;
-      cursor: pointer;
-      height: 12px;
-      -webkit-transform: translateX(-50%) translateY(-50%);
-              transform: translateX(-50%) translateY(-50%);
-      border-radius: 50%;
-      background-color: rgba(236, 236, 236, 0.8);
-      -webkit-box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32);
-              box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32); }
-    .imageeditor .drag-angle .angle-text {
-      position: absolute;
-      display: inline-block;
+      height: 100%;
       left: 50%;
       top: 50%;
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
-      color: rgba(236, 236, 236, 0.9);
-      text-shadow: 1px 1px #a7a7a7; }
-  .imageeditor .drag-position {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
+      z-index: 10;
+      border: 2px solid #b3b3b3;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .page-view .predefined-page-resizer button {
+        padding: 0px;
+        background-color: rgba(179, 179, 179, 0.2);
+        border: 1px solid #b3b3b3;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        outline: none;
+        cursor: pointer;
+        position: absolute;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        width: 10px;
+        height: 10px;
+        pointer-events: all;
+        /* linear */
+        /* linear */ }
+        .imageeditor .page-view .predefined-page-resizer button:hover {
+          background-color: rgba(179, 179, 179, 0.5); }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to top'] {
+          top: -6px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          cursor: n-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to top right'] {
+          top: -6px;
+          right: -6px;
+          cursor: ne-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to right'] {
+          top: 50%;
+          right: -6px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          cursor: e-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to bottom right'] {
+          bottom: -6px;
+          right: -6px;
+          cursor: se-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to bottom'] {
+          bottom: -6px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          cursor: s-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to bottom left'] {
+          left: -6px;
+          bottom: -6px;
+          cursor: sw-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to left'] {
+          top: 50%;
+          left: -6px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          cursor: w-resize; }
+        .imageeditor .page-view .predefined-page-resizer button[data-value='to top left'] {
+          top: -6px;
+          left: -6px;
+          cursor: nw-resize; }
+    .imageeditor .page-view .predefined-layer-resizer {
+      display: none;
+      text-align: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      border: 2px solid #5f80de;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .page-view .predefined-layer-resizer .guide-horizontal {
+        position: absolute;
+        width: 1px;
+        left: 50%;
+        -webkit-transform: translateX(-50%);
+                transform: translateX(-50%);
+        top: -10px;
+        bottom: -10px;
+        background-color: #5f80de;
+        display: none; }
+      .imageeditor .page-view .predefined-layer-resizer .guide-vertical {
+        position: absolute;
+        height: 1px;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+                transform: translateY(-50%);
+        left: -10px;
+        right: -10px;
+        background-color: #5f80de;
+        display: none; }
+      .imageeditor .page-view .predefined-layer-resizer button {
+        pointer-events: all;
+        padding: 0px;
+        background-color: rgba(95, 128, 222, 0.2);
+        border: 1px solid #5f80de;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        outline: none;
+        cursor: pointer;
+        position: absolute;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        width: 10px;
+        height: 10px;
+        /* linear */ }
+        .imageeditor .page-view .predefined-layer-resizer button:hover {
+          background-color: rgba(95, 128, 222, 0.5); }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to top'] {
+          top: -6px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          cursor: n-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to top right'] {
+          top: -6px;
+          right: -6px;
+          cursor: ne-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to right'] {
+          top: 50%;
+          right: -6px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          cursor: e-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to bottom right'] {
+          bottom: -6px;
+          right: -6px;
+          cursor: se-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to bottom'] {
+          bottom: -6px;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          cursor: s-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to bottom left'] {
+          left: -6px;
+          bottom: -6px;
+          cursor: sw-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to left'] {
+          top: 50%;
+          left: -6px;
+          -webkit-transform: translateY(-50%);
+                  transform: translateY(-50%);
+          cursor: w-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to top left'] {
+          top: -6px;
+          left: -6px;
+          cursor: nw-resize; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='to move'] {
+          left: 50%;
+          top: 50%;
+          -webkit-transform: translateX(-50%) translateY(-50%);
+                  transform: translateX(-50%) translateY(-50%);
+          cursor: move; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='layer rotate'] {
+          width: 20px;
+          height: 20px;
+          left: 50%;
+          top: -60px;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+          background-color: rgba(255, 255, 255, 0.5);
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          border-radius: 50%; }
+          .imageeditor .page-view .predefined-layer-resizer button[data-value='layer rotate']:before {
+            position: absolute;
+            content: "";
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            -webkit-transform: translateX(-50%) translateY(-50%);
+                    transform: translateX(-50%) translateY(-50%);
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.8); }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top right'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom right'] {
+          background-color: rgba(255, 255, 0, 0.637);
+          border: 1px solid #83831a;
+          border-radius: 50%; }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'] {
+          top: -18px;
+          left: -6px;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%); }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top right'] {
+          top: -27px;
+          right: -6px;
+          -webkit-transform: translateX(50%);
+                  transform: translateX(50%); }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom left'] {
+          bottom: -18px;
+          left: -6px;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%); }
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom right'] {
+          bottom: -27px;
+          right: -6px;
+          -webkit-transform: translateX(50%);
+                  transform: translateX(50%); }
+  .imageeditor .drag-angle-rect {
     position: absolute;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box; }
+    display: none;
+    bottom: 20px;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%); }
+    .imageeditor .drag-angle-rect .drag-angle {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-radius: 50%;
+      border: 2px solid rgba(236, 236, 236, 0.5);
+      border-style: dashed;
+      overflow: hidden;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%); }
+      .imageeditor .drag-angle-rect .drag-angle .drag-pointer {
+        position: absolute;
+        width: 12px;
+        cursor: pointer;
+        height: 12px;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+                transform: translateX(-50%) translateY(-50%);
+        border-radius: 50%;
+        background-color: rgba(236, 236, 236, 0.8);
+        -webkit-box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32);
+                box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32); }
+      .imageeditor .drag-angle-rect .drag-angle .angle-text {
+        position: absolute;
+        display: inline-block;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+                transform: translateX(-50%) translateY(-50%);
+        color: rgba(236, 236, 236, 0.9);
+        text-shadow: 1px 1px #a7a7a7; }
+  .imageeditor .drag-position {
+    position: absolute;
+    display: none;
+    bottom: 20px;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%); }
     .imageeditor .drag-position .drag-pointer {
       position: absolute;
       width: 12px;
@@ -1826,140 +2070,6 @@
       background-color: rgba(255, 255, 255, 0.8);
       -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32);
               box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32); }
-  .imageeditor .gradient-tools {
-    position: absolute;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    display: block;
-    padding: 5px 0px;
-    bottom: -60px;
-    left: 0px;
-    width: 100%; }
-    .imageeditor .gradient-tools .gradient-type {
-      display: inline-block;
-      vertical-align: top; }
-      .imageeditor .gradient-tools .gradient-type .gradient-item {
-        display: inline-block;
-        width: 34px;
-        height: 34px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 3px solid #ececec;
-        cursor: pointer;
-        position: relative; }
-        .imageeditor .gradient-tools .gradient-type .gradient-item:first-child {
-          margin-right: 1px; }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.selected {
-          border-color: black; }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.static {
-          background-image: -webkit-gradient(linear, left top, right top, from(#333), to(#333));
-          background-image: linear-gradient(to right, #333, #333); }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.linear {
-          background-image: -webkit-gradient(linear, left top, right top, from(black), to(gray));
-          background-image: linear-gradient(to right, black, gray); }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.radial {
-          background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.repeating-linear {
-          background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.repeating-radial {
-          background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
-        .imageeditor .gradient-tools .gradient-type .gradient-item.image {
-          overflow: hidden; }
-          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m1 {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            background-color: #0e4a2e;
-            top: 70%;
-            left: -20%;
-            -webkit-transform: rotate(45deg);
-                    transform: rotate(45deg); }
-          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m2 {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            background-color: #0eb32b;
-            top: 50%;
-            left: 40%;
-            -webkit-transform: rotate(45deg);
-                    transform: rotate(45deg); }
-          .imageeditor .gradient-tools .gradient-type .gradient-item.image .m3 {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            position: absolute;
-            background-color: #ff8800;
-            top: 3px;
-            left: 3px; }
-    .imageeditor .gradient-tools .gradient-angular {
-      display: inline-block;
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none;
-      float: right;
-      vertical-align: middle; }
-      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.linear {
-        display: block; }
-      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.radial {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.linear .gradient-angular-item.image {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.linear {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.radial {
-        display: block; }
-      .imageeditor .gradient-tools .gradient-angular.radial .gradient-angular-item.image {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.linear {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.radial {
-        display: none; }
-      .imageeditor .gradient-tools .gradient-angular.image .gradient-angular-item.image {
-        display: block; }
-      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.linear .predefined-angluar-group {
-        display: inline-block;
-        width: 142px;
-        text-align: center; }
-      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block {
-        position: relative;
-        display: inline-block; }
-        .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block select {
-          -webkit-appearance: none;
-             -moz-appearance: none;
-                  appearance: none;
-          display: inline-block;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          padding: 5px 5px;
-          border: 0px;
-          background-color: white;
-          width: 110px;
-          outline: none;
-          height: 34px;
-          font-size: 15px;
-          height: 100%; }
-      .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial button {
-        padding: 0px;
-        margin: 1px;
-        background-color: transparent;
-        border: 0px;
-        -webkit-appearance: none;
-           -moz-appearance: none;
-                appearance: none;
-        outline: none;
-        cursor: pointer;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        display: inline-block;
-        width: 8px;
-        height: 18px;
-        vertical-align: middle; }
-        .imageeditor .gradient-tools .gradient-angular .gradient-angular-item.radial button[data-value='center'] {
-          background-image: radial-gradient(circle, black, #FFFFFF 50%); }
-  .imageeditor .gradient-manager {
-    height: 120px;
-    position: relative; }
   .imageeditor .image-control {
     position: absolute;
     left: 0px;
@@ -1980,129 +2090,6 @@
       bottom: 0px; }
   .imageeditor .editor-tab {
     height: 100%; }
-  .imageeditor .image-list-container {
-    position: absolute;
-    left: 100px;
-    right: 0px;
-    top: 35px;
-    bottom: 0px;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    padding: 5px; }
-    .imageeditor .image-list-container .image-list {
-      display: block;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px;
-      overflow: auto;
-      border-top: 1px solid #dedede; }
-      .imageeditor .image-list-container .image-list .image-item {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        height: 50px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        border-bottom: 1px solid #dedede;
-        padding: 5px; }
-        .imageeditor .image-list-container .image-list .image-item svg {
-          pointer-events: none; }
-        .imageeditor .image-list-container .image-list .image-item.selected {
-          background-color: #dedede; }
-          .imageeditor .image-list-container .image-list .image-item.selected .image-item-check svg {
-            display: inline-block; }
-        .imageeditor .image-list-container .image-list .image-item .image-item-view-container {
-          position: relative;
-          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-          pointer-events: none;
-          display: inline-block;
-          vertical-align: middle;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          padding: 14px;
-          width: 25%; }
-        .imageeditor .image-list-container .image-list .image-item .image-item-check {
-          position: relative;
-          display: inline-block;
-          vertical-align: middle;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          width: 25%;
-          text-align: center;
-          padding: 8px; }
-          .imageeditor .image-list-container .image-list .image-item .image-item-check svg {
-            display: none; }
-        .imageeditor .image-list-container .image-list .image-item .image-item-visible {
-          position: relative;
-          display: inline-block;
-          vertical-align: middle;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          width: 25%;
-          text-align: center;
-          padding: 8px; }
-          .imageeditor .image-list-container .image-list .image-item .image-item-visible svg.on {
-            display: none; }
-          .imageeditor .image-list-container .image-list .image-item .image-item-visible svg.off {
-            display: inline-block; }
-          .imageeditor .image-list-container .image-list .image-item .image-item-visible.on svg.on {
-            display: inline-block; }
-          .imageeditor .image-list-container .image-list .image-item .image-item-visible.on svg.off {
-            display: none; }
-        .imageeditor .image-list-container .image-list .image-item .image-item-delete {
-          position: relative;
-          display: inline-block;
-          vertical-align: middle;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto;
-          padding: 8px;
-          width: 25%;
-          text-align: center; }
-        .imageeditor .image-list-container .image-list .image-item .image-item-view {
-          pointer-events: none;
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px; }
-  .imageeditor .blend-control {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    top: 0px; }
-    .imageeditor .blend-control > .left {
-      position: absolute;
-      width: 180px;
-      left: 0px;
-      top: 0px;
-      bottom: 0px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      border-right: 1px solid #ececec; }
-    .imageeditor .blend-control > .right {
-      position: absolute;
-      left: 190px;
-      top: 0px;
-      right: 0px;
-      bottom: 0px; }
   .imageeditor .blend-row {
     position: relative; }
   .imageeditor .blend-list-tab {
@@ -2120,21 +2107,17 @@
       bottom: 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      overflow-x: scroll;
-      overflow-y: hidden;
+      overflow-x: auto;
       white-space: nowrap; }
       .imageeditor .blend-list-tab .blend-list .blend-item {
         display: inline-block;
-        height: 50px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
+        height: 120px;
+        width: 120px;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        border: 10px solid #dedede;
-        padding: 5px;
-        width: 225px;
-        height: 164px; }
+        border: 2px solid #dedede;
+        margin: 2px; }
         .imageeditor .blend-list-tab .blend-list .blend-item.selected {
           border-color: #000000; }
         .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-view-container {
@@ -2177,3 +2160,377 @@
           padding: 10px;
           font-size: 13px;
           text-shadow: 0px 3px 4px black; }
+  .imageeditor .property-view {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    overflow: auto; }
+    .imageeditor .property-view .property-item {
+      padding: 10px;
+      border: 1px solid #ececec;
+      font-size: 12px;
+      margin-bottom: 5px;
+      overflow: hidden; }
+      .imageeditor .property-view .property-item > div {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex; }
+        .imageeditor .property-view .property-item > div > label {
+          width: 150px; }
+        .imageeditor .property-view .property-item > div > div {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex; }
+          .imageeditor .property-view .property-item > div > div input[type=number], .imageeditor .property-view .property-item > div > div input[type=text], .imageeditor .property-view .property-item > div > div select {
+            width: 80px; }
+          .imageeditor .property-view .property-item > div > div > span {
+            display: inline-block;
+            width: 30px;
+            margin-left: 10px; }
+      .imageeditor .property-view .property-item.gradient-steps {
+        height: 30px; }
+        .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
+          position: relative;
+          display: block; }
+          .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue-container {
+            width: 100%;
+            height: 16px;
+            margin-top: -1px;
+            left: -1px;
+            right: -1px;
+            position: absolute;
+            z-index: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box; }
+          .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue {
+            position: relative;
+            padding: 0px;
+            margin: 0px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            cursor: pointer;
+            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+            .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue > .step-list {
+              position: relative;
+              width: 100%;
+              cursor: copy;
+              height: 14px;
+              z-index: 1; }
+              .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue > .step-list.mode-drag {
+                cursor: pointer; }
+            .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar {
+              border: 0px;
+              background-color: transparent;
+              border: 2px solid white;
+              -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+                      box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+              width: 10px;
+              height: 10px;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              -webkit-transform: none;
+                      transform: none;
+              border-radius: 50%;
+              display: inline-block;
+              left: 0px;
+              top: 17px;
+              -webkit-transform: translateX(-50%);
+                      transform: translateX(-50%);
+              position: absolute;
+              background-color: rgba(255, 255, 255, 0.8);
+              cursor: pointer;
+              z-index: 0; }
+              .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected {
+                z-index: 1; }
+                .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected:after {
+                  display: none;
+                  content: "";
+                  position: absolute;
+                  width: 1px;
+                  height: 17px;
+                  background-color: rgba(0, 0, 0, 0.3);
+                  -webkit-box-sizing: border-box;
+                          box-sizing: border-box;
+                  bottom: 8px;
+                  left: 50%;
+                  -webkit-transform: translateX(-50%);
+                          transform: translateX(-50%); }
+        .imageeditor .property-view .property-item.gradient-steps .gradient-list-layout {
+          position: absolute;
+          top: 50px !important;
+          left: 0px;
+          right: 0px;
+          bottom: 0px; }
+        .imageeditor .property-view .property-item.gradient-steps .color-list {
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 0px; }
+          .imageeditor .property-view .property-item.gradient-steps .color-list .color-type {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            top: 0px;
+            height: 40px; }
+            .imageeditor .property-view .property-item.gradient-steps .color-list .color-type > div {
+              position: absolute;
+              left: 5px;
+              right: 5px;
+              bottom: 5px;
+              top: 5px; }
+              .imageeditor .property-view .property-item.gradient-steps .color-list .color-type > div select {
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+                position: absolute;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: 0px;
+                padding: 5px;
+                display: inline-block;
+                border: 0px;
+                background-color: white;
+                width: 100%;
+                outline: none; }
+          .imageeditor .property-view .property-item.gradient-steps .color-list .color-sample-list {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            top: 45px;
+            bottom: 0px;
+            padding: 5px; }
+            .imageeditor .property-view .property-item.gradient-steps .color-list .color-sample-list .color-item {
+              display: inline-block;
+              vertical-align: middle;
+              width: 34px;
+              height: 34px;
+              cursor: pointer;
+              position: relative;
+              margin: 2px; }
+      .imageeditor .property-view .property-item.sample-list .gradient-sample-list {
+        min-height: 100px;
+        max-height: 200px;
+        overflow: auto;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        text-align: left;
+        display: inline-block; }
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item {
+          display: inline-block;
+          vertical-align: middle;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+          position: relative;
+          margin: 2px; }
+      .imageeditor .property-view .property-item.gradient-steps-info .gradient-info {
+        overflow: auto; }
+        .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item {
+          font-size: 12px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          margin: 2px 0px; }
+          .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step {
+            display: block;
+            padding: 1px;
+            color: #333; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected {
+              background-color: #ececec; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step > * {
+              display: inline-block;
+              vertical-align: middle; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input {
+              width: 40px; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .tools {
+              text-align: right; }
+              .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .tools button {
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+                -webkit-transform: scale(1.2);
+                        transform: scale(1.2);
+                border: 0px;
+                background-color: transparent;
+                padding: 0px 2px; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input[type=text] {
+              width: 100px; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input[type=number] {
+              -webkit-appearance: none;
+                 -moz-appearance: none;
+                      appearance: none;
+              border: 1px solid #ececec; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-view {
+              width: 20px;
+              height: 20px;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              position: relative;
+              background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+              border: 1px solid #ececec; }
+              .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-view .color-view-item {
+                position: absolute;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: 0px; }
+      .imageeditor .property-view .property-item.gradient-tools {
+        display: block;
+        width: 100%;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+        .imageeditor .property-view .property-item.gradient-tools .menu-buttons {
+          display: inline-block;
+          vertical-align: middle;
+          padding: 4px 0px;
+          font-size: 12px; }
+          .imageeditor .property-view .property-item.gradient-tools .menu-buttons button {
+            display: inline-block;
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            width: 100px;
+            height: 100%;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border: 1px solid #dedede;
+            vertical-align: middle;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            pointer-events: all; }
+        .imageeditor .property-view .property-item.gradient-tools .title {
+          display: inline-block;
+          vertical-align: middle;
+          padding: 10px 0px;
+          font-size: 12px; }
+        .imageeditor .property-view .property-item.gradient-tools .gradient-type {
+          display: inline-block;
+          vertical-align: top; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border: 3px solid #ececec;
+            cursor: pointer;
+            position: relative;
+            pointer-events: all; }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item:first-child {
+              margin-right: 1px; }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.selected {
+              border-color: black; }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.static {
+              background-image: -webkit-gradient(linear, left top, right top, from(#333), to(#333));
+              background-image: linear-gradient(to right, #333, #333); }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.linear {
+              background-image: -webkit-gradient(linear, left top, right top, from(black), to(gray));
+              background-image: linear-gradient(to right, black, gray); }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.radial {
+              background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.repeating-linear {
+              background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.repeating-radial {
+              background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image {
+              overflow: hidden; }
+              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m1 {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                background-color: #0e4a2e;
+                top: 70%;
+                left: -20%;
+                -webkit-transform: rotate(45deg);
+                        transform: rotate(45deg); }
+              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m2 {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                background-color: #0eb32b;
+                top: 50%;
+                left: 40%;
+                -webkit-transform: rotate(45deg);
+                        transform: rotate(45deg); }
+              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m3 {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                position: absolute;
+                background-color: #ff8800;
+                top: 3px;
+                left: 3px; }
+        .imageeditor .property-view .property-item.gradient-tools .gradient-angular {
+          display: block;
+          -webkit-user-select: none;
+             -moz-user-select: none;
+              -ms-user-select: none;
+                  user-select: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.linear {
+            display: block; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.radial {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.image {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.linear {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.radial {
+            display: block; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.image {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.linear {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.radial {
+            display: none; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.image {
+            display: block; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.linear .predefined-angluar-group {
+            display: inline-block;
+            width: 142px;
+            text-align: center; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block {
+            position: relative;
+            display: inline-block; }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block select {
+              -webkit-appearance: none;
+                 -moz-appearance: none;
+                      appearance: none;
+              display: inline-block;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              padding: 5px 5px;
+              border: 0px;
+              background-color: white;
+              width: 110px;
+              outline: none;
+              height: 34px;
+              font-size: 15px;
+              height: 100%; }
+          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial button {
+            padding: 0px;
+            margin: 1px;
+            background-color: transparent;
+            border: 0px;
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            outline: none;
+            cursor: pointer;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            vertical-align: middle; }
+            .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial button[data-value='center'] {
+              background-image: radial-gradient(circle, black, #FFFFFF 50%); }
+    .imageeditor .property-view .gradient-view {
+      height: 230px;
+      width: 100%; }

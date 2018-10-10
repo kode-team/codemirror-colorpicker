@@ -14,21 +14,23 @@ $left-size: 300px;
 
     .layout-top {
         position: absolute;
-        left: $left-size;
-        right: $right-size;
+        left: 0px;
+        right: $right-size + 20;
         top: $tool-size;
-        bottom: $gutter;
+        height: $tool-size * 2;
         z-index: 1;         
+        border-right: 1px solid #ececec;
     }
 
     .layout-right {
         position: absolute;
+        right : 10px;
         width: $right-size;
-        right: 0px;
         top: $tool-size;
-        bottom: $gutter;
+        bottom: $tool-size + $gutter;
         overflow: auto;
         z-index: 1;         
+        background-color: white;     
     }
 
     .layout-left {
@@ -39,13 +41,14 @@ $left-size: 300px;
         bottom: $gutter;
         // background-color: rgba(gray, 0.5);
         z-index: 1; 
+        background-color: white; 
     }    
 
     .layout-body {
         position: absolute;
-        left: $left-size;
-        right: $right-size;
-        top: $tool-size * 3; 
+        left: 10px;
+        right: $right-size + 20px;
+        top: $tool-size * 3 + 10; 
         bottom: $tool-size;
         z-index: 0; 
         overflow: hidden;
@@ -59,6 +62,7 @@ $left-size: 300px;
         top: 0px; 
         z-index: 0; 
         overflow: hidden;
+        box-sizing: border-box;
 
         h1 {
             padding: 10px;
@@ -72,8 +76,8 @@ $left-size: 300px;
 
     .layout-footer {
         position: absolute;
-        left: $left-size;
-        right: $right-size;
+        left: 0px;
+        right: 0px;
         height: $tool-size;
         bottom: 0px;
         z-index: 0; 
@@ -106,7 +110,7 @@ $left-size: 300px;
             margin-top: 0px;
         }
 
-        > .layout-manager-tab, .control-tab, .blend-row, .image-control {
+        > .pages, .control-tab, .blend-row, .image-control, .gradient-layers, .layer-menu-tab {
             flex: 1 1 auto;  
             height: auto;
         }
@@ -123,17 +127,13 @@ $left-size: 300px;
 
 @import './tab-ui.scss';
 @import './colorpicker-ui.scss';
-@import './layers.scss';
+@import './page-manager.scss';
+@import './layer-manager.scss';
+@import './feature-manager.scss';
 @import './layers-menu.scss';
 @import './view.scss';        
-@import './image-info.scss';
-@import './steps.scss';
-@import './image-tool.scss';
 @import './drag-angle.scss';
 @import './drag-position.scss';
-@import './gradient-tools.scss';
-@import './manager.scss';
 @import './image-control.scss';
-@import './images.scss';
-@import './blend-control.scss';
 @import './blends.scss';
+@import './property-view.scss';

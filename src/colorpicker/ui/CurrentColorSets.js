@@ -71,7 +71,7 @@ export default class CurrentColorSets extends UIElement {
     }
 
     'click $colorSetsColorList .add-color-item' (e) {
-        this.addColor(this.dispatch('/toColor'));
+        this.addColor(this.read('/toColor'));
     }
 
     'click $colorSetsColorList .color-item'  (e) {

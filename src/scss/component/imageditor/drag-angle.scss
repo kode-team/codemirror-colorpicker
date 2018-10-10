@@ -1,41 +1,52 @@
 $pointer-color: rgba(#ececec, 0.8);
 
 
-
-.drag-angle {
-    display:inline-block;
-    width: 150px;
-    height: 150px;
+.drag-angle-rect {
     position: absolute;
-    box-sizing: border-box; 
-    border-radius: 50%;
-    border: 2px solid rgba(#ececec, 0.5); 
-    border-style: dashed;
-    overflow: hidden; 
+    display: none;
+    bottom: 20px;
+    width: 200px;
+    height: 200px;
     left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%);
 
-    .drag-pointer {
+    .drag-angle {
+        display:inline-block;
+        width: 100px;
+        height: 100px;
         position: absolute;
-        width: 12px;
-        cursor: pointer;
-        height: 12px;
-        transform: translateX(-50%) translateY(-50%);
+        box-sizing: border-box; 
         border-radius: 50%;
-        background-color: $pointer-color;
-        box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32);                                
-    }
-
-    .angle-text {
-        position: absolute;
-        display: inline-block;
+        border: 2px solid rgba(#ececec, 0.5); 
+        border-style: dashed;
+        overflow: hidden; 
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        color: rgba(#ececec, 0.9);
-        text-shadow: 1px 1px #a7a7a7;
+    
+        .drag-pointer {
+            position: absolute;
+            width: 12px;
+            cursor: pointer;
+            height: 12px;
+            transform: translateX(-50%) translateY(-50%);
+            border-radius: 50%;
+            background-color: $pointer-color;
+            box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.32), inset 0 0 4px 0px rgba(0, 0, 0, 0.32);                                
+        }
+    
+        .angle-text {
+            position: absolute;
+            display: inline-block;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            color: rgba(#ececec, 0.9);
+            text-shadow: 1px 1px #a7a7a7;
+    
+        }
+    }   
+}
 
-    }
-}      
+   
 

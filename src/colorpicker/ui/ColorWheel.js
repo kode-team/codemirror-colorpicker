@@ -134,7 +134,7 @@ export default class ColorWheel extends UIElement {
     }
 
     getCurrentXY(e, angle, radius, centerX, centerY) {
-        return e ? Event.posXY(e) : getXYInCircle(angle, radius, centerX, centerY)
+        return e ? e.xy : getXYInCircle(angle, radius, centerX, centerY)
     }
 
     getRectangle () {

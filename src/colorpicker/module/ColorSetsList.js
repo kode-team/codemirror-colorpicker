@@ -21,9 +21,6 @@ export default class ColorSetsList extends BaseModule {
         this.$store.currentColorSets = {}        
     }
 
-    '/list' ($store) {
-        return Array.isArray($store.userList) && $store.userList.length ? $store.userList : $store.colorSetsList;
-    }
 
     '/setUserPalette' ($store, list) {
         $store.userList = list; 
@@ -55,7 +52,7 @@ export default class ColorSetsList extends BaseModule {
 
     '/setCurrentColorSets' ($store, nameOrIndex) {
 
-        const _list = $store.dispatch('/list');
+        const _list = $store.read('/list');
 
         if (typeof nameOrIndex == 'undefined') {
             $store.currentColorSets = _list[0];
@@ -70,7 +67,7 @@ export default class ColorSetsList extends BaseModule {
         $store.emit('changeCurrentColorSets');
     }
 
-    '/getCurrentColorSets' ($store) {
+    '*/getCurrentColorSets' ($store) {
         return $store.currentColorSets;
     }
 
@@ -107,11 +104,16 @@ export default class ColorSetsList extends BaseModule {
         }
     }
 
-    '/getCurrentColors' ($store ) {
-        return $store.dispatch('/getColors', $store.currentColorSets);
+
+    '*/list' ($store) {
+        return Array.isArray($store.userList) && $store.userList.length ? $store.userList : $store.colorSetsList;
+    }    
+
+    '*/getCurrentColors' ($store ) {
+        return $store.read('/getColors', $store.currentColorSets);
     }
 
-    '/getColors' ($store, element) {
+    '*/getColors' ($store, element) {
         if (element.scale) {
             return Color.scale(element.scale, element.count);
         }
@@ -119,12 +121,12 @@ export default class ColorSetsList extends BaseModule {
         return element.colors || []; 
     }
 
-    '/getColorSetsList' ($store) {
-        return $store.dispatch('/list').map(element => {
+    '*/getColorSetsList' ($store) {
+        return $store.read('/list').map(element => {
            return {
                name : element.name,
                edit : element.edit,
-               colors : $store.dispatch('/getColors', element)
+               colors : $store.read('/getColors', element)
            } 
         });
     }

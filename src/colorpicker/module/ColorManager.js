@@ -73,40 +73,40 @@ export default class ColorManager extends BaseModule {
 
     }
 
-    '/getHueColor' ($store) {
+    '*/getHueColor' ($store) {
         return HueColor.checkHueColor($store.hsv.h/360);
     }
 
-    '/toString' ($store, type) {
+    '*/toString' ($store, type) {
         type = type || $store.format
         var colorObj = $store[type] || $store.rgb
         return Color.format(Object.assign({}, colorObj, {a: $store.alpha} ), type);
     }
 
-    '/toColor' ($store, type) {
+    '*/toColor' ($store, type) {
         type = (type || $store.format).toLowerCase(); 
 
         if (type == 'rgb') {
-            return $store.dispatch('/toRGB')
+            return $store.read('/toRGB')
         } else if (type == 'hsl') {
-            return $store.dispatch('/toHSL')
+            return $store.read('/toHSL')
         } else if (type == 'hex') {
-            return $store.dispatch('/toHEX')            
+            return $store.read('/toHEX')            
         }
 
-        return $store.dispatch('/toString', type);
+        return $store.read('/toString', type);
     }
 
-    '/toRGB' ($store) {
-        return $store.dispatch('/toString', 'rgb')
+    '*/toRGB' ($store) {
+        return $store.read('/toString', 'rgb')
     }
 
-    '/toHSL' ($store) {
-        return $store.dispatch('/toString', 'hsl')
+    '*/toHSL' ($store) {
+        return $store.read('/toString', 'hsl')
     }
 
-    '/toHEX' ($store) {
-        return $store.dispatch('/toString', 'hex').toUpperCase()
+    '*/toHEX' ($store) {
+        return $store.read('/toString', 'hex').toUpperCase()
     }
 
 }

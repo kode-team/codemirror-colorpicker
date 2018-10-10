@@ -1,0 +1,49 @@
+.property-view {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+    box-sizing: border-box;
+    overflow: auto;
+
+    .property-item {
+        padding: 10px;
+        border: 1px solid #ececec;
+        font-size: 12px;
+        margin-bottom: 5px;
+        overflow: hidden;
+        
+        > div {
+            display: flex; 
+
+            > label {
+                width: 150px;
+            }
+
+            > div {
+                display: flex; 
+
+                input[type=number], input[type=text], select {
+                    width: 80px;
+                }
+
+                > span {
+                    display: inline-block;
+                    width: 30px;
+                    margin-left: 10px; 
+                }
+            }
+        }
+
+        @import './property-items/gradient-steps.scss';
+        @import './property-items/gradient-sample-list.scss';
+        @import './property-items/gradient-steps-info.scss';
+        @import './property-items/gradient-tools.scss';
+    }
+
+    .gradient-view {
+        height: 230px;
+        width: 100%;
+    }
+}

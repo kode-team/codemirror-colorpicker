@@ -4,14 +4,16 @@ import LayerManager from "./LayerManager";
 import ToolManager from "./ToolManager";
 import BlendManager from "./BlendManager";
 import GradientManager from "./GradientManager";
-import ColorManager from "./ColorManager";
+import PageManager from "./PageManager";
+import ItemManager from "./ItemManager";
 
 export default [
+    ItemManager,
     ColorStepManager,
     ImageManager,
+    PageManager,
     LayerManager,
     ToolManager,
     BlendManager,
-    GradientManager,
-    ColorManager
+    GradientManager
 ] 

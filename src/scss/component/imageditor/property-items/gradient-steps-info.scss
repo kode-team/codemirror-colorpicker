@@ -1,0 +1,70 @@
+&.gradient-steps-info {
+    
+
+    .gradient-info {
+        // background-color:#ececec;
+        overflow: auto;
+
+        .form-item {
+            font-size: 12px;
+            box-sizing: border-box;
+            margin: 2px 0px;
+
+            .color-step {
+                display: block;
+                padding: 1px;
+                color: #333; 
+
+                &.selected {
+                    background-color: #ececec;
+                }
+
+                > * {
+                    display:inline-block; 
+                    vertical-align: middle;
+                }
+                input {
+                    width: 40px;
+                }
+
+                .tools {
+                    text-align: right;
+                    button {
+                        appearance: none;
+                        transform: scale(1.2);
+                        border:0px;
+                        background-color: transparent;
+                        padding: 0px 2px;
+                    }
+                }
+
+                input[type=text] {
+                    width: 100px;
+                }
+
+                input[type=number] {
+                    appearance: none;
+                    border: 1px solid #ececec;
+                }
+
+                .color-view {
+                    width: 20px;
+                    height: 20px;
+                    box-sizing: border-box;
+                    position: relative;
+                    @include transparent-background();
+                    border: 1px solid #ececec;
+
+                    .color-view-item {
+                        position: absolute; 
+                        left: 0px;
+                        right: 0px;
+                        bottom: 0px;
+                        top: 0px;
+                    }
+                }
+            }
+        }
+    }
+
+}

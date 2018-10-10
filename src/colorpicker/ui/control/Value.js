@@ -20,7 +20,7 @@ export default class Value extends BaseSlider {
     }
 
     setBackgroundColor () {
-        this.refs.$container.css("background-color", this.dispatch('/toRGB'));
+        this.refs.$container.css("background-color", this.read('/toRGB'));
     }
 
 

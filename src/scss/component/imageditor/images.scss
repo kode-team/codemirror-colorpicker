@@ -1,116 +1,195 @@
-$pointer-color: rgba(#ececec, 0.8);
-$direction-border: 2px solid $pointer-color;
-$layer-item-height: 50px;
-$button-size: 24px;
-$layer-item-padding: 8px;
+$image-item-height: 100px;
+$image-item-width: 100px;
 
-.image-list-container {
-    position: absolute;
-    left: 100px;
-    right: 0px;
-    top: 35px;
-    bottom: 0px; 
+.images {
     box-sizing: border-box;
-    padding: 5px;
+    position: relative;
+    height: 100%; 
 
-    .image-list {
-        display: block;
+
+    .image-tools {
+        padding: 10px 0px; 
         position: absolute;
         left: 0px;
         right: 0px;
-        top: 0px;
         bottom: 0px;
-        overflow: auto; 
-        border-top: 1px solid #dedede;
-        .image-item {
-            display: flex;
-            height: $layer-item-height;            
+        top: 40px;
+        display: flex; 
+        flex-direction: row;
+
+        button {
+            display: inline-block;
+            appearance: none;
+            width: $image-item-width;
+            height: $image-item-height;
             box-sizing: border-box;
+            border: 1px solid #dedede;
+            vertical-align: middle;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            pointer-events: all;
+        }
+    
+ 
+        > .tools {
+            flex: none; 
+            width: $image-item-width + 10;            
+        }
+
+        .image-list {
+            flex: 1 1 auto; 
+        }
+    }    
+
+    .tools {
+        padding: 5px; 
+        height: $image-item-height + 10;
+        border-right: 1px solid #dedede;
+
+        button {
+            border: 1px solid #dedede;
+        }
+
+        .tree-item {
+            display: inline-block;
+            height: $image-item-height;            
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            border-bottom: 1px solid #dedede;
-            padding: 5px;
+            border: 5px solid #dedede;  
 
-            svg {
-                pointer-events: none;
-            }
 
             &.selected {
-                background-color: #dedede;                
-                .image-item-check {
-                    svg {
-                        display: inline-block; 
-                    }
-                }
+                border: 5px solid #333;
             }
 
-            .image-item-view-container {
+
+
+            .item-view-container {
                 position: relative; 
-                @include transparent-background();
+                // @include transparent-background();
                 pointer-events: none;
                 display: inline-block;
                 vertical-align: middle;
                 box-sizing: border-box;
-                flex: 1 1 auto;  
-                padding: 14px;
-                width: 25%;
-            }
+                height: $image-item-height;
+                width: $image-item-width;
+                border: 1px solid #ececec;
 
-            .image-item-check {
-                position: relative; 
-                display: inline-block;
-                vertical-align: middle;
-                box-sizing: border-box;
-                flex: 1 1 auto;  
-                width: 25%;
-                text-align: center;
-                padding: $layer-item-padding;
-
-                svg {
-                    display: none;
+                .item-view {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    right: 0px;
+                    bottom: 0px;
                 }
             }
 
-            .image-item-visible {
-                position: relative; 
-                display: inline-block;
-                vertical-align: middle;
-                box-sizing: border-box;
-                flex: 1 1 auto;  
-                width: 25%;
-                text-align: center;       
-                padding: $layer-item-padding;
-
-                svg.on { display: none; }
-                svg.off { display: inline-block; }                
-
-                &.on {
-                    svg.on { display: inline-block; }
-                    svg.off { display: none; }
-                }
-            }
-
-            .image-item-delete {
-                position: relative; 
-                display: inline-block;
-                vertical-align: middle;
-                box-sizing: border-box;
-                flex: 1 1 auto;  
-                padding: $layer-item-padding;                
-                width: 25%;
-                text-align: center;                
-            }
-
-            .image-item-view {
-                pointer-events: none;                
-                position: absolute; 
-                left: 0px;
-                right: 0px;
-                bottom: 0px;
-                top: 0px; 
-            }
         }
-    }
+    }    
 
+    .add-tools {
+        padding: 5px; 
+        height: $image-item-height + 10;
+
+
+    }        
+
+    .image-list {
+        overflow-x: auto;
+        white-space: nowrap;
+
+        .menu-buttons {
+            padding: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .tree-item {
+            display: inline-block;
+            height: $image-item-height;            
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #dedede;  
+            margin: 5px;
+            vertical-align: middle;
+
+            &.selected {
+                border: 5px solid #333;
+            }
+
+            &:hover {
+                .item-tools {
+                    display: inline-block;
+                }
+            }
+
+            .item-view-container {
+                position: relative; 
+                // @include transparent-background();
+                pointer-events: none;
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                height: $image-item-height;
+                width: $image-item-width;
+
+                .item-view {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    right: 0px;
+                    bottom: 0px;
+                }
+            }
+
+            .item-tools {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                display: none;
+                padding: 5px;     
+                pointer-events: none;
+
+                button {
+                    height: $button-size;
+                    width: $button-size;
+                    position: absolute;
+                    display:inline-block;
+                    border: 1px solid #dedede;
+                    cursor: pointer;
+                    pointer-events: all;         
+                    
+                    &.copy-item {
+                        right: 0px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                    }
+
+                    &.left-item {
+                        left: 0px;
+                        bottom: 0px;
+                    }
+
+                    &.right-item {
+                        right: 0px;
+                        bottom: 0px;
+                    }              
+                    
+                    &.delete-item {
+                        top: 0px;
+                        right: 0px;
+                    }
+                }
+
+            }
+
+        }
+
+    }
 }

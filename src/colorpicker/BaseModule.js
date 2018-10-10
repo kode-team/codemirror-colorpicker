@@ -1,13 +1,25 @@
+const ACTION_PREFIX = '/'
+const GETTER_PREFIX = '*/'
+
+
 export default class BaseModule {
     constructor ($store) {
         this.$store = $store;
         this.initialize();
     }
 
+    afterDispatch() {
+        
+    }
+
     initialize() {
-        this.filterProps().forEach(key => {
+        this.filterProps(ACTION_PREFIX).forEach(key => {
             this.$store.action(key, this);
         });
+
+        this.filterProps(GETTER_PREFIX).forEach(key => {
+            this.$store.getter(key, this);
+        });        
     }
 
     filterProps (pattern = '/') {

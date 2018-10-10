@@ -178,7 +178,7 @@ export default class ColorInformation extends UIElement {
     }    
 
     setHexInput () {
-        this.refs.$hexCode.val(this.dispatch('/toHEX'));
+        this.refs.$hexCode.val(this.read('/toHEX'));
     }
 
     refresh () {

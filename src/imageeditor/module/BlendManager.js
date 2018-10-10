@@ -15,32 +15,23 @@ export default class BlendManager extends BaseModule {
         this.$store.blendMode = '';
     }
 
-    '/blend/list' ($store) {
+    '*/blend/toString' ($store, layer, backgroundBlend = '', mixBlend = '', withStyle = true) {
+
+        layer = $store.read('/clone', layer);
+
+        layer.style['background-blend-mode'] = backgroundBlend;
+        layer.style['mix-blend-mode'] = mixBlend;
+
+        return $store.read('/layer/toString', layer, withStyle)
+    }    
+
+    '*/blend/toStringWithoutDimension' ($store, layer, backgroundBlend = '', mixBlend = '') {
+        return $store.read('/blend/toString', layer, backgroundBlend, mixBlend, false)
+    }        
+
+    '*/blend/list' ($store) {
         return blend_list;
     }
 
-    '/blend/select' ($store, backgroundBlendMode) {
 
-        if (!blend_list.includes(backgroundBlendMode))  {
-            backgroundBlendMode = '' 
-        }
-
-        $store.dispatch('/layer/change', {backgroundBlendMode})
-    }
-
-    '/blend/select/mix' ($store, mixBlendMode) {
-
-        if (!blend_list.includes(mixBlendMode))  {
-            mixBlendMode = '' 
-        }
-
-        $store.dispatch('/layer/change', {mixBlendMode})
-    }    
-
-    '/blend/toString' ($store, layer, backgroundBlend = '', mixBlend = '') {
-        return $store.read('/layer/toString', Object.assign({}, layer,  {
-            backgroundBlendMode: backgroundBlend,
-            mixBlendMode: mixBlend
-        }))
-    }
 }

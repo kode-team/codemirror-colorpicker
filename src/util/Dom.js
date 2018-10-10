@@ -121,6 +121,10 @@ export default class Dom {
     
     html (html) {
 
+        if (arguments.length == 0) {
+            return this.el.innerHTML;
+        }
+
         if (typeof html == 'string') {
             this.el.innerHTML = html;
         } else {
@@ -220,9 +224,13 @@ export default class Dom {
     px (key, value) {
         return this.css(key, value + 'px')
     }
+
+    rect () {
+        return this.el.getBoundingClientRect()
+    }
     
     offset () {
-        var rect = this.el.getBoundingClientRect();
+        var rect = this.rect();
 
         return {
             top: rect.top + Dom.getScrollTop(),
@@ -246,7 +254,7 @@ export default class Dom {
                 left: parseFloat(this.css('left'))
             };
         } else {
-            return this.el.getBoundingClientRect();
+            return this.rect();
         }
 
     }
@@ -256,7 +264,7 @@ export default class Dom {
     }
     
     width () {
-        return this.el.offsetWidth || this.el.getBoundingClientRect().width;
+        return this.el.offsetWidth || this.rect().width;
     }
 
     contentWidth() {
@@ -264,7 +272,7 @@ export default class Dom {
     }
     
     height () {
-        return this.el.offsetHeight || this.el.getBoundingClientRect().height;
+        return this.el.offsetHeight || this.rect().height;
     }
 
 

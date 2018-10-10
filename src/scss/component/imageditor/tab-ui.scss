@@ -1,16 +1,37 @@
 $tab-header-height: 30px;
 $tab-background-color: rgb(255, 255, 255);
 $tab-border-color: #dedede;
+$tab-selected-color: #dedede;
 .tab {
-    position: relative;
-    background-color: $tab-background-color;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+
+    &.inner {
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+
+        .tab-header {
+            .tab-item {
+                border:0px;
+            }
+        }
+
+        .tab-body {
+            border:0px;
+        }
+    }
 
     .tab-header {
         position: absolute;
         left: 0px;
         right: 0px;
         height: $tab-header-height;
-        top: 0px;
+        top: 1px;
         // background-color: #ececec;
 
         display: block;
@@ -25,18 +46,17 @@ $tab-border-color: #dedede;
             padding: 6px 4px;
             cursor: pointer;
             color: black; 
-            margin-top: 4px;
             border: 1px solid $tab-border-color;
             min-width: 50px;
 
             &:not(.selected) {
-                background-color: $tab-border-color; 
+                background-color: $tab-background-color; 
                 color: black;
             }
 
             &.selected {
-                background-color: $tab-background-color;
-                border-bottom: 1px solid #ffffff;
+                background-color: $tab-selected-color;
+                // border-bottom: 1px solid #ffffff;
             }
             
         }
@@ -46,7 +66,7 @@ $tab-border-color: #dedede;
         position: absolute;
         left: 0px;
         right: 0px;
-        top: $tab-header-height + 3px;
+        top: $tab-header-height;
         bottom: 0px;
         box-sizing: border-box;
         border: 1px solid $tab-border-color;
@@ -63,6 +83,26 @@ $tab-border-color: #dedede;
             &.selected {
                 display: block;
             }
+        }
+    }
+
+    &.bottom {
+        > .tab-header {
+            top: auto;
+            bottom: 1px;
+
+            .tab-item {
+                &.selected {
+                    border-top: 1px solid #ffffff;
+                    border-bottom: 1px solid $tab-border-color;                    
+                }
+            }
+
+        }
+
+        > .tab-body {
+            top: 0px;
+            bottom: $tab-header-height;
         }
     }
 }

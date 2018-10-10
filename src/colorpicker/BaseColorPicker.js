@@ -190,7 +190,7 @@ export default class BaseColorPicker extends UIElement {
     }
 
     getColor(type) {
-        return this.dispatch('/toColor', type);
+        return this.read('/toColor', type);
     }
 
     definePositionForArrow(opt, elementScreenLeft, elementScreenTop) {
@@ -289,7 +289,7 @@ export default class BaseColorPicker extends UIElement {
     }    
 
     getCurrentColor() {
-        return this.dispatch('/toColor', this.outputFormat);
+        return this.read('/toColor', this.outputFormat);
     }
 
 

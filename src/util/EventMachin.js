@@ -41,12 +41,8 @@ export default class EventMachin {
 
     if ($container) $container.html(this.$el)
 
-    // 개별 객체 셋팅하고 
-    this.parseComponent()
-
     // 데이타 로드 하고 
     this.load()    
-
 
     this.afterRender();
   }
@@ -68,35 +64,52 @@ export default class EventMachin {
    * 
    * @param {*} html 
    */
-  parseTemplate (html) {
-    // 모든 element 는 root element 가 하나여야 한다. 
-    const $el = new Dom("div").html(html).firstChild()  
-    // ref element 정리 
+  parseTemplate (html, isLoad) {
 
-    if ($el.attr('ref')) {
-      this.refs[$el.attr('ref')] = $el; 
+    if (Array.isArray(html)) {
+      html = html.join('')
     }
-    var refs = $el.$$('[ref]');
 
-    [...refs].forEach($dom => {
-      const name = $dom.attr('ref')
-      this.refs[name] = $dom;
+    // 모든 element 는 root element 가 하나여야 한다. 
+    const list = new Dom("div").html(html).children()
+    
+    var fragment = document.createDocumentFragment()
+
+    list.forEach($el => {
+      // ref element 정리 
+      if ($el.attr('ref')) {
+        this.refs[$el.attr('ref')] = $el; 
+      }
+      var refs = $el.$$('[ref]');
+
+      [...refs].forEach($dom => {
+        const name = $dom.attr('ref')
+        this.refs[name] = $dom;
+      })
+
+      fragment.appendChild($el.el);
+
     })
 
-    return $el; 
+    if (!isLoad) {
+      return list[0];
+    }
+
+    return fragment
   }
 
   /**
    * target 으로 지정된 자식 컴포넌트를 대체해준다.
+   * load 이후에 parseComponent 를 한번더 실행을 해야한다. 
+   * load 이후에 새로운 Component 가 있으면 parseComponent 를 할 수가 없는데.... 
+   * 이상한데 왜 로드가 안되어 있지? 
    */
   parseComponent () {
     const $el = this.$el; 
     Object.keys(this.childComponents).forEach(ComponentName => {
       const Component = this.childComponents[ComponentName]
       const targets = $el.$$(`${ComponentName.toLowerCase()}`);
-
       [...targets].forEach($dom => {
-
         let props = {};
         
         [...$dom.el.attributes].filter(t => {
@@ -133,10 +146,12 @@ export default class EventMachin {
     this.filterProps(CHECK_LOAD_PATTERN).forEach(callbackName => {
       const elName = callbackName.split('load ')[1]
       if (this.refs[elName]) { 
-        var html = this.parseTemplate(this[callbackName].call(this));
-        this.refs[elName].html(html)
+        var fragment = this.parseTemplate(this[callbackName].call(this), true);
+        this.refs[elName].html(fragment)
       }
     })
+
+    this.parseComponent()
   }
 
   // 기본 템플릿 지정 
@@ -371,6 +386,7 @@ export default class EventMachin {
         if (delegateTarget) { // delegate target 이 있는 경우만 callback 실행 
           e.delegateTarget = delegateTarget;
           e.$delegateTarget = new Dom(delegateTarget);
+          e.xy = Event.posXY(e)
 
           if (this.checkEventType(e, eventObject)) {
             return callback(e);
@@ -381,6 +397,7 @@ export default class EventMachin {
       }
     }  else {
       return (e) => {
+        e.xy = Event.posXY(e)        
         if (this.checkEventType(e, eventObject)) { 
           return callback(e);
         }

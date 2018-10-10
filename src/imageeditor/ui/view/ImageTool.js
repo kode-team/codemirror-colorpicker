@@ -1,4 +1,3 @@
-import Event from '../../../util/Event'
 import UIElement from '../../../colorpicker/UIElement';
 
 export default class ImageTool extends UIElement {
@@ -19,12 +18,12 @@ export default class ImageTool extends UIElement {
     }
 
     setColorUI() {
-        this.$el.toggle(this.read('/image/isImageType'))
+        var item = this.read('/item/current/image');
+        var type = item ? item.type : ''
+        this.$el.toggle(this.read('/image/type/isImage', type))
     }
 
-    '@changeLayer' () {
+    '@changeEditor' () {
         this.refresh()
     }
-
-    '@initLayer' () { this.refresh() }
 }

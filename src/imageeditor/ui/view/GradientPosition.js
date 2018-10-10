@@ -1,5 +1,4 @@
 import UIElement from '../../../colorpicker/UIElement';
-import Event from '../../../util/Event'
 
 const DEFINE_POSITIONS = { 
     'center': ['center', 'center'],
@@ -23,7 +22,6 @@ export default class GradientPosition extends UIElement {
 
         if (this.isShow()) {
             this.$el.show();
-
             this.refreshUI()            
         } else {
             this.$el.hide();
@@ -31,13 +29,22 @@ export default class GradientPosition extends UIElement {
     }
 
     isShow () {
-        return !this.dispatch('/image/isLinearType') && this.read('/tool/get', 'guide.angle')
+        if (!this.read('/item/is/mode', 'image')) return false; 
+
+        var item = this.read('/item/current/image')
+        if (!item) return false; 
+
+        if (!this.read('/image/type/isRadial', item.type)) {
+            return false; 
+        }
+
+        return this.read('/tool/get', 'guide.angle')
     }
 
     getCurrentXY(e, position) {
 
         if (e) {
-            var xy = Event.posXY(e);
+            var xy = e.xy;
 
             return [xy.x, xy.y]
         }
@@ -79,10 +86,10 @@ export default class GradientPosition extends UIElement {
     }
 
     getRectangle () {
-        var width = this.state.get('$el.width');  
-        var height = this.state.get('$el.height');  
-        var minX = this.state.get('$el.offsetLeft');
-        var minY = this.state.get('$el.offsetTop');
+        var width = this.$el.width();  
+        var height = this.$el.height();  
+        var minX = this.$el.offsetLeft();
+        var minY = this.$el.offsetTop();
 
         var maxX = minX + width; 
         var maxY = minY + height;
@@ -114,11 +121,9 @@ export default class GradientPosition extends UIElement {
 
     }
 
-    '@changeLayer' () {
+    '@changeEditor' () {
         this.refresh()
     }
-
-    '@initLayer' () { this.refresh() }     
 
     '@changeTool' () {
         this.$el.toggle(this.isShow())

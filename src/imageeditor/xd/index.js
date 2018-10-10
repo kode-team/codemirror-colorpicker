@@ -1,44 +1,31 @@
 import BaseImageEditor from '../BaseImageEditor';
-import ColorTab from '../ui/ColorTab';
-import ColorStepsTab from '../ui/ColorStepsTab';
-import LayerManagerTab from '../ui/LayoutManagerTab';
-import ControlTab from '../ui/ControlTab'
-import ImageControl from '../ui/control/ImageControl';
+import PageList from '../ui/layer/PageList';
+import FeatureControl from '../ui/control/FeatureControl';
+import GradientView from '../ui/control/image/GradientView';
 
+import LayerList from '../ui/layer/LayerList';
 
 export default class XDImageEditor extends BaseImageEditor {
-
-    constructor(opt, props) { 
-        super(opt, props);
-
-
-        this.dispatch('/layer/add')
-
-        this.emit('initLayer')
-    }
 
     template () {
         return `
 
             <div class="layout-main">
-                <div class="layout-top">
-                    <div class='layout-flow'>                
-                        <ImageControl></ImageControl>
-                    </div>
-                </div>
-                <div class="layout-left">
-                    <div class='layout-flow'>
-                        <LayerManagerTab></LayerManagerTab>                
-                    </div>
-                </div>
-                <div class="layout-right">
-                    <div class='layout-flow'>
-                        <ColorTab></ColorTab>
-                        <ColorStepsTab></ColorStepsTab>
-                    </div>
-                </div>
                 <div class="layout-header">
-                    <h1>Image Editor</h1>
+                    <h1>EASYLOGIc studio</h1>
+                </div>
+                <div class="layout-top">      
+                    <PageList></PageList>
+                    <LayerList></LayerList>
+                </div>
+                <div class="layout-body">
+                    <GradientView></GradientView>                      
+                </div>                
+                <div class="layout-right">
+                    <FeatureControl></FeatureControl>
+                </div>
+                <div class="layout-footer">
+                
                 </div>
             </div>
         `
@@ -46,7 +33,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
-            ColorTab, ColorStepsTab, LayerManagerTab, ControlTab, ImageControl
+            GradientView, PageList,FeatureControl, LayerList
         }
     } 
 }

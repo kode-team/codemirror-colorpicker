@@ -16,25 +16,21 @@ const INIT_COLOR_SOURCE = 'colorstep'
 
 export default class ColorStepManager extends BaseModule {
 
-    '/colorstep/create' ($store, obj) {
+    '*/colorstep/create' ($store, obj) {
         if (obj) {
-            obj = $store.read('/clone', obj)
+            obj = $store.clone(obj)
         } else {
-            obj = $store.read('/clone', defaultObject)
+            obj = $store.clone(defaultObject)
         }
 
         return obj;
     }
-    '/colorstep/initColor' ($store, color) {
-        $store.dispatch('/tool/setColorSource',INIT_COLOR_SOURCE);
-        $store.dispatch('/tool/changeColor', color);
-    }
 
-    '/colorstep/colorSource' ($store) {
+    '*/colorstep/colorSource' ($store) {
         return INIT_COLOR_SOURCE
     }
 
-    '/colorstep/current' ($store, index) {
+    '*/colorstep/current' ($store, index) {
         if (!isUndefined(index)) {
             return $store.read('/colorstep/list')[index] || $store.read('/colorstep/create')
         } else {
@@ -42,7 +38,7 @@ export default class ColorStepManager extends BaseModule {
         }
     }
 
-    '/colorstep/currentIndex' ($store, index) {
+    '*/colorstep/currentIndex' ($store, index) {
         if (isUndefined(index)) {
             return $store.read('/colorstep/list').map((step, index) => { 
                 return {step, index }
@@ -55,7 +51,7 @@ export default class ColorStepManager extends BaseModule {
     }    
 
     // 이미지 얻어오기 
-    '/colorstep/get' ($store, colorStepOrKey, key) {
+    '*/colorstep/get' ($store, colorStepOrKey, key) {
 
         var current = $store.read('/colorstep/current');
         if (arguments.length == 1) {
@@ -74,7 +70,7 @@ export default class ColorStepManager extends BaseModule {
     }
 
     // 이미지 리스트 얻어오기 
-    '/colorstep/list' ($store, imageIndex) {
+    '*/colorstep/list' ($store, imageIndex) {
         var image = $store.read('/image/current', imageIndex)
 
         if (image) {
@@ -84,19 +80,27 @@ export default class ColorStepManager extends BaseModule {
         return []
     }
 
+    '/colorstep/initColor' ($store, color) {
+        $store.dispatch('/tool/setColorSource',INIT_COLOR_SOURCE);
+        $store.dispatch('/tool/changeColor', color);
+    }
+
+
     // 이미지 변경하기 
     '/colorstep/change' ($store, newColorStep, index) {
         // 현재 image 설정 
         // 현재 layer 설정 
         $store.dispatch('/colorstep/set', newColorStep, index);
-
-        $store.emit('changeLayer')
     }        
 
     // 이미지 설정하기 , 이벤트 까지 
     '/colorstep/set' ($store, newColorStep, index) {
         var current = $store.read('/colorstep/current', index)
         Object.assign(current, newColorStep);
+
+        var colorsteps = $store.read('/colorstep/list');
+
+        $store.dispatch('/image/change', { colorsteps })
     }
 
 
@@ -132,55 +136,62 @@ export default class ColorStepManager extends BaseModule {
         $store.dispatch('/image/change', { colorsteps });
     }
 
-    '/colorstep/add' ($store, percent) {
-        var steps = [...$store.read('/colorstep/list')];
+    '/colorstep/add' ($store, item, percent) {
 
-        if (!steps.length) {
-            var color = 'rgba(0, 0, 0, 1)';
-            $store.dispatch('/colorstep/setAll', [{color: 'rgba(0, 0, 0, 1)', percent}, {color: 'rgba(0, 0, 0, 0)', percent: 100}]);
+        var list = $store.read('/item/list/children', item.id)
+
+        if (!list.length) {
+
+            $store.read('/item/create/colorstep', {parentId: item.id, color: 'rgba(0, 0, 0, 0)', percent});
+            $store.read('/item/create/colorstep', {parentId: item.id, color: 'rgba(0, 0, 0, 1)', percent: 100});
+
+            $store.dispatch('/item/set', item);
+            return; 
+        }
+
+        var colorsteps = list.map(id => {
+            return $store.items[id]
+        })
+    
+        if (percent < colorsteps[0].percent) {
+
+            $store.read('/item/create/colorstep', {parentId: item.id, color: colorsteps[0].color, percent});
+            $store.dispatch('/item/set', item);
             return;             
         }
-        
-        if (percent < steps[0].percent) {
-            var color = steps[0].color;
-            $store.dispatch('/colorstep/setAll', [{color, percent}, ...steps]);
-            return; 
-        }
 
-        if (steps[steps.length -1].percent < percent) {
-            var color = steps[steps.length -1].color;
-            $store.dispatch('/colorstep/setAll', [...steps, {color, percent}]);
-            return; 
+        if (colorsteps[colorsteps.length -1].percent < percent) {
+            var color = colorsteps[colorsteps.length -1].color;         
+
+            $store.read('/item/create/colorstep', {parentId: item.id, color, percent});
+
+            $store.dispatch('/item/set', item);
+            return;             
         }        
        
-        for(var i = 0, len = steps.length - 1; i < len; i++) {
-            var step = steps[i];
-            var nextStep = steps[i+1];
+        for(var i = 0, len = colorsteps.length - 1; i < len; i++) {
+            var step = colorsteps[i];
+            var nextStep = colorsteps[i+1];
 
             if (step.percent <= percent && percent <= nextStep.percent) {
                 var color = Color.mix(step.color, nextStep.color, (percent - step.percent)/(nextStep.percent - step.percent), 'rgb');
 
-                steps.splice(i + 1, 0, {color, percent});
+                $store.read('/item/create/colorstep', {parentId: item.id, color, percent});
 
-                $store.dispatch('/colorstep/setAll', steps);
-                break; 
+                $store.dispatch('/item/set', item);            
+                return; 
             }
         }
     }    
 
-    '/colorstep/remove' ($store, index) {
-        var colorsteps = $store.read('/colorstep/list');
-        index  = $store.read('/colorstep/currentIndex', index);
+    '/colorstep/remove' ($store, id) {
 
-        if (colorsteps[index]) {
-            colorsteps.splice(index, 1);
+        var parentId = $store.read('/item/get', id).parentId; 
+        var image = $store.read('/item/get', parentId);
 
-            if (colorsteps.length - 1 > index) {
-                colorsteps[index].selected = true; 
-            }
+        $store.dispatch('/item/remove', id);
 
-            $store.emit('initLayer') 
-        }
+        $store.dispatch('/item/set', image);
     }
 
 }

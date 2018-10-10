@@ -14,23 +14,32 @@ export default class PredefinedRadialGradientPosition extends UIElement {
         `
     }
     'click $el button' (e) {
-        this.dispatch('/image/change', { radialPosition: e.$delegateTarget.attr('data-value') });
-    }
 
+        var item = this.read('/item/current/image')
+
+        if (item) {
+            item.radialPosition =  e.$delegateTarget.attr('data-value')
+            this.dispatch('/item/set', item);
+        }
+    }
 
     refresh () {
         this.$el.toggle(this.isShow())
     }
 
     isShow () {
-        return !this.dispatch('/image/isLinearType') && this.read('/tool/get', 'guide.angle')
+        if (!this.read('/item/is/mode', 'image')) return false; 
+
+        var image = this.read('/item/current/image')
+
+        if (!image) { return false; }
+
+        return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isRadial', image.type);
     }
 
-    '@changeLayer' () {
+    '@changeEditor' () {
         this.refresh()
     }
-
-    '@initLayer' () { this.refresh() }    
 
     '@changeTool' () {
         this.refresh()

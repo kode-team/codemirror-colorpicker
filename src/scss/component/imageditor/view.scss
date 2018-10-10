@@ -1,30 +1,44 @@
-$pointer-color: rgba(#ececec, 0.8);
+$pointer-color: rgba(#0f72cf, 0.8);
 $direction-border: 2px solid $pointer-color;
 $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
-.gradient-view {
+.page-view {
     position: absolute;
-    width: 600px;
-    height: 400px;    
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    border: 1px solid $guide-border-hover-color;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
     
-    &.drag-over {
-        > * {
-            display: none;
-        } 
+    .page-menu { 
+        position: absolute; 
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        height: 210px;
+        z-index: 5;
 
-        .dropzone {
-            z-index: 100;
-            background-color: yellow;
-            pointer-events: none;            
-            display: block;
-        }
+        @import './images.scss';
     }
 
-    .dropzone,
+    .page-content {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 210px;
+        overflow: auto;
+        background-color: #ececec;
+    }
+
+    .gradient-color-view-container {
+        position: absolute;
+        top: 50px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        display: none;        
+    }
+
     .gradient-color-view,
     .gradient-color-view-container {
         width: 100%;
@@ -33,7 +47,20 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        pointer-events: none;
+        background-color: white;
+        box-sizing: border-box;
+    }
+
+    .gradient-color-view {
+
+        .layer {
+            position: absolute; 
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            
+        }
     }
 
     .dropzone {
@@ -41,24 +68,24 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
     }
 
     .gradient-color-view-container {
-        @include transparent-background();
-
+        // @include transparent-background();
+        box-shadow: 8px 9px 20px -5px #777;
     }
 
 
     .predefined-angluar-group {
-        display: inline-block;
+        display: none;
         text-align: center;
         position: absolute;
-        width: 90%;
-        height: 90%;
         pointer-events: none;
+        bottom: 20px;
+        width: 200px;
+        height: 200px;
         left: 50%;
-        top: 50%;
-        transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.2);
 
         button {
-            pointer-events: all;
             padding: 0px;
             margin: 1px;
             background-color: transparent;
@@ -72,6 +99,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             display: inline-block;
             width: 20px;
             height: 20px;
+            pointer-events: all;
 
             &:hover {
                 border-color: $guide-border-hover-color; 
@@ -91,7 +119,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             /* linear */
             &[data-value='to top'] {
-                top: 0px;
+                top: 10px;
                 left: 50%;
                 transform: translateX(-50%);
                 border-top: $direction-border;
@@ -105,8 +133,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='to top right'] {
-                top: 0px;
-                right: 0px;
+                top: 10px;
+                right: 10px;
                 border-top: $direction-border;
                 border-right: $direction-border;
 
@@ -120,7 +148,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             &[data-value='to right'] {
                 top: 50%;
-                right: 0px;
+                right: 10px;
                 transform: translateY(-50%);
                 border-right: $direction-border;
 
@@ -133,8 +161,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='to bottom right'] {
-                bottom: 0px;
-                right: 0px;
+                bottom: 10px;
+                right: 10px;
                 border-right: $direction-border;
                 border-bottom: $direction-border;
 
@@ -147,7 +175,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='to bottom'] {
-                bottom: 0px;
+                bottom: 10px;
                 left: 50%;
                 transform: translateX(-50%);
                 border-bottom: $direction-border;
@@ -161,8 +189,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='to bottom left'] {
-                left: 0px;
-                bottom: 0px;
+                left: 10px;
+                bottom: 10px;
                 border-left: $direction-border;
                 border-bottom: $direction-border;
 
@@ -176,7 +204,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             &[data-value='to left'] {
                 top: 50%;
-                left: 0px;
+                left: 10px;
                 transform: translateY(-50%);
                 border-left: $direction-border;
 
@@ -189,8 +217,8 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='to top left'] {
-                top: 0px;
-                left: 0px;
+                top: 10px;
+                left: 10px;
                 border-left: $direction-border;
                 border-top: $direction-border;
 
@@ -204,7 +232,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             /* radial */ 
             &[data-value='top'] {
-                top: 0px;
+                top: 10px;
                 left: 50%;
                 transform: translateX(-50%);
                 border-top: $direction-border;
@@ -219,7 +247,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             &[data-value='right'] {
                 top: 50%;
-                right: 0px;
+                right: 10px;
                 transform: translateY(-50%);
                 border-right: $direction-border;
 
@@ -233,7 +261,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
 
             &[data-value='bottom'] {
-                bottom: 0px;
+                bottom: 10px;
                 left: 50%;
                 transform: translateX(-50%);
                 border-bottom: $direction-border;
@@ -248,7 +276,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
 
             &[data-value='left'] {
                 top: 50%;
-                left: 0px;
+                left: 10px;
                 transform: translateY(-50%);
                 border-left: $direction-border;
 
@@ -262,5 +290,273 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }
         }
     }
+
+    $editor-line-color: #b3b3b3;
+    $editor-resizer-width : 10px;
+    $editor-half-width: -6px;    
+
+    .predefined-page-resizer {
+        display: none;
+        text-align: center;
+        pointer-events: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: 10;
+        border:2px solid $editor-line-color;
+        box-sizing: border-box;               
+
+        button {
+            padding: 0px;
+            background-color: rgba($editor-line-color, 0.2);
+            border: 1px solid $editor-line-color;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            position: absolute;
+            display: inline-block;
+            box-sizing: border-box;
+            width: $editor-resizer-width;
+            height: $editor-resizer-width;
+            pointer-events: all;
+
+            &:hover {
+                background-color: rgba($editor-line-color, 0.5);
+            }
+
+            /* linear */
+           /* linear */
+           &[data-value='to top'] {
+                top: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: n-resize;
+            }
+
+            &[data-value='to top right'] {
+                top: $editor-half-width;
+                right: $editor-half-width;
+                cursor: ne-resize;                
+            }
+
+            &[data-value='to right'] {
+                top: 50%;
+                right: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: e-resize;                
+            }
+
+            &[data-value='to bottom right'] {
+                bottom: $editor-half-width;
+                right: $editor-half-width;
+                cursor: se-resize;                
+            }
+
+            &[data-value='to bottom'] {
+                bottom: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: s-resize;                
+            }
+
+            &[data-value='to bottom left'] {
+                left: $editor-half-width;
+                bottom: $editor-half-width;
+                cursor: sw-resize;                
+            }
+
+            &[data-value='to left'] {
+                top: 50%;
+                left: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: w-resize;                
+            }
+
+            &[data-value='to top left'] {
+                top: $editor-half-width;
+                left: $editor-half-width;
+                cursor: nw-resize;                
+            }
+
+        }
+    }  
+
+    $editor-line-color: #5f80de;
+
+
+    .predefined-layer-resizer {
+        display: none;
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        border:2px solid $editor-line-color;
+        box-sizing: border-box;      
+        
+        .guide-horizontal {
+            position: absolute;
+            width: 1px; 
+            left: 50%;
+            transform: translateX(-50%);
+            top: -10px;
+            bottom: -10px;
+            background-color: $editor-line-color; 
+            display: none;
+        }
+
+        .guide-vertical {
+            position: absolute;
+            height: 1px; 
+            top: 50%;
+            transform: translateY(-50%);
+            left: -10px;
+            right: -10px;
+            background-color: $editor-line-color; 
+            display: none;            
+        }        
+
+        button {
+            pointer-events: all;
+            padding: 0px;
+            background-color: rgba($editor-line-color, 0.2);
+            border: 1px solid $editor-line-color;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            position: absolute;
+            display: inline-block;
+            box-sizing: border-box;
+            width: $editor-resizer-width;
+            height: $editor-resizer-width;
+
+            &:hover {
+                background-color: rgba($editor-line-color, 0.5);
+            }
+
+            /* linear */
+            &[data-value='to top'] {
+                top: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: n-resize;
+            }
+
+            &[data-value='to top right'] {
+                top: $editor-half-width;
+                right: $editor-half-width;
+                cursor: ne-resize;                
+            }
+
+            &[data-value='to right'] {
+                top: 50%;
+                right: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: e-resize;                
+            }
+
+            &[data-value='to bottom right'] {
+                bottom: $editor-half-width;
+                right: $editor-half-width;
+                cursor: se-resize;                
+            }
+
+            &[data-value='to bottom'] {
+                bottom: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: s-resize;                
+            }
+
+            &[data-value='to bottom left'] {
+                left: $editor-half-width;
+                bottom: $editor-half-width;
+                cursor: sw-resize;                
+            }
+
+            &[data-value='to left'] {
+                top: 50%;
+                left: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: w-resize;                
+            }
+
+            &[data-value='to top left'] {
+                top: $editor-half-width;
+                left: $editor-half-width;
+                cursor: nw-resize;                
+            }
+
+            &[data-value='to move'] {
+                left: 50%;
+                top: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                cursor: move;                
+            }            
+
+            &[data-value='layer rotate'] {
+                width: 20px;
+                height: 20px;
+                left: 50%;
+                top: -60px;
+                transform: translateX(-50%);
+                background-color: rgba(255, 255, 255, 0.5);
+                box-sizing: border-box;
+                border-radius: 50%;          
+
+                &:before {
+                    position: absolute;
+                    content: "";
+                    left: 50%;
+                    top: 50%;
+                    width: 10px;
+                    height: 10px;
+                    transform: translateX(-50%) translateY(-50%);
+                    box-sizing: border-box;
+                    border-radius: 50%;
+                    border: 1px solid rgba(0, 0, 0, 0.8);
+                    
+                }
+            }
+
+            &[data-value='radius top left'], 
+            &[data-value='radius top right'], 
+            &[data-value='radius bottom left'], 
+            &[data-value='radius bottom right'] {
+                background-color: rgba(255, 255, 0, 0.637); 
+                border: 1px solid rgb(131, 131, 26); 
+                border-radius: 50%;
+            }
+
+            &[data-value='radius top left'] {
+                top: $editor-half-width * 3; 
+                left: $editor-half-width;
+                transform: translateX(-50%);
+            }
+            &[data-value='radius top right'] {
+                top: $editor-half-width * 4.5; 
+                right: $editor-half-width;
+                transform: translateX(50%);
+            }
+
+            &[data-value='radius bottom left'] {
+                bottom: $editor-half-width * 3; 
+                left: $editor-half-width;
+                transform: translateX(-50%);                
+            }
+            &[data-value='radius bottom right'] {
+                bottom: $editor-half-width * 4.5; 
+                right: $editor-half-width;
+                transform: translateX(50%);                
+            }            
+
+
+
+        }
+    }      
 
 }

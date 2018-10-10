@@ -1,70 +1,191 @@
-
 import GradientAngle from '../../view/GradientAngle'
 import GradientPosition from '../../view/GradientPosition' 
 import PredefinedLinearGradientAngle from '../../view/PredefinedLinearGradientAngle'
 import PredefinedRadialGradientPosition from '../../view/PredefinedRadialGradientPosition'
-import GradientType from './GradientType';
 import GradientLayersMenu from './GradientLayersMenu'; 
 import BaseTab from '../../BaseTab';
+import PredefinedPageResizer from '../../view/PredefinedPageResizer';
+import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
 
+import LayerMenuTab from './LayerMenuTab'; 
+import { EDITOR_MODE_IMAGE_IMAGE, EDITOR_MODE_IMAGE_LINEAR, EDITOR_MODE_IMAGE_RADIAL, EDITOR_MODE_IMAGE_STATIC } from '../../../module/ItemManager';
+   
 
 export default class GradientView extends BaseTab {
 
     template () {
         return `
-        <div class="tab editor-tab">
-            <div class="tab-header" ref="$header">
-                <div class="tab-item selected" data-id="editor">Editor</div>
-            </div>
-            <div class="tab-body" ref="$body">
-                <div class="tab-content selected" data-id="editor">
-                    <div class='gradient-view'>
-                        <GradientLayersMenu></GradientLayersMenu>
-                        <div class="gradient-color-view-container"></div>
-                        <div class="gradient-color-view" ref="$colorview"></div>
-                        <div class="gradient-color-view" ref="$colorviewOnly"></div>
-                        <GradientAngle></GradientAngle>   
-                        <GradientPosition></GradientPosition>             
-                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
-                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
-                        <GradientType></GradientType>                
+            <div class='page-view'>
+
+                <div class='page-content'>
+                    <div class="gradient-color-view-container" ref="$page">
+                        <div class="gradient-color-view" ref="$colorview"></div>            
+                        <PredefinedPageResizer></PredefinedPageResizer>
+                        <PredefinedLayerResizer></PredefinedLayerResizer>
                     </div>
+                    <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
+                    <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
+                    <GradientPosition></GradientPosition>
+                    <GradientAngle></GradientAngle>                    
+                </div>
+                <div class="page-menu">
+                    <LayerMenuTab></LayerMenuTab>
                 </div>
             </div>
-        </div>        
-
         `
     } 
 
     components () {
-        return { GradientAngle, GradientPosition, PredefinedLinearGradientAngle, PredefinedRadialGradientPosition, GradientType, GradientLayersMenu }
+        return {  
+            GradientAngle, 
+            GradientPosition, 
+            PredefinedLinearGradientAngle, 
+            PredefinedRadialGradientPosition, 
+            GradientLayersMenu,
+            PredefinedPageResizer,
+            PredefinedLayerResizer,
+            LayerMenuTab
+        }
+    }
+
+    'load $colorview' () {
+        var page = this.read('/item/current/page')
+
+        if (!page) {
+            return ''; 
+        }
+
+        var editMode = this.read('/item/get/editMode');
+
+        return this.read('/item/map/children', page.id, (item) => {
+
+            switch (editMode) {
+            case EDITOR_MODE_IMAGE_IMAGE:
+            case EDITOR_MODE_IMAGE_LINEAR:
+            case EDITOR_MODE_IMAGE_RADIAL:
+            case EDITOR_MODE_IMAGE_STATIC:
+
+                var image = this.read('/item/current/image')
+
+                if (image.parentId == item.id) {
+                    return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/image/toString', item, image)}'></div>`
+                }
+            }
+
+            return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item)}'></div>`
+        });
     }
 
     refresh () {
-        this.setBackgroundColor()
+        this.setBackgroundColor();
+        this.load();
+
+    }
+
+    makePageCSS (page) {
+        return Object.assign({
+            overflow: page.clip ? 'hidden' : ''
+        }, page.style || {});
     }
  
     setBackgroundColor() {
 
-        if (this.read('/tool/get', 'guide.only')) {
-            this.refs.$colorview.hide()
-            this.refs.$colorviewOnly.show();
-            this.refs.$colorviewOnly.css(this.read('/image/toCSS'))
-        } else {
-            this.refs.$colorviewOnly.hide(); 
-            this.refs.$colorview.show();
-            this.refs.$colorview.css(this.read('/layer/toCSS'))
+        var page = this.read('/item/current/page');
+        this.refs.$page.css(this.makePageCSS(page))
+
+        var item = this.read('/item/current/page')
+
+        this.refs.$page.toggle(item)
+
+        if (item) {
+            if (item.itemType == 'page') {
+                var list = this.read('/item/list/children', item.id);
+                this.refs.$colorview.toggle(list.length)
+            }
         }
+        
 
     }
 
-    '@changeLayer' () {
-        this.refresh() 
+    '@changeEditor' () {
+        this.refresh();
     }
-
-    '@initLayer' () { this.refresh() }    
 
     '@changeTool' () {
         this.refresh()
+    }
+
+    checkPage (e) {
+        return e.target == this.refs.$colorview.el;
+    }
+
+    'click.checkPage $colorview' (e) {
+        var page = this.read('/item/current/page')
+        if (page) {
+            this.dispatch('/item/select', page.id)
+        }
+        
+    }
+
+    'click $page .layer' (e) {
+        var id = e.$delegateTarget.attr('item-id')
+        if (id) {
+            this.dispatch('/item/select', id);
+            this.dispatch('/item/select/mode', 'layer')
+        }
+    }
+
+    'click.self $el .page-content' (e) {
+        this.dispatch('/item/select/mode', 'board');
+    }
+
+    'pointerstart $page .layer' (e) {
+        this.isDown = true; 
+        this.xy = e.xy;
+        this.layer = this.read('/item/get', e.$delegateTarget.attr('item-id'))
+        this.moveX = +(this.layer.style.x || 0).replace('px', '')
+        this.moveY = +(this.layer.style.y || 0).replace('px', '')
+
+        this.dispatch('/item/select', this.layer.id)
+    }
+
+    change (style1 = {}, style2 = {}) {
+
+        let style = Object.assign({}, style1, style2);
+
+        Object.keys(style).forEach(key => {
+            style[key] = style[key] + 'px' 
+        })
+
+        var item = this.layer
+
+        item.style = Object.assign(item.style, style);
+
+        this.dispatch('/item/set', item);
+        this.refresh();
+    }
+
+
+    moveXY (dx, dy) {
+        var x = this.moveX + dx; 
+        var y = this.moveY + dy; 
+
+        console.log(x, y)
+
+        this.change({x, y})
+    }    
+
+
+    'pointermove document' (e) {
+        if (this.isDown) {
+            this.targetXY = e.xy;
+
+            this.moveXY(this.targetXY.x - this.xy.x, this.targetXY.y - this.xy.y)
+        }
+    }
+
+    'pointerend document' (e) {
+        this.isDown = false; 
+        this.layer = null;
     }
 }

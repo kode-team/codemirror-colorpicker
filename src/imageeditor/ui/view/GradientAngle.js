@@ -1,14 +1,15 @@
 import {getXYInCircle, caculateAngle} from '../../../util/functions/math'
-import Event from '../../../util/Event'
 import UIElement from '../../../colorpicker/UIElement';
 
 export default class GradientAngle extends UIElement {
 
     template () {
         return `
-            <div class="drag-angle">
-                <div ref="$angleText" class="angle-text"></div>
-                <div ref="$dragPointer" class="drag-pointer"></div>
+            <div class='drag-angle-rect'>
+                <div class="drag-angle" ref="$dragAngle">
+                    <div ref="$angleText" class="angle-text"></div>
+                    <div ref="$dragPointer" class="drag-pointer"></div>
+                </div>
             </div>
         `
     }
@@ -25,18 +26,28 @@ export default class GradientAngle extends UIElement {
     }
 
     isShow () {
-        return this.read('/image/isLinearType') && this.read('/tool/get', 'guide.angle')
+        if (!this.read('/item/is/mode', 'image')) return false; 
+
+        var item = this.read('/item/current/image')
+
+        if (!item) return false; 
+
+        if (!this.read('/image/type/isLinear', item.type)) {
+            return false; 
+        }
+
+        return this.read('/tool/get', 'guide.angle')
     }
 
     getCurrentXY(e, angle, radius, centerX, centerY) {
-        return e ? Event.posXY(e) : getXYInCircle(angle, radius, centerX, centerY)
+        return e ? e.xy : getXYInCircle(angle, radius, centerX, centerY)
     }
 
     getRectangle () {
-        var width = this.state.get('$el.width');  
-        var height = this.state.get('$el.height');  
+        var width = this.refs.$dragAngle.width();  
+        var height = this.refs.$dragAngle.height();  
         var radius = Math.floor(width/2 * 0.7); 
-        var {left, top} = this.state.get('$el.offset');
+        var {left, top} = this.refs.$dragAngle.offset();
         var minX = left; 
         var minY = top; 
         var centerX = minX + width / 2;
@@ -46,7 +57,7 @@ export default class GradientAngle extends UIElement {
     }    
 
     getDefaultValue() {
-        return this.read('/image/get', 'angle') - 90
+        return this.read('/item/current/image').angle - 90
     }
 
     refreshAngleText (angleText) {
@@ -72,16 +83,27 @@ export default class GradientAngle extends UIElement {
         this.refreshAngleText (lastAngle)
 
         if (e) {
-            this.dispatch('/image/setAngle', lastAngle);
+
+            this.setAngle (lastAngle)
         }
 
     }
 
-    '@changeLayer' () {
-        this.refresh()
+    setAngle (angle) {
+
+        var item = this.read('/item/current/image')
+
+        if (!item) return; 
+
+        item.angle = angle; 
+
+        this.dispatch('/item/set', item);
+
     }
 
-    '@initLayer' () { this.refresh() }    
+    '@changeEditor' () {
+        this.refresh()
+    } 
 
     '@changeTool' () {
         this.$el.toggle(this.isShow())

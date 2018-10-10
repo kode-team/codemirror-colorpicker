@@ -1,7 +1,7 @@
 $pointer-color: rgba(#ececec, 0.8);
 $direction-border: 2px solid $pointer-color;
-$layer-item-height: 50px;
-$button-size: 24px;
+$blend-item-height: 120px;
+$blend-item-width: 120px;
 $layer-item-padding: 8px;
 
 .blend-row {
@@ -22,21 +22,18 @@ $layer-item-padding: 8px;
         top: 1px;
         bottom: 0px;
         box-sizing: border-box;
-        overflow-x: scroll;
-        overflow-y: hidden;
-        white-space: nowrap;        
+        overflow-x: auto;
+        white-space: nowrap;
 
         .blend-item {
             display: inline-block;
-            height: $layer-item-height;            
-            box-sizing: border-box;
+            height: $blend-item-height;      
+            width: $blend-item-width;      
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            border: 10px solid #dedede;
-            padding: 5px;
-            width: 225px;
-            height: 164px;
+            border: 2px solid #dedede;
+            margin:2px;
 
             &.selected {
                 border-color: #000000;                

@@ -1,0 +1,102 @@
+$pointer-color: rgba(#ececec, 0.8);
+$direction-border: 2px solid $pointer-color;
+$page-item-height: 30px;
+$button-size: 24px;
+$layer-item-padding: 4px;
+
+.pages {
+    border-top: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
+    box-sizing: border-box;
+    position: relative;
+    height: 50px;
+
+    button {
+        appearance: none;
+        width: auto;
+        height: $button-size;
+        box-sizing: border-box;
+        border: 1px solid #dedede;
+        vertical-align: middle;
+        font-size: 12px;
+        cursor: pointer;
+        outline: none;
+        position: relative;
+        pointer-events: all;
+    }
+
+    .page-list {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
+        overflow: auto; 
+        padding: 3px;
+        
+        button {
+            display: inline-block;
+            height: $page-item-height;            
+            vertical-align: middle;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            padding: 5px;
+            min-width: 80px;
+            margin-right: 5px;
+            text-align: center;
+        }
+
+        .tree-item {
+            display: inline-block;
+            height: $page-item-height;            
+            vertical-align: middle;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            padding: 5px;
+            min-width: 100px;
+            margin-right: 5px;
+            text-align: center;
+
+            &.selected {
+                background-color: #ececec;
+                .item-tools {
+                    visibility: visible;
+                }
+            }
+
+            .item-view-container {
+                position: relative; 
+                // @include transparent-background();
+                pointer-events: none;
+                display: inline-block;
+                vertical-align: middle;
+                box-sizing: border-box;
+                height: 100%;
+                width: 25px;
+                border: 1px solid #ececec;
+
+                .item-view {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    right: 0px;
+                    bottom: 0px;
+                }
+            }
+
+            .item-title {
+                display: inline-block;
+                font-size: 12px;
+                pointer-events: none;
+            }
+
+
+        }
+
+    }
+
+}

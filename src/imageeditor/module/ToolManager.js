@@ -14,16 +14,20 @@ export default class ToolManager extends BaseModule {
         }
     } 
 
-    '/clone' ($store, object) {
+    '*/clone' ($store, object) {
         return JSON.parse(JSON.stringify(object))
     }
 
-    '/tool/setColorSource' ($store, colorSource) {
-        $store.tool.colorSource = colorSource;
+    '*/tool/colorSource' ($store) {
+        return $store.tool.colorSource
     }
 
-    '/tool/colorSource' ($store) {
-        return $store.tool.colorSource
+    '*/tool/get' ($store, key, defaultValue) {
+        return typeof $store.tool[key] == 'undefined' ? defaultValue : $store.tool[key]
+    }    
+
+    '/tool/setColorSource' ($store, colorSource) {
+        $store.tool.colorSource = colorSource;
     }
 
     '/tool/changeColor' ($store, color) {
@@ -39,9 +43,6 @@ export default class ToolManager extends BaseModule {
         $store.emit('changeTool')
     }
 
-    '/tool/get' ($store, key, defaultValue) {
-        return typeof $store.tool[key] == 'undefined' ? defaultValue : $store.tool[key]
-    }
 
     '/tool/toggle' ($store, key, isForce) {
         if (typeof isForce == 'undefined') {

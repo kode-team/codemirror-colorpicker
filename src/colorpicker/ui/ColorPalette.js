@@ -29,8 +29,6 @@ export default class ColorPalette extends UIElement {
         var width = this.$el.width();
         var height = this.$el.height();
 
-        // console.log(width, height, this.$el.size());
-
         var s = (pos.x / width);
         var v = ((height - pos.y) / height);
 
@@ -50,7 +48,7 @@ export default class ColorPalette extends UIElement {
     
         this.drag_pointer_pos = { x , y };
 
-        this.setBackgroundColor(this.dispatch('/getHueColor'))
+        this.setBackgroundColor(this.read('/getHueColor'))
     }
 
 
