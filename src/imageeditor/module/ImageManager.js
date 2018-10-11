@@ -168,8 +168,6 @@ export default class ImageManager extends BaseModule {
     '*/image/toLinear' ($store, image = {}) {
         var colors = $store.read('/image/toItemString', image)
 
-        console.log(colors);
-
         if (colors == '') return '' 
 
         var opt = ''

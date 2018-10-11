@@ -9741,8 +9741,6 @@ var ImageManager = function (_BaseModule) {
 
             var colors = $store.read('/image/toItemString', image);
 
-            console.log(colors);
-
             if (colors == '') return '';
 
             var opt = '';
