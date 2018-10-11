@@ -3,7 +3,9 @@ import PageList from '../ui/layer/PageList';
 import FeatureControl from '../ui/control/FeatureControl';
 import GradientView from '../ui/control/image/GradientView';
 
+
 import LayerList from '../ui/layer/LayerList';
+import SubFeatureControl from '../ui/control/SubFeatureControl';
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -25,7 +27,7 @@ export default class XDImageEditor extends BaseImageEditor {
                     <FeatureControl></FeatureControl>
                 </div>
                 <div class="layout-footer">
-                
+                    <SubFeatureControl></SubFeatureControl>
                 </div>
             </div>
         `
@@ -33,7 +35,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
-            GradientView, PageList,FeatureControl, LayerList
+            GradientView, PageList,FeatureControl, LayerList, SubFeatureControl
         }
     } 
 }

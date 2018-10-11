@@ -11,44 +11,40 @@ export default class Transform extends UIElement {
                         <div>
                             <input type='number' ref="$rotate"> <span>deg</span>
                         </div>
-                    </div>
+                        <label>Scale</label>
+                        <div>
+                            <input type='number' ref="$scale" min="0.5" max="10.0" step="0.1"> <span></span>
+                        </div>
+                    </div>                      
                     <div>
                         <label>SkewX</label>
                         <div>
                             <input type='number' ref="$skewX"> <span>deg</span>
                         </div>
-                    </div>  
-                    <div>
                         <label>SkewY</label>
                         <div>
                             <input type='number' ref="$skewY"> <span>deg</span>
                         </div>
                     </div>     
-                    <div>
-                        <label>Scale</label>
-                        <div>
-                            <input type='number' ref="$scale" min="0.5" max="10.0" step="0.1"> <span></span>
-                        </div>
-                    </div>     
+   
                     <div>
                         <label>translateX</label>
                         <div>
                             <input type='number' ref="$translateX"> <span>px</span>
                         </div>
-                    </div>     
-                    <div>
                         <label>translateY</label>
                         <div>
                             <input type='number' ref="$translateY"> <span>px</span>
                         </div>
                     </div>                                                         
                     
+                    <!--
                     <div>
                         <label>translateZ</label>
                         <div>
                             <input type='number' ref="$translateZ"> <span>px</span>
                         </div>
-                    </div>                                                                             
+                    </div>   -->                                                                          
                 </div>
             </div>
         `

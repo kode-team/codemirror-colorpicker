@@ -34,6 +34,9 @@ export default class GradientManager extends BaseModule {
             var image = $store.read('/item/current/image')
 
             if (image) {
+
+                $store.run('/item/remove/children', image.id);
+
                 image = Object.assign({}, image, obj);
 
                 if (image.colorsteps) {
@@ -41,8 +44,8 @@ export default class GradientManager extends BaseModule {
                         step.parentId = image.id; 
                         $store.read('/item/create/colorstep', step);
                     })
-
-                    delete image.colorsteps; 
+                    // 기존 데이타를 변경 후에 colorsteps 는 지운다. 
+                    delete image.colorsteps;
                 }
 
                 $store.dispatch('/item/set', image);

@@ -75,7 +75,7 @@ export default class ImageManager extends BaseModule {
     }    
 
     '*/image/angle' ($store, angle = '') {
-        return DEFINED_ANGLES[angle] || angle || $store.read('/image/get', 'angle');
+        return typeof DEFINED_ANGLES[angle] == 'undefined' ? angle : (DEFINED_ANGLES[angle] || 0);
     }
 
     '*/image/radialPosition' ($store, position = '') {
@@ -86,10 +86,20 @@ export default class ImageManager extends BaseModule {
 
         var results = {} 
         var backgroundImage = $store.read('/image/toImageString', image)
+        var backgroundSize = $store.read('/image/toBackgroundSizeString', image)
+        var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image)
 
         if (backgroundImage) {
             results['background-image'] = backgroundImage;  // size, position, origin, attachment and etc 
         }
+
+        if (backgroundSize) {
+            results['background-size'] = backgroundSize;
+        }
+
+        if (backgroundRepeat) {
+            results['background-repeat'] = backgroundRepeat;
+        }        
 
         return results
     }
@@ -118,6 +128,20 @@ export default class ImageManager extends BaseModule {
         }
     }
 
+    '*/image/toBackgroundSizeString' ($store, image) {
+        if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
+            return [image.backgroundSizeWidth, image.backgroundSizeHeight].join(' ')
+        } else if (image.backgroundSizeWidth) {
+            return image.backgroundSizeWidth;
+        }
+    }   
+    
+    '*/image/toBackgroundRepeatString' ($store, image) {
+        if (image.backgroundRepeat) {
+            return image.backgroundRepeat;
+        }
+    }       
+
     '*/image/toItemString' ($store, image = undefined ) {
 
         if (!image) return '';
@@ -143,6 +167,8 @@ export default class ImageManager extends BaseModule {
 
     '*/image/toLinear' ($store, image = {}) {
         var colors = $store.read('/image/toItemString', image)
+
+        console.log(colors);
 
         if (colors == '') return '' 
 

@@ -97,12 +97,11 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         display: none;
         text-align: center;
         position: absolute;
-        pointer-events: none;
-        bottom: 20px;
+        // pointer-events: none;
+        bottom: 10px;
         width: 200px;
         height: 200px;
-        left: 50%;
-        transform: translateX(-50%);
+        right: 10px;
         background-color: rgba(0, 0, 0, 0.2);
 
         button {
@@ -573,7 +572,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             }            
 
 
-
+ 
         }
     }      
 

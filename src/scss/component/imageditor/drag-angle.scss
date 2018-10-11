@@ -4,11 +4,11 @@ $pointer-color: rgba(#ececec, 0.8);
 .drag-angle-rect {
     position: absolute;
     display: none;
-    bottom: 20px;
+    bottom: 10px;
     width: 200px;
     height: 200px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 10px;
+    pointer-events: none;
 
     .drag-angle {
         display:inline-block;
@@ -23,6 +23,7 @@ $pointer-color: rgba(#ececec, 0.8);
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
+        pointer-events: all;
     
         .drag-pointer {
             position: absolute;

@@ -2,11 +2,15 @@ import BaseModule from "../../colorpicker/BaseModule";
 import { uuid } from "../../util/functions/math";
 import Dom from "../../util/Dom";
 
+const INDEX_DIST = 100 ; 
+const COPY_INDEX_DIST = 1; 
+const NONE_INDEX = -99999;
 
 const PAGE_DEFAULT_OBJECT = {
     itemType: 'page',
     name: '',
     parentId: '',
+    index: 0,
     style: {
         width: '200px',
         height: '200px'
@@ -17,6 +21,7 @@ const PAGE_DEFAULT_OBJECT = {
 const LAYER_DEFAULT_OBJECT = {
     itemType: 'layer',
     name: '',
+    index: 0,    
     backgroundColor: '',
     backgroundBlendMode: 'normal',
     parentId: '',
@@ -33,6 +38,7 @@ const LAYER_DEFAULT_OBJECT = {
 const IMAGE_DEFAULT_OBJECT = {
     itemType: 'image',
     type: 'static',
+    index: 0,    
     parentId: '',    
     angle: 90,
     color: 'red',
@@ -101,7 +107,28 @@ export default class ItemManager extends BaseModule {
     }
     
     '*/item/create/image' ($store, obj = {}) {
-        return $store.read('/item/create/object', obj, IMAGE_DEFAULT_OBJECT);
+
+        var imageId = $store.read('/item/create/object', obj, IMAGE_DEFAULT_OBJECT);
+
+        if (obj.type == 'static') {
+ 
+        } else if (obj.type == 'image') {
+
+        } else if (obj.type == 'linear') {
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100});
+        } else if (obj.type == 'radial') {
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100});
+        } else if (obj.type == 'repeating-linear') {
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10});
+        } else if (obj.type == 'repeating-radial') {
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10});
+        }
+
+        return imageId; 
     }    
 
     '*/item/create/colorstep' ($store, obj = {}) {
@@ -197,7 +224,13 @@ export default class ItemManager extends BaseModule {
     }
 
     '*/item/list' ($store, filterCallback) {
-        return $store.read('/item/keys').filter(filterCallback)
+        var list = $store.read('/item/keys').filter(filterCallback)
+
+        list.sort( (a, b) => {
+            return $store.items[a].index > $store.items[b].index ? 1 : -1;
+        })
+
+        return list; 
     }
 
     '*/item/filter' ($store, filterCallback) {
@@ -208,7 +241,7 @@ export default class ItemManager extends BaseModule {
         return $store.read('/item/filter', function (id) {
             return $store.items[id].itemType == 'page'
         });
-    }
+    } 
 
     '*/item/map/page' ($store, callback) {
         return $store.read('/item/filter', function (id) {
@@ -325,10 +358,56 @@ export default class ItemManager extends BaseModule {
 
     '/item/remove' ($store, id) {
         if (id) {
-            delete $store.items[id];
-        } else {
-            $store.items = {} 
+
+            var item = $store.read('/item/get', id);
+
+            if (item.parentId) {
+                var list = $store.read('/item/list/children', item.parentId);
+            } else {
+                var list = $store.read('/item/list/page');
+            }
+
+            var nextSelectedId = '' 
+            for(var i = 0, len = list.length; i < len; i++) {
+                var nodeId = list[i]
+                if ($store.items[id].index > item.index) {
+                    nextSelectedId = nodeId; 
+                    break;
+                }
+            }
+
+            if (nextSelectedId) {
+                $store.run('/item/select', nextSelectedId)
+            } else {
+                if (item.index > 0 ) {
+                    for(var i = 0, len = list.length; i < len; i++) {
+                        var nodeId = list[i]
+                        if ($store.items[nodeId].index == item.index - INDEX_DIST) {
+                            nextSelectedId = nodeId; 
+                            break;
+                        }
+                    }
+
+                    if (nextSelectedId) {
+                        $store.run('/item/select', nextSelectedId)
+                    }                        
+                } else {
+                    $store.run('/item/select', item.parentId)
+                }
+            }
+
+
+            $store.items[id].index = NONE_INDEX;
+            $store.read('/item/sort', id);
+
+            delete $store.items[id]
         }
+    }
+
+    '/item/remove/children' ($store, parentId) {
+        $store.read('/item/each/children', parentId, (item) => {
+            $store.run('/item/remove', item.id);
+        })
     }
 
     '/item/select' ($store, selectedId) {
@@ -416,6 +495,18 @@ export default class ItemManager extends BaseModule {
         if (isSelected) $store.run('/item/select', id)
     }
 
+    '*/item/add/index' ($store, id, dist = INDEX_DIST) {
+        return $store.items[id].index + dist;
+    }
+
+    '*/item/next/index' ($store, id) {
+        return $store.read('/item/add/index', id, INDEX_DIST + COPY_INDEX_DIST);
+    }    
+
+    '*/item/prev/index' ($store, id) {
+        return $store.read('/item/add/index', id, -1 * (INDEX_DIST + COPY_INDEX_DIST));
+    }        
+
     '/item/add' ($store, itemType, isSelected = false, parentId = '') {
         var id = $store.read('/item/create', itemType);
         var item = $store.read('/item/get', id);
@@ -427,31 +518,93 @@ export default class ItemManager extends BaseModule {
             item.style = Object.assign(item.style, page.style)
         }
 
+        item.index = Number.MAX_SAFE_INTEGER; 
+
         $store.run('/item/set', item, isSelected);
+        $store.run('/item/sort', item.id)
     }
+
+    '/item/add/image' ($store, imageType, isSelected = false, parentId = '') {
+        var id = $store.read('/item/create/image', { type : imageType });
+        var item = $store.read('/item/get', id);
+        item.type = imageType; 
+        item.parentId = parentId; 
+        item.index = Number.MAX_SAFE_INTEGER; 
+
+        $store.run('/item/set', item, isSelected);
+        $store.run('/item/sort', id); 
+    }    
 
     '/item/add/page' ($store, isSelected = false) {
         var pageId = $store.read('/item/create', 'page');        
         var layerId = $store.read('/item/create', 'layer');
         var imageId = $store.read('/item/create', 'image');
 
+        // 페이지 생성 
         var page = $store.read('/item/get', pageId);
+        page.index = Number.MAX_SAFE_INTEGER;  
         $store.run('/item/set', page);
 
+        // 레이어 생성 
         var layer = $store.read('/item/get', layerId);
         layer.parentId = pageId; 
 
         layer.style = Object.assign({}, layer.style, page.style)        
         $store.run('/item/set', layer);
 
+        // 이미지 생성 
         var image = $store.read('/item/get', imageId);
         image.parentId = layerId; 
         $store.run('/item/set', image, isSelected);        
     }
 
     '/item/addCopy' ($store, id, isSelected = false) {
-        id = $store.read('/item/copy', id)
-        $store.run('/item/set', $store.read('/item/get', id), isSelected);
+        var copyId = $store.read('/item/copy', id)
+
+        var copyItem = $store.read('/item/get', copyId);
+        copyItem.index = Number.MAX_SAFE_INTEGER; 
+
+        $store.run('/item/set', copyItem, copyItem.selected || isSelected);
+        $store.run('/item/sort', copyId);
+    }
+
+    '/item/move/next' ($store, id) {
+        var item = $store.read('/item/get', id);
+        item.index = $store.read('/item/next/index', id);
+
+        $store.run('/item/set', item, item.selected);
+        $store.run('/item/sort', id);
+    }
+
+    '/item/move/prev' ($store, id) {
+        var item = $store.read('/item/get', id);
+        item.index = $store.read('/item/prev/index', id);
+
+        $store.run('/item/set', item, item.selected);
+        $store.run('/item/sort', id);
+    }
+
+    '/item/sort' ($store, id) {
+        var item = $store.read('/item/get', id);
+
+        if (item.parentId) {
+            var list = $store.read('/item/list/children', item.parentId);
+        } else {
+            var list = $store.read('/item/list/page');
+        }
+
+        // 필요 없는 index 를 가진 객체는 지운다. 
+        list = list.filter(id => {
+            return $store.items[id].index != NONE_INDEX
+        });
+
+        list.sort( (a, b) => {
+            return $store.items[a].index > $store.items[b].index ? 1 : -1;
+        })
+
+        list.forEach((id, index) => {
+            $store.items[id].index = index * INDEX_DIST
+        })
     }
 
     '/item/set/parent' ($store, id, parentId) {

@@ -15,7 +15,13 @@ export default class Transform3d extends UIElement {
                                 <input type='number' ref="$rotate3dZ"> 
                                 <input type='number' ref="$rotate3dA"> 
                             </div>
-                            <div class-'input-text'>
+                        </div>
+                    </div>
+                    <div>
+                        <label></label>
+                        <div>
+                            
+                            <div class='input-text'>
                                 <span>X</span>
                                 <span>Y</span>
                                 <span>Z</span>
@@ -31,7 +37,12 @@ export default class Transform3d extends UIElement {
                                 <input type='number' ref="$scale3dY"> 
                                 <input type='number' ref="$scale3dZ"> 
                             </div>
-                            <div class-'input-text'>
+                        </div>
+                    </div>
+                    <div>
+                        <label></label>
+                        <div>
+                            <div class='input-text'>
                                 <span>X</span>
                                 <span>Y</span>
                                 <span>Z</span>
@@ -39,14 +50,19 @@ export default class Transform3d extends UIElement {
                         </div>
                     </div>
                     <div>
-                        <label>Translate 3D</label>
+                        <label>Translate3D</label>
                         <div>
                             <div class='input'> 
                                 <input type='number' ref="$translate3dX"> 
                                 <input type='number' ref="$translate3dY"> 
                                 <input type='number' ref="$translate3dZ"> 
                             </div>
-                            <div class-'input-text'>
+                        </div>
+                    </div>
+                    <div>
+                        <label></label>                            
+                        <div>
+                            <div class='input-text'>
                                 <span>X</span>
                                 <span>Y</span>
                                 <span>Z</span>

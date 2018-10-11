@@ -57,7 +57,11 @@ export default class GradientAngle extends UIElement {
     }    
 
     getDefaultValue() {
-        return this.read('/item/current/image').angle - 90
+        var image = this.read('/item/current/image');
+        if (!image) return 0 
+
+        var angle = this.read('/image/angle', image.angle) 
+        return angle - 90
     }
 
     refreshAngleText (angleText) {
@@ -91,13 +95,11 @@ export default class GradientAngle extends UIElement {
 
     setAngle (angle) {
 
-        var item = this.read('/item/current/image')
+        this.read('/item/current/image', (item) => {
+            item.angle = angle; 
 
-        if (!item) return; 
-
-        item.angle = angle; 
-
-        this.dispatch('/item/set', item);
+            this.dispatch('/item/set', item);
+        })
 
     }
 
@@ -125,7 +127,7 @@ export default class GradientAngle extends UIElement {
         this.isDown = true; 
     }
 
-    'pointerstart $el' (e) {
+    'pointerstart $dragAngle' (e) {
         this.isDown = true; 
         this.refreshUI(e);        
     }     

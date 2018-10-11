@@ -33,85 +33,6 @@ $typetool-size: 34px;
         font-size: 12px;
     }
 
-    .gradient-type {
-
-        display: inline-block;
-        vertical-align: top;
-
-        .gradient-item {
-            display: inline-block;
-            width: $typetool-size;
-            height: $typetool-size;
-            box-sizing: border-box;
-            border: 3px solid #ececec;
-            cursor: pointer;
-            position: relative;
-            pointer-events: all;
-
-            &:first-child {
-                margin-right: 1px; 
-            }
-
-            &.selected {
-                border-color: black;
-            }
-
-            &.static {
-                background-image: linear-gradient(to right, #333, #333);
-            }
-
-            &.linear {
-                background-image: linear-gradient(to right, black, gray);
-            }
-
-            &.radial {
-                background-image: radial-gradient(closest-side, black, #ebf8e1, gray);
-            }
-
-            &.repeating-linear {
-                background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%);
-            }
-
-            &.repeating-radial {
-                background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%);
-            }        
-            
-            &.image {
-                overflow: hidden;
-
-                .m1 {
-                    width: 100%;
-                    height: 100%;
-                    position: absolute;
-                    background-color: #0e4a2e; 
-                    top: 70%;
-                    left: -20%;
-                    transform: rotate(45deg);
-                }
-
-                .m2 {
-                    width: 100%;
-                    height: 100%;
-                    position: absolute;
-                    background-color: #0eb32b; 
-                    top: 50%;
-                    left: 40%;
-                    transform: rotate(45deg);
-                }           
-                
-                .m3 {
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    position: absolute;
-                    background-color: rgb(255, 136, 0); 
-                    top: 3px;
-                    left: 3px;
-                }                           
-                
-            }
-        }
-    }
 
     .gradient-angular {
         display: block;
@@ -187,5 +108,11 @@ $typetool-size: 34px;
             }
         }
 
+    }
+}
+
+.gradient-type {
+    .gradient-item {
+        margin-right: 3px;
     }
 }

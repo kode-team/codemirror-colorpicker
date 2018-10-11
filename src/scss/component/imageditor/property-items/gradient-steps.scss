@@ -1,6 +1,6 @@
 &.gradient-steps {
     $pointer-color: rgba(#ececec, 0.8);
-    height: 45px;
+    height: 60px;
     padding: 10px;
 
     .gradient-steps {
@@ -61,11 +61,13 @@
                 background-color: rgba(white, 0.8);
                 cursor: pointer;
                 z-index: 0;
+                transition: top 0.3s ease-out;
 
                 &.selected {
                     z-index:1;
+                    top: 30px;
                     &:after {
-                        display: none;
+                        // display: none;
                         content: "";
                         position: absolute;
                         width: 1px;

@@ -37,3 +37,30 @@ $layer-item-padding: 4px;
         }
     }
 }
+
+.sub-feature-control {
+
+    .image-feature {
+
+        .property-view {
+            border-bottom: 0px;
+            border-top: 0px;
+            .property-item {
+                display: inline-block;
+                vertical-align: middle;
+                border: 0px;
+    
+                > .items {
+                    > div {
+                        label {
+                            width: auto; 
+                            margin-right: 10px;
+                        }
+                    }
+                }
+    
+            } 
+        }
+
+    }
+}

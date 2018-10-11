@@ -3,11 +3,10 @@ $pointer-color: rgba(#ececec, 0.8);
 .drag-position {
     position: absolute;
     display: none;
-    bottom: 20px;
+    bottom: 10px;
     width: 200px;
     height: 200px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 10px;
 
     .drag-pointer {
         position: absolute;

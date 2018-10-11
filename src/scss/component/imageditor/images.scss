@@ -41,6 +41,25 @@ $image-item-width: 100px;
         .image-list {
             flex: 1 1 auto; 
         }
+
+        .menu-buttons {
+            width: 110px;
+            flex: none;
+
+            .gradient-type {
+                height: 100%;
+
+                > button {
+                    height: auto; 
+                    margin: 5px 0px;
+                }
+
+                .gradient-item {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+        }
     }    
 
     .add-tools {
@@ -69,6 +88,7 @@ $image-item-width: 100px;
             overflow: hidden;
             border: 5px solid #dedede;  
             vertical-align: middle;
+            margin-right: 5px;
 
             &.selected {
                 border: 5px solid #333;
@@ -110,33 +130,35 @@ $image-item-width: 100px;
                 pointer-events: none;
 
                 button {
-                    height: $button-size;
-                    width: $button-size;
+                    height: 20px;
+                    width: 20px;
                     position: absolute;
                     display:inline-block;
-                    border: 1px solid #dedede;
+                    border: 0px solid #dedede;
                     cursor: pointer;
-                    pointer-events: all;         
+                    pointer-events: all;
+                    border-radius: 50%;
+                    background-color: rgba(255, 255, 255, 0.2);                    
                     
                     &.copy-item {
-                        right: 0px;
+                        right: 1px;
                         top: 50%;
-                        transform: translateY(-50%);
+                        transform: translateY(-50%) rotate(45deg);
                     }
 
                     &.left-item {
-                        left: 0px;
-                        bottom: 0px;
+                        left: 1px;
+                        bottom: 1px;
                     }
 
                     &.right-item {
-                        right: 0px;
-                        bottom: 0px;
+                        right: 1px;
+                        bottom: 1px;
                     }              
                     
                     &.delete-item {
-                        top: 0px;
-                        right: 0px;
+                        top: 1px;
+                        right: 1px;
                     }
                 }
 

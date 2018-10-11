@@ -11,13 +11,12 @@ export default class Size extends UIElement {
                         <div>
                             <input type='number' ref="$width"> <span>px</span>
                         </div>
-                    </div>
-                    <div>
                         <label>Height</label>
                         <div>
                             <input type='number' ref="$height"> <span>px</span>
                         </div>
-                    </div>                
+                    </div>   
+                                 
                 </div>
             </div>
         `

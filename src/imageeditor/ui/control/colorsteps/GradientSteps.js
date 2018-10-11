@@ -44,13 +44,17 @@ export default class GradientSteps extends UIElement {
     }
 
     refresh () {
-        var item = this.read('/item/current/image')
-        var type = item ? item.type : '' 
 
-        if (this.read('/image/type/isGradient', type)) {
-            this.load()
-            this.setColorUI()
-        }
+
+        this.read('/item/current/image', item => {
+            var type = item ? item.type : '' 
+    
+            if (this.read('/image/type/isGradient', type)) {
+                this.load()
+                this.setColorUI()
+            }
+        })
+        
     }
 
     setColorUI() {
@@ -58,12 +62,11 @@ export default class GradientSteps extends UIElement {
     }
 
     setBackgroundColor() {
-        if (this.refs.$stepList) {
-            this.refs.$stepList.css(
-                'background-image', 
-                this.read('/image/toLinearRight', this.read('/item/current/image'))
-            )
-        }
+
+        this.refs.$stepList.css(
+            'background-image', 
+            this.read('/image/toLinearRight', this.read('/item/current/image'))
+        )
 
     }
 
@@ -108,7 +111,7 @@ export default class GradientSteps extends UIElement {
             if (item) {
                 item.percent = percent;
                 this.dispatch('/item/set', item);
-                this.refresh();
+                this.setBackgroundColor();
             }
         }
     }
@@ -197,8 +200,13 @@ export default class GradientSteps extends UIElement {
 
         this.initColor(item.color)     
 
+        var $selected = this.refs.$stepList.$('.selected');
+        if ($selected && !$selected.is(this.currentStep)) {
+            $selected.removeClass('selected');
+        }
+        this.currentStep.addClass('selected')
         this.dispatch('/item/set', item); 
-        this.refresh();
+        this.setBackgroundColor();
     }
 
     'click.Shift $steps .step' (e) {

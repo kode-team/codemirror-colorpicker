@@ -6,6 +6,12 @@ export default class LayerManager extends BaseModule {
 
         var obj = $store.read('/layer/toCSS', layer, withStyle, image) || {};
 
+        if (image) {
+            delete obj['background-color'];
+            delete obj['background-blend-mode'];
+            delete obj['mix-blend-mode'];
+        }
+
         return Object.keys(obj).map(key => {
             return `${key}: ${obj[key]};`
         }).join(' ')

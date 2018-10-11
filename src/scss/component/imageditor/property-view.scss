@@ -26,20 +26,52 @@
             display: flex; 
 
             > label {
-                width: 150px;
+                width: 70px;
+                display: inline-block;
+                vertical-align: middle;
+                line-height: 1.6;
+                margin-left: 4px;
+                text-align: right;
+                padding-right: 10px;
+                box-sizing: border-box;
+
+                &.left {
+                    text-align: left;
+                }
+
+                &:first-child {
+                    margin-left: 0px;
+                }
             }
 
             > div {
                 display: flex; 
 
-                input[type=number], input[type=text], select {
-                    width: 80px;
+                input[type=number], input[type=text] {
+                    width: 40px;
+                    vertical-align: middle;                    
+                }
+
+                .input {
+                    input[type=number], input[type=text] {
+                        width: 30px;
+                    }
                 }
 
                 > span {
                     display: inline-block;
-                    width: 30px;
-                    margin-left: 10px; 
+                    margin-left: 4px; 
+                    margin-right: 10px;
+                    vertical-align: middle;
+                    display: none;
+                }
+
+                .input-text {
+                    span {
+                        display: inline-block;
+                        width: 36px;
+                        text-align: center;
+                    }
                 }
             }
         }

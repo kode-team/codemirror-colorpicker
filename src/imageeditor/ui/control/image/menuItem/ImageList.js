@@ -9,13 +9,24 @@ export default class ImageList extends UIElement {
                     <div class="image-list" ref="$imageList">
 
                     </div>
+                    <div class='menu-buttons'>
+                        <div class='gradient-type' ref="$gradientType">
+                            <button type="button">+</button>
+                            <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>
+                            <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
+                            <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
+                            <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
+                            <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>
+                            <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">
+                                <div class="m1"></div>
+                                <div class="m2"></div>
+                                <div class="m3"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `
-    }
-
-    makeAddButton () {
-        return `<div class='menu-buttons'><button type="button" class='add-button'>+ Gradient</button></div>`
     }
 
     makeItemNodeImage (item) {
@@ -26,10 +37,10 @@ export default class ImageList extends UIElement {
                     <div class="item-view"  style='${this.read('/image/toString', item)}'></div>
                 </div>
                 <div class='item-tools'>
-                    <button type="button" class='copy-item' item-id='${item.id}'>+</button>
+                    <button type="button" class='copy-item' item-id='${item.id}'>&times;</button>
                     <button type="button" class='delete-item' item-id='${item.id}'>&times;</button>
-                    <button type="button" class='left-item' item-id='${item.id}'>&lt;&lt;</button>
-                    <button type="button" class='right-item' item-id='${item.id}'>&gt;&gt;</button>
+                    <button type="button" class='left-item' item-id='${item.id}'>&lt;</button>
+                    <button type="button" class='right-item' item-id='${item.id}'>&gt;</button>
                 </div>            
             </div>
             `
@@ -40,13 +51,9 @@ export default class ImageList extends UIElement {
 
         if (!item) return ''; 
 
-        var imageString = this.read('/item/map/children', item.id, (item) => {
+        return this.read('/item/map/children', item.id, (item) => {
             return this.makeItemNodeImage(item)
-        }).join('');
-
-        imageString  += this.makeAddButton();
-
-        return imageString;
+        })
     }
 
     refresh () {
@@ -71,11 +78,35 @@ export default class ImageList extends UIElement {
 
     }
 
-    'click $imageList .add-button' (e) {
+    'click $gradientType .gradient-item' (e) {
+
         this.read('/item/current/layer', (item) => {
-            this.dispatch('/item/add', 'image', false, item.id)
+
+            var type = e.$delegateTarget.attr('data-type')
+
+            this.dispatch('/item/add/image', type, true, item.id)
             this.refresh()
         }); 
     }       
+
+    'click $imageList .copy-item' (e) {
+        this.dispatch('/item/addCopy', e.$delegateTarget.attr('item-id'))
+        this.refresh()
+    }
+
+    'click $imageList .delete-item' (e) {
+        this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
+        this.refresh()
+    }
+
+    'click $imageList .left-item' (e) {
+        this.dispatch('/item/move/prev', e.$delegateTarget.attr('item-id'))
+        this.refresh()
+    }
+
+    'click $imageList .right-item' (e) {
+        this.dispatch('/item/move/next', e.$delegateTarget.attr('item-id'))
+        this.refresh()
+    }
 
 }

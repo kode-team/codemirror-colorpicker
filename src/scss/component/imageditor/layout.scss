@@ -27,7 +27,7 @@ $left-size: 250px;
         right : 10px;
         width: $right-size;
         top: $tool-size;
-        bottom: $tool-size + $gutter;
+        bottom: $gutter;
         overflow: auto;
         z-index: 1;         
         background-color: white;     
@@ -51,7 +51,7 @@ $left-size: 250px;
         left: $left-size + 10;
         right: $right-size + 20px;
         top: $tool-size; 
-        bottom: $tool-size;
+        bottom: $tool-size * 2 + 10;
         z-index: 0; 
         overflow: hidden;
     }
@@ -78,9 +78,9 @@ $left-size: 250px;
 
     .layout-footer {
         position: absolute;
-        left: 0px;
-        right: 0px;
-        height: $tool-size;
+        left: $left-size + 10;
+        right: $right-size + 10;
+        height: $tool-size * 2;
         bottom: 0px;
         z-index: 0; 
         overflow: hidden; 
@@ -113,6 +113,7 @@ $left-size: 250px;
 @import './page-manager.scss';
 @import './layer-manager.scss';
 @import './feature-manager.scss';
+@import './gradient-types.scss';
 @import './layers-menu.scss';
 @import './layer-preview.scss';
 @import './view.scss';        

@@ -98,7 +98,12 @@ export default class GradientPosition extends UIElement {
     }    
 
     getDefaultValue() {
-        return this.read('/image/get', 'radialPosition') || ''
+
+        var item = this.read('/item/current/image');
+
+        if (!item) return ''; 
+
+        return item.radialPosition || ''
 
     }
 
@@ -116,9 +121,17 @@ export default class GradientPosition extends UIElement {
         this.refs.$dragPointer.px('top', top);
 
         if (e) {
-            this.dispatch('/image/setRadialPosition', [Math.floor(left/width * 100) + '%', Math.floor(top/height * 100) + '%']);
+
+            this.setRadialPosition([Math.floor(left/width * 100) + '%', Math.floor(top/height * 100) + '%']);
         }
 
+    }
+
+    setRadialPosition (radialPosition) {
+        this.read('/item/current/image', (image) => {
+            image.radialPosition = radialPosition
+            this.dispatch('/item/set', image);
+        });
     }
 
     '@changeEditor' () {
@@ -147,13 +160,12 @@ export default class GradientPosition extends UIElement {
 
     'pointerstart $el' (e) {
         this.isDown = true; 
-        this.refreshUI(e);        
+        // this.refreshUI(e);        
     }    
     
     'dblclick $dragPointer' (e) {
         e.preventDefault()
-        this.dispatch('/image/setRadialPosition', 'center');        
-        this.refreshUI();
+        this.setRadialPosition('center')
+        this.refreshUI()
     }
-
 }

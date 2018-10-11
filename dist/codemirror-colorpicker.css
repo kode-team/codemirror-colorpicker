@@ -938,7 +938,7 @@
       right: 10px;
       width: 250px;
       top: 50px;
-      bottom: 58px;
+      bottom: 8px;
       overflow: auto;
       z-index: 1;
       background-color: white; }
@@ -956,7 +956,7 @@
       left: 260px;
       right: 270px;
       top: 50px;
-      bottom: 50px;
+      bottom: 110px;
       z-index: 0;
       overflow: hidden; }
     .imageeditor .layout-main .layout-header {
@@ -977,9 +977,9 @@
         text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54); }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 0px;
-      right: 0px;
-      height: 50px;
+      left: 260px;
+      right: 260px;
+      height: 100px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
@@ -1352,6 +1352,73 @@
       height: 290px; }
     .imageeditor .feature-control .image-feature .color-steps-tab {
       top: 620px; }
+  .imageeditor .sub-feature-control .image-feature .property-view {
+    border-bottom: 0px;
+    border-top: 0px; }
+    .imageeditor .sub-feature-control .image-feature .property-view .property-item {
+      display: inline-block;
+      vertical-align: middle;
+      border: 0px; }
+      .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items > div label {
+        width: auto;
+        margin-right: 10px; }
+  .imageeditor .gradient-type {
+    display: inline-block;
+    vertical-align: top; }
+    .imageeditor .gradient-type .gradient-item {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border: 3px solid #ececec;
+      cursor: pointer;
+      position: relative;
+      pointer-events: all; }
+      .imageeditor .gradient-type .gradient-item:first-child {
+        margin-right: 1px; }
+      .imageeditor .gradient-type .gradient-item.selected {
+        border-color: black; }
+      .imageeditor .gradient-type .gradient-item.static {
+        background-image: -webkit-gradient(linear, left top, right top, from(#333), to(#333));
+        background-image: linear-gradient(to right, #333, #333); }
+      .imageeditor .gradient-type .gradient-item.linear {
+        background-image: -webkit-gradient(linear, left top, right top, from(black), to(gray));
+        background-image: linear-gradient(to right, black, gray); }
+      .imageeditor .gradient-type .gradient-item.radial {
+        background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
+      .imageeditor .gradient-type .gradient-item.repeating-linear {
+        background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+      .imageeditor .gradient-type .gradient-item.repeating-radial {
+        background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+      .imageeditor .gradient-type .gradient-item.image {
+        overflow: hidden; }
+        .imageeditor .gradient-type .gradient-item.image .m1 {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          background-color: #0e4a2e;
+          top: 70%;
+          left: -20%;
+          -webkit-transform: rotate(45deg);
+                  transform: rotate(45deg); }
+        .imageeditor .gradient-type .gradient-item.image .m2 {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          background-color: #0eb32b;
+          top: 50%;
+          left: 40%;
+          -webkit-transform: rotate(45deg);
+                  transform: rotate(45deg); }
+        .imageeditor .gradient-type .gradient-item.image .m3 {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          position: absolute;
+          background-color: #ff8800;
+          top: 3px;
+          left: 3px; }
   .imageeditor .gradient-layers-menu {
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
@@ -1600,6 +1667,19 @@
             -webkit-box-flex: 1;
                 -ms-flex: 1 1 auto;
                     flex: 1 1 auto; }
+          .imageeditor .page-view .page-menu .images .image-tools .menu-buttons {
+            width: 110px;
+            -webkit-box-flex: 0;
+                -ms-flex: none;
+                    flex: none; }
+            .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type {
+              height: 100%; }
+              .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type > button {
+                height: auto;
+                margin: 5px 0px; }
+              .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type .gradient-item {
+                width: 30px;
+                height: 30px; }
         .imageeditor .page-view .page-menu .images .add-tools {
           padding: 5px;
           height: 110px; }
@@ -1618,7 +1698,8 @@
             position: relative;
             overflow: hidden;
             border: 5px solid #dedede;
-            vertical-align: middle; }
+            vertical-align: middle;
+            margin-right: 5px; }
             .imageeditor .page-view .page-menu .images .image-list .tree-item.selected {
               border: 5px solid #333; }
             .imageeditor .page-view .page-menu .images .image-list .tree-item:hover .item-tools {
@@ -1648,27 +1729,29 @@
               padding: 5px;
               pointer-events: none; }
               .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button {
-                height: 24px;
-                width: 24px;
+                height: 20px;
+                width: 20px;
                 position: absolute;
                 display: inline-block;
-                border: 1px solid #dedede;
+                border: 0px solid #dedede;
                 cursor: pointer;
-                pointer-events: all; }
+                pointer-events: all;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.2); }
                 .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.copy-item {
-                  right: 0px;
+                  right: 1px;
                   top: 50%;
-                  -webkit-transform: translateY(-50%);
-                          transform: translateY(-50%); }
+                  -webkit-transform: translateY(-50%) rotate(45deg);
+                          transform: translateY(-50%) rotate(45deg); }
                 .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.left-item {
-                  left: 0px;
-                  bottom: 0px; }
+                  left: 1px;
+                  bottom: 1px; }
                 .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.right-item {
-                  right: 0px;
-                  bottom: 0px; }
+                  right: 1px;
+                  bottom: 1px; }
                 .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.delete-item {
-                  top: 0px;
-                  right: 0px; }
+                  top: 1px;
+                  right: 1px; }
     .imageeditor .page-view .page-content {
       position: absolute;
       left: 0px;
@@ -1711,13 +1794,10 @@
       display: none;
       text-align: center;
       position: absolute;
-      pointer-events: none;
-      bottom: 20px;
+      bottom: 10px;
       width: 200px;
       height: 200px;
-      left: 50%;
-      -webkit-transform: translateX(-50%);
-              transform: translateX(-50%);
+      right: 10px;
       background-color: rgba(0, 0, 0, 0.2); }
       .imageeditor .page-view .predefined-angluar-group button {
         padding: 0px;
@@ -2106,12 +2186,11 @@
   .imageeditor .drag-angle-rect {
     position: absolute;
     display: none;
-    bottom: 20px;
+    bottom: 10px;
     width: 200px;
     height: 200px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-            transform: translateX(-50%); }
+    right: 10px;
+    pointer-events: none; }
     .imageeditor .drag-angle-rect .drag-angle {
       display: inline-block;
       width: 100px;
@@ -2126,7 +2205,8 @@
       left: 50%;
       top: 50%;
       -webkit-transform: translateX(-50%) translateY(-50%);
-              transform: translateX(-50%) translateY(-50%); }
+              transform: translateX(-50%) translateY(-50%);
+      pointer-events: all; }
       .imageeditor .drag-angle-rect .drag-angle .drag-pointer {
         position: absolute;
         width: 12px;
@@ -2150,12 +2230,10 @@
   .imageeditor .drag-position {
     position: absolute;
     display: none;
-    bottom: 20px;
+    bottom: 10px;
     width: 200px;
     height: 200px;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-            transform: translateX(-50%); }
+    right: 10px; }
     .imageeditor .drag-position .drag-pointer {
       position: absolute;
       width: 12px;
@@ -2264,19 +2342,40 @@
         display: -ms-flexbox;
         display: flex; }
         .imageeditor .property-view .property-item > .items > div > label {
-          width: 150px; }
+          width: 70px;
+          display: inline-block;
+          vertical-align: middle;
+          line-height: 1.6;
+          margin-left: 4px;
+          text-align: right;
+          padding-right: 10px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+          .imageeditor .property-view .property-item > .items > div > label.left {
+            text-align: left; }
+          .imageeditor .property-view .property-item > .items > div > label:first-child {
+            margin-left: 0px; }
         .imageeditor .property-view .property-item > .items > div > div {
           display: -webkit-box;
           display: -ms-flexbox;
           display: flex; }
-          .imageeditor .property-view .property-item > .items > div > div input[type=number], .imageeditor .property-view .property-item > .items > div > div input[type=text], .imageeditor .property-view .property-item > .items > div > div select {
-            width: 80px; }
+          .imageeditor .property-view .property-item > .items > div > div input[type=number], .imageeditor .property-view .property-item > .items > div > div input[type=text] {
+            width: 40px;
+            vertical-align: middle; }
+          .imageeditor .property-view .property-item > .items > div > div .input input[type=number], .imageeditor .property-view .property-item > .items > div > div .input input[type=text] {
+            width: 30px; }
           .imageeditor .property-view .property-item > .items > div > div > span {
             display: inline-block;
-            width: 30px;
-            margin-left: 10px; }
+            margin-left: 4px;
+            margin-right: 10px;
+            vertical-align: middle;
+            display: none; }
+          .imageeditor .property-view .property-item > .items > div > div .input-text span {
+            display: inline-block;
+            width: 36px;
+            text-align: center; }
       .imageeditor .property-view .property-item.gradient-steps {
-        height: 45px;
+        height: 60px;
         padding: 10px; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
           position: relative;
@@ -2328,11 +2427,13 @@
               position: absolute;
               background-color: rgba(255, 255, 255, 0.8);
               cursor: pointer;
-              z-index: 0; }
+              z-index: 0;
+              -webkit-transition: top 0.3s ease-out;
+              transition: top 0.3s ease-out; }
               .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected {
-                z-index: 1; }
+                z-index: 1;
+                top: 30px; }
                 .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected:after {
-                  display: none;
                   content: "";
                   position: absolute;
                   width: 1px;
@@ -2495,63 +2596,6 @@
           vertical-align: middle;
           padding: 10px 0px;
           font-size: 12px; }
-        .imageeditor .property-view .property-item.gradient-tools .gradient-type {
-          display: inline-block;
-          vertical-align: top; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item {
-            display: inline-block;
-            width: 34px;
-            height: 34px;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-            border: 3px solid #ececec;
-            cursor: pointer;
-            position: relative;
-            pointer-events: all; }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item:first-child {
-              margin-right: 1px; }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.selected {
-              border-color: black; }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.static {
-              background-image: -webkit-gradient(linear, left top, right top, from(#333), to(#333));
-              background-image: linear-gradient(to right, #333, #333); }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.linear {
-              background-image: -webkit-gradient(linear, left top, right top, from(black), to(gray));
-              background-image: linear-gradient(to right, black, gray); }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.radial {
-              background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.repeating-linear {
-              background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.repeating-radial {
-              background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image {
-              overflow: hidden; }
-              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m1 {
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                background-color: #0e4a2e;
-                top: 70%;
-                left: -20%;
-                -webkit-transform: rotate(45deg);
-                        transform: rotate(45deg); }
-              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m2 {
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                background-color: #0eb32b;
-                top: 50%;
-                left: 40%;
-                -webkit-transform: rotate(45deg);
-                        transform: rotate(45deg); }
-              .imageeditor .property-view .property-item.gradient-tools .gradient-type .gradient-item.image .m3 {
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                position: absolute;
-                background-color: #ff8800;
-                top: 3px;
-                left: 3px; }
         .imageeditor .property-view .property-item.gradient-tools .gradient-angular {
           display: block;
           -webkit-user-select: none;
@@ -2616,6 +2660,8 @@
             vertical-align: middle; }
             .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial button[data-value='center'] {
               background-image: radial-gradient(circle, black, #FFFFFF 50%); }
+      .imageeditor .property-view .property-item .gradient-type .gradient-item {
+        margin-right: 3px; }
     .imageeditor .property-view .gradient-view {
       height: 230px;
       width: 100%; }

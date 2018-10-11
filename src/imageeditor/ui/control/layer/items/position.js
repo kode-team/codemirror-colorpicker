@@ -12,8 +12,6 @@ export default class Position extends UIElement {
                         <div>
                             <input type='number' ref="$x"> <span>px</span>
                         </div>
-                    </div>
-                    <div>
                         <label>Y</label>
                         <div>
                             <input type='number' ref="$y"> <span>px</span>

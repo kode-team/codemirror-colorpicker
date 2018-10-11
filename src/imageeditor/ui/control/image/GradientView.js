@@ -24,16 +24,16 @@ export default class GradientView extends BaseTab {
                         <div class="gradient-color-view" ref="$colorview"></div>            
                         <PredefinedPageResizer></PredefinedPageResizer>
                         <PredefinedLayerResizer></PredefinedLayerResizer>
-                    </div>
-                    <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
-                    <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
-                    <GradientPosition></GradientPosition>
-                    <GradientAngle></GradientAngle>                    
+                    </div>                   
                 </div>
                 <div class="page-menu">
                     <LayerPreview></LayerPreview>
                     <LayerMenuTab></LayerMenuTab>
                 </div>
+                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
+                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
+                <GradientPosition></GradientPosition>
+                <GradientAngle></GradientAngle>                 
             </div>
         `
     } 
@@ -173,8 +173,6 @@ export default class GradientView extends BaseTab {
     moveXY (dx, dy) {
         var x = this.moveX + dx; 
         var y = this.moveY + dy; 
-
-        console.log(x, y)
 
         this.change({x, y})
     }    

@@ -5,27 +5,25 @@ export default class Radius extends UIElement {
         return `
             <div class='property-item radius'>
                 <div class='title'>Radius</div>
-                <div class='items'>            
+                <div class='items'>         
+                    <div> <label class='left'>Top</label></div>   
                     <div>
-                        <label>Top Left</label>
+                        <label>Left</label>
                         <div>
                             <input type='number' ref="$topLeftRadius"> <span>px</span>
                         </div>
-                    </div>
-                    <div>
-                        <label>Top Right</label>
+                        <label>Right</label>
                         <div>
                             <input type='number' ref="$topRightRadius"> <span>px</span>
                         </div>
-                    </div>                
+                    </div>          
+                    <div> <label class='left'>Bottom</label></div>                             
                     <div>
-                        <label>Bottom Left</label>
+                        <label>Left</label>
                         <div>
                             <input type='number' ref="$bottomLeftRadius"> <span>px</span>
                         </div>
-                    </div>
-                    <div>
-                        <label>Bottom Right</label>
+                        <label>Right</label>
                         <div>
                             <input type='number' ref="$bottomRightRadius"> <span>px</span>
                         </div>

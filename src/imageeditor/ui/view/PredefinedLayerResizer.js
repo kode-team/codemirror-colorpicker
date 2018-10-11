@@ -14,14 +14,16 @@ export default class PredefinedLayerResizer extends UIElement {
     template () { 
         return `
             <div class="predefined-layer-resizer">
-                <button type="button" data-value="to right"></button>
-                <button type="button" data-value="to left"></button>
-                <button type="button" data-value="to top"></button>
-                <button type="button" data-value="to bottom"></button>
-                <button type="button" data-value="to top right"></button>
-                <button type="button" data-value="to bottom right"></button>
-                <button type="button" data-value="to bottom left"></button>
-                <button type="button" data-value="to top left"></button>
+                <div class='button-group' ref='$buttonGroup'>
+                    <button type="button" data-value="to right"></button>
+                    <button type="button" data-value="to left"></button>
+                    <button type="button" data-value="to top"></button>
+                    <button type="button" data-value="to bottom"></button>
+                    <button type="button" data-value="to top right"></button>
+                    <button type="button" data-value="to bottom right"></button>
+                    <button type="button" data-value="to bottom left"></button>
+                    <button type="button" data-value="to top left"></button>
+                </div>
 
                 <TopLeftRadius></TopLeftRadius>
                 <TopRightRadius></TopRightRadius>
@@ -56,19 +58,25 @@ export default class PredefinedLayerResizer extends UIElement {
         var height = style.height
         var x  = style.x
         var y  = style.y
-        var rotate = style.rotate; 
 
-        
 
         this.$el.css({ 
             width, height, 
             left: x, top: y, 
             transform: this.read('/layer/make/transform', layer)
         })
+
+        var rotate = layer.style.rotate || 0
+
+        if (rotate == 0) {
+            this.refs.$buttonGroup.show()
+        } else {
+            this.refs.$buttonGroup.hide()
+        }
     }
 
     isShow () {
-        return this.read('/item/is/mode', 'layer', 'image');
+        return this.read('/item/is/mode', 'layer');
     }
 
     '@changeEditor' () { this.refresh(); }
