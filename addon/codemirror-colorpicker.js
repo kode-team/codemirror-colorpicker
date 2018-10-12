@@ -6935,8 +6935,6 @@ var BaseColorPicker = function (_UIElement) {
             this.colorpickerHideCallback = hideCallback;
             this.$root.css(this.getInitalizePosition()).show();
 
-            this.definePosition(opt);
-
             this.isColorPickerShow = true;
             this.isShortCut = opt.isShortCut || false;
             this.outputFormat = opt.outputFormat;
@@ -6948,7 +6946,7 @@ var BaseColorPicker = function (_UIElement) {
             }
 
             this.$root.appendTo(this.$body);
-
+            this.definePosition(opt);
             this.initColorWithoutChangeEvent(color);
         }
 
