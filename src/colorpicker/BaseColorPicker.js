@@ -103,7 +103,6 @@ export default class BaseColorPicker extends UIElement {
         this.colorpickerHideCallback = hideCallback;        
         this.$root.css(this.getInitalizePosition()).show();
 
-        this.definePosition(opt);
 
         this.isColorPickerShow = true;
         this.isShortCut = opt.isShortCut || false;
@@ -116,7 +115,7 @@ export default class BaseColorPicker extends UIElement {
         }        
         
         this.$root.appendTo(this.$body);
-
+        this.definePosition(opt);
         this.initColorWithoutChangeEvent(color);
     }     
 
