@@ -245,35 +245,68 @@ export default class BaseColorPicker extends UIElement {
         }
     }
 
+    isAbsolute () {
+        return this.opt.position !== 'inline'
+    }
+
+    // Event Bindings 
+    'mouseup.isAbsolute document' (e) {
+
+        this.__isMouseDown = false; 
+        // when color picker clicked in outside
+        if (this.checkInHtml(e.target)) {
+            //this.setHideDelay(hideDelay);
+        } else if (this.checkColorPickerClass(e.target) == false) {
+            this.hide();
+        } else {
+            if (!this.__isMouseIn) {
+                clearTimeout(this.timerCloseColorPicker);
+                this.timerCloseColorPicker = setTimeout(this.hide.bind(this), this.delayTime || this.hideDelay);
+            }
+
+        }
+    }
+    
+    'mouseover.isAbsolute $root' (e) {
+        clearTimeout(this.timerCloseColorPicker);
+        // this.__isMouseDown = true; 
+    }
+
+    'mousemove.isAbsolute $root' (e) {
+        clearTimeout(this.timerCloseColorPicker)
+    }
+
+    'mouseenter.isAbsolute $root' (e) {
+        clearTimeout(this.timerCloseColorPicker);
+        this.__isMouseIn = true; 
+    }    
+
+    'mouseleave.isAbsolute $root' (e) {
+        this.__isMouseIn = false; 
+        if (!this.__isMouseDown) {
+            clearTimeout(this.timerCloseColorPicker);
+            this.timerCloseColorPicker = setTimeout(this.hide.bind(this), this.delayTime || this.hideDelay);
+        }
+    }
+
+    'mousedown.isAbsolute $root' (e) {
+        this.__isMouseDown = true; 
+    }
     
 
     setHideDelay(delayTime) {
-        delayTime = delayTime || 0;
-
-        const hideCallback = this.hide.bind(this);
-
-        this.$root.off('mouseenter');
-        this.$root.off('mouseleave');
-
-        this.$root.on('mouseenter', () => {
-            clearTimeout(this.timerCloseColorPicker);
-        });
-
-        this.$root.on('mouseleave', () => {
-            clearTimeout(this.timerCloseColorPicker);
-            this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
-        });
-
-        clearTimeout(this.timerCloseColorPicker);
-        // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
-
-        return hideCallback
+        this.delayTime = delayTime || 0;
     }
 
-    runHideDelay (delayTime) {
-        const hideCallback = this.setHideDelay(delayTime);
-        
-        this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+    runHideDelay () {
+
+        if (this.isColorPickerShow) {
+            this.setHideDelay();
+            // const hideCallback = this.setHideDelay(delayTime);
+            
+            // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+        }
+
     }
 
     callbackColorValue(color) {
@@ -340,15 +373,5 @@ export default class BaseColorPicker extends UIElement {
     }
 
 
-     // Event Bindings 
-     'mouseup document' (e) {
-
-        // when color picker clicked in outside
-        if (this.checkInHtml(e.target)) {
-            //this.setHideDelay(hideDelay);
-        } else if (this.checkColorPickerClass(e.target) == false) {
-            this.hide();
-        }
-    }
     
 }

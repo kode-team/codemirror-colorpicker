@@ -7105,37 +7105,76 @@ var BaseColorPicker = function (_UIElement) {
             }
         }
     }, {
+        key: 'isAbsolute',
+        value: function isAbsolute() {
+            return this.opt.position !== 'inline';
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'mouseup.isAbsolute document',
+        value: function mouseupIsAbsoluteDocument(e) {
+
+            this.__isMouseDown = false;
+            // when color picker clicked in outside
+            if (this.checkInHtml(e.target)) {
+                //this.setHideDelay(hideDelay);
+            } else if (this.checkColorPickerClass(e.target) == false) {
+                this.hide();
+            } else {
+                if (!this.__isMouseIn) {
+                    clearTimeout(this.timerCloseColorPicker);
+                    this.timerCloseColorPicker = setTimeout(this.hide.bind(this), this.delayTime || this.hideDelay);
+                }
+            }
+        }
+    }, {
+        key: 'mouseover.isAbsolute $root',
+        value: function mouseoverIsAbsolute$root(e) {
+            clearTimeout(this.timerCloseColorPicker);
+            // this.__isMouseDown = true; 
+        }
+    }, {
+        key: 'mousemove.isAbsolute $root',
+        value: function mousemoveIsAbsolute$root(e) {
+            clearTimeout(this.timerCloseColorPicker);
+        }
+    }, {
+        key: 'mouseenter.isAbsolute $root',
+        value: function mouseenterIsAbsolute$root(e) {
+            clearTimeout(this.timerCloseColorPicker);
+            this.__isMouseIn = true;
+        }
+    }, {
+        key: 'mouseleave.isAbsolute $root',
+        value: function mouseleaveIsAbsolute$root(e) {
+            this.__isMouseIn = false;
+            if (!this.__isMouseDown) {
+                clearTimeout(this.timerCloseColorPicker);
+                this.timerCloseColorPicker = setTimeout(this.hide.bind(this), this.delayTime || this.hideDelay);
+            }
+        }
+    }, {
+        key: 'mousedown.isAbsolute $root',
+        value: function mousedownIsAbsolute$root(e) {
+            this.__isMouseDown = true;
+        }
+    }, {
         key: 'setHideDelay',
         value: function setHideDelay(delayTime) {
-            var _this3 = this;
-
-            delayTime = delayTime || 0;
-
-            var hideCallback = this.hide.bind(this);
-
-            this.$root.off('mouseenter');
-            this.$root.off('mouseleave');
-
-            this.$root.on('mouseenter', function () {
-                clearTimeout(_this3.timerCloseColorPicker);
-            });
-
-            this.$root.on('mouseleave', function () {
-                clearTimeout(_this3.timerCloseColorPicker);
-                _this3.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
-            });
-
-            clearTimeout(this.timerCloseColorPicker);
-            // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
-
-            return hideCallback;
+            this.delayTime = delayTime || 0;
         }
     }, {
         key: 'runHideDelay',
-        value: function runHideDelay(delayTime) {
-            var hideCallback = this.setHideDelay(delayTime);
+        value: function runHideDelay() {
 
-            this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+            if (this.isColorPickerShow) {
+                this.setHideDelay();
+                // const hideCallback = this.setHideDelay(delayTime);
+
+                // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+            }
         }
     }, {
         key: 'callbackColorValue',
@@ -7205,20 +7244,6 @@ var BaseColorPicker = function (_UIElement) {
             // remove color picker callback
             this.colorpickerShowCallback = undefined;
             this.colorpickerHideCallback = undefined;
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'mouseup document',
-        value: function mouseupDocument(e) {
-
-            // when color picker clicked in outside
-            if (this.checkInHtml(e.target)) {
-                //this.setHideDelay(hideDelay);
-            } else if (this.checkColorPickerClass(e.target) == false) {
-                this.hide();
-            }
         }
     }]);
     return BaseColorPicker;
@@ -9461,10 +9486,8 @@ var ColorView = function () {
     }, {
         key: 'hide_delay_color_picker',
         value: function hide_delay_color_picker() {
-            var hideDelay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-
             if (this.colorpicker) {
-                this.colorpicker.runHideDelay(hideDelay);
+                this.colorpicker.runHideDelay();
             }
         }
     }, {

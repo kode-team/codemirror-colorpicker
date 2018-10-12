@@ -236,10 +236,10 @@ export default class ColorView {
         }
     }
 
-    hide_delay_color_picker(hideDelay = 0) {
+    hide_delay_color_picker() {
         if (this.colorpicker)
         {
-            this.colorpicker.runHideDelay(hideDelay);
+            this.colorpicker.runHideDelay();
         }
     }    
 
