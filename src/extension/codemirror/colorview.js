@@ -51,7 +51,7 @@ function onScroll (cm) {
 }
 
 function onBlur (cm) {
-    cm.state.colorpicker.close_color_picker();
+    cm.state.colorpicker.hide_delay_color_picker(cm.state.colorpicker.opt.hideDelay || 1000);
 }
 
 function debounce (callback, delay) {
@@ -229,12 +229,19 @@ export default class ColorView {
 
     }
 
-    close_color_picker(el) {
+    close_color_picker() {
         if (this.colorpicker)
         {
             this.colorpicker.hide();
         }
     }
+
+    hide_delay_color_picker(hideDelay = 0) {
+        if (this.colorpicker)
+        {
+            this.colorpicker.setHideDelay(hideDelay);
+        }
+    }    
 
     key(lineNo, ch) {
         return [lineNo, ch].join(":");

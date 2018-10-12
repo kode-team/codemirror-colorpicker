@@ -9403,7 +9403,7 @@ function onScroll(cm) {
 }
 
 function onBlur(cm) {
-    cm.state.colorpicker.close_color_picker();
+    cm.state.colorpicker.hide_delay_color_picker(cm.state.colorpicker.opt.hideDelay || 1000);
 }
 
 function debounce(callback, delay) {
@@ -9578,9 +9578,18 @@ var ColorView = function () {
         }
     }, {
         key: 'close_color_picker',
-        value: function close_color_picker(el) {
+        value: function close_color_picker() {
             if (this.colorpicker) {
                 this.colorpicker.hide();
+            }
+        }
+    }, {
+        key: 'hide_delay_color_picker',
+        value: function hide_delay_color_picker() {
+            var hideDelay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+            if (this.colorpicker) {
+                this.colorpicker.setHideDelay(hideDelay);
             }
         }
     }, {
