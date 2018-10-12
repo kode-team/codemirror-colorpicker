@@ -1022,6 +1022,10 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
         }
     });
 
+    cm.on('blur' , () => {
+        console.log('saved')
+    })
+
     setTimeout(function(){
         cm.refresh();
     }, 100);

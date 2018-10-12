@@ -115,7 +115,7 @@ export default class ColorView {
         this.cm.on('change', onChange);
         this.cm.on('update', onUpdate);
         this.cm.on('refresh', onRefresh);
-        this.cm.on('blur', onBlur);
+        this.cm.on('blur', onBlur); 
 
         // create paste callback
         this.onPasteCallback = (function (cm, callback) {
@@ -239,7 +239,7 @@ export default class ColorView {
     hide_delay_color_picker(hideDelay = 0) {
         if (this.colorpicker)
         {
-            this.colorpicker.setHideDelay(hideDelay);
+            this.colorpicker.runHideDelay(hideDelay);
         }
     }    
 

@@ -266,6 +266,14 @@ export default class BaseColorPicker extends UIElement {
 
         clearTimeout(this.timerCloseColorPicker);
         // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+
+        return hideCallback
+    }
+
+    runHideDelay (delayTime) {
+        const hideCallback = this.setHideDelay(delayTime);
+        
+        this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
     }
 
     callbackColorValue(color) {

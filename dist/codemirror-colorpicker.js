@@ -7260,6 +7260,15 @@ var BaseColorPicker = function (_UIElement) {
 
             clearTimeout(this.timerCloseColorPicker);
             // this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
+
+            return hideCallback;
+        }
+    }, {
+        key: 'runHideDelay',
+        value: function runHideDelay(delayTime) {
+            var hideCallback = this.setHideDelay(delayTime);
+
+            this.timerCloseColorPicker = setTimeout(hideCallback, delayTime);
         }
     }, {
         key: 'callbackColorValue',
@@ -9589,7 +9598,7 @@ var ColorView = function () {
             var hideDelay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
             if (this.colorpicker) {
-                this.colorpicker.setHideDelay(hideDelay);
+                this.colorpicker.runHideDelay(hideDelay);
             }
         }
     }, {
