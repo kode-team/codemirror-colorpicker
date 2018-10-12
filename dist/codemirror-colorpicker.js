@@ -9402,6 +9402,10 @@ function onScroll(cm) {
     cm.state.colorpicker.close_color_picker();
 }
 
+function onBlur(cm) {
+    cm.state.colorpicker.close_color_picker();
+}
+
 function debounce(callback, delay) {
 
     var t = undefined;
@@ -9461,6 +9465,7 @@ var ColorView = function () {
             this.cm.on('change', onChange);
             this.cm.on('update', onUpdate);
             this.cm.on('refresh', onRefresh);
+            this.cm.on('blur', onBlur);
 
             // create paste callback
             this.onPasteCallback = function (cm, callback) {
@@ -9469,10 +9474,12 @@ var ColorView = function () {
                 };
             }(this.cm, onPaste);
 
+            this.onScrollEvent = debounce(onScroll, 50);
+
             this.cm.getWrapperElement().addEventListener('paste', this.onPasteCallback);
 
             if (this.is_edit_mode()) {
-                this.cm.on('scroll', debounce(onScroll, 50));
+                this.cm.on('scroll', this.onScrollEvent);
             }
         }
     }, {
@@ -9491,10 +9498,12 @@ var ColorView = function () {
             this.cm.off('mousedown', onMousedown);
             this.cm.off('keyup', onKeyup);
             this.cm.off('change', onChange);
+            this.cm.off('blur', onBlur);
+
             this.cm.getWrapperElement().removeEventListener('paste', this.onPasteCallback);
 
             if (this.is_edit_mode()) {
-                this.cm.off('scroll');
+                this.cm.off('scroll', this.onScrollEvent);
             }
         }
     }, {
