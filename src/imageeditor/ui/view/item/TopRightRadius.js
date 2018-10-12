@@ -23,6 +23,6 @@ export default class TopRightRadius extends TopLeftRadius {
         var maxX = this.layerWidth; 
 
         return Math.max(Math.min(maxX, radius - dx), minX)
-    }
+    }    
 
 }

@@ -171,18 +171,6 @@ var math = {
     caculateAngle: caculateAngle
 };
 
-/**
- * @method RGBtoHSV
- *
- * convert rgb to hsv
- *
- * 		color.RGBtoHSV(0, 0, 255) === { h : 240, s : 1, v : 1 } === '#FFFF00'
- *
- * @param {Number} R  red color value
- * @param {Number} G  green color value
- * @param {Number} B  blue color value
- * @return {Object}  hsv color code
- */
 function RGBtoHSV(r, g, b) {
 
     if (arguments.length == 1) {
@@ -494,18 +482,6 @@ var fromLAB = {
     LABtoXYZ: LABtoXYZ
 };
 
-/**
- * @method HSVtoRGB
- *
- * convert hsv to rgb
- *
- * 		color.HSVtoRGB(0,0,1) === #FFFFF === { r : 255, g : 0, b : 0 }
- *
- * @param {Number} H  hue color number  (min : 0, max : 360)
- * @param {Number} S  Saturation number  (min : 0, max : 1)
- * @param {Number} V  Value number 		(min : 0, max : 1 )
- * @returns {Object}
- */
 function HSVtoRGB(h, s, v) {
 
     if (arguments.length == 1) {
@@ -1123,15 +1099,6 @@ var parser = {
     color_split: color_split
 };
 
-/**
- * @deprecated 
- * 
- * instead of this,  use blend function 
- *  
- * @param {*} startColor 
- * @param {*} endColor 
- * @param {*} t 
- */
 function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
@@ -1952,7 +1919,6 @@ function crop() {
     };
 }
 
-// Image manupulate 
 function resize(dstWidth, dstHeight) {
     return function (bitmap, done) {
         var c = Canvas.drawPixels(bitmap);
@@ -2178,9 +2144,6 @@ function bitonal(darkColor, lightColor) {
     });
 }
 
-/*
- * @param {Number} amount  -100..100  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2208,10 +2171,6 @@ function brownie() {
     });
 }
 
-/**
- * 
- * @param {Number} amount from 0 to 100 
- */
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2226,10 +2185,6 @@ function clip() {
     }, { $C: $C });
 }
 
-/**
- * 
- * @param {*} amount   min = -128, max = 128 
- */
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2254,10 +2209,6 @@ function gamma() {
     }, { $C: $C });
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -2329,9 +2280,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -2415,10 +2363,6 @@ function matrix() {
     });
 }
 
-/**
- * 
- * @param {Number} amount 1..100
- */
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2462,9 +2406,6 @@ function polaroid() {
     });
 }
 
-/*
- * @param {Number} amount  -100..100 
- */
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
@@ -2484,9 +2425,6 @@ function saturation() {
     });
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2539,12 +2477,6 @@ function shift() {
     });
 }
 
-/**
- * change the relative darkness of (a part of an image) by overexposure to light.
- * @param {*} r 
- * @param {*} g 
- * @param {*} b 
- */
 function solarize(redValue, greenValue, blueValue) {
     var $redValue = parseParamNumber$1(redValue);
     var $greenValue = parseParamNumber$1(greenValue);
@@ -2604,9 +2536,6 @@ function thresholdColor() {
     });
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -2668,11 +2597,6 @@ function blur () {
     return convolution(createBlurMatrix(amount));
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4245,11 +4169,6 @@ function normal () {
     return convolution$1([0, 0, 0, 0, 1, 0, 0, 0, 0]);
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4257,10 +4176,6 @@ function emboss$1() {
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4377,9 +4292,6 @@ function bitonal$1(darkColor, lightColor) {
     return shader('\n        if ((pixelColor.r + pixelColor.g + pixelColor.b) > ' + checkVlue + ') {\n            outColor = vec4(' + lightColorString + '.rgb, pixelColor.a);\n        } else {\n            outColor = vec4(' + darkColorString + '.rgb, pixelColor.a);\n        }\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4417,9 +4329,6 @@ function brownie$1() {
     return matrix$3(0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount 0..1
- */
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4436,9 +4345,6 @@ function chaos() {
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..1
- */
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4447,9 +4353,6 @@ function contrast$2() {
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4458,10 +4361,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$2() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -4509,10 +4408,6 @@ function gradient$2() {
     return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4524,9 +4419,6 @@ function grayscale$1() {
 }
 
 //http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-/*
- * @param {Number} amount  0..1  ,  (real value 0..360)
- */
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4548,10 +4440,6 @@ function kodachrome$1() {
     return matrix$3(1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4562,10 +4450,6 @@ function noise$1() {
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4579,9 +4463,6 @@ function polaroid$1() {
     return matrix$3(1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4590,9 +4471,6 @@ function saturation$1() {
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4640,9 +4518,6 @@ function thresholdColor$1() {
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold$1() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -4650,12 +4525,6 @@ function threshold$1() {
   return thresholdColor$1(scale, amount, false);
 }
 
-/**
- * 
- * @param {*} redTint  0..1
- * @param {*} greenTint 0..1
- * @param {*} blueTint 0..1
- */
 function tint$1 () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -9959,6 +9828,14 @@ var LayerManager = function (_BaseModule) {
                 css['mix-blend-mode'] = layer.style['mix-blend-mode'] || "";
             }
 
+            if (layer.fixedRadius) {
+                css['border-radius'] = layer.style['border-radius'];
+                css['border-top-left-radius'] = '';
+                css['border-top-right-radius'] = '';
+                css['border-bottom-left-radius'] = '';
+                css['border-bottom-right-radius'] = '';
+            } else {}
+
             css['transform'] = $store.read('/layer/make/transform', layer);
 
             var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer));
@@ -11109,7 +10986,7 @@ var Size = function (_UIElement) {
     createClass(Size, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\'>Dimesion</div>\n                <div class=\'items\'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\'>Dimesion\n                    <span>\n                        <button type="button" ref="$rect">rect</button>\n                    </span>\n                </div>\n                <div class=\'items\'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11130,6 +11007,17 @@ var Size = function (_UIElement) {
             if (item.style.height) {
                 this.refs.$height.val(item.style.height.replace('px', ''));
             }
+        }
+    }, {
+        key: 'click $rect',
+        value: function click$rect(e) {
+            var item = this.read('/item/current');
+
+            if (item.itemType == 'image') return;
+
+            item.style.width = this.refs.$width.int() + 'px';
+            item.style.height = item.style.width;
+            this.dispatch('/item/set', item);
         }
     }, {
         key: 'input $width',
@@ -11223,7 +11111,7 @@ var Radius = function (_UIElement) {
     createClass(Radius, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item radius\'>\n                <div class=\'title\'>Radius</div>\n                <div class=\'items\'>         \n                    <div> <label class=\'left\'>Top</label></div>   \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div> <label class=\'left\'>Bottom</label></div>                             \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item radius\'>\n                <div class=\'title\'>Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span>\n                </div>\n                <div class=\'items\'>         \n                    <div> <label class=\'left\'>Top</label></div>   \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div> <label class=\'left\'>Bottom</label></div>                             \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11236,20 +11124,40 @@ var Radius = function (_UIElement) {
             var _this2 = this;
 
             this.read('/item/current/layer', function (item) {
-                if (item.style['border-top-left-radius']) {
-                    _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
-                }
 
-                if (item.style['border-top-right-radius']) {
-                    _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
-                }
+                if (item.fixedRadius) {
+                    _this2.refs.$fixedRadius.el.checked = true;
+                    var radius = item.style['border-radius'] || '';
+                    radius = radius.replace('px', '');
+                    _this2.refs.$topLeftRadius.val(radius);
+                    _this2.refs.$topRightRadius.val('');
+                    _this2.refs.$bottomLeftRadius.val('');
+                    _this2.refs.$bottomRightRadius.val('');
 
-                if (item.style['border-bottom-left-radius']) {
-                    _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
-                }
+                    // this.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''))
+                    _this2.refs.$topRightRadius.el.disabled = true;
+                    _this2.refs.$bottomLeftRadius.el.disabled = true;
+                    _this2.refs.$bottomRightRadius.el.disabled = true;
+                } else {
+                    _this2.refs.$topRightRadius.el.disabled = false;
+                    _this2.refs.$bottomLeftRadius.el.disabled = false;
+                    _this2.refs.$bottomRightRadius.el.disabled = false;
 
-                if (item.style['border-bottom-right-radius']) {
-                    _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
+                    if (item.style['border-top-left-radius']) {
+                        _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-top-right-radius']) {
+                        _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-left-radius']) {
+                        _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-right-radius']) {
+                        _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
+                    }
                 }
             });
         }
@@ -11264,9 +11172,27 @@ var Radius = function (_UIElement) {
             });
         }
     }, {
+        key: 'click $fixedRadius',
+        value: function click$fixedRadius() {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.fixedRadius = _this4.refs.$fixedRadius.el.checked;
+                _this4.dispatch('/item/set', item);
+            });
+        }
+    }, {
         key: 'input $topLeftRadius',
         value: function input$topLeftRadius() {
-            this.refreshValue('border-top-left-radius', this.refs.$topLeftRadius);
+            var _this5 = this;
+
+            this.read('/item/current/layer', function (item) {
+                if (item.fixedRadius) {
+                    _this5.refreshValue('border-radius', _this5.refs.$topLeftRadius);
+                } else {
+                    _this5.refreshValue('border-top-left-radius', _this5.refs.$topLeftRadius);
+                }
+            });
         }
     }, {
         key: 'input $topRightRadius',
@@ -11396,7 +11322,7 @@ var Name = function (_UIElement) {
     createClass(Name, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item name\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name"> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item name\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11470,7 +11396,7 @@ var GradientSteps = function (_UIElement) {
 
             return this.read('/item/map/children', item.id, function (step) {
 
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                ></div>\n            ';
+                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' style="background-color: ' + step.color + ';"></div>\n                </div>\n            ';
             });
         }
     }, {
@@ -11795,7 +11721,7 @@ var GradientInfo = function (_UIElement) {
             });
 
             return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step) {
-                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
+                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
             }).join('') + '\n                </div>';
         }
     }, {
@@ -12338,7 +12264,37 @@ var Background = function (_UIElement) {
     createClass(Background, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'auto\'>auto</option>\n                                <option value=\'initial\'>initial</option>\n                                <option value=\'contain\'>contain</option>\n                                <option value=\'cover\'>cover</option>\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>\n\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'auto\'>auto</option>\n                                <option value=\'initial\'>initial</option>\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <button type="button" ref="$contain">Contain</button>\n                            <button type="button" ref="$cover">Cover</button>\n                            <button type="button" ref="$auto">Auto</button>\n                        </div>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>\n\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'click $contain',
+        value: function click$contain() {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'contain';
+                _this2.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'click $cover',
+        value: function click$cover() {
+            var _this3 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'cover';
+                _this3.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'click $auto',
+        value: function click$auto() {
+            var _this4 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'auto';
+                _this4.dispatch('/item/set', image);
+            });
         }
     }, {
         key: 'change $widthSelect',
@@ -12353,21 +12309,21 @@ var Background = function (_UIElement) {
     }, {
         key: 'input $width',
         value: function input$width(e) {
-            var _this2 = this;
+            var _this5 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeWidth = _this2.refs.$width.val();
-                _this2.dispatch('/item/set', image);
+                image.backgroundSizeWidth = _this5.refs.$width.val();
+                _this5.dispatch('/item/set', image);
             });
         }
     }, {
         key: 'input $height',
         value: function input$height(e) {
-            var _this3 = this;
+            var _this6 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeHeight = _this3.refs.$height.val();
-                _this3.dispatch('/item/set', image);
+                image.backgroundSizeHeight = _this6.refs.$height.val();
+                _this6.dispatch('/item/set', image);
             });
         }
     }, {
@@ -12376,30 +12332,30 @@ var Background = function (_UIElement) {
             this.refresh();
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.read('/item/is/mode', 'image');
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
-            var _this4 = this;
+            var _this7 = this;
 
-            this.read('/item/current/image', function (image) {
-                if (image.backgroundSizeWidth) {
-                    _this4.refs.$width.val(image.backgroundSizeWidth);
-                }
+            var isShow = this.isShow();
 
-                if (image.backgroundSizeHeight) {
-                    _this4.refs.$height.val(image.backgroundSizeHeight);
-                }
-            });
+            this.$el.toggle(isShow);
 
-            // if (!item) reutrn; 
-            // if (item.itemType == 'image') return; 
+            if (isShow) {
+                this.read('/item/current/image', function (image) {
+                    if (image.backgroundSizeWidth) {
+                        _this7.refs.$width.val(image.backgroundSizeWidth);
+                    }
 
-            // if (item.style.width) {
-            //     this.refs.$width.val(item.style.width.replace('px', ''))
-            // }
-
-            // if (item.style.height) {
-            //     this.refs.$height.val(item.style.height.replace('px', ''))
-            // }
+                    if (image.backgroundSizeHeight) {
+                        _this7.refs.$height.val(image.backgroundSizeHeight);
+                    }
+                });
+            }
         }
     }]);
     return Background;
@@ -12425,6 +12381,7 @@ var BackgroundRepeat = function (_UIElement) {
 
             this.read('/item/current/image', function (image) {
                 image.backgroundRepeat = _this2.refs.$repeat.val();
+                console.log(image);
                 _this2.dispatch('/item/set', image);
             });
         }
@@ -12434,13 +12391,24 @@ var BackgroundRepeat = function (_UIElement) {
             this.refresh();
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.read('/item/is/mode', 'image');
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
 
-            this.read('/item/current/image', function (image) {
-                _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-            });
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.read('/item/current/image', function (image) {
+                    _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
+                });
+            }
         }
     }]);
     return BackgroundRepeat;
@@ -13335,6 +13303,7 @@ var TopLeftRadius = function (_UIElement) {
         value: function refresh() {
             var isShow = this.isShow();
 
+            this.$el.toggle(isShow);
             if (isShow) {
                 this.setPosition();
             }
@@ -13356,12 +13325,17 @@ var TopLeftRadius = function (_UIElement) {
     }, {
         key: 'setRadiusPosition',
         value: function setRadiusPosition(x, y, width, height, layer) {
+
             var radius = layer.style[this.radiusKey] || '0px';
             this.$el.css('left', radius);
         }
     }, {
         key: 'isShow',
         value: function isShow() {
+            var layer = this.read('/item/current/layer');
+            if (!layer) return false;
+
+            if (layer.fixedRadius) return false;
             return this.read('/item/is/mode', 'layer', 'image');
         }
     }, {
@@ -13381,7 +13355,6 @@ var TopLeftRadius = function (_UIElement) {
             //        console.log(dx);
 
             var radius = this.getRealRadius(this.layerRadius, dx);
-
             this.layer.style[this.radiusKey] = radius + 'px';
 
             this.dispatch('/item/set', this.layer);
@@ -13402,7 +13375,9 @@ var TopLeftRadius = function (_UIElement) {
 
             this.xy = e.xy;
             this.layer = layer;
+
             this.layerRadius = +(layer.style[this.radiusKey] || '0px').replace('px', '');
+
             this.layerWidth = +this.layer.style.width.replace('px', '');
             this.layerHeight = +this.layer.style.height.replace('px', '');
         }
@@ -13569,6 +13544,38 @@ var LayerRotate = function (_UIElement) {
     return LayerRotate;
 }(UIElement);
 
+var Radius$2 = function (_TopLeftRadius) {
+    inherits(Radius, _TopLeftRadius);
+
+    function Radius() {
+        classCallCheck(this, Radius);
+        return possibleConstructorReturn(this, (Radius.__proto__ || Object.getPrototypeOf(Radius)).apply(this, arguments));
+    }
+
+    createClass(Radius, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(Radius.prototype.__proto__ || Object.getPrototypeOf(Radius.prototype), 'initialize', this).call(this);
+
+            this.radiusKey = 'border-radius';
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '<button type=\'button\' data-value=\'radius\'></button>';
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            var layer = this.read('/item/current/layer');
+            if (!layer) return false;
+
+            return !!layer.fixedRadius;
+        }
+    }]);
+    return Radius;
+}(TopLeftRadius);
+
 var PredefinedLayerResizer = function (_UIElement) {
     inherits(PredefinedLayerResizer, _UIElement);
 
@@ -13580,12 +13587,12 @@ var PredefinedLayerResizer = function (_UIElement) {
     createClass(PredefinedLayerResizer, [{
         key: 'components',
         value: function components() {
-            return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate };
+            return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate, Radius: Radius$2 };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div>\n        ';
+            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -14016,7 +14023,7 @@ var LayerMenuTab = function (_BaseTab) {
 
             this.read('/item/current/layer', function (item) {
                 _this2.refs.$backgroundBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode']);
-                _this2.refs.$mixBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, '', item.style['mix-blend-mode']);
+                _this2.refs.$mixBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode'], item.style['mix-blend-mode']);
             });
         }
     }, {

@@ -4,7 +4,11 @@ export default class Size extends UIElement {
     template () {
         return `
             <div class='property-item size'>
-                <div class='title'>Dimesion</div>
+                <div class='title'>Dimesion
+                    <span>
+                        <button type="button" ref="$rect">rect</button>
+                    </span>
+                </div>
                 <div class='items'>
                     <div>
                         <label>Width</label>
@@ -40,6 +44,18 @@ export default class Size extends UIElement {
             this.refs.$height.val(item.style.height.replace('px', ''))
         }
         
+    }
+
+    'click $rect' (e) {
+        var item = this.read('/item/current')
+
+        if (!item) reutrn; 
+        if (item.itemType == 'image') return; 
+
+
+        item.style.width = this.refs.$width.int() + 'px'
+        item.style.height = item.style.width; 
+        this.dispatch('/item/set', item)
     }
 
     'input $width' () {

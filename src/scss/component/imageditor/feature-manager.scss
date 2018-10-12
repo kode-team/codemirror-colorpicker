@@ -46,14 +46,12 @@ $layer-item-padding: 4px;
             border-bottom: 0px;
             border-top: 0px;
             .property-item {
-                display: inline-block;
-                vertical-align: middle;
+                display: none; 
                 border: 0px;
     
                 > .items {
                     > div {
                         label {
-                            width: auto; 
                             margin-right: 10px;
                         }
                     }

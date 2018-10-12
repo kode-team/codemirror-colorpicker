@@ -131,6 +131,16 @@ export default class LayerManager extends BaseModule {
             css['mix-blend-mode'] = layer.style['mix-blend-mode'] || ""
         }
 
+        if (layer.fixedRadius) {
+            css['border-radius'] = layer.style['border-radius']
+            css['border-top-left-radius'] = ''
+            css['border-top-right-radius'] = ''
+            css['border-bottom-left-radius'] = ''
+            css['border-bottom-right-radius'] = ''  
+        } else {
+
+        }
+
         css['transform'] = $store.read('/layer/make/transform', layer)
 
         var results = Object.assign(css, 

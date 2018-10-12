@@ -1356,11 +1356,9 @@
     border-bottom: 0px;
     border-top: 0px; }
     .imageeditor .sub-feature-control .image-feature .property-view .property-item {
-      display: inline-block;
-      vertical-align: middle;
+      display: none;
       border: 0px; }
       .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items > div label {
-        width: auto;
         margin-right: 10px; }
   .imageeditor .gradient-type {
     display: inline-block;
@@ -1553,6 +1551,18 @@
             background-color: black; }
   .imageeditor .layer-preview button {
     border: 1px solid #dedede; }
+  .imageeditor .layer-preview:empty:before {
+    content: "Layer Preview";
+    color: #dadada;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    padding: 30px;
+    text-align: center;
+    font-size: 30px;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
   .imageeditor .layer-preview .tree-item {
     display: inline-block;
     position: absolute;
@@ -2159,11 +2169,11 @@
                     box-sizing: border-box;
             border-radius: 50%;
             border: 1px solid rgba(0, 0, 0, 0.8); }
-        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top right'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom right'] {
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top right'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom left'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius bottom right'] {
           background-color: rgba(255, 255, 0, 0.637);
           border: 1px solid #83831a;
           border-radius: 50%; }
-        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'] {
+        .imageeditor .page-view .predefined-layer-resizer button[data-value='radius'], .imageeditor .page-view .predefined-layer-resizer button[data-value='radius top left'] {
           top: -18px;
           left: -6px;
           -webkit-transform: translateX(-50%);
@@ -2336,7 +2346,19 @@
       .imageeditor .property-view .property-item > .title {
         font-size: 12px;
         font-weight: bold;
-        padding: 2px 0px !important; }
+        padding: 4px 0px !important;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        height: 30px; }
+        .imageeditor .property-view .property-item > .title > span button {
+          -webkit-appearance: none;
+             -moz-appearance: none;
+                  appearance: none;
+          border: 1px solid #ececec;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          display: inline-block;
+          height: 100%; }
       .imageeditor .property-view .property-item > .items > div {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -2362,6 +2384,8 @@
           .imageeditor .property-view .property-item > .items > div > div input[type=number], .imageeditor .property-view .property-item > .items > div > div input[type=text] {
             width: 40px;
             vertical-align: middle; }
+            .imageeditor .property-view .property-item > .items > div > div input[type=number].full, .imageeditor .property-view .property-item > .items > div > div input[type=text].full {
+              width: 160px; }
           .imageeditor .property-view .property-item > .items > div > div .input input[type=number], .imageeditor .property-view .property-item > .items > div > div .input input[type=text] {
             width: 30px; }
           .imageeditor .property-view .property-item > .items > div > div > span {
@@ -2376,7 +2400,8 @@
             text-align: center; }
       .imageeditor .property-view .property-item.gradient-steps {
         height: 60px;
-        padding: 10px; }
+        padding: 10px;
+        padding-bottom: 20px; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
           position: relative;
           display: block; }
@@ -2430,21 +2455,24 @@
               z-index: 0;
               -webkit-transition: top 0.3s ease-out;
               transition: top 0.3s ease-out; }
+              .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar .guide-line {
+                pointer-events: none;
+                position: absolute;
+                width: 1px;
+                height: 0px;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+                bottom: 8px;
+                left: 50%;
+                -webkit-transform: translateX(-50%);
+                        transform: translateX(-50%);
+                -webkit-transition: all 0.3s ease-out;
+                transition: all 0.3s ease-out; }
               .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected {
                 z-index: 1;
                 top: 30px; }
-                .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected:after {
-                  content: "";
-                  position: absolute;
-                  width: 1px;
-                  height: 17px;
-                  background-color: rgba(0, 0, 0, 0.3);
-                  -webkit-box-sizing: border-box;
-                          box-sizing: border-box;
-                  bottom: 8px;
-                  left: 50%;
-                  -webkit-transform: translateX(-50%);
-                          transform: translateX(-50%); }
+                .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected .guide-line {
+                  height: 17px; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-list-layout {
           position: absolute;
           top: 50px !important;
@@ -2526,8 +2554,8 @@
             display: block;
             padding: 1px;
             color: #333; }
-            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected {
-              background-color: #ececec; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .color-view {
+              border: 0px; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step > * {
               display: inline-block;
               vertical-align: middle; }

@@ -16,6 +16,7 @@ export default class TopLeftRadius extends UIElement {
     refresh () {
         var isShow = this.isShow();
 
+        this.$el.toggle(isShow)
         if (isShow) {
             this.setPosition()
         }
@@ -36,11 +37,16 @@ export default class TopLeftRadius extends UIElement {
     }
 
     setRadiusPosition (x, y, width, height, layer) {
+
         var radius = layer.style[this.radiusKey] || '0px'
         this.$el.css('left', radius)
     }
 
     isShow () {
+        var layer = this.read('/item/current/layer')
+        if (!layer) return false; 
+
+        if (layer.fixedRadius) return false;         
         return this.read('/item/is/mode', 'layer', 'image');
     }
 
@@ -58,7 +64,6 @@ export default class TopLeftRadius extends UIElement {
 //        console.log(dx);
 
         var radius = this.getRealRadius(this.layerRadius, dx);
-
         this.layer.style[this.radiusKey] = radius + 'px'
 
         this.dispatch('/item/set', this.layer);
@@ -76,7 +81,9 @@ export default class TopLeftRadius extends UIElement {
 
         this.xy = e.xy;
         this.layer = layer; 
+
         this.layerRadius = +(layer.style[this.radiusKey] || '0px').replace('px', '')
+        
         this.layerWidth = +this.layer.style.width.replace('px', '') 
         this.layerHeight = +this.layer.style.height.replace('px', '') 
     }

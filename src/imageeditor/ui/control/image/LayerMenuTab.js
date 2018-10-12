@@ -52,7 +52,7 @@ export default class LayerMenuTab extends BaseTab {
     refresh () {
         this.read('/item/current/layer', (item) => {
             this.refs.$backgroundBlendMode.el.style = this.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode'])
-            this.refs.$mixBlendMode.el.style = this.read('/blend/toStringWithoutDimension', item, '', item.style['mix-blend-mode'])
+            this.refs.$mixBlendMode.el.style = this.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode'], item.style['mix-blend-mode'])
         })
         
     }

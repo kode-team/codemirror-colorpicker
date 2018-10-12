@@ -8,12 +8,13 @@ export default class Background extends UIElement {
                     <div>
                         <label>size</label>
                         <div>
+                            <button type="button" ref="$contain">Contain</button>
+                            <button type="button" ref="$cover">Cover</button>
+                            <button type="button" ref="$auto">Auto</button>
+                        </div>
+                        <div>
                             <input type="text" ref="$width" />
                             <select ref="$widthSelect">
-                                <option value='auto'>auto</option>
-                                <option value='initial'>initial</option>
-                                <option value='contain'>contain</option>
-                                <option value='cover'>cover</option>
                                 <option value='%'>%</option>
                                 <option value='px'>px</option>
                             </selct>
@@ -22,8 +23,6 @@ export default class Background extends UIElement {
                         <div>
                             <input type="text" ref="$height" />
                             <select ref="$heightSelect">
-                                <option value='auto'>auto</option>
-                                <option value='initial'>initial</option>
                                 <option value='%'>%</option>
                                 <option value='px'>px</option>
                             </selct>
@@ -34,6 +33,27 @@ export default class Background extends UIElement {
             </div>
         `
     }
+
+    'click $contain' () {
+        this.read('/item/current/image', (image) => {
+            image.backgroundSize = 'contain'
+            this.dispatch('/item/set', image);
+        })
+    }
+
+    'click $cover' () {
+        this.read('/item/current/image', (image) => {
+            image.backgroundSize = 'cover'
+            this.dispatch('/item/set', image);
+        })
+    }    
+
+    'click $auto' () {
+        this.read('/item/current/image', (image) => {
+            image.backgroundSize = 'auto'
+            this.dispatch('/item/set', image);
+        })
+    }        
 
     'change $widthSelect' () {
         this.refs.$width.val(this.refs.$widthSelect.val());
@@ -62,27 +82,28 @@ export default class Background extends UIElement {
         this.refresh()
     }
 
+    isShow () {
+        return this.read('/item/is/mode', 'image');
+    }
+
     refresh() {
-        this.read('/item/current/image', (image) => {
-            if (image.backgroundSizeWidth) {
-                this.refs.$width.val(image.backgroundSizeWidth);
-            }
 
-            if (image.backgroundSizeHeight) {
-                this.refs.$height.val(image.backgroundSizeHeight);
-            }            
-        })
+        var isShow = this.isShow();
 
-        // if (!item) reutrn; 
-        // if (item.itemType == 'image') return; 
+        this.$el.toggle(isShow)
 
-        // if (item.style.width) {
-        //     this.refs.$width.val(item.style.width.replace('px', ''))
-        // }
+        if (isShow) {
+            this.read('/item/current/image', (image) => {
+                if (image.backgroundSizeWidth) {
+                    this.refs.$width.val(image.backgroundSizeWidth);
+                }
+    
+                if (image.backgroundSizeHeight) {
+                    this.refs.$height.val(image.backgroundSizeHeight);
+                }            
+            })
+        }
 
-        // if (item.style.height) {
-        //     this.refs.$height.val(item.style.height.replace('px', ''))
-        // }
         
     }
 

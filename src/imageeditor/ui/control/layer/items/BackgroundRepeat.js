@@ -26,6 +26,7 @@ export default class BackgroundRepeat extends UIElement {
     'change $repeat' () {
         this.read('/item/current/image', (image) => {
             image.backgroundRepeat = this.refs.$repeat.val()
+            console.log(image);
             this.dispatch('/item/set', image);
         })
     }
@@ -35,10 +36,22 @@ export default class BackgroundRepeat extends UIElement {
         this.refresh()
     }
 
+
+    isShow () {
+        return this.read('/item/is/mode', 'image');
+    }
+
     refresh() {
-        this.read('/item/current/image', (image) => {
-            this.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-        })
+
+        var isShow = this.isShow();
+
+        this.$el.toggle(isShow)
+
+        if (isShow) {        
+            this.read('/item/current/image', (image) => {
+                this.refs.$repeat.val(image.backgroundRepeat || 'repeat');
+            })
+        }
     }
 
 }

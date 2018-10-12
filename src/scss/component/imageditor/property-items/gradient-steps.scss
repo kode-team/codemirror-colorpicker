@@ -2,6 +2,7 @@
     $pointer-color: rgba(#ececec, 0.8);
     height: 60px;
     padding: 10px;
+    padding-bottom: 20px;
 
     .gradient-steps {
         position: relative;
@@ -63,20 +64,24 @@
                 z-index: 0;
                 transition: top 0.3s ease-out;
 
+                .guide-line {
+                    // display: none;
+                    pointer-events: none;
+                    position: absolute;
+                    width: 1px;
+                    height: 0px;
+                    box-sizing: border-box;
+                    bottom: 8px;
+                    left: 50%;
+                    transform: translateX(-50%);                    
+                    transition: all 0.3s ease-out;
+                }
+
                 &.selected {
                     z-index:1;
                     top: 30px;
-                    &:after {
-                        // display: none;
-                        content: "";
-                        position: absolute;
-                        width: 1px;
+                    .guide-line {
                         height: 17px;
-                        background-color: rgba(0, 0, 0, 0.3);
-                        box-sizing: border-box;
-                        bottom: 8px;
-                        left: 50%;
-                        transform: translateX(-50%);
                     }                
                 }
             }                    

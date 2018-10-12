@@ -37,8 +37,11 @@ export default class GradientSteps extends UIElement {
                 <div 
                     class='drag-bar step ${step.selected ? 'selected' : ''}' 
                     id="${step.id}"
+                    color="${step.color}" 
                     style="left: ${this.getStepPosition(step.percent)}px; border-color: ${step.color};background-color: ${step.color};"
-                ></div>
+                >
+                    <div class='guide-line' style="background-color: ${step.color};"></div>
+                </div>
             `
         })
     }

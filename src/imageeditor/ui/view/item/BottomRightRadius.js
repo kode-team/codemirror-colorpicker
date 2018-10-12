@@ -11,5 +11,6 @@ export default class BottomRightRadius extends TopRightRadius {
     template () {
         return `<button type='button' data-value='radius bottom right'></button>`
     }
+    
 
 }

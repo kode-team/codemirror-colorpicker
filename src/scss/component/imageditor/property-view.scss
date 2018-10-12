@@ -19,7 +19,21 @@
         > .title {
             font-size: 12px;
             font-weight: bold;
-            padding: 2px 0px !important;
+            padding: 4px 0px !important;
+            box-sizing: border-box;
+            height: 30px;
+
+            > span {
+                
+
+                button {
+                    appearance: none;
+                    border: 1px solid #ececec;
+                    box-sizing: border-box;
+                    display: inline-block;
+                    height: 100%;
+                }
+            }
         }
 
         > .items > div {
@@ -50,6 +64,10 @@
                 input[type=number], input[type=text] {
                     width: 40px;
                     vertical-align: middle;                    
+
+                    &.full {
+                        width: 160px;
+                    }
                 }
 
                 .input {

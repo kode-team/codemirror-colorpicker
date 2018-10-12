@@ -16,7 +16,11 @@
                 color: #333; 
 
                 &.selected {
-                    background-color: #ececec;
+                    // background-color: #ececec;
+
+                    .color-view {
+                        border:0px;
+                    }
                 }
 
                 > * {

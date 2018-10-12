@@ -9961,6 +9961,14 @@ var LayerManager = function (_BaseModule) {
                 css['mix-blend-mode'] = layer.style['mix-blend-mode'] || "";
             }
 
+            if (layer.fixedRadius) {
+                css['border-radius'] = layer.style['border-radius'];
+                css['border-top-left-radius'] = '';
+                css['border-top-right-radius'] = '';
+                css['border-bottom-left-radius'] = '';
+                css['border-bottom-right-radius'] = '';
+            } else {}
+
             css['transform'] = $store.read('/layer/make/transform', layer);
 
             var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer));
@@ -11111,7 +11119,7 @@ var Size = function (_UIElement) {
     createClass(Size, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\'>Dimesion</div>\n                <div class=\'items\'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\'>Dimesion\n                    <span>\n                        <button type="button" ref="$rect">rect</button>\n                    </span>\n                </div>\n                <div class=\'items\'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11132,6 +11140,17 @@ var Size = function (_UIElement) {
             if (item.style.height) {
                 this.refs.$height.val(item.style.height.replace('px', ''));
             }
+        }
+    }, {
+        key: 'click $rect',
+        value: function click$rect(e) {
+            var item = this.read('/item/current');
+
+            if (item.itemType == 'image') return;
+
+            item.style.width = this.refs.$width.int() + 'px';
+            item.style.height = item.style.width;
+            this.dispatch('/item/set', item);
         }
     }, {
         key: 'input $width',
@@ -11225,7 +11244,7 @@ var Radius = function (_UIElement) {
     createClass(Radius, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item radius\'>\n                <div class=\'title\'>Radius</div>\n                <div class=\'items\'>         \n                    <div> <label class=\'left\'>Top</label></div>   \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div> <label class=\'left\'>Bottom</label></div>                             \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item radius\'>\n                <div class=\'title\'>Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span>\n                </div>\n                <div class=\'items\'>         \n                    <div> <label class=\'left\'>Top</label></div>   \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div> <label class=\'left\'>Bottom</label></div>                             \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11238,20 +11257,40 @@ var Radius = function (_UIElement) {
             var _this2 = this;
 
             this.read('/item/current/layer', function (item) {
-                if (item.style['border-top-left-radius']) {
-                    _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
-                }
 
-                if (item.style['border-top-right-radius']) {
-                    _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
-                }
+                if (item.fixedRadius) {
+                    _this2.refs.$fixedRadius.el.checked = true;
+                    var radius = item.style['border-radius'] || '';
+                    radius = radius.replace('px', '');
+                    _this2.refs.$topLeftRadius.val(radius);
+                    _this2.refs.$topRightRadius.val('');
+                    _this2.refs.$bottomLeftRadius.val('');
+                    _this2.refs.$bottomRightRadius.val('');
 
-                if (item.style['border-bottom-left-radius']) {
-                    _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
-                }
+                    // this.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''))
+                    _this2.refs.$topRightRadius.el.disabled = true;
+                    _this2.refs.$bottomLeftRadius.el.disabled = true;
+                    _this2.refs.$bottomRightRadius.el.disabled = true;
+                } else {
+                    _this2.refs.$topRightRadius.el.disabled = false;
+                    _this2.refs.$bottomLeftRadius.el.disabled = false;
+                    _this2.refs.$bottomRightRadius.el.disabled = false;
 
-                if (item.style['border-bottom-right-radius']) {
-                    _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
+                    if (item.style['border-top-left-radius']) {
+                        _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-top-right-radius']) {
+                        _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-left-radius']) {
+                        _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-right-radius']) {
+                        _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
+                    }
                 }
             });
         }
@@ -11266,9 +11305,27 @@ var Radius = function (_UIElement) {
             });
         }
     }, {
+        key: 'click $fixedRadius',
+        value: function click$fixedRadius() {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.fixedRadius = _this4.refs.$fixedRadius.el.checked;
+                _this4.dispatch('/item/set', item);
+            });
+        }
+    }, {
         key: 'input $topLeftRadius',
         value: function input$topLeftRadius() {
-            this.refreshValue('border-top-left-radius', this.refs.$topLeftRadius);
+            var _this5 = this;
+
+            this.read('/item/current/layer', function (item) {
+                if (item.fixedRadius) {
+                    _this5.refreshValue('border-radius', _this5.refs.$topLeftRadius);
+                } else {
+                    _this5.refreshValue('border-top-left-radius', _this5.refs.$topLeftRadius);
+                }
+            });
         }
     }, {
         key: 'input $topRightRadius',
@@ -11398,7 +11455,7 @@ var Name = function (_UIElement) {
     createClass(Name, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item name\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name"> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item name\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -11472,7 +11529,7 @@ var GradientSteps = function (_UIElement) {
 
             return this.read('/item/map/children', item.id, function (step) {
 
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                ></div>\n            ';
+                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' style="background-color: ' + step.color + ';"></div>\n                </div>\n            ';
             });
         }
     }, {
@@ -11797,7 +11854,7 @@ var GradientInfo = function (_UIElement) {
             });
 
             return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step) {
-                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
+                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
             }).join('') + '\n                </div>';
         }
     }, {
@@ -12340,7 +12397,37 @@ var Background = function (_UIElement) {
     createClass(Background, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'auto\'>auto</option>\n                                <option value=\'initial\'>initial</option>\n                                <option value=\'contain\'>contain</option>\n                                <option value=\'cover\'>cover</option>\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>\n\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'auto\'>auto</option>\n                                <option value=\'initial\'>initial</option>\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <button type="button" ref="$contain">Contain</button>\n                            <button type="button" ref="$cover">Cover</button>\n                            <button type="button" ref="$auto">Auto</button>\n                        </div>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>\n\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'click $contain',
+        value: function click$contain() {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'contain';
+                _this2.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'click $cover',
+        value: function click$cover() {
+            var _this3 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'cover';
+                _this3.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'click $auto',
+        value: function click$auto() {
+            var _this4 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundSize = 'auto';
+                _this4.dispatch('/item/set', image);
+            });
         }
     }, {
         key: 'change $widthSelect',
@@ -12355,21 +12442,21 @@ var Background = function (_UIElement) {
     }, {
         key: 'input $width',
         value: function input$width(e) {
-            var _this2 = this;
+            var _this5 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeWidth = _this2.refs.$width.val();
-                _this2.dispatch('/item/set', image);
+                image.backgroundSizeWidth = _this5.refs.$width.val();
+                _this5.dispatch('/item/set', image);
             });
         }
     }, {
         key: 'input $height',
         value: function input$height(e) {
-            var _this3 = this;
+            var _this6 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeHeight = _this3.refs.$height.val();
-                _this3.dispatch('/item/set', image);
+                image.backgroundSizeHeight = _this6.refs.$height.val();
+                _this6.dispatch('/item/set', image);
             });
         }
     }, {
@@ -12378,30 +12465,30 @@ var Background = function (_UIElement) {
             this.refresh();
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.read('/item/is/mode', 'image');
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
-            var _this4 = this;
+            var _this7 = this;
 
-            this.read('/item/current/image', function (image) {
-                if (image.backgroundSizeWidth) {
-                    _this4.refs.$width.val(image.backgroundSizeWidth);
-                }
+            var isShow = this.isShow();
 
-                if (image.backgroundSizeHeight) {
-                    _this4.refs.$height.val(image.backgroundSizeHeight);
-                }
-            });
+            this.$el.toggle(isShow);
 
-            // if (!item) reutrn; 
-            // if (item.itemType == 'image') return; 
+            if (isShow) {
+                this.read('/item/current/image', function (image) {
+                    if (image.backgroundSizeWidth) {
+                        _this7.refs.$width.val(image.backgroundSizeWidth);
+                    }
 
-            // if (item.style.width) {
-            //     this.refs.$width.val(item.style.width.replace('px', ''))
-            // }
-
-            // if (item.style.height) {
-            //     this.refs.$height.val(item.style.height.replace('px', ''))
-            // }
+                    if (image.backgroundSizeHeight) {
+                        _this7.refs.$height.val(image.backgroundSizeHeight);
+                    }
+                });
+            }
         }
     }]);
     return Background;
@@ -12427,6 +12514,7 @@ var BackgroundRepeat = function (_UIElement) {
 
             this.read('/item/current/image', function (image) {
                 image.backgroundRepeat = _this2.refs.$repeat.val();
+                console.log(image);
                 _this2.dispatch('/item/set', image);
             });
         }
@@ -12436,13 +12524,24 @@ var BackgroundRepeat = function (_UIElement) {
             this.refresh();
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.read('/item/is/mode', 'image');
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
 
-            this.read('/item/current/image', function (image) {
-                _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-            });
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.read('/item/current/image', function (image) {
+                    _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
+                });
+            }
         }
     }]);
     return BackgroundRepeat;
@@ -13337,6 +13436,7 @@ var TopLeftRadius = function (_UIElement) {
         value: function refresh() {
             var isShow = this.isShow();
 
+            this.$el.toggle(isShow);
             if (isShow) {
                 this.setPosition();
             }
@@ -13358,12 +13458,17 @@ var TopLeftRadius = function (_UIElement) {
     }, {
         key: 'setRadiusPosition',
         value: function setRadiusPosition(x, y, width, height, layer) {
+
             var radius = layer.style[this.radiusKey] || '0px';
             this.$el.css('left', radius);
         }
     }, {
         key: 'isShow',
         value: function isShow() {
+            var layer = this.read('/item/current/layer');
+            if (!layer) return false;
+
+            if (layer.fixedRadius) return false;
             return this.read('/item/is/mode', 'layer', 'image');
         }
     }, {
@@ -13383,7 +13488,6 @@ var TopLeftRadius = function (_UIElement) {
             //        console.log(dx);
 
             var radius = this.getRealRadius(this.layerRadius, dx);
-
             this.layer.style[this.radiusKey] = radius + 'px';
 
             this.dispatch('/item/set', this.layer);
@@ -13404,7 +13508,9 @@ var TopLeftRadius = function (_UIElement) {
 
             this.xy = e.xy;
             this.layer = layer;
+
             this.layerRadius = +(layer.style[this.radiusKey] || '0px').replace('px', '');
+
             this.layerWidth = +this.layer.style.width.replace('px', '');
             this.layerHeight = +this.layer.style.height.replace('px', '');
         }
@@ -13571,6 +13677,38 @@ var LayerRotate = function (_UIElement) {
     return LayerRotate;
 }(UIElement);
 
+var Radius$2 = function (_TopLeftRadius) {
+    inherits(Radius, _TopLeftRadius);
+
+    function Radius() {
+        classCallCheck(this, Radius);
+        return possibleConstructorReturn(this, (Radius.__proto__ || Object.getPrototypeOf(Radius)).apply(this, arguments));
+    }
+
+    createClass(Radius, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(Radius.prototype.__proto__ || Object.getPrototypeOf(Radius.prototype), 'initialize', this).call(this);
+
+            this.radiusKey = 'border-radius';
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '<button type=\'button\' data-value=\'radius\'></button>';
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            var layer = this.read('/item/current/layer');
+            if (!layer) return false;
+
+            return !!layer.fixedRadius;
+        }
+    }]);
+    return Radius;
+}(TopLeftRadius);
+
 var PredefinedLayerResizer = function (_UIElement) {
     inherits(PredefinedLayerResizer, _UIElement);
 
@@ -13582,12 +13720,12 @@ var PredefinedLayerResizer = function (_UIElement) {
     createClass(PredefinedLayerResizer, [{
         key: 'components',
         value: function components() {
-            return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate };
+            return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate, Radius: Radius$2 };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div>\n        ';
+            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -14018,7 +14156,7 @@ var LayerMenuTab = function (_BaseTab) {
 
             this.read('/item/current/layer', function (item) {
                 _this2.refs.$backgroundBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode']);
-                _this2.refs.$mixBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, '', item.style['mix-blend-mode']);
+                _this2.refs.$mixBlendMode.el.style = _this2.read('/blend/toStringWithoutDimension', item, item.style['background-blend-mode'], item.style['mix-blend-mode']);
             });
         }
     }, {

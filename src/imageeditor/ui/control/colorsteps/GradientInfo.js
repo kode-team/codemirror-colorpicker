@@ -23,7 +23,7 @@ export default class GradientInfo extends UIElement {
         return `<div class='step-list' ref="$stepList">
                     ${colorsteps.map( step => {
                         return `
-                            <div class='color-step ${step.selected ? 'selected' : ''}' >
+                            <div class='color-step ${step.selected ? 'selected' : ''}' style="background-color: ${step.selected ? step.color : ''}" >
                                 <div class="color-view">
                                     <div class="color-view-item" style="background-color: ${step.color}" colorstep-id="${step.id}" ></div>
                                 </div>

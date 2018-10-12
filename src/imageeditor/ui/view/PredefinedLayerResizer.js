@@ -4,11 +4,13 @@ import TopRightRadius from './item/TopRightRadius';
 import BottomLeftRadius from './item/BottomLeftRadius';
 import BottomRightRadius from './item/BottomRightRadius';
 import LayerRotate from './item/LayerRotate';
+import Radius from './item/Radius';
+
 
 export default class PredefinedLayerResizer extends UIElement {
 
     components () {
-        return { TopLeftRadius, TopRightRadius, BottomLeftRadius, BottomRightRadius, LayerRotate }
+        return { TopLeftRadius, TopRightRadius, BottomLeftRadius, BottomRightRadius, LayerRotate, Radius }
     }
 
     template () { 
@@ -25,6 +27,7 @@ export default class PredefinedLayerResizer extends UIElement {
                     <button type="button" data-value="to top left"></button>
                 </div>
 
+                <Radius></Radius>
                 <TopLeftRadius></TopLeftRadius>
                 <TopRightRadius></TopRightRadius>
                 <BottomLeftRadius></BottomLeftRadius>

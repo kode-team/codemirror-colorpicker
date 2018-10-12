@@ -540,6 +540,7 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
                 }
             }
 
+            &[data-value='radius'],  
             &[data-value='radius top left'], 
             &[data-value='radius top right'], 
             &[data-value='radius bottom left'], 
@@ -549,7 +550,9 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
                 border-radius: 50%;
             }
 
-            &[data-value='radius top left'] {
+            &[data-value='radius'],
+            &[data-value='radius top left']
+             {
                 top: $editor-half-width * 3; 
                 left: $editor-half-width;
                 transform: translateX(-50%);

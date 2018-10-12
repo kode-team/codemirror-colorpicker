@@ -8,7 +8,7 @@ export default class Name extends UIElement {
                     <div>
                         <label>Name</label>
                         <div>
-                            <input type='text' ref="$name"> 
+                            <input type='text' ref="$name" class='full'> 
                         </div>
                     </div>
                 </div>
