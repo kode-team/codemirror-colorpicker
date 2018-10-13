@@ -58,7 +58,6 @@ $layer-item-padding: 4px;
         bottom: 0px;
         top: 30px;
         overflow-x: auto; 
-        padding: 8px; 
         white-space: nowrap;
         border-top: 1px solid #ececec;
         box-sizing: border-box;
@@ -78,19 +77,13 @@ $layer-item-padding: 4px;
         }
 
         .tree-item {
-            display: inline-block;
-            height: 100px;            
-            width: 80px;            
-            vertical-align: middle;
+            display: block;
+            height: 30px;            
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
-            padding: 5px;
-            border: 1px solid #ececec;
-
-            margin-right: 5px;
-            text-align: center;
+            padding: 5px 10px;
+            border-bottom: 1px solid #ececec;
 
             &.selected {
                 background-color: #ececec;

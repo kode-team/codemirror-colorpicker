@@ -1,7 +1,3 @@
-import ColorUtil from './Color'
-
-const color = ColorUtil.color; 
-
 let counter = 0;
 let cached = [];
 

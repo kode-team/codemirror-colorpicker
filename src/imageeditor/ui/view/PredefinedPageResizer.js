@@ -6,13 +6,13 @@ export default class PredefinedPageResizer extends UIElement {
         return `
             <div class="predefined-page-resizer">
                 <button type="button" data-value="to right"></button>
-                <button type="button" data-value="to left"></button>
-                <button type="button" data-value="to top"></button>
+                <!--<button type="button" data-value="to left"></button>-->
+                <!--<button type="button" data-value="to top"></button>-->
                 <button type="button" data-value="to bottom"></button>
-                <button type="button" data-value="to top right"></button>
+                <!--<button type="button" data-value="to top right"></button>-->
                 <button type="button" data-value="to bottom right"></button>
-                <button type="button" data-value="to bottom left"></button>
-                <button type="button" data-value="to top left"></button>
+                <!--<button type="button" data-value="to bottom left"></button>-->
+                <!--<button type="button" data-value="to top left"></button>-->
             </div>
         `
     }
@@ -23,6 +23,7 @@ export default class PredefinedPageResizer extends UIElement {
     }
 
     isShow () {
+        // return false; 
         return this.read('/item/is/mode', 'page')
     }
 
@@ -42,48 +43,48 @@ export default class PredefinedPageResizer extends UIElement {
     }
 
     changeX (dx) {
-        var width = this.width + dx*2; 
+        var width = this.width + dx; 
 
         this.change({ width: width + 'px' });
     }
 
     changeY (dy) {
-        var height = this.height + dy*2; 
+        var height = this.height + dy; 
 
         this.change({ height: height + 'px' });        
     }
 
     changeXY (dx, dy) {
-        var width = this.width + dx*2; 
-        var height = this.height + dy*2; 
+        var width = this.width + dx; 
+        var height = this.height + dy; 
 
         this.change({ width: width + 'px', height: height + 'px' });        
     }
 
     toTop () {
         var dy = this.xy.y - this.targetXY.y
-        var height = this.height + dy*2; 
+        var height = this.height + dy; 
 
         return { height }
     }
 
     toBottom () {
         var dy = this.targetXY.y - this.xy.y
-        var height = this.height + dy*2; 
+        var height = this.height + dy; 
 
         return { height }        
     }
 
     toRight () {
         var dx = this.targetXY.x - this.xy.x
-        var width = this.width + dx*2; 
+        var width = this.width + dx; 
 
         return { width }
     }
 
     toLeft () {
         var dx = this.xy.x  - this.targetXY.x
-        var width = this.width + dx*2; 
+        var width = this.width + dx; 
 
         return { width }
     }

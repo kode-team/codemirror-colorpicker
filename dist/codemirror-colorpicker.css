@@ -935,10 +935,10 @@
       border-right: 1px solid #ececec; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
-      right: 10px;
+      right: 0px;
       width: 250px;
       top: 50px;
-      bottom: 8px;
+      bottom: 0px;
       overflow: auto;
       z-index: 1;
       background-color: white; }
@@ -947,14 +947,14 @@
       left: 0px;
       width: 250px;
       top: 50px;
-      bottom: 8px;
+      bottom: 0px;
       z-index: 1;
       background-color: white;
       border-right: 1px solid #ececec; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
       left: 260px;
-      right: 270px;
+      right: 260px;
       top: 50px;
       bottom: 110px;
       z-index: 0;
@@ -1170,7 +1170,6 @@
       bottom: 0px;
       top: 30px;
       overflow-x: auto;
-      padding: 8px;
       white-space: nowrap;
       border-top: 1px solid #ececec;
       -webkit-box-sizing: border-box;
@@ -1189,19 +1188,14 @@
         margin-right: 5px;
         text-align: center; }
       .imageeditor .pages .page-list .tree-item {
-        display: inline-block;
-        height: 100px;
-        width: 80px;
-        vertical-align: middle;
+        display: block;
+        height: 30px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
-        overflow: hidden;
-        padding: 5px;
-        border: 1px solid #ececec;
-        margin-right: 5px;
-        text-align: center; }
+        padding: 5px 10px;
+        border-bottom: 1px solid #ececec; }
         .imageeditor .pages .page-list .tree-item.selected {
           background-color: #ececec; }
           .imageeditor .pages .page-list .tree-item.selected .item-tools {
@@ -1769,16 +1763,27 @@
       bottom: 0px;
       top: 170px;
       overflow: auto;
-      background-color: #ececec; }
+      background-color: #ececec;
+      border: 1px solid #c9c9c9;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+    .imageeditor .page-view .page-canvas {
+      position: relative;
+      padding: 300px;
+      display: inline-block; }
     .imageeditor .page-view .gradient-color-view-container {
-      position: absolute;
-      top: 50px;
-      left: 0px;
-      right: 0px;
-      bottom: 0px;
-      display: none; }
-    .imageeditor .page-view .gradient-color-view,
-    .imageeditor .page-view .gradient-color-view-container {
+      position: relative;
+      display: inline-block;
+      background-color: white;
+      -webkit-box-shadow: 8px 9px 20px -5px #777;
+              box-shadow: 8px 9px 20px -5px #777; }
+      .imageeditor .page-view .gradient-color-view-container.moving .predefined-layer-resizer {
+        display: none !important; }
+      .imageeditor .page-view .gradient-color-view-container.moving .predefined-page-resizer {
+        display: none !important; }
+      .imageeditor .page-view .gradient-color-view-container.moving .move-guide {
+        display: block !important; }
+    .imageeditor .page-view .gradient-color-view {
       width: 100%;
       height: 100%;
       position: absolute;
@@ -1797,16 +1802,13 @@
       height: 100%; }
     .imageeditor .page-view .dropzone {
       display: none; }
-    .imageeditor .page-view .gradient-color-view-container {
-      -webkit-box-shadow: 8px 9px 20px -5px #777;
-              box-shadow: 8px 9px 20px -5px #777; }
     .imageeditor .page-view .predefined-angluar-group {
       display: none;
       text-align: center;
       position: absolute;
       bottom: 10px;
-      width: 200px;
-      height: 200px;
+      width: 130px;
+      height: 130px;
       right: 10px;
       background-color: rgba(0, 0, 0, 0.2); }
       .imageeditor .page-view .predefined-angluar-group button {
@@ -2193,18 +2195,33 @@
           right: -6px;
           -webkit-transform: translateX(50%);
                   transform: translateX(50%); }
+    .imageeditor .page-view .move-guide {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      pointer-events: none;
+      -webkit-transform: translateX(-1px) translateY(-1px);
+              transform: translateX(-1px) translateY(-1px); }
+      .imageeditor .page-view .move-guide .line {
+        position: absolute;
+        border-top: 1px dashed #c7c7c7;
+        border-left: 1px dashed #c7c7c7;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
   .imageeditor .drag-angle-rect {
     position: absolute;
     display: none;
     bottom: 10px;
-    width: 200px;
-    height: 200px;
+    width: 130px;
+    height: 130px;
     right: 10px;
     pointer-events: none; }
     .imageeditor .drag-angle-rect .drag-angle {
       display: inline-block;
-      width: 100px;
-      height: 100px;
+      width: 90px;
+      height: 90px;
       position: absolute;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
@@ -2241,8 +2258,8 @@
     position: absolute;
     display: none;
     bottom: 10px;
-    width: 200px;
-    height: 200px;
+    width: 130px;
+    height: 130px;
     right: 10px; }
     .imageeditor .drag-position .drag-pointer {
       position: absolute;
@@ -2336,8 +2353,7 @@
             box-sizing: border-box;
     overflow: auto;
     border-top: 1px solid #ececec;
-    border-left: 1px solid #ececec;
-    border-right: 1px solid #ececec; }
+    border-left: 1px solid #ececec; }
     .imageeditor .property-view .property-item {
       padding: 5px;
       border-bottom: 1px solid #ececec;
@@ -2463,9 +2479,9 @@
                 -webkit-box-sizing: border-box;
                         box-sizing: border-box;
                 bottom: 8px;
-                left: 50%;
-                -webkit-transform: translateX(-50%);
-                        transform: translateX(-50%);
+                left: 3px;
+                -webkit-transform: translateX(-1px);
+                        transform: translateX(-1px);
                 -webkit-transition: all 0.3s ease-out;
                 transition: all 0.3s ease-out; }
               .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected {

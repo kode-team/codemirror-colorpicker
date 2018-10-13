@@ -1,0 +1,16 @@
+.move-guide {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+    pointer-events: none;
+    transform: translateX(-1px) translateY(-1px);
+
+    .line { 
+        position: absolute;
+        border-top: 1px dashed #c7c7c7;
+        border-left: 1px dashed #c7c7c7;
+        box-sizing: border-box;
+    }
+}

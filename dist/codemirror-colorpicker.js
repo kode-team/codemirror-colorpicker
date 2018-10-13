@@ -5662,8 +5662,6 @@ var Util = {
     ImageLoader: ImageLoader
 };
 
-var color = Color$1.color;
-
 var counter = 0;
 var cached = [];
 
@@ -10215,9 +10213,10 @@ var GradientManager = function (_BaseModule) {
                     return Object.assign({}, it);
                 })));
 
-                results.push.apply(results, toConsumableArray(ColorList.list['material'].map(function (color) {
-                    return Object.assign({}, { type: 'static', color: color });
-                })));
+                results.push({
+                    type: 'static',
+                    color: ColorList.list['material'][0]
+                });
             } else {
                 results.push.apply(results, toConsumableArray(ColorList.list['material'].map(function (color) {
                     return Object.assign({}, { type: 'static', color: color });
@@ -10250,6 +10249,11 @@ var GradientManager = function (_BaseModule) {
                     }
 
                     $store.dispatch('/item/set', image);
+                } else {
+                    $store.read('/item/current/layer', function (layer) {
+                        layer.style['background-color'] = obj.color;
+                        $store.dispatch('/item/set', layer);
+                    });
                 }
             }
         }
@@ -10308,8 +10312,8 @@ var PAGE_DEFAULT_OBJECT = {
     parentId: '',
     index: 0,
     style: {
-        width: '200px',
-        height: '200px'
+        width: '360px',
+        height: '630px'
     }
 };
 
@@ -10755,7 +10759,9 @@ var ItemManager = function (_BaseModule) {
         }
     }, {
         key: '/item/select',
-        value: function itemSelect($store, selectedId) {
+        value: function itemSelect($store) {
+            var selectedId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
             $store.read('/item/keys').forEach(function (id) {
 
                 var item = $store.items[id];
@@ -10767,11 +10773,16 @@ var ItemManager = function (_BaseModule) {
                 }
             });
 
-            $store.items[selectedId].selectTime = Date.now();
+            if (selectedId) {
+                $store.items[selectedId].selectTime = Date.now();
 
-            $store.selectedId = selectedId;
+                $store.selectedId = selectedId;
 
-            $store.run('/item/select/mode', $store.items[selectedId].itemType);
+                $store.run('/item/select/mode', $store.items[selectedId].itemType);
+            } else {
+                $store.selectedId = selectedId;
+                $store.run('/item/select/mode', 'board');
+            }
         }
     }, {
         key: '/item/select/mode',
@@ -10988,7 +10999,180 @@ var ItemManager = function (_BaseModule) {
     return ItemManager;
 }(BaseModule);
 
-var ModuleList = [ItemManager, ColorStepManager, ImageManager, PageManager, LayerManager, ToolManager, BlendManager, GradientManager];
+var list$1 = new Array(1000);
+var lastIndex = -1;
+var selectedItem = {};
+
+var verticalKeys = ['y', 'centerY', 'y2'];
+var horizontalKeys = ['x', 'centerX', 'x2'];
+var maxDist = 1;
+
+var GuideManager = function (_BaseModule) {
+    inherits(GuideManager, _BaseModule);
+
+    function GuideManager() {
+        classCallCheck(this, GuideManager);
+        return possibleConstructorReturn(this, (GuideManager.__proto__ || Object.getPrototypeOf(GuideManager)).apply(this, arguments));
+    }
+
+    createClass(GuideManager, [{
+        key: '*/guide/rect',
+        value: function guideRect($store, obj) {
+            var x = +(obj.x || '0px').replace('px', '');
+            var y = +(obj.y || '0px').replace('px', '');
+            var width = +(obj.width || '0px').replace('px', '');
+            var height = +(obj.height || '0px').replace('px', '');
+
+            var x2 = x + width;
+            var y2 = y + height;
+
+            var centerX = x + Math.floor(width / 2);
+            var centerY = y + Math.floor(height / 2);
+
+            return { x: x, y: y, x2: x2, y2: y2, width: width, height: height, centerX: centerX, centerY: centerY };
+        }
+    }, {
+        key: '*/guide/line/layer',
+        value: function guideLineLayer($store) {
+
+            var page = $store.read('/item/current/page');
+
+            if (!page) return [];
+            if (!page.style) return [];
+
+            if (page.selected) return [];
+
+            var index = 0;
+            list$1[index++] = $store.read('/guide/rect', {
+                x: 0,
+                y: 0,
+                width: page.style.width,
+                height: page.style.height
+            });
+
+            $store.read('/item/each/children', page.id, function (item) {
+                var newItem = $store.read('/guide/rect', {
+                    x: item.style.x,
+                    y: item.style.y,
+                    width: item.style.width,
+                    height: item.style.height
+                });
+
+                if (item.selected) {
+                    selectedItem = newItem;
+                } else {
+                    list$1[index++] = newItem;
+                }
+            });
+
+            lastIndex = index;
+
+            return $store.read('/guide/paths');
+        }
+    }, {
+        key: '*/guide/paths',
+        value: function guidePaths($store) {
+
+            var results = [];
+            for (var i = 0; i < lastIndex; i++) {
+                results.push.apply(results, toConsumableArray($store.read('/guide/check', list$1[i], selectedItem)));
+            }
+
+            return results;
+        }
+    }, {
+        key: '*/guide/check',
+        value: function guideCheck($store, item1, item2) {
+            var results = [];
+
+            // 가로 먼저 체크 
+
+            results.push.apply(results, toConsumableArray($store.read('/guide/check/vertical', item1, item2)));
+
+            // 세로 체크 
+            results.push.apply(results, toConsumableArray($store.read('/guide/check/horizontal', item1, item2)));
+
+            return results;
+        }
+    }, {
+        key: '*/guide/check/vertical',
+        value: function guideCheckVertical($store, item1, item2) {
+            var results = [];
+
+            verticalKeys.forEach(function (key) {
+
+                // top
+                if (Math.abs(item1.y - item2[key]) < maxDist) {
+                    results.push({ type: '-',
+                        x: Math.min(item1.centerX, item2.centerX),
+                        y: item1.y,
+                        width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
+                    });
+                }
+
+                // middle
+                if (Math.abs(item1.centerY - item2[key]) < maxDist) {
+                    results.push({ type: '-',
+                        x: Math.min(item1.centerX, item2.centerX),
+                        y: item1.centerY,
+                        width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
+                    });
+                }
+
+                // bottom
+                if (Math.abs(item1.y2 - item2[key]) < maxDist) {
+                    results.push({ type: '-',
+                        x: Math.min(item1.centerX, item2.centerX),
+                        y: item1.y2,
+                        width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
+                    });
+                }
+            });
+
+            return results;
+        }
+    }, {
+        key: '*/guide/check/horizontal',
+        value: function guideCheckHorizontal($store, item1, item2) {
+            var results = [];
+
+            horizontalKeys.forEach(function (key) {
+
+                // left 
+                if (Math.abs(item1.x - item2[key]) < maxDist) {
+                    results.push({ type: '|',
+                        x: item1.x,
+                        y: Math.min(item1.centerY, item2.centerY),
+                        height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
+                    });
+                }
+
+                // center
+                if (Math.abs(item1.centerX - item2[key]) < maxDist) {
+                    results.push({ type: '|',
+                        x: item1.centerX,
+                        y: Math.min(item1.centerY, item2.centerY),
+                        height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
+                    });
+                }
+
+                // right
+                if (Math.abs(item1.x2 - item2[key]) < maxDist) {
+                    results.push({ type: '|',
+                        x: item1.x2,
+                        y: Math.min(item1.centerY, item2.centerY),
+                        height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
+                    });
+                }
+            });
+
+            return results;
+        }
+    }]);
+    return GuideManager;
+}(BaseModule);
+
+var ModuleList = [ItemManager, ColorStepManager, ImageManager, PageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -11433,7 +11617,7 @@ var SampleList = function (_UIElement) {
     createClass(SampleList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item sample-list'>\n                <div class='title'>Sample Colors</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item sample-list'>\n                <div class='title'>Select Images</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -12194,7 +12378,7 @@ var ColorSampleList = function (_UIElement) {
     createClass(ColorSampleList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item sample-list'>\n                <div class='title'>Sample Colors</div>\n                <div class='items'>            \n                    <GradientSampleList type=\"color\"></GradientSampleList>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item sample-list'>\n                <div class='items'>            \n                    <GradientSampleList type=\"color\"></GradientSampleList>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -12599,7 +12783,7 @@ var LayerView = function (_UIElement) {
     createClass(LayerView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Name></Name>\n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>\n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
+            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>                \n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
         }
     }, {
         key: "components",
@@ -12621,7 +12805,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>            \n                <SampleList></SampleList>                \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                    \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>\n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -12656,7 +12840,7 @@ var FeatureControl = function (_UIElement) {
             var obj = this.read('/item/current');
             this.$el.$('.feature.selected').removeClass('selected');
 
-            var selectType = '';
+            var selectType = 'page';
             if (obj && obj.itemType == 'page') {
                 selectType = 'page';
             } else if (obj) {
@@ -13272,7 +13456,7 @@ var PredefinedPageResizer = function (_UIElement) {
     createClass(PredefinedPageResizer, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-page-resizer">\n                <button type="button" data-value="to right"></button>\n                <button type="button" data-value="to left"></button>\n                <button type="button" data-value="to top"></button>\n                <button type="button" data-value="to bottom"></button>\n                <button type="button" data-value="to top right"></button>\n                <button type="button" data-value="to bottom right"></button>\n                <button type="button" data-value="to bottom left"></button>\n                <button type="button" data-value="to top left"></button>\n            </div>\n        ';
+            return '\n            <div class="predefined-page-resizer">\n                <button type="button" data-value="to right"></button>\n                <!--<button type="button" data-value="to left"></button>-->\n                <!--<button type="button" data-value="to top"></button>-->\n                <button type="button" data-value="to bottom"></button>\n                <!--<button type="button" data-value="to top right"></button>-->\n                <button type="button" data-value="to bottom right"></button>\n                <!--<button type="button" data-value="to bottom left"></button>-->\n                <!--<button type="button" data-value="to top left"></button>-->\n            </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -13282,6 +13466,7 @@ var PredefinedPageResizer = function (_UIElement) {
     }, {
         key: 'isShow',
         value: function isShow() {
+            // return false; 
             return this.read('/item/is/mode', 'page');
         }
     }, {
@@ -13309,22 +13494,22 @@ var PredefinedPageResizer = function (_UIElement) {
     }, {
         key: 'changeX',
         value: function changeX(dx) {
-            var width = this.width + dx * 2;
+            var width = this.width + dx;
 
             this.change({ width: width + 'px' });
         }
     }, {
         key: 'changeY',
         value: function changeY(dy) {
-            var height = this.height + dy * 2;
+            var height = this.height + dy;
 
             this.change({ height: height + 'px' });
         }
     }, {
         key: 'changeXY',
         value: function changeXY(dx, dy) {
-            var width = this.width + dx * 2;
-            var height = this.height + dy * 2;
+            var width = this.width + dx;
+            var height = this.height + dy;
 
             this.change({ width: width + 'px', height: height + 'px' });
         }
@@ -13332,7 +13517,7 @@ var PredefinedPageResizer = function (_UIElement) {
         key: 'toTop',
         value: function toTop() {
             var dy = this.xy.y - this.targetXY.y;
-            var height = this.height + dy * 2;
+            var height = this.height + dy;
 
             return { height: height };
         }
@@ -13340,7 +13525,7 @@ var PredefinedPageResizer = function (_UIElement) {
         key: 'toBottom',
         value: function toBottom() {
             var dy = this.targetXY.y - this.xy.y;
-            var height = this.height + dy * 2;
+            var height = this.height + dy;
 
             return { height: height };
         }
@@ -13348,7 +13533,7 @@ var PredefinedPageResizer = function (_UIElement) {
         key: 'toRight',
         value: function toRight() {
             var dx = this.targetXY.x - this.xy.x;
-            var width = this.width + dx * 2;
+            var width = this.width + dx;
 
             return { width: width };
         }
@@ -13356,7 +13541,7 @@ var PredefinedPageResizer = function (_UIElement) {
         key: 'toLeft',
         value: function toLeft() {
             var dx = this.xy.x - this.targetXY.x;
-            var width = this.width + dx * 2;
+            var width = this.width + dx;
 
             return { width: width };
         }
@@ -14226,6 +14411,62 @@ var LayerPreview = function (_UIElement) {
     return LayerPreview;
 }(UIElement);
 
+var MoveGuide = function (_UIElement) {
+    inherits(MoveGuide, _UIElement);
+
+    function MoveGuide() {
+        classCallCheck(this, MoveGuide);
+        return possibleConstructorReturn(this, (MoveGuide.__proto__ || Object.getPrototypeOf(MoveGuide)).apply(this, arguments));
+    }
+
+    createClass(MoveGuide, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(MoveGuide.prototype.__proto__ || Object.getPrototypeOf(MoveGuide.prototype), 'initialize', this).call(this);
+
+            this.$board = this.parent.refs.$board;
+            this.$page = this.parent.refs.$page;
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="move-guide">\n\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $el',
+        value: function load$el() {
+            var list = this.read('/guide/line/layer');
+
+            var bo = this.$board.offset();
+            var po = this.$page.offset();
+
+            var top = po.top - bo.top + this.$board.scrollTop();
+            var left = po.left - bo.left + this.$board.scrollLeft();
+
+            // console.log(top, left, bo, po);
+
+            return list.map(function (axis) {
+                if (axis.type == '-') {
+                    return '<div class=\'line\' style=\'left: 0px; top: ' + (axis.y + top) + 'px; right: 0px; height: 1px;\'></div>';
+                } else {
+                    return '<div class=\'line\' style=\'left: ' + (axis.x + left) + 'px; top: 0px; bottom: 0px; width: 1px;\'></div>';
+                }
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }]);
+    return MoveGuide;
+}(UIElement);
+
 var GradientView = function (_BaseTab) {
     inherits(GradientView, _BaseTab);
 
@@ -14237,12 +14478,13 @@ var GradientView = function (_BaseTab) {
     createClass(GradientView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'page-view\'>\n\n                <div class=\'page-content\'>\n                    <div class="gradient-color-view-container" ref="$page">\n                        <div class="gradient-color-view" ref="$colorview"></div>            \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>\n                    </div>                   \n                </div>\n                <div class="page-menu">\n                    <LayerPreview></LayerPreview>\n                    <LayerMenuTab></LayerMenuTab>\n                </div>\n                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                <GradientPosition></GradientPosition>\n                <GradientAngle></GradientAngle>                 \n            </div>\n        ';
+            return '\n            <div class=\'page-view\'>\n                <div class="page-menu">\n                    <LayerPreview></LayerPreview>\n                    <LayerMenuTab></LayerMenuTab>\n                </div>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n                            <PredefinedPageResizer></PredefinedPageResizer>\n                            <PredefinedLayerResizer></PredefinedLayerResizer>\n                        </div>       \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n\n                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                <GradientPosition></GradientPosition>\n                <GradientAngle></GradientAngle>     \n   \n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
+                MoveGuide: MoveGuide,
                 GradientAngle: GradientAngle,
                 GradientPosition: GradientPosition,
                 PredefinedLinearGradientAngle: PredefinedLinearGradientAngle,
@@ -14287,9 +14529,11 @@ var GradientView = function (_BaseTab) {
         }
     }, {
         key: 'refresh',
-        value: function refresh() {
+        value: function refresh(isDrag) {
             this.setBackgroundColor();
             this.load();
+
+            
         }
     }, {
         key: 'makePageCSS',
@@ -14354,6 +14598,15 @@ var GradientView = function (_BaseTab) {
             this.dispatch('/item/select/mode', 'board');
         }
     }, {
+        key: 'click.self $el .page-canvas',
+        value: function clickSelf$elPageCanvas(e) {
+            var _this3 = this;
+
+            this.read('/item/current/page', function (page) {
+                _this3.dispatch('/item/select', page.id);
+            });
+        }
+    }, {
         key: 'pointerstart $page .layer',
         value: function pointerstart$pageLayer(e) {
             this.isDown = true;
@@ -14382,7 +14635,7 @@ var GradientView = function (_BaseTab) {
             item.style = Object.assign(item.style, style);
 
             this.dispatch('/item/set', item);
-            this.refresh();
+            this.refresh(true);
         }
     }, {
         key: 'moveXY',
@@ -14396,6 +14649,7 @@ var GradientView = function (_BaseTab) {
         key: 'pointermove document',
         value: function pointermoveDocument(e) {
             if (this.isDown) {
+                this.refs.$page.addClass('moving');
                 this.targetXY = e.xy;
 
                 this.moveXY(this.targetXY.x - this.xy.x, this.targetXY.y - this.xy.y);
@@ -14406,6 +14660,7 @@ var GradientView = function (_BaseTab) {
         value: function pointerendDocument(e) {
             this.isDown = false;
             this.layer = null;
+            this.refs.$page.removeClass('moving');
         }
     }]);
     return GradientView;

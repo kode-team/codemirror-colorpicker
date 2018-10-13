@@ -6,6 +6,7 @@ import BlendManager from "./BlendManager";
 import GradientManager from "./GradientManager";
 import PageManager from "./PageManager";
 import ItemManager from "./ItemManager";
+import GuideManager from "./GuideManager";
 
 export default [
     ItemManager,
@@ -15,5 +16,6 @@ export default [
     LayerManager,
     ToolManager,
     BlendManager,
-    GradientManager
+    GradientManager,
+    GuideManager
 ] 

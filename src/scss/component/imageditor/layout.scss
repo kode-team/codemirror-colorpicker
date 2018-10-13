@@ -24,10 +24,10 @@ $left-size: 250px;
 
     .layout-right {
         position: absolute;
-        right : 10px;
+        right : 0px;
         width: $right-size;
         top: $tool-size;
-        bottom: $gutter;
+        bottom: 0px;
         overflow: auto;
         z-index: 1;         
         background-color: white;     
@@ -38,7 +38,7 @@ $left-size: 250px;
         left: 0px;
         width: $left-size;
         top: $tool-size;
-        bottom: $gutter;
+        bottom: 0px;
         // background-color: rgba(gray, 0.5);
         z-index: 1; 
         background-color: white; 
@@ -49,7 +49,7 @@ $left-size: 250px;
     .layout-body {
         position: absolute;
         left: $left-size + 10;
-        right: $right-size + 20px;
+        right: $right-size + 10;
         top: $tool-size; 
         bottom: $tool-size * 2 + 10;
         z-index: 0; 

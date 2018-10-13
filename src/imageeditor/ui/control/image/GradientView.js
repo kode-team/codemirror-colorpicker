@@ -9,8 +9,10 @@ import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
 
 import LayerMenuTab from './LayerMenuTab'; 
 
+
 import { EDITOR_MODE_IMAGE_IMAGE, EDITOR_MODE_IMAGE_LINEAR, EDITOR_MODE_IMAGE_RADIAL, EDITOR_MODE_IMAGE_STATIC } from '../../../module/ItemManager';
 import LayerPreview from './menuItem/LayerPreview';
+import MoveGuide from '../../view/MoveGuide';
    
 
 export default class GradientView extends BaseTab {
@@ -18,28 +20,33 @@ export default class GradientView extends BaseTab {
     template () {
         return `
             <div class='page-view'>
-
-                <div class='page-content'>
-                    <div class="gradient-color-view-container" ref="$page">
-                        <div class="gradient-color-view" ref="$colorview"></div>            
-                        <PredefinedPageResizer></PredefinedPageResizer>
-                        <PredefinedLayerResizer></PredefinedLayerResizer>
-                    </div>                   
-                </div>
                 <div class="page-menu">
                     <LayerPreview></LayerPreview>
                     <LayerMenuTab></LayerMenuTab>
                 </div>
+                <div class='page-content' ref="$board">
+                    <div class="page-canvas">
+                        <div class="gradient-color-view-container" ref="$page">
+                            <div class="gradient-color-view" ref="$colorview"></div>            
+                            <PredefinedPageResizer></PredefinedPageResizer>
+                            <PredefinedLayerResizer></PredefinedLayerResizer>
+                        </div>       
+                        <MoveGuide></MoveGuide>                          
+                    </div>          
+                </div>
+
                 <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
                 <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
                 <GradientPosition></GradientPosition>
-                <GradientAngle></GradientAngle>                 
+                <GradientAngle></GradientAngle>     
+   
             </div>
         `
     } 
 
     components () {
         return {  
+            MoveGuide,
             GradientAngle, 
             GradientPosition, 
             PredefinedLinearGradientAngle, 
@@ -80,16 +87,19 @@ export default class GradientView extends BaseTab {
         });
     }
 
-    refresh () {
+    refresh (isDrag) {
         this.setBackgroundColor();
         this.load();
 
+        if (!isDrag) {
+            // this.refs.$page.el.scrollIntoView()
+        }
     }
 
     makePageCSS (page) {
         return Object.assign({
             overflow: page.clip ? 'hidden' : ''
-        }, page.style || {});
+        }, page.style || {}); 
     }
  
     setBackgroundColor() {
@@ -100,6 +110,7 @@ export default class GradientView extends BaseTab {
         var item = this.read('/item/current/page')
 
         this.refs.$page.toggle(item)
+
 
         if (item) {
             if (item.itemType == 'page') {
@@ -143,6 +154,12 @@ export default class GradientView extends BaseTab {
         this.dispatch('/item/select/mode', 'board');
     }
 
+    'click.self $el .page-canvas' (e) {
+        this.read('/item/current/page', (page) => {
+            this.dispatch('/item/select', page.id);
+        })
+    }
+
     'pointerstart $page .layer' (e) {
         this.isDown = true; 
         this.xy = e.xy;
@@ -166,7 +183,7 @@ export default class GradientView extends BaseTab {
         item.style = Object.assign(item.style, style);
 
         this.dispatch('/item/set', item);
-        this.refresh();
+        this.refresh(true); 
     }
 
 
@@ -180,6 +197,7 @@ export default class GradientView extends BaseTab {
 
     'pointermove document' (e) {
         if (this.isDown) {
+            this.refs.$page.addClass('moving');
             this.targetXY = e.xy;
 
             this.moveXY(this.targetXY.x - this.xy.x, this.targetXY.y - this.xy.y)
@@ -189,5 +207,6 @@ export default class GradientView extends BaseTab {
     'pointerend document' (e) {
         this.isDown = false; 
         this.layer = null;
+        this.refs.$page.removeClass('moving');        
     }
 }

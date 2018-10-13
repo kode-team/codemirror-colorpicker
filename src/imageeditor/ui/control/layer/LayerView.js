@@ -7,9 +7,9 @@ export default class LayerView extends UIElement {
     template () {
         return `
             <div class='property-view'>
-                <Name></Name>
+                <Name></Name>                
                 <ColorPickerPanel></ColorPickerPanel>
-                <ColorSampleList></ColorSampleList>
+                <ColorSampleList></ColorSampleList>                
                 <size></size>
                 <position></position>
                 <radius></radius>

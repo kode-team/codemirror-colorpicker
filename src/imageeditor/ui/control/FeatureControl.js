@@ -30,7 +30,7 @@ export default class FeatureControl extends UIElement {
         var obj = this.read('/item/current')
         this.$el.$('.feature.selected').removeClass('selected');
 
-        var selectType = ''; 
+        var selectType = 'page'; 
         if (obj && obj.itemType == 'page') {
             selectType = 'page';
         } else if (obj)  {

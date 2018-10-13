@@ -14,9 +14,10 @@ export default class GradientManager extends BaseModule {
                 return Object.assign({}, it)
             }));
 
-            results.push(...ColorList.list['material'].map(color => {
-                return Object.assign({}, { type: 'static', color})
-            }))
+            results.push( { 
+                type: 'static', 
+                color: ColorList.list['material'][0]
+            })
 
         } else {
             results.push(...ColorList.list['material'].map(color => {
@@ -49,6 +50,12 @@ export default class GradientManager extends BaseModule {
                 }
 
                 $store.dispatch('/item/set', image);
+            } else {
+                $store.read('/item/current/layer', (layer) => {
+                    layer.style['background-color'] = obj.color;
+                    $store.dispatch('/item/set', layer);
+                })
+
             }
         }
     }

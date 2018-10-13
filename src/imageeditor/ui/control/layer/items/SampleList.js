@@ -5,7 +5,7 @@ export default class SampleList extends UIElement {
     template () {
         return `
             <div class='property-item sample-list'>
-                <div class='title'>Sample Colors</div>
+                <div class='title'>Select Images</div>
                 <div class='items'>            
                     <GradientSampleList></GradientSampleList>
                 </div>

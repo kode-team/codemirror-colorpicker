@@ -12,8 +12,8 @@ const PAGE_DEFAULT_OBJECT = {
     parentId: '',
     index: 0,
     style: {
-        width: '200px',
-        height: '200px'
+        width: '360px',
+        height: '630px'
     }
 }
 
@@ -410,7 +410,7 @@ export default class ItemManager extends BaseModule {
         })
     }
 
-    '/item/select' ($store, selectedId) {
+    '/item/select' ($store, selectedId = '') {
         $store.read('/item/keys').forEach(id => {
 
             var item = $store.items[id]
@@ -423,11 +423,16 @@ export default class ItemManager extends BaseModule {
 
         })
 
-        $store.items[selectedId].selectTime = Date.now();
+        if (selectedId) {
+            $store.items[selectedId].selectTime = Date.now();
 
-        $store.selectedId = selectedId;
-
-        $store.run('/item/select/mode', $store.items[selectedId].itemType);
+            $store.selectedId = selectedId;
+    
+            $store.run('/item/select/mode', $store.items[selectedId].itemType);
+        } else {
+            $store.selectedId = selectedId
+            $store.run('/item/select/mode', 'board');
+        }
     }
 
     '/item/select/mode' ($store, mode, editMode) {

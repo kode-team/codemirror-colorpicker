@@ -7,8 +7,9 @@ export default class ImageView extends UIElement {
     template () {
         return `
             <div class='property-view'>
-                <ColorPickerPanel></ColorPickerPanel>            
-                <SampleList></SampleList>                
+                <SampleList></SampleList>                    
+                <ColorPickerPanel></ColorPickerPanel>
+                <ColorSampleList></ColorSampleList>
                 <ImageTypeSelect></ImageTypeSelect>
                 <ColorSteps></ColorSteps>
                 <ColorStepsInfo></ColorStepsInfo>

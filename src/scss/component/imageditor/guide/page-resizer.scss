@@ -1,0 +1,94 @@
+
+    $editor-line-color: #b3b3b3;
+    $editor-resizer-width : 10px;
+    $editor-half-width: -6px;    
+
+    .predefined-page-resizer {
+        display: none;
+        text-align: center;
+        pointer-events: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: 10;
+        border:2px solid $editor-line-color;
+        box-sizing: border-box;               
+
+        button {
+            padding: 0px;
+            background-color: rgba(white, 1);
+            border: 1px solid $editor-line-color;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            position: absolute;
+            display: inline-block;
+            box-sizing: border-box;
+            width: $editor-resizer-width;
+            height: $editor-resizer-width;
+            pointer-events: all;
+            border-radius: 50%;
+
+            &:hover {
+                background-color: rgba(white, 0.5);
+            }
+
+            /* linear */
+           /* linear */
+           &[data-value='to top'] {
+                top: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: n-resize;
+            }
+
+            &[data-value='to top right'] {
+                top: $editor-half-width;
+                right: $editor-half-width;
+                cursor: ne-resize;                
+            }
+
+            &[data-value='to right'] {
+                top: 50%;
+                right: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: e-resize;                
+            }
+
+            &[data-value='to bottom right'] {
+                bottom: $editor-half-width;
+                right: $editor-half-width;
+                cursor: se-resize;                
+            }
+
+            &[data-value='to bottom'] {
+                bottom: $editor-half-width;
+                left: 50%;
+                transform: translateX(-50%);
+                cursor: s-resize;                
+            }
+
+            &[data-value='to bottom left'] {
+                left: $editor-half-width;
+                bottom: $editor-half-width;
+                cursor: sw-resize;                
+            }
+
+            &[data-value='to left'] {
+                top: 50%;
+                left: $editor-half-width;
+                transform: translateY(-50%);
+                cursor: w-resize;                
+            }
+
+            &[data-value='to top left'] {
+                top: $editor-half-width;
+                left: $editor-half-width;
+                cursor: nw-resize;                
+            }
+
+        }
+    }  
