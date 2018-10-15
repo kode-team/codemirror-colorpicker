@@ -10,8 +10,11 @@ import liberty from './liberty';
 import silence from './silence';
 import circle from './circle';
 import circle2 from './circle2';
+import deepblue from './deepblue';
+
 
 export default [
+    deepblue,    
     sample1,
     gradegray,
     piggypink,

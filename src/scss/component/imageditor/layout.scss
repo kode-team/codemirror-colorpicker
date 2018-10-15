@@ -1,8 +1,10 @@
+$background-color: #c7c7c7;
+$border-color: #c7c7c7;
+$font-color: black;
 $pointer-color: rgba(#ececec, 0.8);
-
 $gutter: 8px;
 $tool-size: 50px;
-$right-size: 250px;
+$right-size: 275px;
 $left-size: 250px;
 
 .layout-main {
@@ -19,7 +21,7 @@ $left-size: 250px;
         top: $tool-size;
         height: $tool-size * 2;
         z-index: 1;         
-        border-right: 1px solid #ececec;
+        border-right: 1px solid $border-color;
     }
 
     .layout-right {
@@ -30,7 +32,8 @@ $left-size: 250px;
         bottom: 0px;
         overflow: auto;
         z-index: 1;         
-        background-color: white;     
+        box-sizing: border-box;
+        border-left: 1px solid $border-color;
     }
 
     .layout-left {
@@ -42,76 +45,69 @@ $left-size: 250px;
         // background-color: rgba(gray, 0.5);
         z-index: 1; 
         background-color: white; 
-        border-right: 1px solid #ececec;
+        border-right: 1px solid $border-color;
 
     }    
 
     .layout-body {
         position: absolute;
-        left: $left-size + 10;
-        right: $right-size + 10;
+        left: $left-size;
+        right: $right-size;
         top: $tool-size; 
-        bottom: $tool-size * 2 + 10;
-        z-index: 0; 
-        overflow: hidden;
+        bottom: $tool-size * 2;
     }
 
     .layout-header {
         position: absolute;
         left: 0px;
-        right: $gutter;
+        right: 0px;
         height: $tool-size;
         top: 0px; 
         z-index: 0; 
         overflow: hidden;
         box-sizing: border-box;
+        display: flex; 
+        border-bottom: 1px solid $border-color;
 
-        h1 {
+        .header-title {
+            width: $left-size;
             padding: 10px;
             margin: 0px;
             text-align: left;
             font-size: 24px;
             text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);        
+            flex: none;
+            display: block; 
+            box-sizing: border-box;
+        }
+
+        .page-tab-menu {
+            flex: 1 1 auto; 
+            display: block;
+            position: relative;
         }
     }
 
 
     .layout-footer {
         position: absolute;
-        left: $left-size + 10;
-        right: $right-size + 10;
+        left: $left-size;
+        right: $right-size;
         height: $tool-size * 2;
         bottom: 0px;
         z-index: 0; 
         overflow: hidden; 
-        border-top: 1px solid #ececec;        
-    }
-
-    .layout-flow {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        top: 0px;
-        bottom: 0px;
-
-        &.padding-0 {
-            padding: 0px;
-        }
-
-        > * {
-            flex: 1 1 auto;
-        }
-
+        border-top: 1px solid $border-color;        
     }
 
 }
 
+@import './range-ui.scss';
 @import './tab-ui.scss';
 @import './colorpicker-ui.scss';
 @import './page-manager.scss';
 @import './layer-manager.scss';
+@import './images.scss';
 @import './feature-manager.scss';
 @import './gradient-types.scss';
 @import './layers-menu.scss';
@@ -121,3 +117,4 @@ $left-size: 250px;
 @import './drag-position.scss';
 @import './blends.scss';
 @import './property-view.scss';
+@import './filters.scss';

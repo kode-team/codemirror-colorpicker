@@ -22,14 +22,13 @@ $layer-item-padding: 8px;
         top: 0px;
         bottom: 0px;
         box-sizing: border-box;
-        overflow-x: auto;
-        white-space: nowrap;
+        overflow: auto;
         padding: 5px;
 
         .blend-item {
-            display: inline-block;
+            display: block;
             height: $blend-item-height;      
-            width: $blend-item-width;      
+            // width: $blend-item-width;      
             cursor: pointer;
             position: relative;
             overflow: hidden;

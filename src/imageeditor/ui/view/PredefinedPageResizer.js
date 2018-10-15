@@ -23,8 +23,8 @@ export default class PredefinedPageResizer extends UIElement {
     }
 
     isShow () {
-        // return false; 
-        return this.read('/item/is/mode', 'page')
+        return false; 
+        // return this.read('/item/is/mode', 'page')
     }
 
     '@changeEditor' () { this.refresh(); }

@@ -34,10 +34,6 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
             bottom: 0px;
             left: 170px;
         }
-
-        @import './images.scss';
-
-
     }
 
     .page-content {
@@ -45,10 +41,10 @@ $guide-border-hover-color: rgba(0 , 0, 0, 0.2);
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 170px;
+        top: 0px;
         overflow: auto;
         background-color: #ececec;
-        border: 1px solid #c9c9c9;
+        // border: 1px solid #c9c9c9;
         box-sizing: border-box;        
     }
 

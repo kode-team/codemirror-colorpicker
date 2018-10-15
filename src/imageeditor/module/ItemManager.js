@@ -32,7 +32,7 @@ const LAYER_DEFAULT_OBJECT = {
         x: '0px',
         y: '0px'
     },    
-    filters: []
+    filters: {}
 }
 
 const IMAGE_DEFAULT_OBJECT = {

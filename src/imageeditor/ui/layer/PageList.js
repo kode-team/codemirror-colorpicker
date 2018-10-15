@@ -5,12 +5,6 @@ export default class PageList extends UIElement {
     template () { 
         return `
             <div class='pages'>         
-                <div class='title'> 
-                    <h1>Pages</h1>
-                    <div class="tools">
-                        <button type="button" class='add-page' ref="$addPage">+</button>
-                    </div>
-                </div> 
                 <div class="page-list" ref="$pageList">
                 
                 </div>
@@ -45,12 +39,16 @@ export default class PageList extends UIElement {
     }
 
     'load $pageList' () {
-        return this.read('/item/map/page', (item, index) => {
+        var str = this.read('/item/map/page', (item, index) => {
             return this.makeItemNode(item); 
-        });
+        }).join('');
+
+        str += `<button type="button" class='add-page'>+ Page</button>`
+
+        return str; 
     }
 
-    refresh () {
+    refresh () { 
         this.load()
     }
 
@@ -58,7 +56,7 @@ export default class PageList extends UIElement {
         this.refresh()
     }
 
-    'click $addPage' (e) {
+    'click $pageList .add-page' (e) {
         this.dispatch('/item/add/page', true);
         this.refresh();
     }

@@ -3,8 +3,8 @@ import PageList from '../ui/layer/PageList';
 import FeatureControl from '../ui/control/FeatureControl';
 import GradientView from '../ui/control/image/GradientView';
 
-
 import LayerList from '../ui/layer/LayerList';
+import ImageList from '../ui/layer/ImageList'
 import SubFeatureControl from '../ui/control/SubFeatureControl';
 
 export default class XDImageEditor extends BaseImageEditor {
@@ -14,11 +14,14 @@ export default class XDImageEditor extends BaseImageEditor {
 
             <div class="layout-main">
                 <div class="layout-header">
-                    <h1>EASYLOGIc studio</h1>
+                    <h1 class="header-title">EASYLOGIC</h1>
+                    <div class="page-tab-menu">
+                        <PageList></PageList>
+                    </div>
                 </div>
                 <div class="layout-left">      
-                    <PageList></PageList>
                     <LayerList></LayerList>
+                    <ImageList></ImageList>
                 </div>
                 <div class="layout-body">
                     <GradientView></GradientView>                      
@@ -35,7 +38,12 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
-            GradientView, PageList,FeatureControl, LayerList, SubFeatureControl
+            GradientView, 
+            PageList,
+            FeatureControl, 
+            LayerList, 
+            SubFeatureControl, 
+            ImageList
         }
     } 
 }

@@ -7,11 +7,12 @@ import BaseTab from '../../BaseTab';
 import PredefinedPageResizer from '../../view/PredefinedPageResizer';
 import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
 
-import LayerMenuTab from './LayerMenuTab'; 
-
-
-import { EDITOR_MODE_IMAGE_IMAGE, EDITOR_MODE_IMAGE_LINEAR, EDITOR_MODE_IMAGE_RADIAL, EDITOR_MODE_IMAGE_STATIC } from '../../../module/ItemManager';
-import LayerPreview from './menuItem/LayerPreview';
+import { 
+    EDITOR_MODE_IMAGE_IMAGE, 
+    EDITOR_MODE_IMAGE_LINEAR, 
+    EDITOR_MODE_IMAGE_RADIAL, 
+    EDITOR_MODE_IMAGE_STATIC 
+} from '../../../module/ItemManager';
 import MoveGuide from '../../view/MoveGuide';
    
 
@@ -20,10 +21,6 @@ export default class GradientView extends BaseTab {
     template () {
         return `
             <div class='page-view'>
-                <div class="page-menu">
-                    <LayerPreview></LayerPreview>
-                    <LayerMenuTab></LayerMenuTab>
-                </div>
                 <div class='page-content' ref="$board">
                     <div class="page-canvas">
                         <div class="gradient-color-view-container" ref="$page">
@@ -53,9 +50,7 @@ export default class GradientView extends BaseTab {
             PredefinedRadialGradientPosition, 
             GradientLayersMenu,
             PredefinedPageResizer,
-            PredefinedLayerResizer,
-            LayerMenuTab,
-            LayerPreview
+            PredefinedLayerResizer
         }
     }
 
@@ -134,14 +129,6 @@ export default class GradientView extends BaseTab {
         return e.target == this.refs.$colorview.el;
     }
 
-    'click.checkPage $colorview' (e) {
-        var page = this.read('/item/current/page')
-        if (page) {
-            this.dispatch('/item/select', page.id)
-        }
-        
-    }
-
     'click $page .layer' (e) {
         var id = e.$delegateTarget.attr('item-id')
         if (id) {
@@ -152,12 +139,6 @@ export default class GradientView extends BaseTab {
 
     'click.self $el .page-content' (e) {
         this.dispatch('/item/select/mode', 'board');
-    }
-
-    'click.self $el .page-canvas' (e) {
-        this.read('/item/current/page', (page) => {
-            this.dispatch('/item/select', page.id);
-        })
     }
 
     'pointerstart $page .layer' (e) {

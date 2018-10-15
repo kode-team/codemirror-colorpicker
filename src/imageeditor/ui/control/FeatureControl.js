@@ -1,8 +1,7 @@
 import UIElement from "../../../colorpicker/UIElement";
-import PropertyView from "./layer/PropertyView";
-import LayerView from "./layer/LayerView";  
-import ImageView from "./layer/ImageView";
-
+import PageMenuTab from "./PageMenuTab";
+import LayerMenuTab from "./LayerMenuTab";
+import ImageMenuTab from "./ImageMenuTab";
 
 export default class FeatureControl extends UIElement {
 
@@ -10,20 +9,24 @@ export default class FeatureControl extends UIElement {
         return `
             <div class='feature-control'>
                 <div class='feature page-feature selected' data-type='page'>
-                    <PropertyView></PropertyView>
+                    <PageMenuTab></PageMenuTab>
                 </div>
                 <div class='feature layer-feature' data-type='layer'>
-                    <LayerView></LayerView>
+                    <LayerMenuTab></LayerMenuTab>
                 </div>              
                 <div class='feature image-feature' data-type='image'>
-                    <ImageView></ImageView>
+                    <ImageMenuTab></ImageMenuTab>
                 </div>
             </div>
         `
     }
 
     components () {
-        return { PropertyView, LayerView, ImageView } 
+        return { 
+            PageMenuTab,
+            LayerMenuTab,
+            ImageMenuTab 
+        } 
     }
 
     selectFeature () {

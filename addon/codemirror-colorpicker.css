@@ -928,20 +928,22 @@
     .imageeditor .layout-main .layout-top {
       position: absolute;
       left: 0px;
-      right: 270px;
+      right: 295px;
       top: 50px;
       height: 100px;
       z-index: 1;
-      border-right: 1px solid #ececec; }
+      border-right: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
       right: 0px;
-      width: 250px;
+      width: 275px;
       top: 50px;
       bottom: 0px;
       overflow: auto;
       z-index: 1;
-      background-color: white; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-left: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
@@ -950,59 +952,152 @@
       bottom: 0px;
       z-index: 1;
       background-color: white;
-      border-right: 1px solid #ececec; }
+      border-right: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 260px;
-      right: 260px;
+      left: 250px;
+      right: 275px;
       top: 50px;
-      bottom: 110px;
-      z-index: 0;
-      overflow: hidden; }
+      bottom: 100px; }
     .imageeditor .layout-main .layout-header {
       position: absolute;
       left: 0px;
-      right: 8px;
+      right: 0px;
       height: 50px;
       top: 0px;
       z-index: 0;
       overflow: hidden;
       -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
-      .imageeditor .layout-main .layout-header h1 {
+              box-sizing: border-box;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      border-bottom: 1px solid #c7c7c7; }
+      .imageeditor .layout-main .layout-header .header-title {
+        width: 250px;
         padding: 10px;
         margin: 0px;
         text-align: left;
         font-size: 24px;
-        text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54); }
+        text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        display: block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+      .imageeditor .layout-main .layout-header .page-tab-menu {
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        display: block;
+        position: relative; }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 260px;
-      right: 260px;
+      left: 250px;
+      right: 275px;
       height: 100px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
-      border-top: 1px solid #ececec; }
-    .imageeditor .layout-main .layout-flow {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-          -ms-flex-direction: column;
-              flex-direction: column;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px; }
-      .imageeditor .layout-main .layout-flow.padding-0 {
-        padding: 0px; }
-      .imageeditor .layout-main .layout-flow > * {
-        -webkit-box-flex: 1;
-            -ms-flex: 1 1 auto;
-                flex: 1 1 auto; }
+      border-top: 1px solid #c7c7c7; }
+  .imageeditor [type='range'] {
+    -webkit-appearance: none;
+    background: transparent;
+    margin: 6px 0;
+    width: 95%; }
+    .imageeditor [type='range']::-moz-focus-outer {
+      border: 0; }
+    .imageeditor [type='range']:focus {
+      outline: 0; }
+      .imageeditor [type='range']:focus::-webkit-slider-runnable-track {
+        background: #fbfbfc; }
+      .imageeditor [type='range']:focus::-ms-fill-lower {
+        background: #eceff1; }
+      .imageeditor [type='range']:focus::-ms-fill-upper {
+        background: #fbfbfc; }
+    .imageeditor [type='range']::-webkit-slider-runnable-track {
+      cursor: default;
+      height: 1px;
+      -webkit-transition: all .2s ease;
+      transition: all .2s ease;
+      width: 95%;
+      -webkit-box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+              box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #eceff1;
+      border: 1px solid #cfd8dc;
+      border-radius: 0px; }
+    .imageeditor [type='range']::-webkit-slider-thumb {
+      -webkit-box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+              box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #03A9F4;
+      border: 0px solid #eceff1;
+      border-radius: 10px;
+      cursor: default;
+      height: 12px;
+      width: 12px;
+      -webkit-appearance: none;
+      margin-top: -6.5px; }
+    .imageeditor [type='range']::-moz-range-track {
+      box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      cursor: default;
+      height: 1px;
+      -webkit-transition: all .2s ease;
+      transition: all .2s ease;
+      width: 95%;
+      background: #eceff1;
+      border: 1px solid #cfd8dc;
+      border-radius: 0px;
+      height: 0.5px; }
+    .imageeditor [type='range']::-moz-range-thumb {
+      box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #03A9F4;
+      border: 0px solid #eceff1;
+      border-radius: 10px;
+      cursor: default;
+      height: 8px;
+      width: 8px; }
+    .imageeditor [type='range']::-ms-track {
+      cursor: default;
+      height: 1px;
+      -webkit-transition: all .2s ease;
+      transition: all .2s ease;
+      width: 95%;
+      background: transparent;
+      border-color: transparent;
+      border-width: 6px 0;
+      color: transparent; }
+    .imageeditor [type='range']::-ms-fill-lower {
+      box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #dde3e6;
+      border: 1px solid #cfd8dc;
+      border-radius: 0px; }
+    .imageeditor [type='range']::-ms-fill-upper {
+      box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #eceff1;
+      border: 1px solid #cfd8dc;
+      border-radius: 0px; }
+    .imageeditor [type='range']::-ms-thumb {
+      box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
+      background: #03A9F4;
+      border: 0px solid #eceff1;
+      border-radius: 10px;
+      cursor: default;
+      height: 8px;
+      width: 8px;
+      margin-top: 0.25px; }
+    .imageeditor [type='range']:disabled::-webkit-slider-thumb {
+      cursor: not-allowed; }
+    .imageeditor [type='range']:disabled::-moz-range-thumb {
+      cursor: not-allowed; }
+    .imageeditor [type='range']:disabled::-ms-thumb {
+      cursor: not-allowed; }
+    .imageeditor [type='range']:disabled::-webkit-slider-runnable-track {
+      cursor: not-allowed; }
+    .imageeditor [type='range']:disabled::-ms-fill-lower {
+      cursor: not-allowed; }
+    .imageeditor [type='range']:disabled::-ms-fill-upper {
+      cursor: not-allowed; }
   .imageeditor .tab {
     position: absolute;
     left: 0px;
@@ -1023,13 +1118,18 @@
       left: 0px;
       right: 0px;
       height: 30px;
-      top: 1px;
       display: block;
-      z-index: 1; }
+      z-index: 1;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex; }
       .imageeditor .tab .tab-header .tab-item {
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
         display: inline-block;
         font-size: 12px;
-        text-align: center;
+        text-align: left;
         height: 100%;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
@@ -1071,45 +1171,30 @@
     .imageeditor .tab.bottom > .tab-body {
       top: 0px;
       bottom: 30px; }
-  .imageeditor .layer-menu-tab .blend-preview-item {
-    display: inline-block;
-    height: 16px;
-    width: 16px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    vertical-align: middle; }
-    .imageeditor .layer-menu-tab .blend-preview-item.selected {
-      border-color: #000000; }
-    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-view-container {
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      bottom: 0px;
-      top: 0px;
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-      pointer-events: none;
-      display: inline-block;
+  .imageeditor .layer-menu-tab > .tab-header,
+  .imageeditor .page-menu-tab > .tab-header,
+  .imageeditor .image-menu-tab > .tab-header {
+    height: 40px; }
+    .imageeditor .layer-menu-tab > .tab-header > .tab-item,
+    .imageeditor .page-menu-tab > .tab-header > .tab-item,
+    .imageeditor .image-menu-tab > .tab-header > .tab-item {
+      border: 0px;
+      border-right: 1px solid #c7c7c7;
+      text-align: center;
       vertical-align: middle;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      -webkit-box-flex: 1;
-          -ms-flex: 1 1 auto;
-              flex: 1 1 auto; }
-    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-view {
-      pointer-events: none;
-      position: absolute;
-      left: 0px;
-      right: 50%;
-      bottom: 0px;
-      top: 0px; }
-    .imageeditor .layer-menu-tab .blend-preview-item .blend-item-blend-view {
-      pointer-events: none;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      bottom: 0px;
-      top: 0px; }
+      line-height: 1.2;
+      padding: 10px 5px;
+      font-size: 12px; }
+      .imageeditor .layer-menu-tab > .tab-header > .tab-item:last-child,
+      .imageeditor .page-menu-tab > .tab-header > .tab-item:last-child,
+      .imageeditor .image-menu-tab > .tab-header > .tab-item:last-child {
+        border-right: 0px; }
+  .imageeditor .layer-menu-tab > .tab-body,
+  .imageeditor .page-menu-tab > .tab-body,
+  .imageeditor .image-menu-tab > .tab-body {
+    top: 40px;
+    border: 0px;
+    border-top: 1px solid #c7c7c7; }
   .imageeditor .colorpicker-layer .codemirror-colorpicker {
     background-color: transparent;
     width: 100%;
@@ -1122,84 +1207,41 @@
       border: 0px;
       background-color: transparent; }
   .imageeditor .pages {
-    border-top: 1px solid #ececec;
-    border-bottom: 1px solid #ececec;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    height: 150px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 0px; }
-    .imageeditor .pages button {
-      -webkit-appearance: none;
-         -moz-appearance: none;
-              appearance: none;
-      width: auto;
-      height: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 100%; }
+    .imageeditor .pages .page-list {
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      border: 1px solid #dedede;
-      vertical-align: middle;
-      font-size: 12px;
-      cursor: pointer;
-      outline: none;
-      position: relative;
-      pointer-events: all; }
-    .imageeditor .pages > .title {
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      right: 0px;
-      height: 30px;
-      padding: 5px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
-      .imageeditor .pages > .title h1 {
-        font-size: 15px;
-        float: left;
-        vertical-align: middle;
-        margin: 0px; }
-      .imageeditor .pages > .title .tools {
-        float: right;
-        vertical-align: middle; }
-    .imageeditor .pages .page-list {
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      bottom: 0px;
-      top: 30px;
-      overflow-x: auto;
-      white-space: nowrap;
-      border-top: 1px solid #ececec;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
+      height: 100%; }
       .imageeditor .pages .page-list button {
         display: inline-block;
-        height: 30px;
+        height: 100%;
         vertical-align: middle;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
-        overflow: hidden;
         padding: 5px;
-        min-width: 80px;
-        margin-right: 5px;
-        text-align: center; }
+        text-align: center;
+        border: 0px;
+        pointer-events: all;
+        outline: none; }
       .imageeditor .pages .page-list .tree-item {
-        display: block;
-        height: 30px;
+        display: inline-block;
+        height: 100%;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
         position: relative;
-        padding: 5px 10px;
-        border-bottom: 1px solid #ececec; }
+        min-width: 80px;
+        text-align: center;
+        padding: 15px 10px; }
         .imageeditor .pages .page-list .tree-item.selected {
-          background-color: #ececec; }
-          .imageeditor .pages .page-list .tree-item.selected .item-tools {
-            visibility: visible; }
+          background-color: #c7c7c7;
+          color: white; }
         .imageeditor .pages .page-list .tree-item .item-view-container {
           position: relative;
           pointer-events: none;
@@ -1226,9 +1268,9 @@
             box-sizing: border-box;
     position: absolute;
     left: 0px;
-    top: 150px;
+    top: 0px;
     right: 0px;
-    bottom: 0px; }
+    height: 240px; }
     .imageeditor .layers button {
       -webkit-appearance: none;
          -moz-appearance: none;
@@ -1322,6 +1364,135 @@
           display: inline-block;
           font-size: 12px;
           pointer-events: none; }
+  .imageeditor .images {
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    position: absolute;
+    top: 240px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    border-top: 1px solid #c7c7c7; }
+    .imageeditor .images .image-tools {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column; }
+      .imageeditor .images .image-tools button {
+        display: inline-block;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        width: 100px;
+        height: 100px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #dedede;
+        vertical-align: middle;
+        font-size: 12px;
+        cursor: pointer;
+        outline: none;
+        position: relative;
+        pointer-events: all; }
+      .imageeditor .images .image-tools > .tools {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        width: 110px; }
+      .imageeditor .images .image-tools .image-list {
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        overflow: auto;
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        border-top: 1px solid #c8c8c8; }
+        .imageeditor .images .image-tools .image-list .tree-item {
+          display: inline-block;
+          height: 100px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          border: 5px solid #dedede;
+          vertical-align: middle;
+          margin: 5px; }
+          .imageeditor .images .image-tools .image-list .tree-item.selected {
+            border: 5px solid #333; }
+          .imageeditor .images .image-tools .image-list .tree-item:hover .item-tools {
+            display: inline-block; }
+          .imageeditor .images .image-tools .image-list .tree-item .item-view-container {
+            position: relative;
+            pointer-events: none;
+            display: inline-block;
+            vertical-align: middle;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            height: 100px;
+            width: 100px; }
+            .imageeditor .images .image-tools .image-list .tree-item .item-view-container .item-view {
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              right: 0px;
+              bottom: 0px; }
+          .imageeditor .images .image-tools .image-list .tree-item .item-tools {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            display: none;
+            padding: 5px;
+            pointer-events: none; }
+            .imageeditor .images .image-tools .image-list .tree-item .item-tools button {
+              height: 20px;
+              width: 20px;
+              position: absolute;
+              display: inline-block;
+              border: 0px solid #dedede;
+              cursor: pointer;
+              pointer-events: all;
+              border-radius: 50%;
+              background-color: rgba(255, 255, 255, 0.2); }
+              .imageeditor .images .image-tools .image-list .tree-item .item-tools button.copy-item {
+                right: 1px;
+                top: 50%;
+                -webkit-transform: translateY(-50%) rotate(45deg);
+                        transform: translateY(-50%) rotate(45deg); }
+              .imageeditor .images .image-tools .image-list .tree-item .item-tools button.left-item {
+                left: 1px;
+                bottom: 1px; }
+              .imageeditor .images .image-tools .image-list .tree-item .item-tools button.right-item {
+                right: 1px;
+                bottom: 1px; }
+              .imageeditor .images .image-tools .image-list .tree-item .item-tools button.delete-item {
+                top: 1px;
+                right: 1px; }
+      .imageeditor .images .image-tools .menu-buttons {
+        height: auto;
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        padding: 5px; }
+        .imageeditor .images .image-tools .menu-buttons .gradient-type {
+          display: block; }
+          .imageeditor .images .image-tools .menu-buttons .gradient-type > button {
+            height: auto;
+            margin: 5px 0px; }
+          .imageeditor .images .image-tools .menu-buttons .gradient-type .gradient-item {
+            width: 30px;
+            height: 30px; }
+    .imageeditor .images .add-tools {
+      padding: 5px;
+      height: 110px; }
   .imageeditor .feature-control {
     position: absolute;
     -webkit-box-sizing: border-box;
@@ -1627,144 +1798,14 @@
         top: 0px;
         bottom: 0px;
         left: 170px; }
-      .imageeditor .page-view .page-menu .images {
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        position: relative;
-        height: 100%; }
-        .imageeditor .page-view .page-menu .images .image-tools {
-          padding: 5px;
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px;
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-orient: horizontal;
-          -webkit-box-direction: normal;
-              -ms-flex-direction: row;
-                  flex-direction: row; }
-          .imageeditor .page-view .page-menu .images .image-tools button {
-            display: inline-block;
-            -webkit-appearance: none;
-               -moz-appearance: none;
-                    appearance: none;
-            width: 100px;
-            height: 100px;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-            border: 1px solid #dedede;
-            vertical-align: middle;
-            font-size: 12px;
-            cursor: pointer;
-            outline: none;
-            position: relative;
-            pointer-events: all; }
-          .imageeditor .page-view .page-menu .images .image-tools > .tools {
-            -webkit-box-flex: 0;
-                -ms-flex: none;
-                    flex: none;
-            width: 110px; }
-          .imageeditor .page-view .page-menu .images .image-tools .image-list {
-            -webkit-box-flex: 1;
-                -ms-flex: 1 1 auto;
-                    flex: 1 1 auto; }
-          .imageeditor .page-view .page-menu .images .image-tools .menu-buttons {
-            width: 110px;
-            -webkit-box-flex: 0;
-                -ms-flex: none;
-                    flex: none; }
-            .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type {
-              height: 100%; }
-              .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type > button {
-                height: auto;
-                margin: 5px 0px; }
-              .imageeditor .page-view .page-menu .images .image-tools .menu-buttons .gradient-type .gradient-item {
-                width: 30px;
-                height: 30px; }
-        .imageeditor .page-view .page-menu .images .add-tools {
-          padding: 5px;
-          height: 110px; }
-        .imageeditor .page-view .page-menu .images .image-list {
-          overflow-x: auto;
-          white-space: nowrap;
-          padding: 0px 5px; }
-          .imageeditor .page-view .page-menu .images .image-list .menu-buttons {
-            padding: 5px 10px;
-            display: inline-block;
-            vertical-align: middle; }
-          .imageeditor .page-view .page-menu .images .image-list .tree-item {
-            display: inline-block;
-            height: 100px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            border: 5px solid #dedede;
-            vertical-align: middle;
-            margin-right: 5px; }
-            .imageeditor .page-view .page-menu .images .image-list .tree-item.selected {
-              border: 5px solid #333; }
-            .imageeditor .page-view .page-menu .images .image-list .tree-item:hover .item-tools {
-              display: inline-block; }
-            .imageeditor .page-view .page-menu .images .image-list .tree-item .item-view-container {
-              position: relative;
-              pointer-events: none;
-              display: inline-block;
-              vertical-align: middle;
-              -webkit-box-sizing: border-box;
-                      box-sizing: border-box;
-              height: 100px;
-              width: 100px; }
-              .imageeditor .page-view .page-menu .images .image-list .tree-item .item-view-container .item-view {
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                right: 0px;
-                bottom: 0px; }
-            .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools {
-              position: absolute;
-              right: 0px;
-              top: 0px;
-              bottom: 0px;
-              left: 0px;
-              display: none;
-              padding: 5px;
-              pointer-events: none; }
-              .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button {
-                height: 20px;
-                width: 20px;
-                position: absolute;
-                display: inline-block;
-                border: 0px solid #dedede;
-                cursor: pointer;
-                pointer-events: all;
-                border-radius: 50%;
-                background-color: rgba(255, 255, 255, 0.2); }
-                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.copy-item {
-                  right: 1px;
-                  top: 50%;
-                  -webkit-transform: translateY(-50%) rotate(45deg);
-                          transform: translateY(-50%) rotate(45deg); }
-                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.left-item {
-                  left: 1px;
-                  bottom: 1px; }
-                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.right-item {
-                  right: 1px;
-                  bottom: 1px; }
-                .imageeditor .page-view .page-menu .images .image-list .tree-item .item-tools button.delete-item {
-                  top: 1px;
-                  right: 1px; }
     .imageeditor .page-view .page-content {
       position: absolute;
       left: 0px;
       right: 0px;
       bottom: 0px;
-      top: 170px;
+      top: 0px;
       overflow: auto;
       background-color: #ececec;
-      border: 1px solid #c9c9c9;
       -webkit-box-sizing: border-box;
               box-sizing: border-box; }
     .imageeditor .page-view .page-canvas {
@@ -2289,13 +2330,11 @@
       bottom: 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      overflow-x: auto;
-      white-space: nowrap;
+      overflow: auto;
       padding: 5px; }
       .imageeditor .blend-list-tab .blend-list .blend-item {
-        display: inline-block;
+        display: block;
         height: 100px;
-        width: 100px;
         cursor: pointer;
         position: relative;
         overflow: hidden;
@@ -2351,9 +2390,7 @@
     top: 0px;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    overflow: auto;
-    border-top: 1px solid #ececec;
-    border-left: 1px solid #ececec; }
+    overflow: auto; }
     .imageeditor .property-view .property-item {
       padding: 5px;
       border-bottom: 1px solid #ececec;
@@ -2709,3 +2746,52 @@
     .imageeditor .property-view .gradient-view {
       height: 230px;
       width: 100%; }
+  .imageeditor .filter-list .filter-item {
+    padding: 5px;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    border-bottom: 1px solid #c7c7c7; }
+    .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-view {
+      display: block;
+      height: 100px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #dedede;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      margin: 2px; }
+    .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-text {
+      font-size: 12px; }
+  .imageeditor .filter-list .filter-item-input {
+    font-size: 12px; }
+    .imageeditor .filter-list .filter-item-input > div {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex; }
+      .imageeditor .filter-list .filter-item-input > div > * {
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        display: inline-block;
+        vertical-align: middle;
+        text-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+      .imageeditor .filter-list .filter-item-input > div > .title {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        width: 80px;
+        text-align: left; }
+      .imageeditor .filter-list .filter-item-input > div > .input {
+        width: 50px;
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none; }
+      .imageeditor .filter-list .filter-item-input > div > .unit {
+        width: 30px;
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        padding: 2px; }

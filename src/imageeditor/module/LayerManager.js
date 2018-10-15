@@ -1,7 +1,39 @@
 import BaseModule from "../../colorpicker/BaseModule";
 
+const filterInfo = {
+
+    'blur': { title: 'Blur', type: 'range', min: 0, max: 100, step: 1, unit: 'px', defaultValue: 0 },
+    'grayscale' : { title: 'Grayscale', type: 'range', min: 0, max: 100, step: 1, unit: '%', defaultValue: 100 },
+    'hue-rotate' : { title: 'Hue', type: 'range', min: 0, max: 360, step: 1, unit: 'deg', defaultValue: 0 },
+    'invert' : { title: 'Invert', type: 'range', min: 0, max: 100, step: 1, unit: '%', defaultValue: 0 },    
+    'brightness': { title: 'Brightness', type: 'range', min: 0, max: 200, step: 1, unit: '%', defaultValue: 100 },
+    'contrast': { title: 'Contrast', type: 'range', min: 0, max: 200, step: 1, unit: '%', defaultValue: 100 },
+    'drop-shadow': { 
+        title: 'Drop Shadow', 
+        type: 'multi',
+        items: [
+            { title: 'Offset X', type: 'range', min: 0, max: 100, step: 1, defaultValue: 0 },
+            { title: 'Offset Y', type: 'range', min: 0, max: 100, step: 1, defaultValue: 0 },
+            { title: 'Blur Radius', type: 'range', min: 0, max: 100, step: 1, defaultValue: 0 },
+            { title: 'Spread Radius', type: 'range', min: 0, max: 100, step: 1, defaultValue: 0 },
+            { title: 'Color', type: 'color', defaultValue: 'black' }
+        ]  
+    },
+    'opacity' : { title: 'Opacity', type: 'range', min: 0, max: 100, step: 1, unit: '%', defaultValue: 100 },
+    'saturate' : { title: 'Saturate', type: 'range', min: 0, max: 100, step: 1, unit: '%', defaultValue: 100 },
+    'sepia' : { title: 'Sepia', type: 'range', min: 0, max: 100, step: 1, unit: '%', defaultValue: 0 },
+}
+
 export default class LayerManager extends BaseModule {
    
+    '*/layer/filter/list' ($store) {
+        return filterInfo;
+    }
+
+    '*/layer/get/filter' ($store, id) {
+        return filterInfo[id];
+    }    
+
     '*/layer/toString' ($store, layer, withStyle = true, image = null) {
 
         var obj = $store.read('/layer/toCSS', layer, withStyle, image) || {};
@@ -10,12 +42,61 @@ export default class LayerManager extends BaseModule {
             delete obj['background-color'];
             delete obj['background-blend-mode'];
             delete obj['mix-blend-mode'];
+            delete obj['filter'];
         }
 
         return Object.keys(obj).map(key => {
             return `${key}: ${obj[key]};`
         }).join(' ')
     }
+
+    '*/layer/make/filter' ($store, filters, defaultDataObject = {}) {        
+        return Object.keys(filters).map(id => {
+            var dataObject = filters[id] || defaultDataObject;
+            
+            // 적용하는 필터가 아니면 제외 한다. 
+            if (!dataObject.checked) return '';
+
+            var viewObject = $store.read('/layer/get/filter', id);
+
+            var value = dataObject.value; 
+
+            if (typeof value == 'undefined') {
+                value = viewObject.defaultValue;
+            }
+
+            return `${id}(${value}${viewObject.unit})`
+        }).join(' ')
+    }
+
+    '*/layer/filter/toString' ($store, layer, filterId = '', onlyFilter = false) {
+
+        if (!layer) return '';
+        if (!filterId && !layer.filters) return ''
+
+        var obj = $store.read('/layer/toCSS', layer, true) || { filters: []};
+        var filters = {}
+
+        if (!filterId) {
+            filters = layer.filters || {}
+        } else {
+            filters[filterId] = Object.assign({}, layer.filters[filterId] || {})
+            filters[filterId].checked = true; 
+        } 
+
+        if (onlyFilter) {
+            delete obj.width;
+            delete obj.height;
+            delete obj.left;
+            delete obj.top;
+        }
+
+        obj.filter = $store.read('/layer/make/filter', filters )
+
+        return Object.keys(obj).map(key => {
+            return `${key}: ${obj[key]};`
+        }).join(' ')
+    }    
 
     '*/layer/toImageCSS' ($store, layer) {    
         var results = {}
@@ -142,6 +223,7 @@ export default class LayerManager extends BaseModule {
         }
 
         css['transform'] = $store.read('/layer/make/transform', layer)
+        css['filter'] = $store.read('/layer/make/filter', layer.filters);
 
         var results = Object.assign(css, 
              (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer)

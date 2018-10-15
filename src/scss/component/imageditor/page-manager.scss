@@ -5,91 +5,44 @@ $button-size: 24px;
 $layer-item-padding: 4px;
 
 .pages {
-    border-top: 1px solid #ececec;
-    border-bottom: 1px solid #ececec;
     box-sizing: border-box;
-    height: 150px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 0px;
-
-
-    button {
-        appearance: none;
-        width: auto;
-        height: 20px;
-        box-sizing: border-box;
-        border: 1px solid #dedede;
-        vertical-align: middle;
-        font-size: 12px;
-        cursor: pointer;
-        outline: none;
-        position: relative;
-        pointer-events: all;
-    }
-
-    > .title {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        right: 0px;
-        height: 30px;
-        padding: 5px;
-        box-sizing: border-box;
-
-        h1 {
-            font-size: 15px;
-            float:left;
-            vertical-align: middle;
-            margin: 0px;
-        }
-
-        .tools {
-            float: right; 
-            vertical-align: middle;            
-        }
-    }
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 100%;
+    
 
     .page-list {
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        top: 30px;
-        overflow-x: auto; 
-        white-space: nowrap;
-        border-top: 1px solid #ececec;
         box-sizing: border-box;
+        height: 100%;
         
         button {
             display: inline-block;
-            height: $page-item-height;            
+            height: 100%;            
             vertical-align: middle;
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
             padding: 5px;
-            min-width: 80px;
-            margin-right: 5px;
             text-align: center;
+            border: 0px;            
+            pointer-events: all;            
+            outline: none;            
         }
+    
 
         .tree-item {
-            display: block;
-            height: 30px;            
+            display: inline-block;
+            height: 100%;
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
-            padding: 5px 10px;
-            border-bottom: 1px solid #ececec;
+            min-width: 80px;
+            text-align: center;
+            padding: 15px 10px;            
 
             &.selected {
-                background-color: #ececec;
-                .item-tools {
-                    visibility: visible;
-                }
+                background-color: #c7c7c7;
+                color: white;
             }
 
             .item-view-container {

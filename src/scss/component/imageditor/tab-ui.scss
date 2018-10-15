@@ -31,16 +31,18 @@ $tab-selected-color: #dedede;
         left: 0px;
         right: 0px;
         height: $tab-header-height;
-        top: 1px;
+        // top: 1px;
         // background-color: #ececec;
 
         display: block;
         z-index: 1;
+        display: flex;
 
         .tab-item {
+            flex:1;
             display: inline-block;
             font-size: 12px;
-            text-align: center;
+            text-align: left;
             height: 100%;
             box-sizing: border-box;
             padding: 6px 4px;
@@ -107,54 +109,28 @@ $tab-selected-color: #dedede;
     }
 }
 
-.layer-menu-tab {
-
-    .blend-preview-item {
-        display: inline-block;
-        height: 16px;
-        width: 16px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        vertical-align: middle;
-
-        &.selected {
-            border-color: #000000;                
-            
-        }
-
-        .blend-item-view-container {
-            position: absolute; 
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-            top: 0px;
-            @include transparent-background();
-            pointer-events: none;
-            display: inline-block;
+.layer-menu-tab,
+.page-menu-tab,
+.image-menu-tab {
+    > .tab-header{
+        height: 40px;
+        > .tab-item {
+            border: 0px;
+            border-right: 1px solid $border-color;
+            text-align: center;
             vertical-align: middle;
-            box-sizing: border-box;
-            flex: 1 1 auto;  
-            // padding: 14px;
+            line-height: 1.2;
+            padding: 10px 5px;
+            font-size: 12px;
+            &:last-child {
+                border-right: 0px;
+            }
         }
+    }
 
-        .blend-item-view {
-            pointer-events: none;                
-            position: absolute; 
-            left: 0px;
-            right: 50%;
-            bottom: 0px;
-            top: 0px; 
-        }
-
-        .blend-item-blend-view {
-            pointer-events: none;                
-            position: absolute; 
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-            top: 0px; 
-        }
-
+    > .tab-body {
+        top: 40px;
+        border:0px;
+        border-top: 1px solid $border-color;
     }
 }
