@@ -2839,14 +2839,31 @@
       cursor: pointer; }
     .imageeditor .export-view .color-view {
       position: absolute;
-      width: 500px;
+      width: 800px;
       height: 500px;
       left: 50%;
       top: 50%;
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
-      background-color: white; }
+      background-color: white;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex; }
       .imageeditor .export-view .color-view textarea {
-        width: 100%;
-        height: 100%;
-        display: block; }
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        display: inline-block;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+      .imageeditor .export-view .color-view .preview {
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        overflow: auto; }

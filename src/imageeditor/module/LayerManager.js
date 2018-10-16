@@ -50,6 +50,25 @@ export default class LayerManager extends BaseModule {
         }).join(' ')
     }
 
+    '*/layer/toExport' ($store, layer, withStyle = true) {
+
+        var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+
+        obj.position = 'absolute';
+
+        return Object.keys(obj).filter(key => {
+
+            if (key == 'transform' && obj[key] == 'none') return false; 
+            if (key == 'mix-blend-mode' && obj[key] == 'normal') return false; 
+            if (key == 'background-blend-mode' && obj[key] == 'normal') return false; 
+            if (key == 'x') return false; 
+            if (key == 'y') return false; 
+            return obj[key];
+        }).map(key => {
+            return `${key}: ${obj[key]};`
+        }).join(' ')
+    }    
+
     '*/layer/make/filter' ($store, filters, defaultDataObject = {}) {        
         return Object.keys(filters).map(id => {
             var dataObject = filters[id] || defaultDataObject;

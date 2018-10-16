@@ -8,18 +8,27 @@ export default class ExportView extends UIElement {
                 <div class="color-view">
                     <div class="close" ref="$close">&times;</div>                
                     <textarea ref="$code"></textarea>
+                    <div class='preview' ref="$preview"></div>
                 </div>
             </div>
         `
     }
-
+ 
 
     makePageCSS (page) {
         var obj = Object.assign({
-            overflow: page.clip ? 'hidden' : 'inherit'
+            position: 'relative',
+            overflow: page.clip ? 'hidden' : ''
         }, page.style || {}); 
 
-        var results = Object.keys(obj).map(key => {
+        var results = Object.keys(obj).filter(key => {
+
+            if (key == 'transform' && obj[key] == 'none') return false; 
+            if (key == 'x') return false; 
+            if (key == 'y') return false; 
+ 
+            return obj[key];
+        }).map(key => {
             return `${key}: ${obj[key]}`
         })
 
@@ -35,11 +44,13 @@ export default class ExportView extends UIElement {
 
         var pageStyle = this.makePageCSS(page)
 
-        var html = `<div class='page' style="${pageStyle}">\n${this.read('/item/map/children', page.id, (item) => {
-                return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item, true)}'></div>`
+        var html = `<div style="${pageStyle}">\n${this.read('/item/map/children', page.id, (item) => {
+                return `<div style='${this.read('/layer/toExport', item, true)}'></div>`
             }).join('\n')}\n</div>`
 
         this.refs.$code.val(html);
+
+        this.refs.$preview.html(html);
     }
 
     refresh () {

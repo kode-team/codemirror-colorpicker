@@ -15289,8 +15289,8 @@ var ExportView = function (_UIElement) {
 
             var pageStyle = this.makePageCSS(page);
 
-            var html = '<div class=\'page\' style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
-                return '<div class=\'layer\' item-id="' + item.id + '" style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
+            var html = '<div style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
+                return '<div style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
             }).join('\n') + '\n</div>';
 
             this.refs.$code.val(html);

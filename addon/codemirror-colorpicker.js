@@ -9755,6 +9755,28 @@ var LayerManager = function (_BaseModule) {
             }).join(' ');
         }
     }, {
+        key: '*/layer/toExport',
+        value: function layerToExport($store, layer) {
+            var withStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+
+            var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+
+            obj.position = 'absolute';
+
+            return Object.keys(obj).filter(function (key) {
+
+                if (key == 'transform' && obj[key] == 'none') return false;
+                if (key == 'mix-blend-mode' && obj[key] == 'normal') return false;
+                if (key == 'background-blend-mode' && obj[key] == 'normal') return false;
+                if (key == 'x') return false;
+                if (key == 'y') return false;
+                return obj[key];
+            }).map(function (key) {
+                return key + ': ' + obj[key] + ';';
+            }).join(' ');
+        }
+    }, {
         key: '*/layer/make/filter',
         value: function layerMakeFilter($store, filters) {
             var defaultDataObject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -15128,16 +15150,24 @@ var ExportView = function (_UIElement) {
     createClass(ExportView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'export-view\'>\n                <div class="color-view">\n                    <div class="close" ref="$close">&times;</div>                \n                    <textarea ref="$code"></textarea>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'export-view\'>\n                <div class="color-view">\n                    <div class="close" ref="$close">&times;</div>                \n                    <textarea ref="$code"></textarea>\n                    <div class=\'preview\' ref="$preview"></div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makePageCSS',
         value: function makePageCSS(page) {
             var obj = Object.assign({
-                overflow: page.clip ? 'hidden' : 'inherit'
+                position: 'relative',
+                overflow: page.clip ? 'hidden' : ''
             }, page.style || {});
 
-            var results = Object.keys(obj).map(function (key) {
+            var results = Object.keys(obj).filter(function (key) {
+
+                if (key == 'transform' && obj[key] == 'none') return false;
+                if (key == 'x') return false;
+                if (key == 'y') return false;
+
+                return obj[key];
+            }).map(function (key) {
                 return key + ': ' + obj[key];
             });
 
@@ -15156,11 +15186,13 @@ var ExportView = function (_UIElement) {
 
             var pageStyle = this.makePageCSS(page);
 
-            var html = '<div class=\'page\' style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
-                return '<div class=\'layer\' item-id="' + item.id + '" style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
+            var html = '<div style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
+                return '<div style=\'' + _this2.read('/layer/toExport', item, true) + '\'></div>';
             }).join('\n') + '\n</div>';
 
             this.refs.$code.val(html);
+
+            this.refs.$preview.html(html);
         }
     }, {
         key: 'refresh',
