@@ -9819,23 +9819,34 @@ var ColorView = function () {
     return ColorView;
 }();
 
-if (CodeMirror) {
+var CHECK_CODEMIRROR_OBJECT = function CHECK_CODEMIRROR_OBJECT() {
+    return CodeMirror || window.CodeMirror;
+};
+var CHECK_CODEMIRROR_LOAD_TIME = window.CHECK_CODEMIRROR_LOAD_TIME || 10;
+function LOAD_CODEMIRROR_COLORPICKER() {
+    var CODEMIRROR_OBJECT = CHECK_CODEMIRROR_OBJECT();
+    if (CODEMIRROR_OBJECT) {
 
-    CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
-        if (old && old != CodeMirror.Init) {
+        CODEMIRROR_OBJECT.defineOption("colorpicker", false, function (cm, val, old) {
+            if (old && old != CODEMIRROR_OBJECT.Init) {
 
-            if (cm.state.colorpicker) {
-                cm.state.colorpicker.destroy();
-                cm.state.colorpicker = null;
+                if (cm.state.colorpicker) {
+                    cm.state.colorpicker.destroy();
+                    cm.state.colorpicker = null;
+                }
+                // remove event listener
             }
-            // remove event listener
-        }
 
-        if (val) {
-            cm.state.colorpicker = new ColorView(cm, val);
-        }
-    });
+            if (val) {
+                cm.state.colorpicker = new ColorView(cm, val);
+            }
+        });
+    } else {
+        setTimeout(LOAD_CODEMIRROR_COLORPICKER, CHECK_CODEMIRROR_LOAD_TIME);
+    }
 }
+
+LOAD_CODEMIRROR_COLORPICKER();
 
 var index = _extends({}, Util, ColorPicker);
 
