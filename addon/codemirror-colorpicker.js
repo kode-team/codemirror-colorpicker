@@ -9688,11 +9688,10 @@ var ColorView = function () {
 var CHECK_CODEMIRROR_OBJECT = function CHECK_CODEMIRROR_OBJECT() {
     return CodeMirror || window.CodeMirror;
 };
-var CHECK_CODEMIRROR_LOAD_TIME = window.CHECK_CODEMIRROR_LOAD_TIME || 10;
 function LOAD_CODEMIRROR_COLORPICKER() {
     var CODEMIRROR_OBJECT = CHECK_CODEMIRROR_OBJECT();
-    if (CODEMIRROR_OBJECT) {
 
+    if (CODEMIRROR_OBJECT) {
         CODEMIRROR_OBJECT.defineOption("colorpicker", false, function (cm, val, old) {
             if (old && old != CODEMIRROR_OBJECT.Init) {
 
@@ -9707,14 +9706,16 @@ function LOAD_CODEMIRROR_COLORPICKER() {
                 cm.state.colorpicker = new ColorView(cm, val);
             }
         });
-    } else {
-        setTimeout(LOAD_CODEMIRROR_COLORPICKER, CHECK_CODEMIRROR_LOAD_TIME);
     }
 }
 
 LOAD_CODEMIRROR_COLORPICKER();
 
-var index = _extends({}, Util, ColorPicker);
+var CodeMirrorExtension = {
+    load: LOAD_CODEMIRROR_COLORPICKER
+};
+
+var index = _extends({}, Util, ColorPicker, CodeMirrorExtension);
 
 return index;
 
