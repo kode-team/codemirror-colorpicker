@@ -10423,8 +10423,8 @@ var PAGE_DEFAULT_OBJECT = {
     parentId: '',
     index: 0,
     style: {
-        width: '560px',
-        height: '430px'
+        width: '400px',
+        height: '300px'
     }
 };
 
@@ -13196,11 +13196,11 @@ var PageSize = function (_UIElement) {
             var _this2 = this;
 
             this.read('/item/current/page', function (item) {
-                if (item.style.width) {
+                if (item.style && item.style.width) {
                     _this2.refs.$width.val(item.style.width.replace('px', ''));
                 }
 
-                if (item.style.height) {
+                if (item.style && item.style.height) {
                     _this2.refs.$height.val(item.style.height.replace('px', ''));
                 }
             });
@@ -13286,7 +13286,30 @@ var PageName = function (_UIElement) {
     return PageName;
 }(UIElement);
 
+var PageExport = function (_UIElement) {
+    inherits(PageExport, _UIElement);
+
+    function PageExport() {
+        classCallCheck(this, PageExport);
+        return possibleConstructorReturn(this, (PageExport.__proto__ || Object.getPrototypeOf(PageExport)).apply(this, arguments));
+    }
+
+    createClass(PageExport, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item export\'>\n                <div class=\'title\'>Export</div>\n                <div class=\'items\'>\n                    <div>\n                        <button type="button" ref="$export">view</button>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'click $export',
+        value: function click$export(e) {
+            this.emit('showExport');
+        }
+    }]);
+    return PageExport;
+}(UIElement);
+
 var items = {
+    PageExport: PageExport,
     PageSize: PageSize,
     PageName: PageName,
     BackgroundRepeat: BackgroundRepeat,
@@ -15216,7 +15239,7 @@ var PropertyView = function (_UIElement) {
     createClass(PropertyView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view inline'>\n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n            </div>\n        ";
+            return "\n            <div class='property-view inline'>\n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n                <PageExport></PageExport>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -15225,6 +15248,81 @@ var PropertyView = function (_UIElement) {
         }
     }]);
     return PropertyView;
+}(UIElement);
+
+var ExportView = function (_UIElement) {
+    inherits(ExportView, _UIElement);
+
+    function ExportView() {
+        classCallCheck(this, ExportView);
+        return possibleConstructorReturn(this, (ExportView.__proto__ || Object.getPrototypeOf(ExportView)).apply(this, arguments));
+    }
+
+    createClass(ExportView, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'export-view\'>\n                <div class="color-view">\n                    <div class="close" ref="$close">&times;</div>                \n                    <textarea ref="$code"></textarea>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'makePageCSS',
+        value: function makePageCSS(page) {
+            var obj = Object.assign({
+                overflow: page.clip ? 'hidden' : 'inherit'
+            }, page.style || {});
+
+            var results = Object.keys(obj).map(function (key) {
+                return key + ': ' + obj[key];
+            });
+
+            return results.join(';');
+        }
+    }, {
+        key: 'loadCode',
+        value: function loadCode() {
+            var _this2 = this;
+
+            var page = this.read('/item/current/page');
+
+            if (!page) {
+                return '';
+            }
+
+            var pageStyle = this.makePageCSS(page);
+
+            var html = '<div class=\'page\' style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
+                return '<div class=\'layer\' item-id="' + item.id + '" style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
+            }).join('\n') + '\n</div>';
+
+            this.refs.$code.val(html);
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.loadCode();
+        }
+    }, {
+        key: 'click $close',
+        value: function click$close(e) {
+            this.$el.hide();
+        }
+    }, {
+        key: '@toggleExport',
+        value: function toggleExport() {
+            this.$el.toggle();
+        }
+    }, {
+        key: '@showExport',
+        value: function showExport() {
+            this.refresh();
+            this.$el.show();
+        }
+    }, {
+        key: '@hideExport',
+        value: function hideExport() {
+            this.$el.hide();
+        }
+    }]);
+    return ExportView;
 }(UIElement);
 
 var XDImageEditor = function (_BaseImageEditor) {
@@ -15238,12 +15336,14 @@ var XDImageEditor = function (_BaseImageEditor) {
     createClass(XDImageEditor, [{
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <SubFeatureControl></SubFeatureControl>\n                </div>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <SubFeatureControl></SubFeatureControl>\n                </div>\n                <ExportView></ExportView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
+
+                ExportView: ExportView,
                 PropertyView: PropertyView,
                 GradientView: GradientView,
                 PageList: PageList,

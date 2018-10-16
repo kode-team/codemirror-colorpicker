@@ -12,8 +12,8 @@ const PAGE_DEFAULT_OBJECT = {
     parentId: '',
     index: 0,
     style: {
-        width: '560px',
-        height: '430px'
+        width: '400px',
+        height: '300px'
     }
 }
 

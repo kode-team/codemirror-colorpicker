@@ -7,7 +7,7 @@ import LayerList from '../ui/layer/LayerList';
 import ImageList from '../ui/layer/ImageList'
 import SubFeatureControl from '../ui/control/SubFeatureControl';
 import PropertyView from '../ui/control/layer/PropertyView';
-
+import ExportView from '../ui/control/ExportView';
 
 
 
@@ -40,12 +40,15 @@ export default class XDImageEditor extends BaseImageEditor {
                 <div class="layout-footer">
                     <SubFeatureControl></SubFeatureControl>
                 </div>
+                <ExportView></ExportView>
             </div>
         `
     }
 
     components() { 
         return { 
+
+            ExportView,
             PropertyView,
             GradientView, 
             PageList,

@@ -15,10 +15,12 @@ import Background from "./Background";
 import BackgroundRepeat from "./BackgroundRepeat";
 import PageSize from "./PageSize";
 import PageName from "./PageName";
+import PageExport from "./PageExport";
 
 
 
 export default {
+    PageExport,
     PageSize,
     PageName,
     BackgroundRepeat,

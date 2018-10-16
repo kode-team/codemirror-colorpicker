@@ -32,11 +32,11 @@ export default class PageSize extends UIElement {
 
     refresh() {
         this.read('/item/current/page', (item) => {
-            if (item.style.width) {
+            if (item.style && item.style.width) {
                 this.refs.$width.val(item.style.width.replace('px', ''))
             }
     
-            if (item.style.height) {
+            if (item.style && item.style.height) {
                 this.refs.$height.val(item.style.height.replace('px', ''))
             }
     

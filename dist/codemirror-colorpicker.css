@@ -2819,3 +2819,34 @@
             -ms-flex: none;
                 flex: none;
         padding: 2px; }
+  .imageeditor .export-view {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 100000;
+    display: none; }
+    .imageeditor .export-view .close {
+      font-size: 50px;
+      position: absolute;
+      display: inline-block;
+      padding: 30px 0px;
+      right: 0px;
+      bottom: 100%;
+      color: white;
+      cursor: pointer; }
+    .imageeditor .export-view .color-view {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translateX(-50%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
+      background-color: white; }
+      .imageeditor .export-view .color-view textarea {
+        width: 100%;
+        height: 100%;
+        display: block; }

@@ -10,6 +10,7 @@ export default class PropertyView extends UIElement {
                 <PageName></PageName>
                 <PageSize></PageSize>
                 <clip></clip>
+                <PageExport></PageExport>
             </div>
         `
     }
