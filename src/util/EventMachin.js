@@ -294,6 +294,7 @@ export default class EventMachin {
     // })
 
     // const debounce = delay.length ? +delay[0] : 0;   // 0 은 debounce 하지 않음 . 
+    const debounceTime = 0;
     
     arr = arr.filter(code => {
       return checkMethodList.includes(code) === false 
@@ -309,7 +310,7 @@ export default class EventMachin {
       isAlt,
       isMeta,
       codes : arr,
-      debounce,
+      debounce: debounceTime,
       checkMethodList: checkMethodList
     }
   }

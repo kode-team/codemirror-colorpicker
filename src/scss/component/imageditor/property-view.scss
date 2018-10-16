@@ -7,6 +7,19 @@
     box-sizing: border-box;
     overflow: auto;
 
+    &.inline {
+        .property-item {
+            display: inline-block;
+            vertical-align: middle;
+            border:0px;
+
+            > * {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+    }
+
     .property-item {
         padding: 5px;
         border-bottom: 1px solid #ececec;

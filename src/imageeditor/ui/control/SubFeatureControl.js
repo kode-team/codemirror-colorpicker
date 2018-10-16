@@ -6,14 +6,8 @@ export default class SubFeatureControl extends UIElement {
 
     template () {
         return `
-            <div class='sub-feature-control'>
-                <div class='feature page-feature selected' data-type='page'>
-                    
-                </div>
-                <div class='feature layer-feature' data-type='layer'>
-                    
-                </div>              
-                <div class='feature image-feature' data-type='image'>
+            <div class='sub-feature-control'>         
+                <div class='feature selected image-feature' data-type='image'>
                     <ImageSubView></ImageSubView>
                 </div>
             </div>
@@ -24,33 +18,11 @@ export default class SubFeatureControl extends UIElement {
         return { ImageSubView } 
     }
 
-    selectFeature () {
-        var obj = this.read('/item/current')
-        this.$el.$('.feature.selected').removeClass('selected');
-
-        var selectType = ''; 
-        if (obj && obj.itemType == 'page') {
-            selectType = 'page';
-        } else if (obj)  {
-            if (obj.itemType == 'layer') {
-                selectType = 'layer';
-            } else if (obj.itemType == 'image') {
-                var layer = this.read('/item/current/layer');
-
-                if (layer.selectTime > obj.selectTime) {
-                    selectType = 'layer';
-                } else {
-                    selectType = 'image';
-                }
-                
-            }
-        }
-
-        this.$el.$(`.feature[data-type=${selectType}]`).addClass('selected')
-
+    refresh () {
+        // this.$el.toggleClass('show', this.read('/item/is/mode', 'image'));
     }
 
     '@changeEditor' () {
-        this.selectFeature()
+        // this.refresh();
     }
 }

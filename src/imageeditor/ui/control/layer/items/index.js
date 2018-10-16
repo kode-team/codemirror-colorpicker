@@ -13,10 +13,14 @@ import Transform from "./transform";
 import Transform3d from './transform3d';
 import Background from "./Background";
 import BackgroundRepeat from "./BackgroundRepeat";
+import PageSize from "./PageSize";
+import PageName from "./PageName";
 
 
 
 export default {
+    PageSize,
+    PageName,
     BackgroundRepeat,
     Background,
     Transform3d,

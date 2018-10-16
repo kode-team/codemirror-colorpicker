@@ -6,9 +6,9 @@ export default class PropertyView extends UIElement {
 
     template () {
         return `
-            <div class='property-view'>
-                <name></name>
-                <size></size>
+            <div class='property-view inline'>
+                <PageName></PageName>
+                <PageSize></PageSize>
                 <clip></clip>
             </div>
         `

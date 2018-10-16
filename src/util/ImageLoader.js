@@ -23,10 +23,8 @@ class ImageLoader {
     }
 
     loadImage (callback) {
-        var ctx = this.context; 
-        this.newImage = new Image();
-        const img = this.newImage
-        img.onload = () => {
+
+        this.getImage( (img) => {
             var ratio = img.height / img.width;
 
             if (this.opt.canvasWidth && this.opt.canvasHeight) {
@@ -40,6 +38,15 @@ class ImageLoader {
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.canvas.width, this.canvas.height);
             this.isLoaded = true; 
             callback && callback();
+        })
+    }
+
+    getImage (callback) {
+        var ctx = this.context; 
+        this.newImage = new Image();
+        const img = this.newImage
+        img.onload = () => {
+            callback && callback(img);
         };
 
         this.getImageUrl(function (url) {

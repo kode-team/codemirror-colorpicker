@@ -137,13 +137,26 @@ export default class GradientView extends BaseTab {
         }
     }
 
-    'click.self $el .page-content' (e) {
-        this.dispatch('/item/select/mode', 'board');
+    'click.self $el .page-canvas' (e) {
+
+        this.read('/item/current/layer', layer => {
+            this.dispatch('/item/select', layer.id);
+            this.refresh();
+        })
     }
+
+    'click $colorview' (e) {
+
+        this.read('/item/current/layer', layer => {
+            this.dispatch('/item/select', layer.id);
+            this.refresh();
+        })
+    }    
 
     'pointerstart $page .layer' (e) {
         this.isDown = true; 
         this.xy = e.xy;
+        this.$layer = e.$delegateTarget;
         this.layer = this.read('/item/get', e.$delegateTarget.attr('item-id'))
         this.moveX = +(this.layer.style.x || 0).replace('px', '')
         this.moveY = +(this.layer.style.y || 0).replace('px', '')
@@ -163,6 +176,10 @@ export default class GradientView extends BaseTab {
 
         item.style = Object.assign(item.style, style);
 
+        this.$layer.css({
+            left: style.x,
+            top: style.y
+        })
         this.dispatch('/item/set', item);
         this.refresh(true); 
     }
@@ -189,5 +206,29 @@ export default class GradientView extends BaseTab {
         this.isDown = false; 
         this.layer = null;
         this.refs.$page.removeClass('moving');        
+    }
+
+    'dragover' (e) {
+        e.preventDefault()
+    }
+
+    'dragstart' (e) {
+        e.preventDefault()
+    }
+
+    'dragover document' (e) {
+        // alert('a');
+        e.preventDefault() 
+    }
+
+    'drop document' (e) {
+        return; 
+        e.preventDefault();
+        var files = [...e.dataTransfer.files]; 
+        this.read('/item/current/layer', (layer) => {
+            this.read('/image/get/file', files, (img) => {
+                this.dispatch('/item/add/image/file', img, true, layer.id);
+            })
+        })
     }
 }

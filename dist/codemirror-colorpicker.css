@@ -928,16 +928,18 @@
     .imageeditor .layout-main .layout-top {
       position: absolute;
       left: 0px;
-      right: 295px;
+      right: 0px;
       top: 50px;
-      height: 100px;
+      height: 50px;
       z-index: 1;
-      border-right: 1px solid #c7c7c7; }
+      border-bottom: 1px solid #c7c7c7;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
       right: 0px;
       width: 275px;
-      top: 50px;
+      top: 100px;
       bottom: 0px;
       overflow: auto;
       z-index: 1;
@@ -948,7 +950,7 @@
       position: absolute;
       left: 0px;
       width: 250px;
-      top: 50px;
+      top: 100px;
       bottom: 0px;
       z-index: 1;
       background-color: white;
@@ -957,8 +959,8 @@
       position: absolute;
       left: 250px;
       right: 275px;
-      top: 50px;
-      bottom: 100px; }
+      top: 100px;
+      bottom: 150px; }
     .imageeditor .layout-main .layout-header {
       position: absolute;
       left: 0px;
@@ -996,7 +998,7 @@
       position: absolute;
       left: 250px;
       right: 275px;
-      height: 100px;
+      height: 150px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
@@ -1328,7 +1330,7 @@
         text-align: center; }
       .imageeditor .layers .layer-list .tree-item {
         display: block;
-        height: 35px;
+        height: 50px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         cursor: pointer;
@@ -1352,7 +1354,7 @@
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
           height: 100%;
-          width: 25px;
+          width: 50px;
           border: 1px solid #ececec; }
           .imageeditor .layers .layer-list .tree-item .item-view-container .item-view {
             position: absolute;
@@ -1517,14 +1519,29 @@
       height: 290px; }
     .imageeditor .feature-control .image-feature .color-steps-tab {
       top: 620px; }
-  .imageeditor .sub-feature-control .image-feature .property-view {
-    border-bottom: 0px;
-    border-top: 0px; }
-    .imageeditor .sub-feature-control .image-feature .property-view .property-item {
-      display: none;
-      border: 0px; }
-      .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items > div label {
-        margin-right: 10px; }
+  .imageeditor .sub-feature-control {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    -webkit-transition: all 0.1s linear;
+    transition: all 0.1s linear; }
+    .imageeditor .sub-feature-control .image-feature .property-view {
+      border-bottom: 0px;
+      border-top: 0px; }
+      .imageeditor .sub-feature-control .image-feature .property-view .property-item {
+        border: 0px; }
+        .imageeditor .sub-feature-control .image-feature .property-view .property-item > .title {
+          display: inline-block;
+          vertical-align: middle; }
+        .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items {
+          display: inline-block;
+          vertical-align: middle; }
+          .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items .gradient-sample-list {
+            min-height: auto; }
+          .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items > div label {
+            margin-right: 10px; }
   .imageeditor .gradient-type {
     display: inline-block;
     vertical-align: top; }
@@ -1810,7 +1827,7 @@
               box-sizing: border-box; }
     .imageeditor .page-view .page-canvas {
       position: relative;
-      padding: 300px;
+      padding: 100px;
       display: inline-block; }
     .imageeditor .page-view .gradient-color-view-container {
       position: relative;
@@ -2391,6 +2408,13 @@
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     overflow: auto; }
+    .imageeditor .property-view.inline .property-item {
+      display: inline-block;
+      vertical-align: middle;
+      border: 0px; }
+      .imageeditor .property-view.inline .property-item > * {
+        display: inline-block;
+        vertical-align: middle; }
     .imageeditor .property-view .property-item {
       padding: 5px;
       border-bottom: 1px solid #ececec;

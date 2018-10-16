@@ -39,6 +39,16 @@ $layer-item-padding: 4px;
 }
 
 .sub-feature-control {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    transition: all 0.1s linear;
+
+    &.show {
+        // top: 0px;
+    }
 
     .image-feature {
 
@@ -46,10 +56,18 @@ $layer-item-padding: 4px;
             border-bottom: 0px;
             border-top: 0px;
             .property-item {
-                display: none; 
+                // display: none; 
                 border: 0px;
-    
+                > .title  {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
                 > .items {
+                    display: inline-block;
+                    vertical-align: middle;
+                    .gradient-sample-list {
+                        min-height: auto; 
+                    }
                     > div {
                         label {
                             margin-right: 10px;

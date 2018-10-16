@@ -1,3 +1,4 @@
+import ImageLoader from '../../util/ImageLoader'
 import BaseModule from "../../colorpicker/BaseModule";
 
 const DEFINED_ANGLES = {
@@ -32,8 +33,19 @@ const DEFINED_POSITIONS = {
 }
 
 
-export default class ImageManager extends BaseModule {
+export default class ImageManager extends BaseModule { 
  
+    '*/image/get/file' ($store, files, callback) {
+        (files || []).forEach(file => {
+            var ext = file.name.split('.').pop();
+            if (ext == 'jpg' || ext == 'png' || ext == 'gif') {
+                new ImageLoader(file).getImage(image => {
+                    callback (image)
+                });
+            }
+        });
+    }
+
     '/image/setAngle' ($store, angle = '') {
         angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : ( +angle % 360);
 
@@ -221,7 +233,7 @@ export default class ImageManager extends BaseModule {
     }
 
     '*/image/toImage' ($store, image = null) {
-        var url = image.url
+        var url = image.backgroundImage
 
         if (url) {
             return `url(${url})`

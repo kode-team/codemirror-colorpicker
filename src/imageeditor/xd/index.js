@@ -6,6 +6,11 @@ import GradientView from '../ui/control/image/GradientView';
 import LayerList from '../ui/layer/LayerList';
 import ImageList from '../ui/layer/ImageList'
 import SubFeatureControl from '../ui/control/SubFeatureControl';
+import PropertyView from '../ui/control/layer/PropertyView';
+
+
+
+
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -18,6 +23,9 @@ export default class XDImageEditor extends BaseImageEditor {
                     <div class="page-tab-menu">
                         <PageList></PageList>
                     </div>
+                </div>
+                <div class="layout-top">
+                    <PropertyView></PropertyView>
                 </div>
                 <div class="layout-left">      
                     <LayerList></LayerList>
@@ -38,6 +46,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
+            PropertyView,
             GradientView, 
             PageList,
             FeatureControl, 

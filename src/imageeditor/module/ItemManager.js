@@ -12,8 +12,8 @@ const PAGE_DEFAULT_OBJECT = {
     parentId: '',
     index: 0,
     style: {
-        width: '360px',
-        height: '630px'
+        width: '560px',
+        height: '430px'
     }
 }
 
@@ -30,7 +30,9 @@ const LAYER_DEFAULT_OBJECT = {
     visible: true,
     style: {
         x: '0px',
-        y: '0px'
+        y: '0px',
+        'background-blend-mode' : 'multiply',
+        'mix-blend-mode': 'normal'
     },    
     filters: {}
 }
@@ -539,6 +541,21 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
     }    
+
+    '/item/add/image/file' ($store, img, isSelected = false, parentId = '') {
+        var id = $store.read('/item/create/image');
+        var item = $store.read('/item/get', id);
+        item.type = 'image'; 
+        item.parentId = parentId; 
+        item.index = Number.MAX_SAFE_INTEGER;
+        item.backgroundImage = img.src;  
+        // item.backgroundSizeWidth = img.width + 'px';  //이미지에 따라서 어떻게 바뀔 지 모르겠다. 원본 크기를 줘야할까? 
+        // item.backgroundSizeHeight = img.height + 'px';
+        item.backgroundSizeWidth = '100%';
+
+        $store.run('/item/set', item, isSelected);
+        $store.run('/item/sort', id); 
+    }        
 
     '/item/add/page' ($store, isSelected = false) {
         var pageId = $store.read('/item/create', 'page');        

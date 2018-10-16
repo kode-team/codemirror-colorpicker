@@ -48,7 +48,18 @@ export default class ImageList extends UIElement {
     'load $imageList' () {
         var item = this.read('/item/current/layer');
 
-        if (!item) return ''; 
+        if (!item)  {
+            var page = this.read('/item/current/page');
+            if (page) {
+                var list = this.read('/item/list/children', page.id)
+                if (list.length) {
+                    item = { id: list[0]}
+                } else {
+                    return '';
+                }
+            }
+            
+        }; 
 
         return this.read('/item/map/children', item.id, (item) => {
             return this.makeItemNodeImage(item)
@@ -78,7 +89,6 @@ export default class ImageList extends UIElement {
     }
 
     'click $gradientType .gradient-item' (e) {
-        console.log(e);
         this.read('/item/current/layer', (item) => {
 
             var type = e.$delegateTarget.attr('data-type')
