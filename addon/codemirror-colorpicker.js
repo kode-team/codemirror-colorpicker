@@ -10186,7 +10186,7 @@ var deepblue = {
 
 var gradientList = [deepblue, sample1, gradegray, piggypink, coolblues, megatron, jshine, darkocean, yoda, liberty, silence, circle, circle2];
 
-var material = ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B'];
+var material = ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E'];
 
 var types = [{ id: 'material', title: 'Material Colors' }];
 
@@ -10407,7 +10407,7 @@ var ItemManager = function (_BaseModule) {
         value: function itemSave($store) {
             localStorage.setItem(SAVE_ID, JSON.stringify({
                 items: $store.items,
-                selectedId: $store.selected,
+                selectedId: $store.selectedId,
                 selectedMode: $store.selectedMode
             }));
         }
@@ -11056,8 +11056,10 @@ var lastIndex = -1;
 var selectedItem = {};
 
 var verticalKeys = ['y', 'centerY', 'y2'];
+var verticalAlign = { 'y': 'top', 'centerY': 'middle', 'y2': 'bottom' };
 var horizontalKeys = ['x', 'centerX', 'x2'];
-var maxDist = 1;
+var horizontalAlign = { 'x': 'left', 'centerX': 'center', 'x2': 'right' };
+var MAX_DIST = 1;
 
 var GuideManager = function (_BaseModule) {
     inherits(GuideManager, _BaseModule);
@@ -11084,8 +11086,73 @@ var GuideManager = function (_BaseModule) {
             return { x: x, y: y, x2: x2, y2: y2, width: width, height: height, centerX: centerX, centerY: centerY };
         }
     }, {
+        key: '*/guide/snap/layer',
+        value: function guideSnapLayer($store, layer) {
+            var dist = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : MAX_DIST;
+
+            var list = $store.read('/guide/line/layer', dist);
+            var x, y;
+            if (list.length) {
+
+                var height = +(layer.style.height || '0px').replace('px', '');
+                var width = +(layer.style.width || '0px').replace('px', '');
+                var topY = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'top';
+                }).map(function (it) {
+                    return it.y;
+                })));
+                var middleY = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'middle';
+                }).map(function (it) {
+                    return it.y;
+                })));
+                var bottomY = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'bottom';
+                }).map(function (it) {
+                    return it.y;
+                })));
+                var leftX = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'left';
+                }).map(function (it) {
+                    return it.x;
+                })));
+                var centerX = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'center';
+                }).map(function (it) {
+                    return it.x;
+                })));
+                var rightX = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
+                    return it.align == 'right';
+                }).map(function (it) {
+                    return it.x;
+                })));
+
+                if (topY != Infinity) {
+                    y = topY;
+                } else if (bottomY != Infinity) {
+                    y = bottomY - height;
+                } else if (middleY != Infinity) {
+                    y = Math.floor(middleY - height / 2);
+                }
+
+                if (leftX != Infinity) {
+                    x = leftX;
+                } else if (rightX != Infinity) {
+                    x = rightX - width;
+                } else if (centerX != Infinity) {
+                    x = Math.floor(centerX - width / 2);
+                }
+
+                return [x, y];
+            }
+
+            return [];
+        }
+    }, {
         key: '*/guide/line/layer',
         value: function guideLineLayer($store) {
+            var dist = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : MAX_DIST;
+
 
             var page = $store.read('/item/current/page');
 
@@ -11119,15 +11186,17 @@ var GuideManager = function (_BaseModule) {
 
             lastIndex = index;
 
-            return $store.read('/guide/paths');
+            return $store.read('/guide/paths', dist);
         }
     }, {
         key: '*/guide/paths',
         value: function guidePaths($store) {
+            var dist = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : MAX_DIST;
+
 
             var results = [];
             for (var i = 0; i < lastIndex; i++) {
-                results.push.apply(results, toConsumableArray($store.read('/guide/check', list$1[i], selectedItem)));
+                results.push.apply(results, toConsumableArray($store.read('/guide/check', list$1[i], selectedItem, dist)));
             }
 
             return results;
@@ -11135,27 +11204,32 @@ var GuideManager = function (_BaseModule) {
     }, {
         key: '*/guide/check',
         value: function guideCheck($store, item1, item2) {
+            var dist = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : MAX_DIST;
+
             var results = [];
 
             // 가로 먼저 체크 
 
-            results.push.apply(results, toConsumableArray($store.read('/guide/check/vertical', item1, item2)));
+            results.push.apply(results, toConsumableArray($store.read('/guide/check/vertical', item1, item2, dist)));
 
             // 세로 체크 
-            results.push.apply(results, toConsumableArray($store.read('/guide/check/horizontal', item1, item2)));
+            results.push.apply(results, toConsumableArray($store.read('/guide/check/horizontal', item1, item2, dist)));
 
             return results;
         }
     }, {
         key: '*/guide/check/vertical',
         value: function guideCheckVertical($store, item1, item2) {
+            var dist = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : MAX_DIST;
+
             var results = [];
 
             verticalKeys.forEach(function (key) {
 
                 // top
-                if (Math.abs(item1.y - item2[key]) < maxDist) {
+                if (Math.abs(item1.y - item2[key]) < dist) {
                     results.push({ type: '-',
+                        align: verticalAlign[key],
                         x: Math.min(item1.centerX, item2.centerX),
                         y: item1.y,
                         width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
@@ -11163,8 +11237,9 @@ var GuideManager = function (_BaseModule) {
                 }
 
                 // middle
-                if (Math.abs(item1.centerY - item2[key]) < maxDist) {
+                if (Math.abs(item1.centerY - item2[key]) < dist) {
                     results.push({ type: '-',
+                        align: verticalAlign[key],
                         x: Math.min(item1.centerX, item2.centerX),
                         y: item1.centerY,
                         width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
@@ -11172,8 +11247,9 @@ var GuideManager = function (_BaseModule) {
                 }
 
                 // bottom
-                if (Math.abs(item1.y2 - item2[key]) < maxDist) {
+                if (Math.abs(item1.y2 - item2[key]) < dist) {
                     results.push({ type: '-',
+                        align: verticalAlign[key],
                         x: Math.min(item1.centerX, item2.centerX),
                         y: item1.y2,
                         width: Math.max(item1.centerX, item2.centerX) - Math.min(item1.centerX, item2.centerX)
@@ -11186,13 +11262,16 @@ var GuideManager = function (_BaseModule) {
     }, {
         key: '*/guide/check/horizontal',
         value: function guideCheckHorizontal($store, item1, item2) {
+            var dist = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : MAX_DIST;
+
             var results = [];
 
             horizontalKeys.forEach(function (key) {
 
                 // left 
-                if (Math.abs(item1.x - item2[key]) < maxDist) {
+                if (Math.abs(item1.x - item2[key]) < dist) {
                     results.push({ type: '|',
+                        align: horizontalAlign[key],
                         x: item1.x,
                         y: Math.min(item1.centerY, item2.centerY),
                         height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
@@ -11200,8 +11279,9 @@ var GuideManager = function (_BaseModule) {
                 }
 
                 // center
-                if (Math.abs(item1.centerX - item2[key]) < maxDist) {
+                if (Math.abs(item1.centerX - item2[key]) < dist) {
                     results.push({ type: '|',
+                        align: horizontalAlign[key],
                         x: item1.centerX,
                         y: Math.min(item1.centerY, item2.centerY),
                         height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
@@ -11209,8 +11289,9 @@ var GuideManager = function (_BaseModule) {
                 }
 
                 // right
-                if (Math.abs(item1.x2 - item2[key]) < maxDist) {
+                if (Math.abs(item1.x2 - item2[key]) < dist) {
                     results.push({ type: '|',
+                        align: horizontalAlign[key],
                         x: item1.x2,
                         y: Math.min(item1.centerY, item2.centerY),
                         height: Math.max(item1.centerY, item2.centerY) - Math.min(item1.centerY, item2.centerY)
@@ -13967,59 +14048,6 @@ var PredefinedRadialGradientPosition = function (_UIElement) {
     return PredefinedRadialGradientPosition;
 }(UIElement);
 
-var GradientType = function (_UIElement) {
-    inherits(GradientType, _UIElement);
-
-    function GradientType() {
-        classCallCheck(this, GradientType);
-        return possibleConstructorReturn(this, (GradientType.__proto__ || Object.getPrototypeOf(GradientType)).apply(this, arguments));
-    }
-
-    createClass(GradientType, [{
-        key: 'components',
-        value: function components() {
-            return { PredefinedRadialGradientAngle: PredefinedRadialGradientAngle };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            return '\n        <div class=\'gradient-tools\'>\n            <div class=\'menu-buttons\'><button type="button" ref="$createGradientButton">+ Gradient</button></div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'click $createGradientButton',
-        value: function click$createGradientButton(e) {
-            var _this2 = this;
-
-            this.read('/item/current/layer', function (item) {
-                _this2.dispatch('/item/add', 'image', false, item.id);
-            });
-        }
-    }]);
-    return GradientType;
-}(UIElement);
-
-var LayersMenu = function (_UIElement) {
-    inherits(LayersMenu, _UIElement);
-
-    function LayersMenu() {
-        classCallCheck(this, LayersMenu);
-        return possibleConstructorReturn(this, (LayersMenu.__proto__ || Object.getPrototypeOf(LayersMenu)).apply(this, arguments));
-    }
-
-    createClass(LayersMenu, [{
-        key: 'template',
-        value: function template() {
-            return ' \n            <div class=\'gradient-layers-menu\'>\n                <div class="left">\n                    <GradientType></GradientType>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'components',
-        value: function components() {
-            return { GradientType: GradientType };
-        }
-    }]);
-    return LayersMenu;
-}(UIElement);
-
 var PredefinedPageResizer = function (_UIElement) {
     inherits(PredefinedPageResizer, _UIElement);
 
@@ -14702,7 +14730,7 @@ var MoveGuide = function (_UIElement) {
     }, {
         key: 'load $el',
         value: function load$el() {
-            var list = this.read('/guide/line/layer');
+            var list = this.read('/guide/line/layer', 3);
 
             var bo = this.$board.offset();
             var po = this.$page.offset();
@@ -14723,7 +14751,7 @@ var MoveGuide = function (_UIElement) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.$el.hide();
+            // this.$el.hide();
             this.load();
         }
     }, {
@@ -14757,7 +14785,6 @@ var GradientView = function (_BaseTab) {
                 GradientPosition: GradientPosition,
                 PredefinedLinearGradientAngle: PredefinedLinearGradientAngle,
                 PredefinedRadialGradientPosition: PredefinedRadialGradientPosition,
-                GradientLayersMenu: LayersMenu,
                 PredefinedPageResizer: PredefinedPageResizer,
                 PredefinedLayerResizer: PredefinedLayerResizer
             };
@@ -14896,12 +14923,27 @@ var GradientView = function (_BaseTab) {
             });
 
             var item = this.layer;
-
             item.style = Object.assign(item.style, style);
 
+            var list = this.read('/guide/snap/layer', item, 3);
+
+            if (list.length) {
+                var _list = slicedToArray(list, 2),
+                    x = _list[0],
+                    y = _list[1];
+
+                if (typeof x != 'undefined') {
+                    item.style.x = x + 'px';
+                }
+
+                if (typeof y != 'undefined') {
+                    item.style.y = y + 'px';
+                }
+            }
+
             this.$layer.css({
-                left: style.x,
-                top: style.y
+                left: item.style.x,
+                top: item.style.y
             });
             this.dispatch('/item/set', item);
             this.refresh(true);

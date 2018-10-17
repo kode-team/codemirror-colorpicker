@@ -937,14 +937,15 @@
               box-sizing: border-box; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
-      right: 0px;
-      width: 275px;
+      left: 250px;
+      width: 250px;
       top: 100px;
       bottom: 0px;
       overflow: auto;
       z-index: 1;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
+      border-right: 1px solid #c7c7c7;
       border-left: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
@@ -957,8 +958,8 @@
       border-right: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 250px;
-      right: 275px;
+      left: 500px;
+      right: 0px;
       top: 100px;
       bottom: 150px; }
     .imageeditor .layout-main .layout-header {
@@ -996,8 +997,8 @@
         position: relative; }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 250px;
-      right: 275px;
+      left: 500px;
+      right: 0px;
       height: 150px;
       bottom: 0px;
       z-index: 0;
@@ -1362,7 +1363,6 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        padding: 5px;
         border-bottom: 1px solid #ececec; }
         .imageeditor .layers .layer-list .tree-item.selected {
           background-color: #ececec; }
@@ -2368,12 +2368,12 @@
     .imageeditor .blend-list .blend-item {
       display: inline-block;
       height: 75px;
-      width: 75px;
+      width: 105px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
       border: 5px solid #dedede;
-      margin: 0px; }
+      margin: 1px; }
       .imageeditor .blend-list .blend-item.selected {
         border-color: #000000; }
       .imageeditor .blend-list .blend-item .blend-item-view-container {

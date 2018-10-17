@@ -27,13 +27,15 @@ $left-size: 250px;
 
     .layout-right {
         position: absolute;
-        right : 0px;
-        width: $right-size;
+        // right : 0px;
+        left: $left-size;
+        width: $left-size;
         top: $tool-size * 2;
         bottom: 0px;
         overflow: auto;
         z-index: 1;         
         box-sizing: border-box;
+        border-right: 1px solid $border-color;
         border-left: 1px solid $border-color;
     }
 
@@ -52,8 +54,8 @@ $left-size: 250px;
 
     .layout-body {
         position: absolute;
-        left: $left-size;
-        right: $right-size;
+        left: $left-size * 2;
+        right: 0px;
         top: $tool-size * 2;  
         bottom: $tool-size * 3;
     }
@@ -92,8 +94,8 @@ $left-size: 250px;
 
     .layout-footer {
         position: absolute;
-        left: $left-size;
-        right: $right-size;
+        left: $left-size * 2;
+        right: 0px;
         height: $tool-size * 3;
         bottom: 0px;
         z-index: 0; 

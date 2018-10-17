@@ -18,7 +18,7 @@ export default class MoveGuide extends UIElement {
     }
 
     'load $el' () {
-        var list = this.read('/guide/line/layer');
+        var list = this.read('/guide/line/layer', 3);
 
         var bo = this.$board.offset()
         var po = this.$page.offset()
@@ -38,7 +38,7 @@ export default class MoveGuide extends UIElement {
     }
 
     refresh () {
-        this.$el.hide();
+        // this.$el.hide();
         this.load()
     }
 

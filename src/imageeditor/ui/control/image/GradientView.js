@@ -2,7 +2,6 @@ import GradientAngle from '../../view/GradientAngle'
 import GradientPosition from '../../view/GradientPosition' 
 import PredefinedLinearGradientAngle from '../../view/PredefinedLinearGradientAngle'
 import PredefinedRadialGradientPosition from '../../view/PredefinedRadialGradientPosition'
-import GradientLayersMenu from './GradientLayersMenu'; 
 import BaseTab from '../../BaseTab';
 import PredefinedPageResizer from '../../view/PredefinedPageResizer';
 import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
@@ -48,7 +47,6 @@ export default class GradientView extends BaseTab {
             GradientPosition, 
             PredefinedLinearGradientAngle, 
             PredefinedRadialGradientPosition, 
-            GradientLayersMenu,
             PredefinedPageResizer,
             PredefinedLayerResizer
         }
@@ -173,12 +171,26 @@ export default class GradientView extends BaseTab {
         })
 
         var item = this.layer
-
         item.style = Object.assign(item.style, style);
 
+        var list = this.read('/guide/snap/layer', item, 3);
+
+        if (list.length) {
+
+            var [x, y] = list
+
+            if (typeof x != 'undefined') {
+                item.style.x = x + 'px';
+            }
+
+            if (typeof y != 'undefined') {
+                item.style.y = y + 'px';
+            }
+        }
+
         this.$layer.css({
-            left: style.x,
-            top: style.y
+            left: item.style.x,
+            top: item.style.y
         })
         this.dispatch('/item/set', item);
         this.refresh(true); 

@@ -1,7 +1,7 @@
 $pointer-color: rgba(#ececec, 0.8);
 $direction-border: 2px solid $pointer-color;
 $blend-item-height: 75px;
-$blend-item-width: 75px;
+$blend-item-width: 105px;
 $layer-item-padding: 8px;
 
 .blend-row {
@@ -26,7 +26,7 @@ $layer-item-padding: 8px;
         position: relative;
         overflow: hidden;
         border: 5px solid #dedede;
-        margin:0px;
+        margin:1px;
 
         &.selected {
             border-color: #000000;                

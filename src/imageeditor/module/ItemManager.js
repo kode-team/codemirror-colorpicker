@@ -95,7 +95,7 @@ export default class ItemManager extends BaseModule {
     '/item/save' ($store) {
         localStorage.setItem(SAVE_ID, JSON.stringify({
             items: $store.items,
-            selectedId: $store.selected,
+            selectedId: $store.selectedId,
             selectedMode: $store.selectedMode
         }))
     }
