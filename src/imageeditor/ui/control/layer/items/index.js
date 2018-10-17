@@ -16,10 +16,17 @@ import BackgroundRepeat from "./BackgroundRepeat";
 import PageSize from "./PageSize";
 import PageName from "./PageName";
 import PageExport from "./PageExport";
+import BlendList from "./BlendList";
+import MixBlendList from "./MixBlendList";
+import FilterList from "./FilterList";
 
 
 
 export default {
+
+    BlendList,
+    MixBlendList,
+    FilterList,    
     PageExport,
     PageSize,
     PageName,

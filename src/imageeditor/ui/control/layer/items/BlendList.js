@@ -1,13 +1,16 @@
 
-import UIElement from '../../../../../colorpicker/UIElement';
+import BasePropertyItem from './BasePropertyItem';
 
-export default class BlendList extends UIElement {
+export default class BlendList extends BasePropertyItem {
 
     template () { 
         return `
-            <div class='background-blend-list blend-list-tab'>
+        <div class='property-item blend'>
+            <div class='title' ref="$title">Blend - <span class='description' ref="$desc"></span></div>
+            <div class='items'>         
                 <div class="blend-list" ref="$blendList"></div>
             </div>
+        </div>
         `
     }
 
@@ -33,6 +36,11 @@ export default class BlendList extends UIElement {
 
     refresh () {
         this.load()
+
+        this.read('/item/current/layer', (layer) => {
+            this.refs.$desc.html(layer.style['background-blend-mode'])
+        })
+        
     }
 
     '@changeEditor' () {

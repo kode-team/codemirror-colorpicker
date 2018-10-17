@@ -1,8 +1,12 @@
 &.gradient-steps {
     $pointer-color: rgba(#ececec, 0.8);
-    height: 60px;
-    padding: 10px;
-    padding-bottom: 20px;
+    height: 90px;
+    padding: 0px;
+
+    > .items {
+        padding: 20px !important;
+        padding-top: 10px !important;
+    }
 
     .gradient-steps {
         position: relative;

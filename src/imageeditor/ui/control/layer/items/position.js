@@ -1,11 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class Position extends UIElement {
+export default class Position extends BasePropertyItem {
     template () {
         return `
-
             <div class='property-item position'>
-                <div class='title'>Position</div>
+                <div class='title' ref="$title">Position</div>
                 <div class='items'>            
                     <div>
                         <label>X</label>

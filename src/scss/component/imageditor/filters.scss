@@ -1,5 +1,7 @@
 .filter-list {
+    display: block !important;
     .filter-item {
+        display: block;
         padding:5px;
         box-sizing: border-box;
         border-bottom: 1px solid $border-color;

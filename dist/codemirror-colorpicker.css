@@ -1213,8 +1213,34 @@
             box-sizing: border-box;
     overflow-x: auto;
     white-space: nowrap;
-    height: 100%; }
+    height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex; }
+    .imageeditor .pages .project-tools {
+      -webkit-box-flex: 0;
+          -ms-flex: none;
+              flex: none;
+      display: inline-block;
+      padding: 10px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      text-align: right; }
+      .imageeditor .pages .project-tools button {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        border: 1px solid #c7c7c7;
+        padding: 4px 20px;
+        height: 100%;
+        display: inline-block;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
     .imageeditor .pages .page-list {
+      -webkit-box-flex: 1;
+          -ms-flex: 1 1 auto;
+              flex: 1 1 auto;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       height: 100%; }
@@ -2332,73 +2358,64 @@
               box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.32); }
   .imageeditor .blend-row {
     position: relative; }
-  .imageeditor .blend-list-tab {
-    position: relative;
-    height: 100%;
+  .imageeditor .blend-list {
+    display: block !important;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    padding: 5px; }
-    .imageeditor .blend-list-tab .blend-list {
-      display: block;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      overflow: auto;
-      padding: 5px; }
-      .imageeditor .blend-list-tab .blend-list .blend-item {
-        display: block;
-        height: 100px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        border: 5px solid #dedede;
-        margin: 2px; }
-        .imageeditor .blend-list-tab .blend-list .blend-item.selected {
-          border-color: #000000; }
-        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-view-container {
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px;
-          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-          pointer-events: none;
-          display: inline-block;
-          vertical-align: middle;
-          -webkit-box-sizing: border-box;
-                  box-sizing: border-box;
-          -webkit-box-flex: 1;
-              -ms-flex: 1 1 auto;
-                  flex: 1 1 auto; }
-        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-view {
-          pointer-events: none;
-          position: absolute;
-          left: 0px;
-          right: 50%;
-          bottom: 0px;
-          top: 0px; }
-        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-blend-view {
-          pointer-events: none;
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px; }
-        .imageeditor .blend-list-tab .blend-list .blend-item .blend-item-text {
-          pointer-events: none;
-          position: absolute;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
-          top: 0px;
-          color: white;
-          padding: 10px;
-          font-size: 13px;
-          text-shadow: 0px 3px 4px black; }
+    overflow: auto; }
+    .imageeditor .blend-list > div {
+      display: block !important; }
+    .imageeditor .blend-list .blend-item {
+      display: inline-block;
+      height: 75px;
+      width: 75px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 5px solid #dedede;
+      margin: 0px; }
+      .imageeditor .blend-list .blend-item.selected {
+        border-color: #000000; }
+      .imageeditor .blend-list .blend-item .blend-item-view-container {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
+        pointer-events: none;
+        display: inline-block;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto; }
+      .imageeditor .blend-list .blend-item .blend-item-view {
+        pointer-events: none;
+        position: absolute;
+        left: 0px;
+        right: 50%;
+        bottom: 0px;
+        top: 0px; }
+      .imageeditor .blend-list .blend-item .blend-item-blend-view {
+        pointer-events: none;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px; }
+      .imageeditor .blend-list .blend-item .blend-item-text {
+        pointer-events: none;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
+        color: white;
+        padding: 10px;
+        font-size: 13px;
+        text-shadow: 0px 3px 4px black; }
   .imageeditor .property-view {
     position: absolute;
     left: 0px;
@@ -2411,22 +2428,89 @@
     .imageeditor .property-view.inline .property-item {
       display: inline-block;
       vertical-align: middle;
-      border: 0px; }
+      border: 0px;
+      padding: 8px; }
+      .imageeditor .property-view.inline .property-item > .title {
+        background-image: none;
+        border-bottom: 0px; }
+        .imageeditor .property-view.inline .property-item > .title > span button {
+          -webkit-appearance: none;
+             -moz-appearance: none;
+                  appearance: none;
+          background-color: transparent;
+          border: 1px solid #c7c7c7;
+          vertical-align: middle;
+          display: inline-block;
+          height: auto; }
+      .imageeditor .property-view.inline .property-item > .items {
+        display: inline-block; }
       .imageeditor .property-view.inline .property-item > * {
         display: inline-block;
         vertical-align: middle; }
+        .imageeditor .property-view.inline .property-item > * button {
+          -webkit-appearance: none;
+             -moz-appearance: none;
+                  appearance: none;
+          background-color: transparent;
+          border: 1px solid #c7c7c7;
+          vertical-align: middle;
+          display: inline-block; }
+    .imageeditor .property-view.accordian {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column; }
+      .imageeditor .property-view.accordian .property-item {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        position: relative; }
+        .imageeditor .property-view.accordian .property-item.show {
+          -webkit-box-flex: 1;
+              -ms-flex: 1 1 auto;
+                  flex: 1 1 auto; }
+          .imageeditor .property-view.accordian .property-item.show > .items {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            top: 30px;
+            overflow: auto; }
+        .imageeditor .property-view.accordian .property-item > .title span {
+          display: inline-block;
+          max-width: 200px;
+          overflow: hidden;
+          white-space: nowrap;
+          vertical-align: middle;
+          text-overflow: ellipsis; }
+        .imageeditor .property-view.accordian .property-item.filters > .items {
+          padding: 0px !important; }
+          .imageeditor .property-view.accordian .property-item.filters > .items .filter-list {
+            display: block !important; }
+            .imageeditor .property-view.accordian .property-item.filters > .items .filter-list .filter-item {
+              display: block !important; }
+              .imageeditor .property-view.accordian .property-item.filters > .items .filter-list .filter-item .filter-item-input .input input[type=number] {
+                width: 40px; }
     .imageeditor .property-view .property-item {
-      padding: 5px;
+      padding: 0px;
       border-bottom: 1px solid #ececec;
       font-size: 12px;
       overflow: hidden; }
       .imageeditor .property-view .property-item > .title {
         font-size: 12px;
         font-weight: bold;
-        padding: 4px 0px !important;
+        padding: 8px 5px !important;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
-        height: 30px; }
+        height: 30px;
+        background-image: -webkit-gradient(linear, left bottom, left top, from(#e0e0e0), to(#ffffff));
+        background-image: linear-gradient(to top, #e0e0e0 0%, #ffffff 100%);
+        border-bottom: 1px solid #c7c7c7;
+        color: #333;
+        cursor: pointer; }
         .imageeditor .property-view .property-item > .title > span button {
           -webkit-appearance: none;
              -moz-appearance: none;
@@ -2436,6 +2520,12 @@
                   box-sizing: border-box;
           display: inline-block;
           height: 100%; }
+      .imageeditor .property-view .property-item > .items {
+        display: none;
+        padding: 4px 5px !important;
+        padding-top: 0px; }
+      .imageeditor .property-view .property-item.show .items {
+        display: block; }
       .imageeditor .property-view .property-item > .items > div {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -2476,9 +2566,11 @@
             width: 36px;
             text-align: center; }
       .imageeditor .property-view .property-item.gradient-steps {
-        height: 60px;
-        padding: 10px;
-        padding-bottom: 20px; }
+        height: 90px;
+        padding: 0px; }
+        .imageeditor .property-view .property-item.gradient-steps > .items {
+          padding: 20px !important;
+          padding-top: 10px !important; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
           position: relative;
           display: block; }
@@ -2696,8 +2788,7 @@
             outline: none;
             position: relative;
             pointer-events: all; }
-        .imageeditor .property-view .property-item.gradient-tools .title {
-          display: inline-block;
+        .imageeditor .property-view .property-item.gradient-tools > .title {
           vertical-align: middle;
           padding: 10px 0px;
           font-size: 12px; }
@@ -2770,55 +2861,58 @@
     .imageeditor .property-view .gradient-view {
       height: 230px;
       width: 100%; }
-  .imageeditor .filter-list .filter-item {
-    padding: 5px;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    border-bottom: 1px solid #c7c7c7; }
-    .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-view {
+  .imageeditor .filter-list {
+    display: block !important; }
+    .imageeditor .filter-list .filter-item {
       display: block;
-      height: 100px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid #dedede;
+      padding: 5px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      margin: 2px; }
-    .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-text {
-      font-size: 12px; }
-  .imageeditor .filter-list .filter-item-input {
-    font-size: 12px; }
-    .imageeditor .filter-list .filter-item-input > div {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex; }
-      .imageeditor .filter-list .filter-item-input > div > * {
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1;
-        display: inline-block;
-        vertical-align: middle;
-        text-align: middle;
+      border-bottom: 1px solid #c7c7c7; }
+      .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-view {
+        display: block;
+        height: 100px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #dedede;
         -webkit-box-sizing: border-box;
-                box-sizing: border-box; }
-      .imageeditor .filter-list .filter-item-input > div > .title {
-        -webkit-box-flex: 0;
-            -ms-flex: none;
-                flex: none;
-        width: 80px;
-        text-align: left; }
-      .imageeditor .filter-list .filter-item-input > div > .input {
-        width: 50px;
-        -webkit-box-flex: 0;
-            -ms-flex: none;
-                flex: none; }
-      .imageeditor .filter-list .filter-item-input > div > .unit {
-        width: 30px;
-        -webkit-box-flex: 0;
-            -ms-flex: none;
-                flex: none;
-        padding: 2px; }
+                box-sizing: border-box;
+        margin: 2px; }
+      .imageeditor .filter-list .filter-item .filter-item-view-container .filter-item-text {
+        font-size: 12px; }
+    .imageeditor .filter-list .filter-item-input {
+      font-size: 12px; }
+      .imageeditor .filter-list .filter-item-input > div {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex; }
+        .imageeditor .filter-list .filter-item-input > div > * {
+          -webkit-box-flex: 1;
+              -ms-flex: 1;
+                  flex: 1;
+          display: inline-block;
+          vertical-align: middle;
+          text-align: middle;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+        .imageeditor .filter-list .filter-item-input > div > .title {
+          -webkit-box-flex: 0;
+              -ms-flex: none;
+                  flex: none;
+          width: 80px;
+          text-align: left; }
+        .imageeditor .filter-list .filter-item-input > div > .input {
+          width: 50px;
+          -webkit-box-flex: 0;
+              -ms-flex: none;
+                  flex: none; }
+        .imageeditor .filter-list .filter-item-input > div > .unit {
+          width: 30px;
+          -webkit-box-flex: 0;
+              -ms-flex: none;
+                  flex: none;
+          padding: 2px; }
   .imageeditor .export-view {
     position: absolute;
     left: 0px;

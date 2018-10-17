@@ -12,16 +12,107 @@
             display: inline-block;
             vertical-align: middle;
             border:0px;
+            padding: 8px;
+
+            > .title {
+                background-image: none;
+                border-bottom: 0px;
+
+                > span {
+
+                    button {
+                        appearance: none;
+                        background-color: transparent;
+                        border: 1px solid $border-color;
+                        vertical-align: middle;
+                        display: inline-block;
+                        height: auto;
+                    }
+
+                }
+            }
+
+            > .items {
+                display: inline-block;
+            }
 
             > * {
                 display: inline-block;
                 vertical-align: middle;
+
+                button {
+                    appearance: none;
+                    background-color: transparent;
+                    border: 1px solid $border-color;
+                    vertical-align: middle;
+                    display: inline-block;
+                }
+
+
             }
         }
     }
 
+    &.accordian {
+        display: flex;
+        flex-direction: column;
+
+        .property-item {
+            flex: none;            
+            position: relative;
+
+            &.show {
+                flex: 1 1 auto;    
+
+                > .items {
+                    position: absolute;
+                    left: 0px;
+                    right: 0px;
+                    bottom: 0px;
+                    top: 30px;
+                    overflow: auto;
+                }
+            }
+
+            > .title {
+
+                span {
+                    display: inline-block;
+                    max-width: 200px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    vertical-align: middle;
+                    text-overflow: ellipsis;
+                }
+
+            }
+
+            &.filters {
+                > .items {
+                    padding: 0px !important;
+
+                    .filter-list {
+                        display: block !important;
+
+                        .filter-item {
+                            display: block !important;
+
+                            .filter-item-input {
+                                .input {
+                                    input[type=number] {
+                                        width: 40px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }    
+    }
+
     .property-item {
-        padding: 5px;
+        padding: 0px;
         border-bottom: 1px solid #ececec;
         font-size: 12px;
         overflow: hidden; 
@@ -29,9 +120,13 @@
         > .title {
             font-size: 12px;
             font-weight: bold;
-            padding: 4px 0px !important;
+            padding: 8px 5px !important;
             box-sizing: border-box;
             height: 30px;
+            background-image: linear-gradient(to top, #e0e0e0 0%, #ffffff 100%);
+            border-bottom: 1px solid $border-color;
+            color: #333;
+            cursor: pointer;
 
             > span {
                 
@@ -43,6 +138,18 @@
                     display: inline-block;
                     height: 100%;
                 }
+            }
+        }
+
+        > .items {
+            display: none; 
+            padding: 4px 5px !important; 
+            padding-top: 0px;
+        }
+
+        &.show {
+            .items {
+                display: block; 
             }
         }
 

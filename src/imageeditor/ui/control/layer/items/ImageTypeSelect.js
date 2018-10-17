@@ -1,7 +1,7 @@
-import UIElement from '../../../../../colorpicker/UIElement';
 import PredefinedRadialGradientAngle from '../../../view/PredefinedRadialGradientAngle'
+import BasePropertyItem from './BasePropertyItem';
 
-export default class ImageTypeSelect extends UIElement {
+export default class ImageTypeSelect extends BasePropertyItem {
 
     components () {
         return { PredefinedRadialGradientAngle }
@@ -10,8 +10,8 @@ export default class ImageTypeSelect extends UIElement {
     template () {
         return `
         <div class='property-item gradient-tools'>
-            <div class='title'>Image Types</div>
-            <div class='items'>        
+            <div class='title' ref="$title">Change Image Types</div>
+            <div class='items' ref="$items">        
                 <div class='gradient-type' ref="$gradientType">
                     <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>
                     <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>

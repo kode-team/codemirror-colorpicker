@@ -8,6 +8,9 @@ export default class PageList extends UIElement {
                 <div class="page-list" ref="$pageList">
                 
                 </div>
+                <div class='project-tools'>
+                    <button type="button" ref="$saveButton">Save</button>
+                </div>
             </div>
         `
     }
@@ -70,6 +73,10 @@ export default class PageList extends UIElement {
             this.emit('@selectPage')
         } 
         
+    }
+
+    'click $saveButton' (e) {
+        this.run('/item/save');
     }
 
 }

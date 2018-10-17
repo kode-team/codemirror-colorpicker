@@ -58,4 +58,12 @@ export default class XDImageEditor extends BaseImageEditor {
             ImageList
         }
     } 
+
+    loadStart (isAdd) {
+        this.dispatch('/item/load', (isLoaded) => {
+            if (!isLoaded && isAdd) { 
+                this.run('/item/add/page', true)
+            }
+        });
+    }
 }

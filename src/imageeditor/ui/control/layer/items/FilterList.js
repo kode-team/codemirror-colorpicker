@@ -1,14 +1,16 @@
-import BaseTab from "../../../BaseTab";
+import BasePropertyItem from "./BasePropertyItem";
 
-
-
-
-export default class FilterList extends BaseTab {
+export default class FilterList extends BasePropertyItem {
 
     template () { 
         return `
-            <div class="filter-list" ref="$filterList">
-                
+            <div class='property-item filters'>
+                <div class='title' ref="$title">Filter - <span class='description' ref="$desc"></span></div>
+                <div class='items'>                    
+                    <div class="filter-list" ref="$filterList">
+                        
+                    </div>
+                </div>
             </div>
         `
     }
@@ -77,6 +79,7 @@ export default class FilterList extends BaseTab {
                 $dom.$(`.range [data-filter-id=${id}]`).val(filter.value)
             }
         })
+        this.refreshFilterList()        
     }
 
     '@changeEditor' () {
@@ -85,6 +88,13 @@ export default class FilterList extends BaseTab {
 
     refresh () {
         this.load()
+        this.refreshFilterList()
+    }
+
+    refreshFilterList() {
+        this.read('/item/current/layer', (layer) => {
+            this.refs.$desc.html(this.read('/layer/make/filter', layer.filters)); 
+        })        
     }
 
     getFilterList () {
@@ -107,7 +117,7 @@ export default class FilterList extends BaseTab {
             layer.filters[id].checked = e.$delegateTarget.el.checked;
 
             this.dispatch('/item/set', layer);
-            // this.refresh();
+            this.refreshFilterList()
         })
     }
 

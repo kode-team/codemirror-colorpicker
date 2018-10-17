@@ -1,10 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class Transform extends UIElement {
+export default class Transform extends BasePropertyItem {
     template () {
         return `
             <div class='property-item transform'>
-                <div class='title'>Transform</div>
+                <div class='title' ref="$title">Transform</div>
                 <div class='items'>            
                     <div>
                         <label>Rotate</label>

@@ -4,7 +4,7 @@ import GradientInfo from "../../colorsteps/GradientInfo";
 export default class ColorStepsInfo extends UIElement {
     template () {
         return `
-            <div class='property-item gradient-steps-info'>
+            <div class='property-item gradient-steps-info show'>
                 <div class='items'>            
                     <GradientInfo></GradientInfo>
                 </div>

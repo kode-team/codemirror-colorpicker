@@ -5,7 +5,7 @@ import ColorPicker  from "../../color/ColorPicker";
 export default class ColorPickerPanel extends UIElement {
     template () {
         return `
-            <div class='property-item colorpicker'>
+            <div class='property-item colorpicker show'>
                 <div class='items'>            
                     <ColorPicker></ColorPicker>
                 </div>

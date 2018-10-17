@@ -26,8 +26,8 @@ $typetool-size: 34px;
         }
     }
 
-    .title {
-        display: inline-block;
+    > .title {
+        // display: inline-block;
         vertical-align: middle;
         padding: 10px 0px;
         font-size: 12px;

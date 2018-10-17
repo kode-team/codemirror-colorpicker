@@ -1,10 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class Radius extends UIElement {
+export default class Radius extends BasePropertyItem {
     template () {
         return `
             <div class='property-item radius'>
-                <div class='title'>Radius 
+                <div class='title' ref="$title">Radius 
                     <span>
                         <label><input type='checkbox' ref="$fixedRadius" /> fixed</label>
                     </span>

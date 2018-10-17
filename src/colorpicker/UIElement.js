@@ -58,6 +58,10 @@ class UIElement extends EventMachin {
         return this.$store.read(...args)
     }
 
+    run (...args) {
+        return this.$store.run(...args);
+    }
+
     dispatch (...args) {
         this.$store.source = this.source ; 
         return this.$store.dispatch(...args)

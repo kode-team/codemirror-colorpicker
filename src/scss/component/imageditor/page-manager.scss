@@ -9,9 +9,28 @@ $layer-item-padding: 4px;
     overflow-x: auto;
     white-space: nowrap;
     height: 100%;
+    display: flex;
     
+    .project-tools {
+        flex: none;
+        display:inline-block;
+        padding: 10px;
+        box-sizing: border-box;
+        text-align: right;
+
+        button {
+            appearance: none;
+            border: 1px solid $border-color;
+            padding: 4px 20px;
+            height: 100%;
+            display: inline-block;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+    }
 
     .page-list {
+        flex: 1 1 auto;
         box-sizing: border-box;
         height: 100%;
         

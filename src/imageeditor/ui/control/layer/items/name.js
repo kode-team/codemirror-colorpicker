@@ -3,7 +3,7 @@ import UIElement from "../../../../../colorpicker/UIElement";
 export default class Name extends UIElement {
     template () {
         return `
-            <div class='property-item name'>
+            <div class='property-item name show'>
                 <div class='items'>            
                     <div>
                         <label>Name</label>

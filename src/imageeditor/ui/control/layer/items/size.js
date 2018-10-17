@@ -1,15 +1,17 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class Size extends UIElement {
+export default class Size extends BasePropertyItem {
     template () {
         return `
             <div class='property-item size'>
-                <div class='title'>Dimesion
-                    <span>
-                        <button type="button" ref="$rect">rect</button>
-                    </span>
-                </div>
+                <div class='title' ref="$title">Dimesion</div>
                 <div class='items'>
+                    <div>
+                        <label>fixed</label>
+                        <div>
+                            <button type="button" ref="$rect">like width</button>
+                        </div>
+                    </div>                   
                     <div>
                         <label>Width</label>
                         <div>
@@ -35,7 +37,7 @@ export default class Size extends UIElement {
 
         if (!item) reutrn; 
         if (item.itemType == 'image') return; 
-
+        if (!item.style) return; 
         if (item.style.width) {
             this.refs.$width.val(item.style.width.replace('px', ''))
         }

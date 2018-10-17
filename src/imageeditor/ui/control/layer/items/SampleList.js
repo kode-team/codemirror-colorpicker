@@ -1,11 +1,11 @@
-import UIElement from "../../../../../colorpicker/UIElement";
 import GradientSampleList from "../../colorsteps/GradientSampleList";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class SampleList extends UIElement {
+export default class SampleList extends BasePropertyItem {
     template () {
         return `
             <div class='property-item sample-list'>
-                <div class='title'>Select Images</div>
+                <div class='title' ref="$title">Change Image</div>
                 <div class='items'>            
                     <GradientSampleList></GradientSampleList>
                 </div>

@@ -1,11 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
 import GradientSteps from "../../colorsteps/GradientSteps";
+import BasePropertyItem from "./BasePropertyItem";
 
-
-export default class ColorSteps extends UIElement {
+export default class ColorSteps extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item gradient-steps'>
+            <div class='property-item gradient-steps show'>
                 <div class='title'>Color Steps</div>
                 <div class='items'>            
                     <GradientSteps></GradientSteps>

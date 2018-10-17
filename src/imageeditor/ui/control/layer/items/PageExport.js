@@ -4,9 +4,9 @@ export default class PageExport extends UIElement {
     template () {
         return `
             <div class='property-item export'>
-                <div class='title'>Export</div>
                 <div class='items'>
                     <div>
+                        <label>Export</label>
                         <button type="button" ref="$export">view</button>
                     </div>   
                                  
