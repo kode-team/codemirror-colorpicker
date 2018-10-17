@@ -14863,7 +14863,7 @@ var MoveGuide = function (_UIElement) {
     }, {
         key: 'load $el',
         value: function load$el() {
-            var list = this.read('/guide/line/layer', 3);
+            var list = this.read('/guide/line/layer');
 
             var bo = this.$board.offset();
             var po = this.$page.offset();
