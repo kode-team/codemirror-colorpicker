@@ -1853,8 +1853,17 @@
               box-sizing: border-box; }
     .imageeditor .page-view .page-canvas {
       position: relative;
-      padding: 100px;
-      display: inline-block; }
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      width: 100%;
+      height: 100%; }
     .imageeditor .page-view .gradient-color-view-container {
       position: relative;
       display: inline-block;
