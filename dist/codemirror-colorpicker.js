@@ -8366,8 +8366,7 @@ var ColorInformation = function (_UIElement) {
                 r: this.refs.$rgb_r.int(),
                 g: this.refs.$rgb_g.int(),
                 b: this.refs.$rgb_b.int(),
-                a: this.refs.$rgb_a.float(),
-                source: source
+                a: this.refs.$rgb_a.float()
             });
         }
     }, {
@@ -8378,8 +8377,7 @@ var ColorInformation = function (_UIElement) {
                 h: this.refs.$hsl_h.int(),
                 s: this.refs.$hsl_s.int(),
                 l: this.refs.$hsl_l.int(),
-                a: this.refs.$hsl_a.float(),
-                source: source
+                a: this.refs.$hsl_a.float()
             });
         }
     }, {
@@ -8445,7 +8443,7 @@ var ColorInformation = function (_UIElement) {
             var code = this.refs.$hexCode.val();
 
             if (code.charAt(0) == '#' && code.length == 7) {
-                this.dispatch('/changeColor', code, source);
+                this.dispatch('/changeColor', code);
             }
         }
     }, {
