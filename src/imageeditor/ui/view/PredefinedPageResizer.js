@@ -1,6 +1,15 @@
 import UIElement from '../../../colorpicker/UIElement';
+import { parseParamNumber } from '../../../util/gl/filter/util';
 
 export default class PredefinedPageResizer extends UIElement {
+
+
+    initialize () {
+        super.initialize()
+
+        this.$board = this.parent.refs.$board;
+        this.$page = this.parent.refs.$page; 
+    }
 
     template () { 
         return `
@@ -19,8 +28,39 @@ export default class PredefinedPageResizer extends UIElement {
 
 
     refresh () {
-        this.$el.toggle(this.isShow())
+        var isShow = this.isShow();
+        this.$el.toggle(isShow)
+
+        if (isShow) {
+            this.setPosition()
+        }
     }
+
+
+    setPosition () {
+        var page = this.read('/item/current/page')
+
+        if (!page) return; 
+
+        var item = page; 
+        var style = page.style; 
+
+        var width = style.width
+        var height = style.height
+
+
+        var boardOffset = this.$board.offset()
+        var pageOffset = this.$page.offset()
+
+        var x = (pageOffset.left - boardOffset.left) + 'px'; 
+        var y = (pageOffset.top - boardOffset.top) + 'px'; 
+
+        this.$el.css({ 
+            width, height, 
+            left: x, top: y
+        })
+
+    }    
 
     isShow () { 
         return this.read('/item/is/mode', 'page')
@@ -39,6 +79,7 @@ export default class PredefinedPageResizer extends UIElement {
         var page = this.read('/item/current/page')
         page.style = Object.assign(page.style, style)
         this.dispatch('/item/set', page)
+        this.refresh();
     }
 
     changeX (dx) {
@@ -69,14 +110,14 @@ export default class PredefinedPageResizer extends UIElement {
 
     toBottom () {
         var dy = this.targetXY.y - this.xy.y
-        var height = this.height + dy; 
+        var height = this.height + dy*2; 
 
         return { height }        
     }
 
     toRight () {
         var dx = this.targetXY.x - this.xy.x
-        var width = this.width + dx; 
+        var width = this.width + dx*2; 
 
         return { width }
     }
@@ -114,8 +155,8 @@ export default class PredefinedPageResizer extends UIElement {
         this.currentType = type; 
         this.xy = e.xy;
         this.page = this.read('/item/current/page')
-        this.width = +this.page.style.width.replace('px', '') 
-        this.height = +this.page.style.height.replace('px', '') 
+        this.width = parseParamNumber(this.page.style.width)
+        this.height = parseParamNumber(this.page.style.height)
     }
 
     'pointermove document' (e) {

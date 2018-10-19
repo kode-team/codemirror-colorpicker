@@ -247,7 +247,9 @@ export default class LayerManager extends BaseModule {
         var results = Object.assign(css, 
              (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer)
         )
-        
+        delete results.x;
+        delete results.y;
+
         var realCSS = {}
         Object.keys(results).filter(key => {
             return !!results[key]

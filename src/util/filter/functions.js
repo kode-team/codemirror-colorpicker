@@ -282,10 +282,12 @@ export function putBitmap(bitmap, subBitmap, area) {
     return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
-export function parseParamNumber (param) {
+export function parseParamNumber (param, callback) {
     if (typeof param === 'string') {
-        param = param.replace(/deg/, '')
-        param = param.replace(/px/, '')
+        param = param.replace(/deg|px/g, '')
+    }
+    if (typeof callback  == 'function') {
+        return callback(+param);
     }
     return +param 
 } 

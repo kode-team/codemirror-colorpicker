@@ -24,9 +24,10 @@ export default class GradientView extends BaseTab {
                     <div class="page-canvas">
                         <div class="gradient-color-view-container" ref="$page">
                             <div class="gradient-color-view" ref="$colorview"></div>            
-                            <PredefinedPageResizer></PredefinedPageResizer>
-                            <PredefinedLayerResizer></PredefinedLayerResizer>
+
                         </div>       
+                        <PredefinedPageResizer></PredefinedPageResizer>
+                        <PredefinedLayerResizer></PredefinedLayerResizer>                        
                         <MoveGuide></MoveGuide>                          
                     </div>          
                 </div>
@@ -127,7 +128,7 @@ export default class GradientView extends BaseTab {
         return e.target == this.refs.$colorview.el;
     }
 
-    'click $page .layer' (e) {
+    'click.self $page .layer' (e) {
         var id = e.$delegateTarget.attr('item-id')
         if (id) {
             this.run('/item/select/mode', 'layer')
@@ -135,13 +136,24 @@ export default class GradientView extends BaseTab {
         }
     }
 
-    'click.self $el .page-canvas' (e) {
-
-        this.read('/item/current/layer', layer => {
-            this.dispatch('/item/select', layer.id);
-            this.refresh();
-        })
+    selectPageMode () {
+        this.dispatch('/item/select/mode', 'page')    
     }
+
+
+    'click $page' (e) {
+        if (!e.$delegateTarget) {
+            this.selectPageMode()
+        } else if (!e.$delegateTarget.hasClass('layer')) {
+            this.selectPageMode()
+        }
+
+    }    
+
+    'click.self $el .page-canvas' (e) {
+        this.selectPageMode()
+    }
+
 
     'click $colorview' (e) {
 

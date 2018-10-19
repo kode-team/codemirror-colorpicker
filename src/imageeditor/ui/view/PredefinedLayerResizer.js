@@ -5,7 +5,7 @@ import BottomLeftRadius from './item/BottomLeftRadius';
 import BottomRightRadius from './item/BottomRightRadius';
 import LayerRotate from './item/LayerRotate';
 import Radius from './item/Radius';
-
+import { parseParamNumber } from '../../../util/filter/functions';
 
 export default class PredefinedLayerResizer extends UIElement {
 
@@ -69,10 +69,6 @@ export default class PredefinedLayerResizer extends UIElement {
         return undefined;
     }    
 
-    parseNumber (value, unit = 'px') {
-        return +((value || '0px').replace(unit, ''))
-    }
-
     setPosition () {
         var layer = this.read('/item/current/layer')
 
@@ -85,6 +81,12 @@ export default class PredefinedLayerResizer extends UIElement {
         var height = style.height
         var x  = style.x
         var y  = style.y
+
+        var boardOffset = this.$board.offset()
+        var pageOffset = this.$page.offset()
+
+        x = parseParamNumber(x, x => x + pageOffset.left - boardOffset.left) + 'px'; 
+        y = parseParamNumber(y, y => y + pageOffset.top - boardOffset.top) + 'px'; 
 
         this.$el.css({ 
             width, height, 
@@ -111,7 +113,7 @@ export default class PredefinedLayerResizer extends UIElement {
         var x = this.caculatePosition(list, 'x', 'right')
 
         if (typeof x != 'undefined') {
-            var newWidth = Math.abs(this.moveX - this.parseNumber(x))
+            var newWidth = Math.abs(this.moveX - parseParamNumber(x))
             item.style.width = newWidth + 'px'; 
         }
     }
@@ -120,7 +122,7 @@ export default class PredefinedLayerResizer extends UIElement {
         var x = this.caculatePosition(list, 'x', 'left')
 
         if (typeof x != 'undefined') {
-            var newWidth = this.width + (this.moveX - this.parseNumber(x))
+            var newWidth = this.width + (this.moveX - parseParamNumber(x))
 
             item.style.x = x 
             item.style.width = newWidth + 'px'; 
@@ -131,7 +133,7 @@ export default class PredefinedLayerResizer extends UIElement {
         var y = this.caculatePosition(list, 'y', 'bottom')
 
         if (typeof y != 'undefined') {
-            var newHeight = Math.abs(this.moveY - this.parseNumber(y));
+            var newHeight = Math.abs(this.moveY - parseParamNumber(y));
             item.style.height = newHeight + 'px'; 
         }
     }
@@ -140,7 +142,7 @@ export default class PredefinedLayerResizer extends UIElement {
         var y = this.caculatePosition(list, 'y', 'top')
 
         if (typeof y != 'undefined') {
-            var newHeight = this.height + (this.moveY - this.parseNumber(y))
+            var newHeight = this.height + (this.moveY - parseParamNumber(y))
 
             item.style.y = y 
             item.style.height = newHeight + 'px'; 
@@ -293,10 +295,10 @@ export default class PredefinedLayerResizer extends UIElement {
         this.currentType = type; 
         this.xy = e.xy;
         this.layer = layer
-        this.width = this.parseNumber(layer.style.width) 
-        this.height = this.parseNumber(layer.style.height)
-        this.moveX = this.parseNumber(layer.style.x)
-        this.moveY = this.parseNumber(layer.style.y)
+        this.width = parseParamNumber(layer.style.width) 
+        this.height = parseParamNumber(layer.style.height)
+        this.moveX = parseParamNumber(layer.style.x)
+        this.moveY = parseParamNumber(layer.style.y)
 
     }
 
