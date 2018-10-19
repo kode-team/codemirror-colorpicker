@@ -31,7 +31,7 @@ export default class GradientInfo extends UIElement {
                                     <input type="text" class="code" value='${step.color}'  colorstep-id="${step.id}"  />
                                 </div>
                                 <div class="color-percent">
-                                    <input type="number" class="percent" value="${step.percent}"   colorstep-id="${step.id}"  />%
+                                    <input type="number" class="percent" min="0" max="100" step="0.1"  value="${step.percent}"   colorstep-id="${step.id}"  />%
                                 </div>
                                 <div class="tools">
                                     <button type="button" class='remove-step'  colorstep-id="${step.id}" >&times;</button>
@@ -55,7 +55,7 @@ export default class GradientInfo extends UIElement {
         if (!item) return; 
 
         var color = e.$delegateTarget.val()
-        var id = +e.$delegateTarget.attr('colorstep-id')
+        var id = e.$delegateTarget.attr('colorstep-id')
         
         var step = this.read('/item/get', id)
 
@@ -71,7 +71,7 @@ export default class GradientInfo extends UIElement {
         if (!item) return; 
 
         var percent = e.$delegateTarget.val()
-        var id = +e.$delegateTarget.attr('colorstep-id')
+        var id = e.$delegateTarget.attr('colorstep-id')
         
         var step = this.read('/item/get', id)
 
@@ -85,7 +85,7 @@ export default class GradientInfo extends UIElement {
         var item = this.read('/item/current/image')
         if (!item) return; 
 
-        var id = +e.$delegateTarget.attr('colorstep-id')
+        var id = e.$delegateTarget.attr('colorstep-id')
         
         this.dispatch('/colorstep/remove', id)
         this.refresh()

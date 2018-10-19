@@ -12424,7 +12424,7 @@ var GradientInfo = function (_UIElement) {
             });
 
             return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step) {
-                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
+                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
             }).join('') + '\n                </div>';
         }
     }, {
@@ -12444,7 +12444,7 @@ var GradientInfo = function (_UIElement) {
             if (!item) return;
 
             var color = e.$delegateTarget.val();
-            var id = +e.$delegateTarget.attr('colorstep-id');
+            var id = e.$delegateTarget.attr('colorstep-id');
 
             var step = this.read('/item/get', id);
 
@@ -12460,7 +12460,7 @@ var GradientInfo = function (_UIElement) {
             if (!item) return;
 
             var percent = e.$delegateTarget.val();
-            var id = +e.$delegateTarget.attr('colorstep-id');
+            var id = e.$delegateTarget.attr('colorstep-id');
 
             var step = this.read('/item/get', id);
 
@@ -12475,7 +12475,7 @@ var GradientInfo = function (_UIElement) {
             var item = this.read('/item/current/image');
             if (!item) return;
 
-            var id = +e.$delegateTarget.attr('colorstep-id');
+            var id = e.$delegateTarget.attr('colorstep-id');
 
             this.dispatch('/colorstep/remove', id);
             this.refresh();
