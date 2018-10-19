@@ -14726,22 +14726,6 @@ var PredefinedLayerResizer = function (_UIElement) {
             }
         }
     }, {
-        key: 'caculateSize',
-        value: function caculateSize(list, key, align) {
-
-            var valueList = list.filter(function (it) {
-                return it.align == align;
-            }).map(function (it) {
-                return it[key];
-            });
-
-            if (valueList.length) {
-                return Math.max.apply(Math, [Number.MIN_SAFE_INTEGER].concat(toConsumableArray(valueList)));
-            }
-
-            return undefined;
-        }
-    }, {
         key: 'caculatePosition',
         value: function caculatePosition(list, key, align) {
             var unit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'px';
@@ -14754,7 +14738,7 @@ var PredefinedLayerResizer = function (_UIElement) {
             });
 
             if (valueList.length) {
-                return Math.max.apply(Math, [0].concat(toConsumableArray(valueList))) + unit;
+                return Math.max.apply(Math, [Number.MIN_SAFE_INTEGER].concat(toConsumableArray(valueList))) + unit;
             }
 
             return undefined;
@@ -14807,10 +14791,10 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'caculateRightSize',
         value: function caculateRightSize(item, list) {
-            var width = this.caculateSize(list, 'x', 'right');
+            var x = this.caculatePosition(list, 'x', 'right');
 
-            if (typeof width != 'undefined') {
-                var newWidth = this.moveX + width;
+            if (typeof x != 'undefined') {
+                var newWidth = Math.abs(this.moveX - this.parseNumber(x));
                 item.style.width = newWidth + 'px';
             }
         }
@@ -14829,10 +14813,10 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'caculateBottomSize',
         value: function caculateBottomSize(item, list) {
-            var height = this.caculateSize(list, 'y', 'bottom');
+            var y = this.caculatePosition(list, 'y', 'bottom');
 
-            if (typeof height != 'undefined') {
-                var newHeight = this.moveY + height;
+            if (typeof y != 'undefined') {
+                var newHeight = Math.abs(this.moveY - this.parseNumber(y));
                 item.style.height = newHeight + 'px';
             }
         }

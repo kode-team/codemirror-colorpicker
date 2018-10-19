@@ -58,23 +58,12 @@ export default class PredefinedLayerResizer extends UIElement {
         }
     }
 
-    caculateSize (list, key, align) {
-
-        var valueList = list.filter(it => it.align == align).map(it => it[key])
-
-        if (valueList.length) {
-            return Math.max(  Number.MIN_SAFE_INTEGER,  ...valueList )  
-        }
-
-        return undefined;
-    }
-
     caculatePosition (list, key, align, unit = 'px') {
 
         var valueList = list.filter(it => it.align == align).map(it => it[key])
 
         if (valueList.length) {
-            return Math.max(  0,  ...valueList ) + unit  
+            return Math.max(  Number.MIN_SAFE_INTEGER,  ...valueList ) + unit  
         }
 
         return undefined;
@@ -119,10 +108,10 @@ export default class PredefinedLayerResizer extends UIElement {
     '@changeEditor' () { this.refresh(); }
 
     caculateRightSize (item, list) {
-        var width = this.caculateSize(list, 'x', 'right')
+        var x = this.caculatePosition(list, 'x', 'right')
 
-        if (typeof width != 'undefined') {
-            var newWidth = this.moveX + width 
+        if (typeof x != 'undefined') {
+            var newWidth = Math.abs(this.moveX - this.parseNumber(x))
             item.style.width = newWidth + 'px'; 
         }
     }
@@ -139,10 +128,10 @@ export default class PredefinedLayerResizer extends UIElement {
     }
 
     caculateBottomSize (item, list) {
-        var height = this.caculateSize(list, 'y', 'bottom')
+        var y = this.caculatePosition(list, 'y', 'bottom')
 
-        if (typeof height != 'undefined') {
-            var newHeight = this.moveY + height 
+        if (typeof y != 'undefined') {
+            var newHeight = Math.abs(this.moveY - this.parseNumber(y));
             item.style.height = newHeight + 'px'; 
         }
     }
