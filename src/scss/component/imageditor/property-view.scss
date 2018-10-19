@@ -193,6 +193,12 @@
                     }
                 }
 
+                .input-field.hex {
+                    input[type=number], input[type=text] {
+                        width: 100%;
+                    }
+                }
+
                 > span {
                     display: inline-block;
                     margin-left: 4px; 

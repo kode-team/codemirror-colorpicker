@@ -1205,11 +1205,13 @@
     border: 0px;
     -webkit-box-shadow: none;
             box-shadow: none; }
-    .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .information, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-chooser, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets-contextmenu {
-      display: none; }
-    .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .wheel {
-      border: 0px;
-      background-color: transparent; }
+    .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body {
+      width: 240px; }
+      .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-chooser, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets-contextmenu {
+        display: none; }
+      .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .wheel {
+        border: 0px;
+        background-color: transparent; }
   .imageeditor .pages {
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
@@ -2574,6 +2576,8 @@
               width: 160px; }
           .imageeditor .property-view .property-item > .items > div > div .input input[type=number], .imageeditor .property-view .property-item > .items > div > div .input input[type=text] {
             width: 30px; }
+          .imageeditor .property-view .property-item > .items > div > div .input-field.hex input[type=number], .imageeditor .property-view .property-item > .items > div > div .input-field.hex input[type=text] {
+            width: 100%; }
           .imageeditor .property-view .property-item > .items > div > div > span {
             display: inline-block;
             margin-left: 4px;
@@ -2594,8 +2598,7 @@
         height: 90px;
         padding: 0px; }
         .imageeditor .property-view .property-item.gradient-steps > .items {
-          padding: 20px !important;
-          padding-top: 10px !important; }
+          padding: 10px !important; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-steps {
           position: relative;
           display: block; }
@@ -2743,18 +2746,31 @@
           font-size: 12px;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
-          margin: 2px 0px; }
+          margin: 2px 0px;
+          width: 100%; }
+          .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .step-list {
+            width: 100%; }
           .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step {
-            display: block;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
             padding: 1px;
             color: #333; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .color-view {
               border: 0px; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .color-percent {
+              color: rgba(236, 236, 236, 0.5); }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .tools button {
+              color: rgba(236, 236, 236, 0.5); }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step > * {
+              -webkit-box-flex: 1;
+                  -ms-flex: 1 1 auto;
+                      flex: 1 1 auto;
               display: inline-block;
               vertical-align: middle; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input {
-              width: 40px; }
+              width: 40px;
+              display: inline-block; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .tools {
               text-align: right; }
               .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .tools button {
@@ -2765,7 +2781,10 @@
                         transform: scale(1.2);
                 border: 0px;
                 background-color: transparent;
-                padding: 0px 2px; }
+                padding: 2px 2px;
+                font-size: 14px;
+                vertical-align: middle;
+                line-height: 0; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input[type=text] {
               width: 100px; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step input[type=number] {
@@ -2775,6 +2794,9 @@
               border: 1px solid #ececec; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-view {
               width: 20px;
+              -webkit-box-flex: 0;
+                  -ms-flex: none;
+                      flex: none;
               height: 20px;
               -webkit-box-sizing: border-box;
                       box-sizing: border-box;

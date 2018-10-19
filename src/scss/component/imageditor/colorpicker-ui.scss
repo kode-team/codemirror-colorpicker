@@ -5,7 +5,8 @@
         border:0px;
         box-shadow: none;
         .colorpicker-body {
-            .information, .colorsets, .color-chooser, .colorsets-contextmenu {
+            width: 240px;
+            .colorsets, .color-chooser, .colorsets-contextmenu {
                 display: none;
             }
     

@@ -23,7 +23,7 @@ export default class GradientInfo extends UIElement {
         return `<div class='step-list' ref="$stepList">
                     ${colorsteps.map( step => {
                         return `
-                            <div class='color-step ${step.selected ? 'selected' : ''}' style="background-color: ${step.selected ? step.color : ''}" >
+                            <div class='color-step ${step.selected ? 'selected' : ''}' style="background-color: ${step.selected ? step.color : ''}" colorstep-id="${step.id}" >
                                 <div class="color-view">
                                     <div class="color-view-item" style="background-color: ${step.color}" colorstep-id="${step.id}" ></div>
                                 </div>
@@ -48,6 +48,30 @@ export default class GradientInfo extends UIElement {
 
     '@changeEditor' () {
         this.refresh()
+    }
+
+    initColor (color) {
+        this.dispatch('/colorstep/initColor', color)        
+    }
+
+    selectStep (e) {
+        var item = this.read('/item/get', e.$delegateTarget.attr('colorstep-id'));
+            
+        this.read('/item/each/children', item.parentId, (step) => {
+            if (step.selected) step.selected = false; 
+        })
+
+        console.log(e, item);
+
+        item.selected = true; 
+
+        this.initColor(item.color)     
+        this.dispatch('/item/set', item); 
+        this.refresh();        
+    }    
+
+    'click $colorsteps .color-view-item' (e) {
+        this.selectStep(e)
     }
 
     'input $colorsteps input.code' (e) {

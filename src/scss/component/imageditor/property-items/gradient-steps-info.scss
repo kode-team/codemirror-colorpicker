@@ -9,9 +9,14 @@
             font-size: 12px;
             box-sizing: border-box;
             margin: 2px 0px;
+            width: 100%;
+
+            .step-list {
+                width: 100%;
+            }
 
             .color-step {
-                display: block;
+                display: flex;
                 padding: 1px;
                 color: #333; 
 
@@ -21,14 +26,27 @@
                     .color-view {
                         border:0px;
                     }
+
+                    .color-percent {
+                        color: rgba(#ececec, 0.5);
+                    }
+
+                    .tools {
+                        button {
+                            color: rgba(#ececec, 0.5);
+                        }
+                    }
                 }
 
                 > * {
+                    flex: 1 1 auto; 
                     display:inline-block; 
                     vertical-align: middle;
                 }
+
                 input {
                     width: 40px;
+                    display: inline-block;
                 }
 
                 .tools {
@@ -38,7 +56,10 @@
                         transform: scale(1.2);
                         border:0px;
                         background-color: transparent;
-                        padding: 0px 2px;
+                        padding: 2px 2px;
+                        font-size: 14px;
+                        vertical-align: middle;
+                        line-height: 0;
                     }
                 }
 
@@ -53,6 +74,7 @@
 
                 .color-view {
                     width: 20px;
+                    flex: none;
                     height: 20px;
                     box-sizing: border-box;
                     position: relative;
