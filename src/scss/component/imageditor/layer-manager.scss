@@ -5,7 +5,7 @@ $button-size: 24px;
 $layer-item-padding: 4px;
 
 .layers {
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid $border-color;
     box-sizing: border-box;
     position: absolute;
     left: 0px;
@@ -17,7 +17,7 @@ $layer-item-padding: 4px;
     button {
         appearance: none;
         width: auto;
-        height: 20px;
+        height: 100%;
         box-sizing: border-box;
         border: 1px solid #dedede;
         vertical-align: middle;
@@ -44,8 +44,19 @@ $layer-item-padding: 4px;
             margin: 0px;
         }
         .tools {
-            float: right; 
-            vertical-align: middle;            
+            display: inline-block; 
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+
+            button {
+                border-left: 1px solid $border-color;
+                border-top: 0px;
+                border-bottom: 0px;
+                border-right: 0px;
+                padding: 0px 10px;
+            }
         }
     }    
 
@@ -82,9 +93,10 @@ $layer-item-padding: 4px;
             position: relative;
             overflow: hidden;
             // padding: 5px;
-            border-bottom: 1px solid #ececec;
+            border: 2px solid #ececec;
 
             &.selected {
+                border-color: #333;
                 background-color: #ececec;
                 .item-tools {
                     visibility: visible;
@@ -102,7 +114,7 @@ $layer-item-padding: 4px;
                 box-sizing: border-box;
                 height: 100%;
                 width: 50px;
-                border: 1px solid #ececec;
+                // border: 1px solid #ececec;
 
                 .item-view {
                     position: absolute;

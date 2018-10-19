@@ -9,6 +9,14 @@ import Radius from './item/Radius';
 
 export default class PredefinedLayerResizer extends UIElement {
 
+
+    initialize () {
+        super.initialize()
+
+        this.$board = this.parent.refs.$board;
+        this.$page = this.parent.refs.$page; 
+    }
+
     components () {
         return { TopLeftRadius, TopRightRadius, BottomLeftRadius, BottomRightRadius, LayerRotate, Radius }
     }
@@ -50,18 +58,44 @@ export default class PredefinedLayerResizer extends UIElement {
         }
     }
 
+    caculateSize (list, key, align) {
+
+        var valueList = list.filter(it => it.align == align).map(it => it[key])
+
+        if (valueList.length) {
+            return Math.max(  Number.MIN_SAFE_INTEGER,  ...valueList )  
+        }
+
+        return undefined;
+    }
+
+    caculatePosition (list, key, align, unit = 'px') {
+
+        var valueList = list.filter(it => it.align == align).map(it => it[key])
+
+        if (valueList.length) {
+            return Math.max(  0,  ...valueList ) + unit  
+        }
+
+        return undefined;
+    }    
+
+    parseNumber (value, unit = 'px') {
+        return +((value || '0px').replace(unit, ''))
+    }
+
     setPosition () {
         var layer = this.read('/item/current/layer')
 
         if (!layer) return; 
 
+        var item = layer; 
         var style = layer.style; 
 
         var width = style.width
         var height = style.height
         var x  = style.x
         var y  = style.y
-
 
         this.$el.css({ 
             width, height, 
@@ -84,6 +118,81 @@ export default class PredefinedLayerResizer extends UIElement {
 
     '@changeEditor' () { this.refresh(); }
 
+    caculateRightSize (item, list) {
+        var width = this.caculateSize(list, 'x', 'right')
+
+        if (typeof width != 'undefined') {
+            var newWidth = this.moveX + width 
+            item.style.width = newWidth + 'px'; 
+        }
+    }
+
+    caculateLeftSize (item, list) {
+        var x = this.caculatePosition(list, 'x', 'left')
+
+        if (typeof x != 'undefined') {
+            var newWidth = this.width + (this.moveX - this.parseNumber(x))
+
+            item.style.x = x 
+            item.style.width = newWidth + 'px'; 
+        }
+    }
+
+    caculateBottomSize (item, list) {
+        var height = this.caculateSize(list, 'y', 'bottom')
+
+        if (typeof height != 'undefined') {
+            var newHeight = this.moveY + height 
+            item.style.height = newHeight + 'px'; 
+        }
+    }
+
+    caculateTopSize (item, list) {
+        var y = this.caculatePosition(list, 'y', 'top')
+
+        if (typeof y != 'undefined') {
+            var newHeight = this.height + (this.moveY - this.parseNumber(y))
+
+            item.style.y = y 
+            item.style.height = newHeight + 'px'; 
+        }
+    }
+
+    resizeItem (item, list) {
+        if (this.currentType == 'to right') {   // 오른쪽 왼쪽 크기를 맞추기 
+            this.caculateRightSize(item, list);
+        } else if (this.currentType == 'to bottom') {   // 아래위 크기 맞추기 
+            this.caculateBottomSize(item, list);
+        } else if (this.currentType == 'to bottom left') {   // 아래위 크기 맞추기 
+            this.caculateBottomSize(item, list);
+            this.caculateLeftSize(item, list);
+        } else if (this.currentType == 'to bottom right') {   // 아래위 크기 맞추기 
+            this.caculateBottomSize(item, list);
+            this.caculateRightSize(item, list);
+        } else if (this.currentType == 'to left') {
+            this.caculateLeftSize(item, list)
+        } else if (this.currentType == 'to top') {
+            this.caculateTopSize(item, list);
+        } else if (this.currentType == 'to top right') {
+            this.caculateTopSize(item, list);
+            this.caculateRightSize(item, list);
+        } else if (this.currentType == 'to top left') {
+            this.caculateTopSize(item, list);
+            this.caculateLeftSize(item, list);
+        }
+    }
+
+    caculateSnap (item) {
+
+        var list = this.read('/guide/line/layer', 3);
+
+        if (list.length) {
+            this.resizeItem(item, list);
+        }
+
+        return item; 
+    }
+
     change (style1 = {}, style2 = {}) { 
 
         let style = Object.assign({}, style1, style2);
@@ -95,6 +204,10 @@ export default class PredefinedLayerResizer extends UIElement {
         var item = this.read('/item/current/layer')
 
         item.style = Object.assign(item.style, style);
+
+
+        item = this.caculateSnap(item)
+
 
         this.dispatch('/item/set', item);
         this.setPosition();
@@ -191,15 +304,17 @@ export default class PredefinedLayerResizer extends UIElement {
         this.currentType = type; 
         this.xy = e.xy;
         this.layer = layer
-        this.width = +this.layer.style.width.replace('px', '') 
-        this.height = +this.layer.style.height.replace('px', '') 
-        this.moveX = +(this.layer.style.x || 0).replace('px', '')
-        this.moveY = +(this.layer.style.y || 0).replace('px', '')
+        this.width = this.parseNumber(layer.style.width) 
+        this.height = this.parseNumber(layer.style.height)
+        this.moveX = this.parseNumber(layer.style.x)
+        this.moveY = this.parseNumber(layer.style.y)
+
     }
 
     'pointermove document' (e) {
         if (this.xy) {
             this.targetXY = e.xy; 
+            this.$page.addClass('moving')
 
             this.resize();
         }
@@ -211,5 +326,6 @@ export default class PredefinedLayerResizer extends UIElement {
         this.xy = null 
         this.moveX = null;
         this.moveY = null; 
+        this.$page.removeClass('moving')        
     }
 }

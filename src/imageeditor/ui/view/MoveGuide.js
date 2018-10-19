@@ -38,8 +38,17 @@ export default class MoveGuide extends UIElement {
     }
 
     refresh () {
-        // this.$el.hide();
-        this.load()
+
+        var isShow = this.isShow()
+
+        this.$el.toggle(isShow);
+        if (isShow) {
+            this.load()
+        }
+    }
+
+    isShow() {
+        return this.$page.hasClass('moving');
     }
 
     '@changeEditor' () { this.refresh(); }

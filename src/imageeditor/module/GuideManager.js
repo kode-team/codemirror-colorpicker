@@ -63,8 +63,8 @@ export default class GuideManager extends BaseModule {
 
         return []
 
-    }
- 
+    } 
+
     '*/guide/line/layer' ($store , dist = MAX_DIST) {
 
         var page = $store.read('/item/current/page');

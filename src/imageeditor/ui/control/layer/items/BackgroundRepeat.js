@@ -1,9 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class BackgroundRepeat extends UIElement {
+export default class BackgroundRepeat extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item background'>
+            <div class='property-item background-repeat'>
+                <div class='title' ref="$title">Background Repeat</div>                        
                 <div class='items'>
                     <div>
                         <label>repeat</label>
@@ -36,22 +37,12 @@ export default class BackgroundRepeat extends UIElement {
         this.refresh()
     }
 
-
-    isShow () {
-        return this.read('/item/is/mode', 'image');
-    }
-
     refresh() {
 
-        var isShow = this.isShow();
+        this.read('/item/current/image', (image) => {
+            this.refs.$repeat.val(image.backgroundRepeat || 'repeat');
+        })
 
-        this.$el.toggle(isShow)
-
-        if (isShow) {        
-            this.read('/item/current/image', (image) => {
-                this.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-            })
-        }
     }
 
 }

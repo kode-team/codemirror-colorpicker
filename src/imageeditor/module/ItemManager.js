@@ -72,7 +72,6 @@ export const EDITOR_MODE_IMAGE_RADIAL = 'image-radial';
 export const EDITOR_MODE_IMAGE_STATIC = 'image-static'; 
 export const EDITOR_MODE_IMAGE_IMAGE = 'image-image'; 
 
-const SAVE_ID = 'css-imageeditor'
 
 const isUndefined = (value) => {
     return typeof value == 'undefined' || value == null;
@@ -90,26 +89,6 @@ export default class ItemManager extends BaseModule {
 
     afterDispatch () {
         this.$store.emit('changeEditor')
-    }
-
-    '/item/save' ($store) {
-        localStorage.setItem(SAVE_ID, JSON.stringify({
-            items: $store.items,
-            selectedId: $store.selectedId,
-            selectedMode: $store.selectedMode
-        }))
-    }
-
-    '/item/load' ($store, callback) {
-        var obj = JSON.parse(localStorage.getItem(SAVE_ID) || "{}");
-
-        if (obj.items) $store.items = obj.items 
-        if (obj.selectedId) $store.selectedId = obj.selectedId
-        if (obj.selectedMode) $store.selectedMode = obj.selectedMode
-
-        if (typeof callback == 'function') {
-            callback(!!obj.items)
-        }
     }
 
     '*/item/create/object' ($store, obj, defaultObj = {}) {

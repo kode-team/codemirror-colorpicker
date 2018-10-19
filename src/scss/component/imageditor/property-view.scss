@@ -12,7 +12,7 @@
             display: inline-block;
             vertical-align: middle;
             border:0px;
-            padding: 8px;
+            padding: 2px 4px;
 
             > .title {
                 background-image: none;
@@ -199,6 +199,14 @@
                     margin-right: 10px;
                     vertical-align: middle;
                     display: none;
+
+                    &.color {
+                        display:  block;
+                        height: 100%;
+                        width: 100%;
+                        margin-right: 0px;
+                        border: 1px solid $border-color;
+                    }
                 }
 
                 .input-text {

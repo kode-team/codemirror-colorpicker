@@ -11,7 +11,7 @@ import ImageTypeSelect from "./ImageTypeSelect";
 import ColorSampleList from "./ColorSampleList";
 import Transform from "./transform";
 import Transform3d from './transform3d';
-import Background from "./Background";
+import BackgroundSize from "./BackgroundSize";
 import BackgroundRepeat from "./BackgroundRepeat";
 import PageSize from "./PageSize";
 import PageName from "./PageName";
@@ -19,11 +19,10 @@ import PageExport from "./PageExport";
 import BlendList from "./BlendList";
 import MixBlendList from "./MixBlendList";
 import FilterList from "./FilterList";
-
-
+import BackgroundColor from "./BackgroundColor"; 
 
 export default {
-
+    BackgroundColor,
     BlendList,
     MixBlendList,
     FilterList,    
@@ -31,7 +30,7 @@ export default {
     PageSize,
     PageName,
     BackgroundRepeat,
-    Background,
+    BackgroundSize,
     Transform3d,
     Transform,
     ColorSampleList,

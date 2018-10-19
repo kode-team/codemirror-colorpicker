@@ -130,8 +130,8 @@ export default class GradientView extends BaseTab {
     'click $page .layer' (e) {
         var id = e.$delegateTarget.attr('item-id')
         if (id) {
+            this.run('/item/select/mode', 'layer')
             this.dispatch('/item/select', id);
-            this.dispatch('/item/select/mode', 'layer')
         }
     }
 

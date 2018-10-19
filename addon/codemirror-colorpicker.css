@@ -929,8 +929,8 @@
       position: absolute;
       left: 0px;
       right: 0px;
-      top: 50px;
-      height: 50px;
+      top: 40px;
+      height: 40px;
       z-index: 1;
       border-bottom: 1px solid #c7c7c7;
       -webkit-box-sizing: border-box;
@@ -939,8 +939,8 @@
       position: absolute;
       left: 250px;
       width: 250px;
-      top: 100px;
-      bottom: 0px;
+      top: 80px;
+      bottom: 200px;
       overflow: auto;
       z-index: 1;
       -webkit-box-sizing: border-box;
@@ -951,22 +951,22 @@
       position: absolute;
       left: 0px;
       width: 250px;
-      top: 100px;
-      bottom: 0px;
+      top: 80px;
+      bottom: 200px;
       z-index: 1;
-      background-color: white;
-      border-right: 1px solid #c7c7c7; }
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
       left: 500px;
       right: 0px;
-      top: 100px;
-      bottom: 150px; }
+      top: 80px;
+      bottom: 200px; }
     .imageeditor .layout-main .layout-header {
       position: absolute;
       left: 0px;
       right: 0px;
-      height: 50px;
+      height: 40px;
       top: 0px;
       z-index: 0;
       overflow: hidden;
@@ -978,17 +978,18 @@
       border-bottom: 1px solid #c7c7c7; }
       .imageeditor .layout-main .layout-header .header-title {
         width: 250px;
-        padding: 10px;
+        padding: 4px;
         margin: 0px;
         text-align: left;
-        font-size: 24px;
+        font-size: 20px;
         text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
         display: block;
         -webkit-box-sizing: border-box;
-                box-sizing: border-box; }
+                box-sizing: border-box;
+        line-height: 1.6; }
       .imageeditor .layout-main .layout-header .page-tab-menu {
         -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
@@ -997,9 +998,9 @@
         position: relative; }
     .imageeditor .layout-main .layout-footer {
       position: absolute;
-      left: 500px;
+      left: 0px;
       right: 0px;
-      height: 150px;
+      height: 200px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
@@ -1177,7 +1178,7 @@
   .imageeditor .layer-menu-tab > .tab-header,
   .imageeditor .page-menu-tab > .tab-header,
   .imageeditor .image-menu-tab > .tab-header {
-    height: 40px; }
+    height: 32px; }
     .imageeditor .layer-menu-tab > .tab-header > .tab-item,
     .imageeditor .page-menu-tab > .tab-header > .tab-item,
     .imageeditor .image-menu-tab > .tab-header > .tab-item {
@@ -1195,7 +1196,7 @@
   .imageeditor .layer-menu-tab > .tab-body,
   .imageeditor .page-menu-tab > .tab-body,
   .imageeditor .image-menu-tab > .tab-body {
-    top: 40px;
+    top: 32px;
     border: 0px;
     border-top: 1px solid #c7c7c7; }
   .imageeditor .colorpicker-layer .codemirror-colorpicker {
@@ -1223,7 +1224,7 @@
           -ms-flex: none;
               flex: none;
       display: inline-block;
-      padding: 10px;
+      padding: 0px 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       text-align: right; }
@@ -1231,7 +1232,7 @@
         -webkit-appearance: none;
            -moz-appearance: none;
                 appearance: none;
-        border: 1px solid #c7c7c7;
+        border: 0px solid #c7c7c7;
         padding: 4px 20px;
         height: 100%;
         display: inline-block;
@@ -1267,7 +1268,8 @@
         position: relative;
         min-width: 80px;
         text-align: center;
-        padding: 15px 10px; }
+        padding: 10px 10px;
+        vertical-align: top; }
         .imageeditor .pages .page-list .tree-item.selected {
           background-color: #c7c7c7;
           color: white; }
@@ -1292,7 +1294,7 @@
           font-size: 12px;
           pointer-events: none; }
   .imageeditor .layers {
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid #c7c7c7;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     position: absolute;
@@ -1305,7 +1307,7 @@
          -moz-appearance: none;
               appearance: none;
       width: auto;
-      height: 20px;
+      height: 100%;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border: 1px solid #dedede;
@@ -1330,8 +1332,17 @@
         vertical-align: middle;
         margin: 0px; }
       .imageeditor .layers > .title .tools {
-        float: right;
-        vertical-align: middle; }
+        display: inline-block;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px; }
+        .imageeditor .layers > .title .tools button {
+          border-left: 1px solid #c7c7c7;
+          border-top: 0px;
+          border-bottom: 0px;
+          border-right: 0px;
+          padding: 0px 10px; }
     .imageeditor .layers .layer-list {
       position: absolute;
       left: 0px;
@@ -1363,8 +1374,9 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        border-bottom: 1px solid #ececec; }
+        border: 2px solid #ececec; }
         .imageeditor .layers .layer-list .tree-item.selected {
+          border-color: #333;
           background-color: #ececec; }
           .imageeditor .layers .layer-list .tree-item.selected .item-tools {
             visibility: visible; }
@@ -1380,8 +1392,7 @@
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
           height: 100%;
-          width: 50px;
-          border: 1px solid #ececec; }
+          width: 50px; }
           .imageeditor .layers .layer-list .tree-item .item-view-container .item-view {
             position: absolute;
             top: 0px;
@@ -1399,8 +1410,7 @@
     top: 240px;
     left: 0px;
     right: 0px;
-    bottom: 0px;
-    border-top: 1px solid #c7c7c7; }
+    bottom: 0px; }
     .imageeditor .images .image-tools {
       position: absolute;
       left: 0px;
@@ -1419,8 +1429,8 @@
         -webkit-appearance: none;
            -moz-appearance: none;
                 appearance: none;
-        width: 100px;
-        height: 100px;
+        width: 70px;
+        height: 70px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         border: 1px solid #dedede;
@@ -1434,7 +1444,7 @@
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
-        width: 110px; }
+        width: 80px; }
       .imageeditor .images .image-tools .image-list {
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
@@ -1442,18 +1452,17 @@
         -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
                 flex: 1 1 auto;
-        border-top: 1px solid #c8c8c8; }
+        border-top: 1px solid #c7c7c7; }
         .imageeditor .images .image-tools .image-list .tree-item {
           display: inline-block;
-          height: 100px;
           cursor: pointer;
           position: relative;
           overflow: hidden;
-          border: 5px solid #dedede;
+          border: 3px solid #dedede;
           vertical-align: middle;
-          margin: 5px; }
+          margin: 2px; }
           .imageeditor .images .image-tools .image-list .tree-item.selected {
-            border: 5px solid #333; }
+            border: 3px solid #333; }
           .imageeditor .images .image-tools .image-list .tree-item:hover .item-tools {
             display: inline-block; }
           .imageeditor .images .image-tools .image-list .tree-item .item-view-container {
@@ -1463,8 +1472,8 @@
             vertical-align: middle;
             -webkit-box-sizing: border-box;
                     box-sizing: border-box;
-            height: 100px;
-            width: 100px; }
+            height: 70px;
+            width: 70px; }
             .imageeditor .images .image-tools .image-list .tree-item .item-view-container .item-view {
               position: absolute;
               top: 0px;
@@ -1505,13 +1514,18 @@
                 top: 1px;
                 right: 1px; }
       .imageeditor .images .image-tools .menu-buttons {
-        height: auto;
+        height: 35px;
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
-        padding: 5px; }
+        padding: 0px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
         .imageeditor .images .image-tools .menu-buttons .gradient-type {
-          display: block; }
+          padding: 2px;
+          display: block;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
           .imageeditor .images .image-tools .menu-buttons .gradient-type > button {
             height: auto;
             margin: 5px 0px; }
@@ -1520,7 +1534,7 @@
             height: 30px; }
     .imageeditor .images .add-tools {
       padding: 5px;
-      height: 110px; }
+      height: 80px; }
   .imageeditor .feature-control {
     position: absolute;
     -webkit-box-sizing: border-box;
@@ -2438,7 +2452,7 @@
       display: inline-block;
       vertical-align: middle;
       border: 0px;
-      padding: 8px; }
+      padding: 2px 4px; }
       .imageeditor .property-view.inline .property-item > .title {
         background-image: none;
         border-bottom: 0px; }
@@ -2570,6 +2584,12 @@
             margin-right: 10px;
             vertical-align: middle;
             display: none; }
+            .imageeditor .property-view .property-item > .items > div > div > span.color {
+              display: block;
+              height: 100%;
+              width: 100%;
+              margin-right: 0px;
+              border: 1px solid #c7c7c7; }
           .imageeditor .property-view .property-item > .items > div > div .input-text span {
             display: inline-block;
             width: 36px;

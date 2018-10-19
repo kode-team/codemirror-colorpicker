@@ -14,13 +14,13 @@ $layer-item-padding: 4px;
     .project-tools {
         flex: none;
         display:inline-block;
-        padding: 10px;
+        padding: 0px 0px;
         box-sizing: border-box;
         text-align: right;
 
         button {
             appearance: none;
-            border: 1px solid $border-color;
+            border: 0px solid $border-color;
             padding: 4px 20px;
             height: 100%;
             display: inline-block;
@@ -57,7 +57,8 @@ $layer-item-padding: 4px;
             position: relative;
             min-width: 80px;
             text-align: center;
-            padding: 15px 10px;            
+            padding: 10px 10px;     
+            vertical-align: top;       
 
             &.selected {
                 background-color: #c7c7c7;

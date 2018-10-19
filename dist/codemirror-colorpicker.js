@@ -10401,47 +10401,6 @@ var GradientManager = function (_BaseModule) {
     return GradientManager;
 }(BaseModule);
 
-var PageManager = function (_BaseModule) {
-    inherits(PageManager, _BaseModule);
-
-    function PageManager() {
-        classCallCheck(this, PageManager);
-        return possibleConstructorReturn(this, (PageManager.__proto__ || Object.getPrototypeOf(PageManager)).apply(this, arguments));
-    }
-
-    createClass(PageManager, [{
-        key: '*/page/toString',
-        value: function pageToString($store, id) {
-
-            var page = $store.read('/item/get', id);
-            var obj = $store.read('/page/toCSS', page) || {};
-
-            return Object.keys(obj).map(function (key) {
-                return key + ': ' + obj[key] + ';';
-            }).join(' ');
-        }
-    }, {
-        key: '*/page/toCSS',
-        value: function pageToCSS($store) {
-            var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-            var css = page.style || {};
-
-            var realCSS = {};
-            Object.keys(css).filter(function (key) {
-                return !!css[key];
-            }).forEach(function (key) {
-                realCSS[key] = css[key];
-            });
-
-            console.log(realCSS);
-
-            return realCSS;
-        }
-    }]);
-    return PageManager;
-}(BaseModule);
-
 var INDEX_DIST = 100;
 var COPY_INDEX_DIST = 1;
 var NONE_INDEX = -99999;
@@ -10511,8 +10470,6 @@ var EDITOR_MODE_IMAGE_RADIAL = 'image-radial';
 var EDITOR_MODE_IMAGE_STATIC = 'image-static';
 var EDITOR_MODE_IMAGE_IMAGE = 'image-image';
 
-var SAVE_ID = 'css-imageeditor';
-
 var ItemManager = function (_BaseModule) {
     inherits(ItemManager, _BaseModule);
 
@@ -10534,28 +10491,6 @@ var ItemManager = function (_BaseModule) {
         key: "afterDispatch",
         value: function afterDispatch() {
             this.$store.emit('changeEditor');
-        }
-    }, {
-        key: '/item/save',
-        value: function itemSave($store) {
-            localStorage.setItem(SAVE_ID, JSON.stringify({
-                items: $store.items,
-                selectedId: $store.selectedId,
-                selectedMode: $store.selectedMode
-            }));
-        }
-    }, {
-        key: '/item/load',
-        value: function itemLoad($store, callback) {
-            var obj = JSON.parse(localStorage.getItem(SAVE_ID) || "{}");
-
-            if (obj.items) $store.items = obj.items;
-            if (obj.selectedId) $store.selectedId = obj.selectedId;
-            if (obj.selectedMode) $store.selectedMode = obj.selectedMode;
-
-            if (typeof callback == 'function') {
-                callback(!!obj.items);
-            }
         }
     }, {
         key: '*/item/create/object',
@@ -11438,7 +11373,123 @@ var GuideManager = function (_BaseModule) {
     return GuideManager;
 }(BaseModule);
 
-var ModuleList = [ItemManager, ColorStepManager, ImageManager, PageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var SAVE_ID = 'css-imageeditor';
+var CACHED_LAYER_SAVE_ID = 'css-imageeditor-cached-layers';
+var CACHED_IMAGE_SAVE_ID = 'css-imageeditor-cached-images';
+
+var StorageManager = function (_BaseModule) {
+    inherits(StorageManager, _BaseModule);
+
+    function StorageManager() {
+        classCallCheck(this, StorageManager);
+        return possibleConstructorReturn(this, (StorageManager.__proto__ || Object.getPrototypeOf(StorageManager)).apply(this, arguments));
+    }
+
+    createClass(StorageManager, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(StorageManager.prototype.__proto__ || Object.getPrototypeOf(StorageManager.prototype), 'initialize', this).call(this);
+
+            this.$store.cachedLayers = [];
+            this.$store.cachedImages = [];
+        }
+    }, {
+        key: 'afterDispatch',
+        value: function afterDispatch() {
+            this.$store.emit('changeEditor');
+        }
+    }, {
+        key: '*/storage/layers',
+        value: function storageLayers($store) {
+            return $store.cachedLayers;
+        }
+    }, {
+        key: '/storage/unshift/layer',
+        value: function storageUnshiftLayer($store, layer) {
+            var item = $store.read('/clone', layer);
+            $store.cachedLayers.unshift(item);
+
+            $store.run('/storage/save/layer');
+        }
+    }, {
+        key: '/storage/add/layer',
+        value: function storageAddLayer($store, layer) {
+            var item = $store.read('/clone', layer);
+            $store.cachedLayers.add(item);
+
+            $store.run('/storage/save/layer');
+        }
+    }, {
+        key: '/storage/add/image',
+        value: function storageAddImage($store, image) {
+            var item = $store.read('/clone', image);
+            $store.cachedImages.add(item);
+
+            $store.run('/storage/save/image');
+        }
+    }, {
+        key: '/storage/add/current/layer',
+        value: function storageAddCurrentLayer($store) {
+            $store.read('/item/current/layer', function (layer) {
+                $store.dispatch('/storage/add/layer', [$store.read('/clone', layer)].concat(toConsumableArray($store.read('/item/map/children', layer.id, function (item) {
+                    return $store.read('/clone', item);
+                }))));
+            });
+        }
+    }, {
+        key: '/storage/add/current/image',
+        value: function storageAddCurrentImage($store) {
+            $store.read('/item/current/image', function (image) {
+                $store.dispatch('/storage/add/image', image);
+            });
+        }
+    }, {
+        key: '/storage/save',
+        value: function storageSave($store) {
+            localStorage.setItem(SAVE_ID, JSON.stringify({
+                items: $store.items,
+                selectedId: $store.selectedId,
+                selectedMode: $store.selectedMode
+            }));
+        }
+    }, {
+        key: '/storage/save/layer',
+        value: function storageSaveLayer($store) {
+            localStorage.setItem(CACHED_LAYER_SAVE_ID, JSON.stringify($store.cachedLayers));
+        }
+    }, {
+        key: '/storage/save/image',
+        value: function storageSaveImage($store) {
+            localStorage.setItem(CACHED_IMAGE_SAVE_ID, JSON.stringify($store.cachedImages));
+        }
+    }, {
+        key: '/storage/load/layer',
+        value: function storageLoadLayer($store) {
+            $store.cachedLayers = JSON.parse(localStorage.getItem(CACHED_LAYER_SAVE_ID) || "[]");
+        }
+    }, {
+        key: '/storage/load/image',
+        value: function storageLoadImage($store) {
+            $store.cachedImages = JSON.parse(localStorage.getItem(CACHED_IMAGE_SAVE_ID) || "[]");
+        }
+    }, {
+        key: '/storage/load',
+        value: function storageLoad($store, callback) {
+            var obj = JSON.parse(localStorage.getItem(SAVE_ID) || "{}");
+
+            if (obj.items) $store.items = obj.items;
+            if (obj.selectedId) $store.selectedId = obj.selectedId;
+            if (obj.selectedMode) $store.selectedMode = obj.selectedMode;
+
+            if (typeof callback == 'function') {
+                callback(!!obj.items);
+            }
+        }
+    }]);
+    return StorageManager;
+}(BaseModule);
+
+var ModuleList = [StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -11499,7 +11550,7 @@ var PageList = function (_UIElement) {
         }
     }, {
         key: 'makeItemNode',
-        value: function makeItemNode(node) {
+        value: function makeItemNode(node, index) {
             var item = this.read('/item/get', node.id);
 
             var page = this.read('/item/current/page');
@@ -11509,14 +11560,14 @@ var PageList = function (_UIElement) {
             if (page) selectedId = page.id;
 
             if (item.itemType == 'page') {
-                return this.makeItemNodePage(item, selectedId);
+                return this.makeItemNodePage(item, index, selectedId);
             }
         }
     }, {
         key: 'makeItemNodePage',
-        value: function makeItemNodePage(item, selectedId) {
+        value: function makeItemNodePage(item, index, selectedId) {
             var selected = item.id == selectedId ? 'selected' : '';
-            return '\n            <div class=\'tree-item ' + selected + '\' id="' + item.id + '" type=\'page\'>\n                <div class="item-title">\n                    ' + (item.name || 'Page ') + '\n                </div>   \n            </div>\n            ';
+            return '\n            <div class=\'tree-item ' + selected + '\' id="' + item.id + '" type=\'page\'>\n                <div class="item-title">\n                    ' + (item.name || 'Project ' + index) + '\n                </div>   \n            </div>\n            ';
         }
     }, {
         key: 'load $pageList',
@@ -11524,10 +11575,10 @@ var PageList = function (_UIElement) {
             var _this2 = this;
 
             var str = this.read('/item/map/page', function (item, index) {
-                return _this2.makeItemNode(item);
+                return _this2.makeItemNode(item, index);
             }).join('');
 
-            str += '<button type="button" class=\'add-page\'>+ Page</button>';
+            str += '<button type="button" class=\'add-page\'>+ Project</button>';
 
             return str;
         }
@@ -11555,13 +11606,13 @@ var PageList = function (_UIElement) {
             this.refresh();
 
             if (e.$delegateTarget.attr('type') == 'page') {
-                this.emit('@selectPage');
+                this.emit('selectPage');
             }
         }
     }, {
         key: 'click $saveButton',
         value: function click$saveButton(e) {
-            this.run('/item/save');
+            this.run('/storage/save');
         }
     }]);
     return PageList;
@@ -12901,18 +12952,18 @@ var Transform3d = function (_BasePropertyItem) {
     return Transform3d;
 }(BasePropertyItem);
 
-var Background = function (_UIElement) {
-    inherits(Background, _UIElement);
+var BackgroundSize = function (_BasePropertyItem) {
+    inherits(BackgroundSize, _BasePropertyItem);
 
-    function Background() {
-        classCallCheck(this, Background);
-        return possibleConstructorReturn(this, (Background.__proto__ || Object.getPrototypeOf(Background)).apply(this, arguments));
+    function BackgroundSize() {
+        classCallCheck(this, BackgroundSize);
+        return possibleConstructorReturn(this, (BackgroundSize.__proto__ || Object.getPrototypeOf(BackgroundSize)).apply(this, arguments));
     }
 
-    createClass(Background, [{
+    createClass(BackgroundSize, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <button type="button" ref="$contain">Contain</button>\n                            <button type="button" ref="$cover">Cover</button>\n                            <button type="button" ref="$auto">Auto</button>\n                        </div>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>\n\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </selct>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background-size\'>\n                <div class=\'title\' ref="$title">Background Size</div>            \n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <button type="button" ref="$contain">Contain</button>\n                            <button type="button" ref="$cover">Cover</button>\n                            <button type="button" ref="$auto">Auto</button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </select>\n                        </div>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </select>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'click $contain',
@@ -12980,37 +13031,26 @@ var Background = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'isShow',
-        value: function isShow() {
-            return this.read('/item/is/mode', 'image');
-        }
-    }, {
         key: 'refresh',
         value: function refresh() {
             var _this7 = this;
 
-            var isShow = this.isShow();
+            this.read('/item/current/image', function (image) {
+                if (image.backgroundSizeWidth) {
+                    _this7.refs.$width.val(image.backgroundSizeWidth);
+                }
 
-            this.$el.toggle(isShow);
-
-            if (isShow) {
-                this.read('/item/current/image', function (image) {
-                    if (image.backgroundSizeWidth) {
-                        _this7.refs.$width.val(image.backgroundSizeWidth);
-                    }
-
-                    if (image.backgroundSizeHeight) {
-                        _this7.refs.$height.val(image.backgroundSizeHeight);
-                    }
-                });
-            }
+                if (image.backgroundSizeHeight) {
+                    _this7.refs.$height.val(image.backgroundSizeHeight);
+                }
+            });
         }
     }]);
-    return Background;
-}(UIElement);
+    return BackgroundSize;
+}(BasePropertyItem);
 
-var BackgroundRepeat = function (_UIElement) {
-    inherits(BackgroundRepeat, _UIElement);
+var BackgroundRepeat = function (_BasePropertyItem) {
+    inherits(BackgroundRepeat, _BasePropertyItem);
 
     function BackgroundRepeat() {
         classCallCheck(this, BackgroundRepeat);
@@ -13020,7 +13060,7 @@ var BackgroundRepeat = function (_UIElement) {
     createClass(BackgroundRepeat, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>repeat</label>\n                        <div>\n                            <select ref="$repeat">\n                                <option value=\'repeat\'>repeat</option>\n                                <option value=\'no-repeat\'>no-repeat</option>\n                                <option value=\'repeat-x\'>repeat-x</option>\n                                <option value=\'repeat-y\'>repeat-y</option>\n                            </selct>\n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background-repeat\'>\n                <div class=\'title\' ref="$title">Background Repeat</div>                        \n                <div class=\'items\'>\n                    <div>\n                        <label>repeat</label>\n                        <div>\n                            <select ref="$repeat">\n                                <option value=\'repeat\'>repeat</option>\n                                <option value=\'no-repeat\'>no-repeat</option>\n                                <option value=\'repeat-x\'>repeat-x</option>\n                                <option value=\'repeat-y\'>repeat-y</option>\n                            </selct>\n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'change $repeat',
@@ -13039,28 +13079,17 @@ var BackgroundRepeat = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'isShow',
-        value: function isShow() {
-            return this.read('/item/is/mode', 'image');
-        }
-    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
 
-            var isShow = this.isShow();
-
-            this.$el.toggle(isShow);
-
-            if (isShow) {
-                this.read('/item/current/image', function (image) {
-                    _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-                });
-            }
+            this.read('/item/current/image', function (image) {
+                _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
+            });
         }
     }]);
     return BackgroundRepeat;
-}(UIElement);
+}(BasePropertyItem);
 
 var PageSize = function (_UIElement) {
     inherits(PageSize, _UIElement);
@@ -13487,8 +13516,39 @@ var FilterList$1 = function (_BasePropertyItem) {
     return FilterList;
 }(BasePropertyItem);
 
-var items = {
+var BackgroundColor = function (_UIElement) {
+    inherits(BackgroundColor, _UIElement);
 
+    function BackgroundColor() {
+        classCallCheck(this, BackgroundColor);
+        return possibleConstructorReturn(this, (BackgroundColor.__proto__ || Object.getPrototypeOf(BackgroundColor)).apply(this, arguments));
+    }
+
+    createClass(BackgroundColor, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Background Color</label>\n                        <div style=\'width: 40px\'>\n                            <span class=\'color\' ref="$color"></span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                _this2.refs.$color.css('background-color', layer.style['background-color']);
+            });
+        }
+    }]);
+    return BackgroundColor;
+}(UIElement);
+
+var items = {
+    BackgroundColor: BackgroundColor,
     BlendList: BlendList,
     MixBlendList: MixBlendList,
     FilterList: FilterList$1,
@@ -13496,7 +13556,7 @@ var items = {
     PageSize: PageSize,
     PageName: PageName,
     BackgroundRepeat: BackgroundRepeat,
-    Background: Background,
+    BackgroundSize: BackgroundSize,
     Transform3d: Transform3d,
     Transform: Transform,
     ColorSampleList: ColorSampleList,
@@ -13524,7 +13584,7 @@ var LayerView = function (_UIElement) {
     createClass(LayerView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>                \n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
+            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>                \n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
         }
     }, {
         key: "components",
@@ -13606,7 +13666,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>                \n                <ColorSampleList></ColorSampleList>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>                \n                <ColorSampleList></ColorSampleList>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n                <BackgroundSize></BackgroundSize>\n                <BackgroundRepeat></BackgroundRepeat>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -14202,8 +14262,7 @@ var PredefinedPageResizer = function (_UIElement) {
     }, {
         key: 'isShow',
         value: function isShow() {
-            return false;
-            // return this.read('/item/is/mode', 'page')
+            return this.read('/item/is/mode', 'page');
         }
     }, {
         key: '@changeEditor',
@@ -14639,6 +14698,14 @@ var PredefinedLayerResizer = function (_UIElement) {
     }
 
     createClass(PredefinedLayerResizer, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(PredefinedLayerResizer.prototype.__proto__ || Object.getPrototypeOf(PredefinedLayerResizer.prototype), 'initialize', this).call(this);
+
+            this.$board = this.parent.refs.$board;
+            this.$page = this.parent.refs.$page;
+        }
+    }, {
         key: 'components',
         value: function components() {
             return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate, Radius: Radius$2 };
@@ -14657,6 +14724,47 @@ var PredefinedLayerResizer = function (_UIElement) {
             if (isShow) {
                 this.setPosition();
             }
+        }
+    }, {
+        key: 'caculateSize',
+        value: function caculateSize(list, key, align) {
+
+            var valueList = list.filter(function (it) {
+                return it.align == align;
+            }).map(function (it) {
+                return it[key];
+            });
+
+            if (valueList.length) {
+                return Math.max.apply(Math, [Number.MIN_SAFE_INTEGER].concat(toConsumableArray(valueList)));
+            }
+
+            return undefined;
+        }
+    }, {
+        key: 'caculatePosition',
+        value: function caculatePosition(list, key, align) {
+            var unit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'px';
+
+
+            var valueList = list.filter(function (it) {
+                return it.align == align;
+            }).map(function (it) {
+                return it[key];
+            });
+
+            if (valueList.length) {
+                return Math.max.apply(Math, [0].concat(toConsumableArray(valueList))) + unit;
+            }
+
+            return undefined;
+        }
+    }, {
+        key: 'parseNumber',
+        value: function parseNumber(value) {
+            var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'px';
+
+            return +(value || '0px').replace(unit, '');
         }
     }, {
         key: 'setPosition',
@@ -14697,6 +14805,91 @@ var PredefinedLayerResizer = function (_UIElement) {
             this.refresh();
         }
     }, {
+        key: 'caculateRightSize',
+        value: function caculateRightSize(item, list) {
+            var width = this.caculateSize(list, 'x', 'right');
+
+            if (typeof width != 'undefined') {
+                var newWidth = this.moveX + width;
+                item.style.width = newWidth + 'px';
+            }
+        }
+    }, {
+        key: 'caculateLeftSize',
+        value: function caculateLeftSize(item, list) {
+            var x = this.caculatePosition(list, 'x', 'left');
+
+            if (typeof x != 'undefined') {
+                var newWidth = this.width + (this.moveX - this.parseNumber(x));
+
+                item.style.x = x;
+                item.style.width = newWidth + 'px';
+            }
+        }
+    }, {
+        key: 'caculateBottomSize',
+        value: function caculateBottomSize(item, list) {
+            var height = this.caculateSize(list, 'y', 'bottom');
+
+            if (typeof height != 'undefined') {
+                var newHeight = this.moveY + height;
+                item.style.height = newHeight + 'px';
+            }
+        }
+    }, {
+        key: 'caculateTopSize',
+        value: function caculateTopSize(item, list) {
+            var y = this.caculatePosition(list, 'y', 'top');
+
+            if (typeof y != 'undefined') {
+                var newHeight = this.height + (this.moveY - this.parseNumber(y));
+
+                item.style.y = y;
+                item.style.height = newHeight + 'px';
+            }
+        }
+    }, {
+        key: 'resizeItem',
+        value: function resizeItem(item, list) {
+            if (this.currentType == 'to right') {
+                // 오른쪽 왼쪽 크기를 맞추기 
+                this.caculateRightSize(item, list);
+            } else if (this.currentType == 'to bottom') {
+                // 아래위 크기 맞추기 
+                this.caculateBottomSize(item, list);
+            } else if (this.currentType == 'to bottom left') {
+                // 아래위 크기 맞추기 
+                this.caculateBottomSize(item, list);
+                this.caculateLeftSize(item, list);
+            } else if (this.currentType == 'to bottom right') {
+                // 아래위 크기 맞추기 
+                this.caculateBottomSize(item, list);
+                this.caculateRightSize(item, list);
+            } else if (this.currentType == 'to left') {
+                this.caculateLeftSize(item, list);
+            } else if (this.currentType == 'to top') {
+                this.caculateTopSize(item, list);
+            } else if (this.currentType == 'to top right') {
+                this.caculateTopSize(item, list);
+                this.caculateRightSize(item, list);
+            } else if (this.currentType == 'to top left') {
+                this.caculateTopSize(item, list);
+                this.caculateLeftSize(item, list);
+            }
+        }
+    }, {
+        key: 'caculateSnap',
+        value: function caculateSnap(item) {
+
+            var list = this.read('/guide/line/layer', 3);
+
+            if (list.length) {
+                this.resizeItem(item, list);
+            }
+
+            return item;
+        }
+    }, {
         key: 'change',
         value: function change() {
             var style1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -14712,6 +14905,8 @@ var PredefinedLayerResizer = function (_UIElement) {
             var item = this.read('/item/current/layer');
 
             item.style = Object.assign(item.style, style);
+
+            item = this.caculateSnap(item);
 
             this.dispatch('/item/set', item);
             this.setPosition();
@@ -14813,16 +15008,17 @@ var PredefinedLayerResizer = function (_UIElement) {
             this.currentType = type;
             this.xy = e.xy;
             this.layer = layer;
-            this.width = +this.layer.style.width.replace('px', '');
-            this.height = +this.layer.style.height.replace('px', '');
-            this.moveX = +(this.layer.style.x || 0).replace('px', '');
-            this.moveY = +(this.layer.style.y || 0).replace('px', '');
+            this.width = this.parseNumber(layer.style.width);
+            this.height = this.parseNumber(layer.style.height);
+            this.moveX = this.parseNumber(layer.style.x);
+            this.moveY = this.parseNumber(layer.style.y);
         }
     }, {
         key: 'pointermove document',
         value: function pointermoveDocument(e) {
             if (this.xy) {
                 this.targetXY = e.xy;
+                this.$page.addClass('moving');
 
                 this.resize();
             }
@@ -14834,6 +15030,7 @@ var PredefinedLayerResizer = function (_UIElement) {
             this.xy = null;
             this.moveX = null;
             this.moveY = null;
+            this.$page.removeClass('moving');
         }
     }]);
     return PredefinedLayerResizer;
@@ -14884,8 +15081,18 @@ var MoveGuide = function (_UIElement) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            // this.$el.hide();
-            this.load();
+
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+            if (isShow) {
+                this.load();
+            }
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return this.$page.hasClass('moving');
         }
     }, {
         key: '@changeEditor',
@@ -15006,8 +15213,8 @@ var GradientView = function (_BaseTab) {
         value: function click$pageLayer(e) {
             var id = e.$delegateTarget.attr('item-id');
             if (id) {
+                this.run('/item/select/mode', 'layer');
                 this.dispatch('/item/select', id);
-                this.dispatch('/item/select/mode', 'layer');
             }
         }
     }, {
@@ -15342,7 +15549,7 @@ var ImageView$2 = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Background></Background>\n                <BackgroundRepeat></BackgroundRepeat>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15525,7 +15732,7 @@ var XDImageEditor = function (_BaseImageEditor) {
         value: function loadStart(isAdd) {
             var _this2 = this;
 
-            this.dispatch('/item/load', function (isLoaded) {
+            this.dispatch('/storage/load', function (isLoaded) {
                 if (!isLoaded && isAdd) {
                     _this2.run('/item/add/page', true);
                 }

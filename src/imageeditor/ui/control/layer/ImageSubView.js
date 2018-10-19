@@ -7,8 +7,7 @@ export default class ImageView extends UIElement {
     template () {
         return `
             <div class='property-view'>
-                <Background></Background>
-                <BackgroundRepeat></BackgroundRepeat>
+
             </div>  
         `
     }

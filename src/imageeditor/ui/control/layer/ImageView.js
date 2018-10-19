@@ -13,6 +13,8 @@ export default class ImageView extends UIElement {
                 <ImageTypeSelect></ImageTypeSelect>
                 <ColorSteps></ColorSteps>
                 <ColorStepsInfo></ColorStepsInfo>
+                <BackgroundSize></BackgroundSize>
+                <BackgroundRepeat></BackgroundRepeat>
             </div>  
         `
     }

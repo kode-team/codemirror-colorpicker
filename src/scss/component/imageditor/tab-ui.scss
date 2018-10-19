@@ -113,7 +113,7 @@ $tab-selected-color: #dedede;
 .page-menu-tab,
 .image-menu-tab {
     > .tab-header{
-        height: 40px;
+        height: 32px;
         > .tab-item {
             border: 0px;
             border-right: 1px solid $border-color;
@@ -129,7 +129,7 @@ $tab-selected-color: #dedede;
     }
 
     > .tab-body {
-        top: 40px;
+        top: 32px;
         border:0px;
         border-top: 1px solid $border-color;
     }

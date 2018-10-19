@@ -8,6 +8,7 @@ export default class LayerView extends UIElement {
         return `
             <div class='property-view'>
                 <Name></Name>                
+                <BackgroundColor></BackgroundColor> 
                 <ColorPickerPanel></ColorPickerPanel>
                 <ColorSampleList></ColorSampleList>                
                 <size></size>

@@ -1,9 +1,10 @@
-import UIElement from "../../../../../colorpicker/UIElement";
+import BasePropertyItem from "./BasePropertyItem";
 
-export default class Background extends UIElement {
+export default class BackgroundSize extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item background'>
+            <div class='property-item background-size'>
+                <div class='title' ref="$title">Background Size</div>            
                 <div class='items'>
                     <div>
                         <label>size</label>
@@ -12,20 +13,25 @@ export default class Background extends UIElement {
                             <button type="button" ref="$cover">Cover</button>
                             <button type="button" ref="$auto">Auto</button>
                         </div>
+                    </div>
+                    <div>
+                        <label>width</label>
                         <div>
                             <input type="text" ref="$width" />
                             <select ref="$widthSelect">
                                 <option value='%'>%</option>
                                 <option value='px'>px</option>
-                            </selct>
+                            </select>
                         </div>
-
+                    </div>
+                    <div>
+                        <label>height</label>
                         <div>
                             <input type="text" ref="$height" />
                             <select ref="$heightSelect">
                                 <option value='%'>%</option>
                                 <option value='px'>px</option>
-                            </selct>
+                            </select>
                         </div>                        
                     </div>
 
@@ -77,33 +83,21 @@ export default class Background extends UIElement {
         })
     }
 
-
     '@changeEditor' () {
         this.refresh()
     }
 
-    isShow () {
-        return this.read('/item/is/mode', 'image');
-    }
-
     refresh() {
 
-        var isShow = this.isShow();
+        this.read('/item/current/image', (image) => {
+            if (image.backgroundSizeWidth) {
+                this.refs.$width.val(image.backgroundSizeWidth);
+            }
 
-        this.$el.toggle(isShow)
-
-        if (isShow) {
-            this.read('/item/current/image', (image) => {
-                if (image.backgroundSizeWidth) {
-                    this.refs.$width.val(image.backgroundSizeWidth);
-                }
-    
-                if (image.backgroundSizeHeight) {
-                    this.refs.$height.val(image.backgroundSizeHeight);
-                }            
-            })
-        }
-
+            if (image.backgroundSizeHeight) {
+                this.refs.$height.val(image.backgroundSizeHeight);
+            }            
+        })
         
     }
 

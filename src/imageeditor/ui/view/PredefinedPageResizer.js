@@ -22,9 +22,8 @@ export default class PredefinedPageResizer extends UIElement {
         this.$el.toggle(this.isShow())
     }
 
-    isShow () {
-        return false; 
-        // return this.read('/item/is/mode', 'page')
+    isShow () { 
+        return this.read('/item/is/mode', 'page')
     }
 
     '@changeEditor' () { this.refresh(); }

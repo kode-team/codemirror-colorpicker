@@ -15,7 +15,7 @@ export default class PageList extends UIElement {
         `
     }
 
-    makeItemNode (node) {
+    makeItemNode (node, index) {
         var item = this.read('/item/get', node.id);
 
         var page = this.read('/item/current/page')
@@ -25,17 +25,17 @@ export default class PageList extends UIElement {
         if (page) selectedId = page.id; 
 
         if (item.itemType == 'page') {
-            return this.makeItemNodePage(item, selectedId);
+            return this.makeItemNodePage(item, index, selectedId);
         }
 
     }
 
-    makeItemNodePage (item, selectedId) {
+    makeItemNodePage (item, index, selectedId) {
         var selected = item.id == selectedId ? 'selected' : ''; 
         return `
             <div class='tree-item ${selected}' id="${item.id}" type='page'>
                 <div class="item-title">
-                    ${item.name || `Page `}
+                    ${item.name || `Project ${index}`}
                 </div>   
             </div>
             `
@@ -43,10 +43,10 @@ export default class PageList extends UIElement {
 
     'load $pageList' () {
         var str = this.read('/item/map/page', (item, index) => {
-            return this.makeItemNode(item); 
+            return this.makeItemNode(item, index); 
         }).join('');
 
-        str += `<button type="button" class='add-page'>+ Page</button>`
+        str += `<button type="button" class='add-page'>+ Project</button>`
 
         return str; 
     }
@@ -70,13 +70,13 @@ export default class PageList extends UIElement {
         this.refresh();
 
         if (e.$delegateTarget.attr('type') == 'page') {
-            this.emit('@selectPage')
+            this.emit('selectPage')
         } 
         
     }
 
     'click $saveButton' (e) {
-        this.run('/item/save');
+        this.run('/storage/save');
     }
 
 }
