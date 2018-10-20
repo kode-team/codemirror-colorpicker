@@ -3363,6 +3363,12 @@ var functions$1 = (_functions = {
     radian: radian,
     convolution: convolution,
     parseParamNumber: parseParamNumber$1,
+    px2em: px2em,
+    px2percent: px2percent,
+    em2percent: em2percent,
+    em2px: em2px,
+    percent2em: percent2em,
+    percent2px: percent2px,
     filter: filter$1,
     clamp: clamp$1,
     fillColor: fillColor,
@@ -3637,6 +3643,34 @@ function parseParamNumber$1(param, callback) {
         return callback(+param);
     }
     return +param;
+}
+
+function px2percent(px, maxValue) {
+    return round(px / maxValue * 100, 100);
+}
+
+function px2em(px, maxValue) {
+    var fontSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 16;
+
+    return round(px / fontSize, 100);
+}
+
+function em2px(em, maxValue) {
+    var fontSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 16;
+
+    return Math.floor(round(em * fontSize, 100));
+}
+
+function em2percent(em, maxValue) {
+    return px2percent(em2px(em), maxValue);
+}
+
+function percent2px(percent, maxValue) {
+    return Math.floor(round(maxValue * (percent / 100), 100));
+}
+
+function percent2em(percent, maxValue) {
+    return px2em(percent2px(percent, maxValue), maxValue);
 }
 
 var filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
@@ -4150,6 +4184,8 @@ function parseParamNumber$2(param) {
     if (typeof param === 'string') {
         param = param.replace(/deg/, '');
         param = param.replace(/px/, '');
+        param = param.replace(/em/, '');
+        param = param.replace(/%/, '');
     }
     return +param;
 }
@@ -5867,6 +5903,7 @@ var Dom = function () {
                 return this.el.textContent;
             } else {
                 this.el.textContent = value;
+                return this;
             }
         }
     }, {
@@ -6457,7 +6494,7 @@ var EventMachin = function () {
 
     this.state = new State(this);
     this.refs = {};
-
+    this.children = {};
     this.childComponents = this.components();
   }
 
@@ -6554,6 +6591,7 @@ var EventMachin = function () {
 
       var $el = this.$el;
       Object.keys(this.childComponents).forEach(function (ComponentName) {
+
         var Component = _this2.childComponents[ComponentName];
         var targets = $el.$$('' + ComponentName.toLowerCase());
         [].concat(toConsumableArray(targets)).forEach(function ($dom) {
@@ -6570,8 +6608,9 @@ var EventMachin = function () {
           if (refName) {
 
             if (Component) {
+
               var instance = new Component(_this2, props);
-              _this2[refName] = instance;
+              _this2.children[refName] = instance;
               _this2.refs[refName] = instance.$el;
 
               if (instance) {
@@ -6613,6 +6652,17 @@ var EventMachin = function () {
   }, {
     key: 'initialize',
     value: function initialize() {}
+  }, {
+    key: 'eachChildren',
+    value: function eachChildren(callback) {
+      var _this4 = this;
+
+      Object.keys(this.children).forEach(function (ChildComponentName) {
+        if (typeof callback == 'function') {
+          callback(_this4.children[ChildComponentName]);
+        }
+      });
+    }
 
     /**
      * 이벤트를 초기화한다. 
@@ -6621,14 +6671,12 @@ var EventMachin = function () {
   }, {
     key: 'initializeEvent',
     value: function initializeEvent() {
-      var _this4 = this;
-
       this.initializeEventMachin();
 
       // 자식 이벤트도 같이 초기화 한다. 
       // 그래서 이 메소드는 부모에서 한번만 불려도 된다. 
-      Object.keys(this.childComponents).forEach(function (key) {
-        if (_this4[key]) _this4[key].initializeEvent();
+      this.eachChildren(function (Component) {
+        Component.initializeEvent();
       });
     }
 
@@ -6640,13 +6688,11 @@ var EventMachin = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      var _this5 = this;
-
       this.destroyEventMachin();
       // this.refs = {} 
 
-      Object.keys(this.childComponents).forEach(function (key) {
-        if (_this5[key]) _this5[key].destroy();
+      this.eachChildren(function (Component) {
+        Component.destroy();
       });
     }
   }, {
@@ -6705,7 +6751,7 @@ var EventMachin = function () {
   }, {
     key: 'parseEvent',
     value: function parseEvent(key) {
-      var _this6 = this;
+      var _this5 = this;
 
       var arr = key.split(EVENT_SAPARATOR);
 
@@ -6716,7 +6762,7 @@ var EventMachin = function () {
 
       eventNames.forEach(function (eventName) {
         var eventInfo = [eventName].concat(toConsumableArray(params));
-        _this6.bindingEvent(eventInfo, callback);
+        _this5.bindingEvent(eventInfo, callback);
       });
     }
   }, {
@@ -6748,7 +6794,7 @@ var EventMachin = function () {
   }, {
     key: 'getDefaultEventObject',
     value: function getDefaultEventObject(eventName) {
-      var _this7 = this;
+      var _this6 = this;
 
       var arr = eventName.split('.');
       var realEventName = arr.shift();
@@ -6763,7 +6809,7 @@ var EventMachin = function () {
       });
 
       var checkMethodList = arr.filter(function (code) {
-        return !!_this7[code];
+        return !!_this6[code];
       });
 
       // const delay = arr.filter(code => {
@@ -6841,7 +6887,7 @@ var EventMachin = function () {
   }, {
     key: 'checkEventType',
     value: function checkEventType(e, eventObject) {
-      var _this8 = this;
+      var _this7 = this;
 
       var onlyControl = eventObject.isControl ? e.ctrlKey : true;
       var onlyShift = eventObject.isShift ? e.shiftKey : true;
@@ -6859,7 +6905,7 @@ var EventMachin = function () {
       var isAllCheck = true;
       if (eventObject.checkMethodList.length) {
         isAllCheck = eventObject.checkMethodList.every(function (method) {
-          return _this8[method].call(_this8, e);
+          return _this7[method].call(_this7, e);
         });
       }
 
@@ -6868,7 +6914,7 @@ var EventMachin = function () {
   }, {
     key: 'makeCallback',
     value: function makeCallback(eventObject, callback) {
-      var _this9 = this;
+      var _this8 = this;
 
       if (eventObject.debounce) {
         callback = debounce(callback, eventObject.debounce);
@@ -6876,7 +6922,7 @@ var EventMachin = function () {
 
       if (eventObject.delegate) {
         return function (e) {
-          var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
+          var delegateTarget = _this8.matchPath(e.target || e.srcElement, eventObject.delegate);
 
           if (delegateTarget) {
             // delegate target 이 있는 경우만 callback 실행 
@@ -6884,7 +6930,7 @@ var EventMachin = function () {
             e.$delegateTarget = new Dom(delegateTarget);
             e.xy = Event.posXY(e);
 
-            if (_this9.checkEventType(e, eventObject)) {
+            if (_this8.checkEventType(e, eventObject)) {
               return callback(e);
             }
           }
@@ -6892,7 +6938,7 @@ var EventMachin = function () {
       } else {
         return function (e) {
           e.xy = Event.posXY(e);
-          if (_this9.checkEventType(e, eventObject)) {
+          if (_this8.checkEventType(e, eventObject)) {
             return callback(e);
           }
         };
@@ -6908,10 +6954,10 @@ var EventMachin = function () {
   }, {
     key: 'removeEventAll',
     value: function removeEventAll() {
-      var _this10 = this;
+      var _this9 = this;
 
       this.getBindings().forEach(function (obj) {
-        _this10.removeEvent(obj);
+        _this9.removeEvent(obj);
       });
       this.initBindings();
     }
@@ -9719,15 +9765,12 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/toBackgroundSizeString',
         value: function imageToBackgroundSizeString($store, image) {
 
-            var widthUnit = image.backgroundSizeWidthUnit || 'px';
-            var heightUnit = image.backgroundSizeHeightUnit || 'px';
-
             if (image.backgroundSize == 'contain' || image.backgroundSize == 'cover') {
                 return image.backgroundSize;
             } else if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
-                return [image.backgroundSizeWidth + widthUnit, image.backgroundSizeHeight + heightUnit].join(' ');
+                return [image.backgroundSizeWidth, image.backgroundSizeHeight].join(' ');
             } else if (image.backgroundSizeWidth) {
-                return image.backgroundSizeWidth + widthUnit;
+                return image.backgroundSizeWidth;
             }
 
             return 'auto';
@@ -10459,8 +10502,6 @@ var IMAGE_DEFAULT_OBJECT = {
     backgroundSize: null,
     backgroundSizeWidth: 0,
     backgroundSizeHeight: 0,
-    backgroundSizeWidthUnit: 'px',
-    backgroundSizeHeightUnit: 'px',
     backgroundOrigin: null,
     backgroundPosition: null,
     backgroundColor: null,
@@ -12993,8 +13034,145 @@ var Transform3d = function (_BasePropertyItem) {
     return Transform3d;
 }(BasePropertyItem);
 
-var BackgroundSize = function (_BasePropertyItem) {
-    inherits(BackgroundSize, _BasePropertyItem);
+var unit_names = {
+    'percent': '%',
+    'px': 'px',
+    'em': 'em'
+};
+
+var UnitRange = function (_UIElement) {
+    inherits(UnitRange, _UIElement);
+
+    function UnitRange() {
+        classCallCheck(this, UnitRange);
+        return possibleConstructorReturn(this, (UnitRange.__proto__ || Object.getPrototypeOf(UnitRange)).apply(this, arguments));
+    }
+
+    createClass(UnitRange, [{
+        key: "created",
+        value: function created() {
+            this.min = this.props.min || 0;
+            this.max = this.props.max || 1000;
+            this.step = this.props.step || 1;
+            this.value = this.props.value || 0;
+            this.unit = this.props.unit || 'px';
+            this.showClass = 'show';
+            this.maxValueFunction = this.parent[this.props.maxvaluefunction].bind(this.parent);
+            this.updateFunction = this.parent[this.props.updatefunction].bind(this.parent);
+        }
+    }, {
+        key: "afterRender",
+        value: function afterRender() {
+            this.initializeRangeMax(this.unit);
+        }
+    }, {
+        key: "template",
+        value: function template() {
+
+            return "\n            <div class='unit-range'>\n                <div class='base-value'>\n                    <input ref=\"$range\" type=\"range\" class='range' min=\"" + this.min + "\" max=\"" + this.max + "\" step=\"" + this.step + "\" value=\"" + this.value + "\" />\n                    <input ref=\"$number\" type=\"number\" class='number' min=\"" + this.min + "\" max=\"" + this.max + "\" step=\"" + this.step + "\" value=\"" + this.value + "\"  />\n                    <button ref=\"$unit\" type=\"button\" class='unit'>" + this.unit + "</button>\n                </div>\n                <div class=\"multi-value\" ref=\"$multiValue\">\n                    <div ref=\"$px\" class=\"px\" unit='px'></div>\n                    <div ref=\"$percent\" class=\"percent\" unit='percent'></div>\n                    <div ref=\"$em\" class=\"em\" unit='em'></div>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: 'click $multiValue div',
+        value: function click$multiValueDiv(e) {
+            var unit = e.$delegateTarget.attr('unit');
+            var value = e.$delegateTarget.attr('value');
+
+            this.selectUnit(unit, value);
+        }
+    }, {
+        key: "refresh",
+        value: function refresh(value) {
+            var unit = 'px';
+            if (value.includes('%')) {
+                unit = 'percent';
+            } else if (value.includes('em')) {
+                unit = 'em';
+            }
+
+            this.selectUnit(unit, parseParamNumber$2(value));
+        }
+    }, {
+        key: "initializeRangeMax",
+        value: function initializeRangeMax(unit) {
+
+            if (unit == 'percent') {
+                this.refs.$range.attr('max', 300);
+                this.refs.$range.attr('step', 0.01);
+                this.refs.$number.attr('max', 300);
+                this.refs.$number.attr('step', 0.01);
+            } else if (unit == 'px') {
+                this.refs.$range.attr('max', 1000);
+                this.refs.$range.attr('step', 1);
+                this.refs.$number.attr('max', 1000);
+                this.refs.$number.attr('step', 1);
+            } else if (unit == 'em') {
+                this.refs.$range.attr('max', 300);
+                this.refs.$range.attr('step', 0.01);
+                this.refs.$number.attr('max', 300);
+                this.refs.$number.attr('step', 0.01);
+            }
+        }
+    }, {
+        key: "selectUnit",
+        value: function selectUnit(unit, value) {
+            this.unit = unit;
+            this.value = value;
+
+            this.refs.$range.val(this.value);
+            this.refs.$number.val(this.value);
+            this.refs.$unit.text(unit_names[this.unit]);
+
+            this.initializeRangeMax(this.unit);
+        }
+    }, {
+        key: 'click $unit',
+        value: function click$unit(e) {
+            this.$el.toggleClass(this.showClass);
+            this.updateRange();
+        }
+    }, {
+        key: "updateRange",
+        value: function updateRange() {
+            var unit = this.unit;
+            var px = unit == 'px' ? this.refs.$range.val() : undefined;
+            var percent = unit == 'percent' ? this.refs.$range.val() : undefined;
+            var em = unit == 'em' ? this.refs.$range.val() : undefined;
+            var maxValue = this.maxValueFunction();
+
+            if (px) {
+                this.refs.$px.text(px + ' px').attr('value', px);
+                this.refs.$percent.text(px2percent(px, maxValue) + ' %').attr('value', px2percent(px, maxValue));
+                this.refs.$em.text(px2em(px, maxValue) + ' em').attr('value', px2em(px, maxValue));
+            } else if (percent) {
+                this.refs.$percent.text(percent + ' %').attr('value', percent);
+                this.refs.$px.text(percent2px(percent, maxValue) + ' px').attr('value', percent2px(percent, maxValue));
+                this.refs.$em.text(percent2em(percent, maxValue) + ' em').attr('value', percent2em(percent, maxValue));
+            } else if (em) {
+                this.refs.$em.text(em + ' em').attr('value', em);
+                this.refs.$percent.text(em2percent(em, maxValue) + ' %').attr('value', em2percent(em, maxValue));
+                this.refs.$px.text(em2px(em, maxValue) + ' px').attr('value', em2px(em, maxValue));
+            }
+        }
+    }, {
+        key: 'input $range',
+        value: function input$range(e) {
+            this.refs.$number.val(this.refs.$range.val());
+            this.updateRange();
+            this.updateFunction(this.refs.$range.val() + unit_names[this.unit]);
+        }
+    }, {
+        key: 'input $number',
+        value: function input$number(e) {
+            this.refs.$range.val(this.refs.$number.val());
+            this.updateRange();
+            this.updateFunction(this.refs.$range.val() + unit_names[this.unit]);
+        }
+    }]);
+    return UnitRange;
+}(UIElement);
+
+var BackgroundSize = function (_UIElement) {
+    inherits(BackgroundSize, _UIElement);
 
     function BackgroundSize() {
         classCallCheck(this, BackgroundSize);
@@ -13002,83 +13180,68 @@ var BackgroundSize = function (_BasePropertyItem) {
     }
 
     createClass(BackgroundSize, [{
-        key: 'template',
+        key: "components",
+        value: function components() {
+            return {
+                UnitRange: UnitRange
+            };
+        }
+    }, {
+        key: "template",
         value: function template() {
-            return '\n            <div class=\'property-item background\'>\n                <div class=\'title\' ref="$title">Background</div>            \n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div class=\'size-list\' ref="$size">\n                            <button type="button" value="contain" title="contain" ></button>\n                            <button type="button" value="cover" title="cover"></button>\n                            <button type="button" value="auto" title="auto"></button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <div>\n                            <input type="range" min="0" max="1000" step="1" value="0" data-value="width" />\n                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="width" />\n                            <select ref="$widthUnit">\n                                <option value=\'px\'>px</option>                            \n                                <option value=\'%\'>%</option>\n                                <option value=\'em\'>em</option>\n                            </select>\n                        </div>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <div>\n                            <input type="range" min="0" max="1000" step="1"  value="0" data-value="height" />\n                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="height" />\n                            <select ref="$heightUnit">\n                                <option value=\'px\'>px</option>                            \n                                <option value=\'%\'>%</option>\n                                <option value=\'em\'>em</option>\n                                <option value=\'auto\'>auto</option>                                \n                            </select>\n                        </div>                        \n                    </div>\n                    <div>\n                        <label>repeat</label>\n                        <div class=\'flex repeat-list\' ref="$repeat">\n                            <button type="button" value=\'no-repeat\' title="no-repeat">\n                                <span></span>\n                            </button>                        \n                            <button type="button" value=\'repeat\' title="repeat">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'repeat-x\' title="repeat-x">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'repeat-y\' title="repeat-y">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'space\' title="space">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                \n                            </button>\n                            <button type="button" value=\'round\' title="round">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                                                \n                            </button>                            \n                            \n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return "\n            <div class='property-item background'>\n                <div class='title' ref=\"$title\">Background</div>            \n                <div class='items'>\n                    <div>\n                        <label>size</label>\n                        <div class='size-list' ref=\"$size\">\n                            <button type=\"button\" value=\"contain\" title=\"contain\" ></button>\n                            <button type=\"button\" value=\"cover\" title=\"cover\"></button>\n                            <button type=\"button\" value=\"auto\" title=\"auto\"></button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <UnitRange \n                            ref=\"$width\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxWidth\"\n                            updateFunction=\"updateWidth\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <UnitRange \n                            ref=\"$height\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxHeight\"\n                            updateFunction=\"updateHeight\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>repeat</label>\n                        <div class='flex repeat-list' ref=\"$repeat\">\n                            <button type=\"button\" value='no-repeat' title=\"no-repeat\">\n                                <span></span>\n                            </button>                        \n                            <button type=\"button\" value='repeat' title=\"repeat\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-x' title=\"repeat-x\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-y' title=\"repeat-y\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='space' title=\"space\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                \n                            </button>\n                            <button type=\"button\" value='round' title=\"round\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                                                \n                            </button>                            \n                            \n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ";
         }
     }, {
-        key: 'input $el input[type=range][data-value]',
-        value: function input$elInputTypeRangeDataValue(e) {
-            var target = e.$delegateTarget.attr('data-value');
-            var value = e.$delegateTarget.val();
-            var obj = this.$el.$('input[type=number][data-value=' + target + ']');
-            if (obj) {
-                obj.val(value);
-            }
-        }
-    }, {
-        key: 'input $el input[type=number][data-value]',
-        value: function input$elInputTypeNumberDataValue(e) {
-            var target = e.$delegateTarget.attr('data-value');
-            var value = e.$delegateTarget.val();
-            var obj = this.$el.$('input[type=range][data-value=' + target + ']');
-            if (obj) {
-                obj.val(value);
-            }
-        }
-    }, {
-        key: 'click $size button',
-        value: function click$sizeButton(e) {
+        key: "updateWidth",
+        value: function updateWidth(value) {
             var _this2 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSize = e.$delegateTarget.val();
-                _this2.selectBackgroundSize(image.backgroundSize);
+                image.backgroundSizeWidth = value;
                 _this2.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'change $widthUnit',
-        value: function change$widthUnit(e) {
+        key: "updateHeight",
+        value: function updateHeight(value) {
             var _this3 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeWidthUnit = e.$delegateTarget.val();
+                image.backgroundSizeHeight = value;
                 _this3.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'change $heightUnit',
-        value: function change$heightUnit() {
+        key: "getMaxHeight",
+        value: function getMaxHeight() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return 0;
+
+            return parseParamNumber$1(layer.style.height);
+        }
+    }, {
+        key: "getMaxWidth",
+        value: function getMaxWidth() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return 0;
+
+            return parseParamNumber$1(layer.style.width);
+        }
+    }, {
+        key: 'click $size button',
+        value: function click$sizeButton(e) {
             var _this4 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeHeightUnit = e.$delegateTarget.val();
+                image.backgroundSize = e.$delegateTarget.val();
+                _this4.selectBackgroundSize(image.backgroundSize);
                 _this4.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'input $el [data-value=width]',
-        value: function input$elDataValueWidth(e) {
-            var _this5 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.backgroundSizeWidth = e.$delegateTarget.val();
-                _this5.dispatch('/item/set', image);
-            });
-        }
-    }, {
-        key: 'input $el [data-value=height]',
-        value: function input$elDataValueHeight(e) {
-            var _this6 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.backgroundSizeHeight = e.$delegateTarget.val();
-                _this6.dispatch('/item/set', image);
-            });
-        }
-    }, {
-        key: 'selectBackgroundSize',
+        key: "selectBackgroundSize",
         value: function selectBackgroundSize() {
             var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'auto';
 
@@ -13089,19 +13252,19 @@ var BackgroundSize = function (_BasePropertyItem) {
                 value = 'auto';
             }
 
-            var item = this.refs.$size.$('[value=' + value + ']');
+            var item = this.refs.$size.$("[value=" + value + "]");
 
             if (item) {
                 item.addClass('selected');
             }
         }
     }, {
-        key: 'selectBackgroundRepeat',
+        key: "selectBackgroundRepeat",
         value: function selectBackgroundRepeat(value) {
             var selectedItem = this.refs.$repeat.$('.selected');
             if (selectedItem) selectedItem.removeClass('selected');
 
-            var item = this.refs.$repeat.$('[value=' + value + ']');
+            var item = this.refs.$repeat.$("[value=" + value + "]");
 
             if (item) {
                 item.addClass('selected');
@@ -13110,15 +13273,15 @@ var BackgroundSize = function (_BasePropertyItem) {
     }, {
         key: 'click $repeat button',
         value: function click$repeatButton(e) {
-            var _this7 = this;
+            var _this5 = this;
 
             this.read('/item/current/image', function (image) {
 
                 image.backgroundRepeat = e.$delegateTarget.val();
 
-                _this7.selectBackgroundRepeat(image.backgroundRepeat);
+                _this5.selectBackgroundRepeat(image.backgroundRepeat);
 
-                _this7.dispatch('/item/set', image);
+                _this5.dispatch('/item/set', image);
             });
         }
     }, {
@@ -13127,33 +13290,26 @@ var BackgroundSize = function (_BasePropertyItem) {
             this.refresh();
         }
     }, {
-        key: 'refresh',
+        key: "refresh",
         value: function refresh() {
-            var _this8 = this;
+            var _this6 = this;
 
             this.read('/item/current/image', function (image) {
                 if (image.backgroundSizeWidth) {
-                    _this8.$el.$$('[data-value=width]').forEach(function ($node) {
-                        $node.val(image.backgroundSizeWidth);
-                    });
-
-                    _this8.refs.$widthUnit.val(image.backgroundSizeWidthUnit);
+                    _this6.children.$width.refresh(image.backgroundSizeWidth);
                 }
 
                 if (image.backgroundSizeHeight) {
-                    _this8.$el.$$('[data-value=height]').forEach(function ($node) {
-                        $node.val(image.backgroundSizeHeight);
-                    });
-                    _this8.refs.$heightUnit.val(image.backgroundSizeHeightUnit);
+                    _this6.children.$height.refresh(image.backgroundSizeHeight);
                 }
 
-                _this8.selectBackgroundSize(image.backgroundSize);
-                _this8.selectBackgroundRepeat(image.backgroundRepeat);
+                _this6.selectBackgroundSize(image.backgroundSize);
+                _this6.selectBackgroundRepeat(image.backgroundRepeat);
             });
         }
     }]);
     return BackgroundSize;
-}(BasePropertyItem);
+}(UIElement);
 
 var BackgroundRepeat = function (_BasePropertyItem) {
     inherits(BackgroundRepeat, _BasePropertyItem);
@@ -15487,8 +15643,8 @@ var GradientView = function (_BaseTab) {
             this.dispatch('/item/select', this.layer.id);
         }
     }, {
-        key: 'changePosition',
-        value: function changePosition() {
+        key: 'updatePosition',
+        value: function updatePosition() {
             var style1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var style2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -15530,7 +15686,7 @@ var GradientView = function (_BaseTab) {
             var x = this.moveX + dx;
             var y = this.moveY + dy;
 
-            this.changePosition({ x: x, y: y });
+            this.updatePosition({ x: x, y: y });
         }
     }, {
         key: 'pointermove document',

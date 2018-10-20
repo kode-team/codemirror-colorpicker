@@ -2,6 +2,8 @@ export function parseParamNumber (param) {
     if (typeof param === 'string') {
         param = param.replace(/deg/, '')
         param = param.replace(/px/, '')
+        param = param.replace(/em/, '')
+        param = param.replace(/%/, '')
     }
     return +param 
 } 

@@ -142,18 +142,15 @@ export default class ImageManager extends BaseModule {
 
     '*/image/toBackgroundSizeString' ($store, image) {
 
-        var widthUnit = image.backgroundSizeWidthUnit || 'px'
-        var heightUnit = image.backgroundSizeHeightUnit || 'px'
-
         if (image.backgroundSize == 'contain' || image.backgroundSize == 'cover') {
             return image.backgroundSize; 
         } else if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
             return [
-                image.backgroundSizeWidth + widthUnit, 
-                image.backgroundSizeHeight + heightUnit
+                image.backgroundSizeWidth, 
+                image.backgroundSizeHeight
             ].join(' ')
         } else if (image.backgroundSizeWidth) {
-            return image.backgroundSizeWidth + widthUnit;
+            return image.backgroundSizeWidth;
         }
 
         return 'auto'

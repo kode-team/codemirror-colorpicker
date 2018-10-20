@@ -1039,7 +1039,7 @@
       -webkit-box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
               box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
       background: #eceff1;
-      border: 1px solid #cfd8dc;
+      border: 0px solid #cfd8dc;
       border-radius: 0px; }
     .imageeditor [type='range']::-webkit-slider-thumb {
       -webkit-box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
@@ -1051,7 +1051,7 @@
       height: 10px;
       width: 10px;
       -webkit-appearance: none;
-      margin-top: -5.5px; }
+      margin-top: -4.5px; }
     .imageeditor [type='range']::-moz-range-track {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
       cursor: default;
@@ -1060,7 +1060,7 @@
       transition: all .2s ease;
       width: 95%;
       background: #eceff1;
-      border: 1px solid #cfd8dc;
+      border: 0px solid #cfd8dc;
       border-radius: 0px;
       height: 0.5px; }
     .imageeditor [type='range']::-moz-range-thumb {
@@ -1084,12 +1084,12 @@
     .imageeditor [type='range']::-ms-fill-lower {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
       background: #dde3e6;
-      border: 1px solid #cfd8dc;
+      border: 0px solid #cfd8dc;
       border-radius: 0px; }
     .imageeditor [type='range']::-ms-fill-upper {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
       background: #eceff1;
-      border: 1px solid #cfd8dc;
+      border: 0px solid #cfd8dc;
       border-radius: 0px; }
     .imageeditor [type='range']::-ms-thumb {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
@@ -1209,6 +1209,59 @@
     top: 32px;
     border: 0px;
     border-top: 1px solid #c7c7c7; }
+  .imageeditor .unit-range {
+    pointer-events: all;
+    display: block !important; }
+    .imageeditor .unit-range.show .multi-value {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex; }
+    .imageeditor .unit-range .base-value {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex; }
+      .imageeditor .unit-range .base-value > * {
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto; }
+      .imageeditor .unit-range .base-value .number {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        border: 0px;
+        background-color: transparent;
+        margin-left: 5px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        width: 50px; }
+      .imageeditor .unit-range .base-value .unit {
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        border: 0px;
+        background-color: transparent;
+        width: 30px; }
+    .imageeditor .unit-range .multi-value {
+      display: none;
+      height: 26px; }
+      .imageeditor .unit-range .multi-value > * {
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        margin: 2px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #c7c7c7;
+        background-color: transparent;
+        cursor: pointer;
+        padding: 3px;
+        border-radius: 5px; }
   .imageeditor .colorpicker-layer .codemirror-colorpicker {
     background-color: transparent;
     width: 100%;
@@ -1599,43 +1652,10 @@
             height: 20px; }
           .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items {
             display: block; }
-            .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label {
-              width: 50px; }
-              .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div {
-                display: -webkit-box;
-                display: -ms-flexbox;
-                display: flex; }
-                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div button, .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input {
-                  padding-left: 0px;
-                  padding-right: 0px;
-                  border: 1px solid #c7c7c7;
-                  -webkit-appearance: none;
-                     -moz-appearance: none;
-                          appearance: none;
-                  -webkit-box-flex: 1;
-                      -ms-flex: 1;
-                          flex: 1;
-                  border-radius: 0px; }
-                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input[type=number] {
-                  -webkit-box-flex: 0 !important;
-                      -ms-flex: none !important;
-                          flex: none !important;
-                  width: 40px; }
-                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input[type=range] {
-                  -webkit-box-flex: 0 !important;
-                      -ms-flex: none !important;
-                          flex: none !important;
-                  width: 80px;
-                  margin-right: 10px; }
-                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div select {
-                  width: 30px;
-                  -webkit-box-flex: 0;
-                      -ms-flex: none;
-                          flex: none;
-                  -webkit-appearance: none;
-                     -moz-appearance: none;
-                          appearance: none;
-                  border-radius: 0px; }
+            .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div {
+              margin-bottom: 2px; }
+              .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label {
+                width: 50px; }
             .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list {
               display: -webkit-box;
               display: -ms-flexbox;

@@ -186,6 +186,7 @@ export default class Dom {
             return this.el.textContent;
         } else {
             this.el.textContent = value; 
+            return this; 
         }
         
     }

@@ -24,7 +24,7 @@ export default class EventMachin {
   constructor() { 
     this.state = new State(this);
     this.refs = {} 
-
+    this.children = {} 
     this.childComponents = this.components()
   }
 
@@ -107,6 +107,7 @@ export default class EventMachin {
   parseComponent () {
     const $el = this.$el; 
     Object.keys(this.childComponents).forEach(ComponentName => {
+
       const Component = this.childComponents[ComponentName]
       const targets = $el.$$(`${ComponentName.toLowerCase()}`);
       [...targets].forEach($dom => {
@@ -123,8 +124,9 @@ export default class EventMachin {
         if (refName) {
         
           if (Component) { 
+
             var instance = new Component(this, props);
-            this[refName] = instance
+            this.children[refName] = instance
             this.refs[refName] = instance.$el
       
             if (instance) {
@@ -163,6 +165,14 @@ export default class EventMachin {
 
   }
 
+  eachChildren (callback) {
+    Object.keys(this.children).forEach(ChildComponentName => {
+      if (typeof callback == 'function') {
+        callback(this.children[ChildComponentName])
+      }
+    })
+  }
+
   /**
    * 이벤트를 초기화한다. 
    */
@@ -171,10 +181,9 @@ export default class EventMachin {
 
     // 자식 이벤트도 같이 초기화 한다. 
     // 그래서 이 메소드는 부모에서 한번만 불려도 된다. 
-    Object.keys(this.childComponents).forEach(key => {
-      if (this[key]) this[key].initializeEvent()
+    this.eachChildren(Component => {
+      Component.initializeEvent()
     })
-
   }
 
   /**
@@ -185,10 +194,9 @@ export default class EventMachin {
     this.destroyEventMachin();
     // this.refs = {} 
 
-    Object.keys(this.childComponents).forEach(key => {
-      if (this[key]) this[key].destroy()
+    this.eachChildren(Component => {
+      Component.destroy()
     })
-
   }
 
   destroyEventMachin () {

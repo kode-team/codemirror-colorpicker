@@ -172,7 +172,7 @@ export default class GradientView extends BaseTab {
         this.dispatch('/item/select', this.layer.id)
     }
 
-    changePosition (style1 = {}, style2 = {}) {
+    updatePosition (style1 = {}, style2 = {}) {
         let style = Object.assign({}, style1, style2);
 
         Object.keys(style).forEach(key => {
@@ -210,7 +210,7 @@ export default class GradientView extends BaseTab {
         var x = this.moveX + dx; 
         var y = this.moveY + dy; 
 
-        this.changePosition({x, y})
+        this.updatePosition({x, y})
     }    
 
 

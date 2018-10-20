@@ -122,6 +122,9 @@ $show-timeline-animation: all 0.3s linear;
 
 @import './range-ui.scss';
 @import './tab-ui.scss';
+
+@import './element/unit-range.scss';
+
 @import './colorpicker-ui.scss';
 @import './page-manager.scss';
 @import './layer-manager.scss';

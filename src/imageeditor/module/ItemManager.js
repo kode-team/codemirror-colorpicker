@@ -51,8 +51,6 @@ const IMAGE_DEFAULT_OBJECT = {
     backgroundSize: null,
     backgroundSizeWidth: 0,
     backgroundSizeHeight: 0,
-    backgroundSizeWidthUnit: 'px',
-    backgroundSizeHeightUnit: 'px',
     backgroundOrigin: null, 
     backgroundPosition: null,
     backgroundColor: null,

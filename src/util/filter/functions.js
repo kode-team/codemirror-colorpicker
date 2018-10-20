@@ -2,6 +2,7 @@ import Canvas from '../Canvas'
 import Matrix from '../Matrix'
 import ImageFilter from './index' 
 import Color from '../Color'
+import { round } from '../functions/math';
 
 let makeId = 0 
 
@@ -26,6 +27,12 @@ const functions = {
     radian,
     convolution,
     parseParamNumber,
+    px2em,
+    px2percent,
+    em2percent,
+    em2px,
+    percent2em,
+    percent2px,
     filter,
     clamp,
     fillColor,
@@ -291,6 +298,31 @@ export function parseParamNumber (param, callback) {
     }
     return +param 
 } 
+
+
+export function px2percent (px, maxValue) {
+    return round((px / maxValue) * 100, 100); 
+}
+
+export function px2em (px, maxValue, fontSize = 16) {
+    return round((px / fontSize), 100);
+}
+
+export function em2px (em, maxValue, fontSize = 16) {
+    return Math.floor(round(em * fontSize, 100)); 
+}
+
+export function em2percent (em, maxValue) {
+    return px2percent(em2px(em), maxValue); 
+}
+
+export function percent2px (percent, maxValue) {
+    return Math.floor(round(maxValue * (percent/ 100), 100));
+}
+
+export function percent2em (percent, maxValue) {
+    return px2em(percent2px(percent, maxValue), maxValue);
+}
 
 const filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
 const filter_split = ' '

@@ -42,39 +42,9 @@ $layer-item-padding: 4px;
                     display: block;
 
                     > div {
+                        margin-bottom: 2px;
                         > label {
                             width: 50px;
-
-                            &+ div {
-                                display: flex; 
-                                button, input {
-                                    padding-left: 0px;
-                                    padding-right: 0px;
-                                    border: 1px solid $border-color; 
-                                    appearance: none;
-                                    flex: 1;
-                                    border-radius: 0px;
-                                }
-
-                                input[type=number] {
-                                    flex: none !important;
-                                     width: 40px;  
-                                }
-
-                                input[type=range] {
-                                    flex: none !important;
-                                    width: 80px;
-                                    margin-right: 10px;  
-                                }
-
-
-                                select {
-                                    width: 30px;
-                                    flex: none; 
-                                    appearance: none;
-                                    border-radius: 0px;                                    
-                                }
-                            }
                         }
    
                     }

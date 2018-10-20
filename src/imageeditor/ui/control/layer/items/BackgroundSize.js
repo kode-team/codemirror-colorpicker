@@ -1,6 +1,13 @@
-import BasePropertyItem from "./BasePropertyItem";
+import UnitRange from "./element/UnitRange";
+import UIElement from "../../../../../colorpicker/UIElement";
+import { parseParamNumber } from "../../../../../util/filter/functions";
 
-export default class BackgroundSize extends BasePropertyItem {
+export default class BackgroundSize extends UIElement {
+    components () {
+        return {
+            UnitRange
+        }
+    }
     template () {
         return `
             <div class='property-item background'>
@@ -16,28 +23,21 @@ export default class BackgroundSize extends BasePropertyItem {
                     </div>
                     <div>
                         <label>width</label>
-                        <div>
-                            <input type="range" min="0" max="1000" step="1" value="0" data-value="width" />
-                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="width" />
-                            <select ref="$widthUnit">
-                                <option value='px'>px</option>                            
-                                <option value='%'>%</option>
-                                <option value='em'>em</option>
-                            </select>
-                        </div>
+                        <UnitRange 
+                            ref="$width" 
+                            min="0" max="1000" step="1" value="0" unit="px" 
+                            maxValueFunction="getMaxWidth"
+                            updateFunction="updateWidth"
+                        ></UnitRange>
                     </div>
                     <div>
                         <label>height</label>
-                        <div>
-                            <input type="range" min="0" max="1000" step="1"  value="0" data-value="height" />
-                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="height" />
-                            <select ref="$heightUnit">
-                                <option value='px'>px</option>                            
-                                <option value='%'>%</option>
-                                <option value='em'>em</option>
-                                <option value='auto'>auto</option>                                
-                            </select>
-                        </div>                        
+                        <UnitRange 
+                            ref="$height" 
+                            min="0" max="1000" step="1" value="0" unit="px" 
+                            maxValueFunction="getMaxHeight"
+                            updateFunction="updateHeight"
+                        ></UnitRange>
                     </div>
                     <div>
                         <label>repeat</label>
@@ -90,23 +90,35 @@ export default class BackgroundSize extends BasePropertyItem {
         `
     }
 
-    'input $el input[type=range][data-value]' (e) {
-        var target = e.$delegateTarget.attr('data-value')
-        var value = e.$delegateTarget.val()
-        var obj = this.$el.$(`input[type=number][data-value=${target}]`)
-        if (obj) {
-            obj.val(value);
-        }
+    updateWidth (value) {
+        this.read('/item/current/image', (image) => {
+            image.backgroundSizeWidth = value;
+            this.dispatch('/item/set', image);
+        })
     }
 
-    'input $el input[type=number][data-value]' (e) {
-        var target = e.$delegateTarget.attr('data-value')
-        var value = e.$delegateTarget.val()
-        var obj = this.$el.$(`input[type=range][data-value=${target}]`)
-        if (obj) {
-            obj.val(value);
-        }
-    }    
+    updateHeight (value) {
+        this.read('/item/current/image', (image) => {
+            image.backgroundSizeHeight = value;
+            this.dispatch('/item/set', image);
+        })
+    }
+
+    getMaxHeight () {
+        var layer = this.read('/item/current/layer');
+
+        if (!layer) return 0;
+
+        return parseParamNumber(layer.style.height)
+    }
+
+    getMaxWidth () {
+        var layer = this.read('/item/current/layer');
+
+        if (!layer) return 0;
+
+        return parseParamNumber(layer.style.width)
+    }
 
     'click $size button' (e) {
         
@@ -116,34 +128,6 @@ export default class BackgroundSize extends BasePropertyItem {
             this.dispatch('/item/set', image);
         })
     }    
-
-    'change $widthUnit' (e) {
-        this.read('/item/current/image', (image) => {
-            image.backgroundSizeWidthUnit = e.$delegateTarget.val()
-            this.dispatch('/item/set', image);
-        })
-    }
-
-    'change $heightUnit' () {
-        this.read('/item/current/image', (image) => {
-            image.backgroundSizeHeightUnit = e.$delegateTarget.val()
-            this.dispatch('/item/set', image);
-        })
-    }    
-
-    'input $el [data-value=width]' (e) {
-        this.read('/item/current/image', (image) => {
-            image.backgroundSizeWidth = e.$delegateTarget.val()
-            this.dispatch('/item/set', image);
-        })
-    }
-
-    'input $el [data-value=height]' (e) {
-        this.read('/item/current/image', (image) => {
-            image.backgroundSizeHeight = e.$delegateTarget.val()
-            this.dispatch('/item/set', image);
-        })
-    }
 
     selectBackgroundSize(value = 'auto') {
         var selectedItem = this.refs.$size.$('.selected');
@@ -183,8 +167,6 @@ export default class BackgroundSize extends BasePropertyItem {
         })
     }
 
-
-
     '@changeEditor' () {
         this.refresh()
     }
@@ -193,18 +175,11 @@ export default class BackgroundSize extends BasePropertyItem {
 
         this.read('/item/current/image', (image) => {
             if (image.backgroundSizeWidth) {
-                this.$el.$$('[data-value=width]').forEach($node => {
-                    $node.val(image.backgroundSizeWidth);
-                })
-
-                this.refs.$widthUnit.val(image.backgroundSizeWidthUnit);                
+                this.children.$width.refresh(image.backgroundSizeWidth);
             }
 
             if (image.backgroundSizeHeight) {
-                this.$el.$$('[data-value=height]').forEach($node => {
-                    $node.val(image.backgroundSizeHeight);
-                })
-                this.refs.$heightUnit.val(image.backgroundSizeHeightUnit);
+                this.children.$height.refresh(image.backgroundSizeHeight);
             }
 
             this.selectBackgroundSize(image.backgroundSize);
