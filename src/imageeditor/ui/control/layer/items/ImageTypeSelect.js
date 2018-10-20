@@ -9,7 +9,7 @@ export default class ImageTypeSelect extends BasePropertyItem {
 
     template () {
         return `
-        <div class='property-item gradient-tools'>
+        <div class='property-item gradient-tools show'>
             <div class='title' ref="$title">Change Image Types</div>
             <div class='items' ref="$items">        
                 <div class='gradient-type' ref="$gradientType">

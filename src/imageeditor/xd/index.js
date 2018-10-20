@@ -8,9 +8,7 @@ import ImageList from '../ui/layer/ImageList'
 import SubFeatureControl from '../ui/control/SubFeatureControl';
 import PropertyView from '../ui/control/layer/PropertyView';
 import ExportView from '../ui/control/ExportView';
-
-
-
+import Timeline from '../ui/control/Timeline';
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -38,7 +36,7 @@ export default class XDImageEditor extends BaseImageEditor {
                     <FeatureControl></FeatureControl>
                 </div>
                 <div class="layout-footer">
-                    <SubFeatureControl></SubFeatureControl>
+                    <Timeline></Timeline>
                 </div>
                 <ExportView></ExportView>
             </div>
@@ -55,7 +53,8 @@ export default class XDImageEditor extends BaseImageEditor {
             FeatureControl, 
             LayerList, 
             SubFeatureControl, 
-            ImageList
+            ImageList,
+            Timeline
         }
     } 
 
@@ -65,5 +64,9 @@ export default class XDImageEditor extends BaseImageEditor {
                 this.run('/item/add/page', true)
             }
         });
+    }
+
+    toggleTimeline () {
+        this.$el.toggleClass('show-timeline')
     }
 }

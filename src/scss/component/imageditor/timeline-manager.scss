@@ -1,0 +1,21 @@
+.timeline-view {
+    position: absolute;
+    box-sizing: border-box;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    display: flex; 
+    flex-direction: column;
+
+    > * {
+        flex: 1 1 auto; 
+    }
+
+    > .timeline-header {
+        flex: none;
+        height: 30px;
+        border-bottom: 1px solid $border-color;
+    }
+}

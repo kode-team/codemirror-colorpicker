@@ -171,18 +171,6 @@ var math = {
     caculateAngle: caculateAngle
 };
 
-/**
- * @method RGBtoHSV
- *
- * convert rgb to hsv
- *
- * 		color.RGBtoHSV(0, 0, 255) === { h : 240, s : 1, v : 1 } === '#FFFF00'
- *
- * @param {Number} R  red color value
- * @param {Number} G  green color value
- * @param {Number} B  blue color value
- * @return {Object}  hsv color code
- */
 function RGBtoHSV(r, g, b) {
 
     if (arguments.length == 1) {
@@ -494,18 +482,6 @@ var fromLAB = {
     LABtoXYZ: LABtoXYZ
 };
 
-/**
- * @method HSVtoRGB
- *
- * convert hsv to rgb
- *
- * 		color.HSVtoRGB(0,0,1) === #FFFFF === { r : 255, g : 0, b : 0 }
- *
- * @param {Number} H  hue color number  (min : 0, max : 360)
- * @param {Number} S  Saturation number  (min : 0, max : 1)
- * @param {Number} V  Value number 		(min : 0, max : 1 )
- * @returns {Object}
- */
 function HSVtoRGB(h, s, v) {
 
     if (arguments.length == 1) {
@@ -1123,15 +1099,6 @@ var parser = {
     color_split: color_split
 };
 
-/**
- * @deprecated 
- * 
- * instead of this,  use blend function 
- *  
- * @param {*} startColor 
- * @param {*} endColor 
- * @param {*} t 
- */
 function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
@@ -1959,7 +1926,6 @@ function crop() {
     };
 }
 
-// Image manupulate 
 function resize(dstWidth, dstHeight) {
     return function (bitmap, done) {
         var c = Canvas.drawPixels(bitmap);
@@ -2185,9 +2151,6 @@ function bitonal(darkColor, lightColor) {
     });
 }
 
-/*
- * @param {Number} amount  -100..100  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2215,10 +2178,6 @@ function brownie() {
     });
 }
 
-/**
- * 
- * @param {Number} amount from 0 to 100 
- */
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2233,10 +2192,6 @@ function clip() {
     }, { $C: $C });
 }
 
-/**
- * 
- * @param {*} amount   min = -128, max = 128 
- */
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2261,10 +2216,6 @@ function gamma() {
     }, { $C: $C });
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -2336,9 +2287,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -2422,10 +2370,6 @@ function matrix() {
     });
 }
 
-/**
- * 
- * @param {Number} amount 1..100
- */
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2469,9 +2413,6 @@ function polaroid() {
     });
 }
 
-/*
- * @param {Number} amount  -100..100 
- */
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
@@ -2491,9 +2432,6 @@ function saturation() {
     });
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2546,12 +2484,6 @@ function shift() {
     });
 }
 
-/**
- * change the relative darkness of (a part of an image) by overexposure to light.
- * @param {*} r 
- * @param {*} g 
- * @param {*} b 
- */
 function solarize(redValue, greenValue, blueValue) {
     var $redValue = parseParamNumber$1(redValue);
     var $greenValue = parseParamNumber$1(greenValue);
@@ -2611,9 +2543,6 @@ function thresholdColor() {
     });
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -2675,11 +2604,6 @@ function blur () {
     return convolution(createBlurMatrix(amount));
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4254,11 +4178,6 @@ function normal () {
     return convolution$1([0, 0, 0, 0, 1, 0, 0, 0, 0]);
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4266,10 +4185,6 @@ function emboss$1() {
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4386,9 +4301,6 @@ function bitonal$1(darkColor, lightColor) {
     return shader('\n        if ((pixelColor.r + pixelColor.g + pixelColor.b) > ' + checkVlue + ') {\n            outColor = vec4(' + lightColorString + '.rgb, pixelColor.a);\n        } else {\n            outColor = vec4(' + darkColorString + '.rgb, pixelColor.a);\n        }\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4426,9 +4338,6 @@ function brownie$1() {
     return matrix$3(0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount 0..1
- */
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4445,9 +4354,6 @@ function chaos() {
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..1
- */
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4456,9 +4362,6 @@ function contrast$2() {
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4467,10 +4370,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$2() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -4518,10 +4417,6 @@ function gradient$2() {
     return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4533,9 +4428,6 @@ function grayscale$1() {
 }
 
 //http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-/*
- * @param {Number} amount  0..1  ,  (real value 0..360)
- */
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4557,10 +4449,6 @@ function kodachrome$1() {
     return matrix$3(1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4571,10 +4459,6 @@ function noise$1() {
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4588,9 +4472,6 @@ function polaroid$1() {
     return matrix$3(1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4599,9 +4480,6 @@ function saturation$1() {
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4649,9 +4527,6 @@ function thresholdColor$1() {
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold$1() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -4659,12 +4534,6 @@ function threshold$1() {
   return thresholdColor$1(scale, amount, false);
 }
 
-/**
- * 
- * @param {*} redTint  0..1
- * @param {*} greenTint 0..1
- * @param {*} blueTint 0..1
- */
 function tint$1 () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -9716,11 +9585,19 @@ var ImageManager = function (_BaseModule) {
     }, {
         key: '*/image/toBackgroundSizeString',
         value: function imageToBackgroundSizeString($store, image) {
-            if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
-                return [image.backgroundSizeWidth, image.backgroundSizeHeight].join(' ');
+
+            var widthUnit = image.backgroundSizeWidthUnit || 'px';
+            var heightUnit = image.backgroundSizeHeightUnit || 'px';
+
+            if (image.backgroundSize == 'contain' || image.backgroundSize == 'cover') {
+                return image.backgroundSize;
+            } else if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
+                return [image.backgroundSizeWidth + widthUnit, image.backgroundSizeHeight + heightUnit].join(' ');
             } else if (image.backgroundSizeWidth) {
-                return image.backgroundSizeWidth;
+                return image.backgroundSizeWidth + widthUnit;
             }
+
+            return 'auto';
         }
     }, {
         key: '*/image/toBackgroundRepeatString',
@@ -10447,6 +10324,10 @@ var IMAGE_DEFAULT_OBJECT = {
     visible: true,
     backgroundRepeat: null,
     backgroundSize: null,
+    backgroundSizeWidth: 0,
+    backgroundSizeHeight: 0,
+    backgroundSizeWidthUnit: 'px',
+    backgroundSizeHeightUnit: 'px',
     backgroundOrigin: null,
     backgroundPosition: null,
     backgroundColor: null,
@@ -12298,7 +12179,7 @@ var SampleList = function (_BasePropertyItem) {
     createClass(SampleList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item sample-list'>\n                <div class='title' ref=\"$title\">Change Image</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item sample-list show'>\n                <div class='title' ref=\"$title\">Change Image</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -12710,7 +12591,7 @@ var ImageTypeSelect = function (_BasePropertyItem) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class=\'property-item gradient-tools\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n                <div ref="$angular" class=\'gradient-angular linear\'>\n                    <div class="gradient-angular-item radial">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>\n                    </div>\n                    <div class="gradient-angular-item image">\n                        \n                    </div>                \n                </div>\n            </div>\n        </div>\n\n          \n        ';
+            return '\n        <div class=\'property-item gradient-tools show\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n                <div ref="$angular" class=\'gradient-angular linear\'>\n                    <div class="gradient-angular-item radial">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>\n                    </div>\n                    <div class="gradient-angular-item image">\n                        \n                    </div>                \n                </div>\n            </div>\n        </div>\n\n          \n        ';
         }
     }, {
         key: 'refresh',
@@ -12990,66 +12871,121 @@ var BackgroundSize = function (_BasePropertyItem) {
     createClass(BackgroundSize, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background-size\'>\n                <div class=\'title\' ref="$title">Background Size</div>            \n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div>\n                            <button type="button" ref="$contain">Contain</button>\n                            <button type="button" ref="$cover">Cover</button>\n                            <button type="button" ref="$auto">Auto</button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <div>\n                            <input type="text" ref="$width" />\n                            <select ref="$widthSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </select>\n                        </div>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <div>\n                            <input type="text" ref="$height" />\n                            <select ref="$heightSelect">\n                                <option value=\'%\'>%</option>\n                                <option value=\'px\'>px</option>\n                            </select>\n                        </div>                        \n                    </div>\n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background\'>\n                <div class=\'title\' ref="$title">Background</div>            \n                <div class=\'items\'>\n                    <div>\n                        <label>size</label>\n                        <div class=\'size-list\' ref="$size">\n                            <button type="button" value="contain" title="contain" ></button>\n                            <button type="button" value="cover" title="cover"></button>\n                            <button type="button" value="auto" title="auto"></button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <div>\n                            <input type="range" min="0" max="1000" step="1" value="0" data-value="width" />\n                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="width" />\n                            <select ref="$widthUnit">\n                                <option value=\'px\'>px</option>                            \n                                <option value=\'%\'>%</option>\n                                <option value=\'em\'>em</option>\n                            </select>\n                        </div>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <div>\n                            <input type="range" min="0" max="1000" step="1"  value="0" data-value="height" />\n                            <input type="number" min="0" max="1000" step="1"  value="0" data-value="height" />\n                            <select ref="$heightUnit">\n                                <option value=\'px\'>px</option>                            \n                                <option value=\'%\'>%</option>\n                                <option value=\'em\'>em</option>\n                                <option value=\'auto\'>auto</option>                                \n                            </select>\n                        </div>                        \n                    </div>\n                    <div>\n                        <label>repeat</label>\n                        <div class=\'flex repeat-list\' ref="$repeat">\n                            <button type="button" value=\'no-repeat\' title="no-repeat">\n                                <span></span>\n                            </button>                        \n                            <button type="button" value=\'repeat\' title="repeat">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'repeat-x\' title="repeat-x">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'repeat-y\' title="repeat-y">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type="button" value=\'space\' title="space">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                \n                            </button>\n                            <button type="button" value=\'round\' title="round">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                                                \n                            </button>                            \n                            \n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ';
         }
     }, {
-        key: 'click $contain',
-        value: function click$contain() {
+        key: 'input $el input[type=range][data-value]',
+        value: function input$elInputTypeRangeDataValue(e) {
+            var target = e.$delegateTarget.attr('data-value');
+            var value = e.$delegateTarget.val();
+            var obj = this.$el.$('input[type=number][data-value=' + target + ']');
+            if (obj) {
+                obj.val(value);
+            }
+        }
+    }, {
+        key: 'input $el input[type=number][data-value]',
+        value: function input$elInputTypeNumberDataValue(e) {
+            var target = e.$delegateTarget.attr('data-value');
+            var value = e.$delegateTarget.val();
+            var obj = this.$el.$('input[type=range][data-value=' + target + ']');
+            if (obj) {
+                obj.val(value);
+            }
+        }
+    }, {
+        key: 'click $size button',
+        value: function click$sizeButton(e) {
             var _this2 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSize = 'contain';
+                image.backgroundSize = e.$delegateTarget.val();
+                _this2.selectBackgroundSize(image.backgroundSize);
                 _this2.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'click $cover',
-        value: function click$cover() {
+        key: 'change $widthUnit',
+        value: function change$widthUnit(e) {
             var _this3 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSize = 'cover';
+                image.backgroundSizeWidthUnit = e.$delegateTarget.val();
                 _this3.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'click $auto',
-        value: function click$auto() {
+        key: 'change $heightUnit',
+        value: function change$heightUnit() {
             var _this4 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSize = 'auto';
+                image.backgroundSizeHeightUnit = e.$delegateTarget.val();
                 _this4.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'change $widthSelect',
-        value: function change$widthSelect() {
-            this.refs.$width.val(this.refs.$widthSelect.val());
-        }
-    }, {
-        key: 'change $heightSelect',
-        value: function change$heightSelect() {
-            this.refs.$height.val(this.refs.$heightSelect.val());
-        }
-    }, {
-        key: 'input $width',
-        value: function input$width(e) {
+        key: 'input $el [data-value=width]',
+        value: function input$elDataValueWidth(e) {
             var _this5 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeWidth = _this5.refs.$width.val();
+                image.backgroundSizeWidth = e.$delegateTarget.val();
                 _this5.dispatch('/item/set', image);
             });
         }
     }, {
-        key: 'input $height',
-        value: function input$height(e) {
+        key: 'input $el [data-value=height]',
+        value: function input$elDataValueHeight(e) {
             var _this6 = this;
 
             this.read('/item/current/image', function (image) {
-                image.backgroundSizeHeight = _this6.refs.$height.val();
+                image.backgroundSizeHeight = e.$delegateTarget.val();
                 _this6.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'selectBackgroundSize',
+        value: function selectBackgroundSize() {
+            var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'auto';
+
+            var selectedItem = this.refs.$size.$('.selected');
+            if (selectedItem) selectedItem.removeClass('selected');
+
+            if (!['contain', 'cover', 'auto'].includes(value)) {
+                value = 'auto';
+            }
+
+            var item = this.refs.$size.$('[value=' + value + ']');
+
+            if (item) {
+                item.addClass('selected');
+            }
+        }
+    }, {
+        key: 'selectBackgroundRepeat',
+        value: function selectBackgroundRepeat(value) {
+            var selectedItem = this.refs.$repeat.$('.selected');
+            if (selectedItem) selectedItem.removeClass('selected');
+
+            var item = this.refs.$repeat.$('[value=' + value + ']');
+
+            if (item) {
+                item.addClass('selected');
+            }
+        }
+    }, {
+        key: 'click $repeat button',
+        value: function click$repeatButton(e) {
+            var _this7 = this;
+
+            this.read('/item/current/image', function (image) {
+
+                image.backgroundRepeat = e.$delegateTarget.val();
+
+                _this7.selectBackgroundRepeat(image.backgroundRepeat);
+
+                _this7.dispatch('/item/set', image);
             });
         }
     }, {
@@ -13060,16 +12996,26 @@ var BackgroundSize = function (_BasePropertyItem) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            var _this7 = this;
+            var _this8 = this;
 
             this.read('/item/current/image', function (image) {
                 if (image.backgroundSizeWidth) {
-                    _this7.refs.$width.val(image.backgroundSizeWidth);
+                    _this8.$el.$$('[data-value=width]').forEach(function ($node) {
+                        $node.val(image.backgroundSizeWidth);
+                    });
+
+                    _this8.refs.$widthUnit.val(image.backgroundSizeWidthUnit);
                 }
 
                 if (image.backgroundSizeHeight) {
-                    _this7.refs.$height.val(image.backgroundSizeHeight);
+                    _this8.$el.$$('[data-value=height]').forEach(function ($node) {
+                        $node.val(image.backgroundSizeHeight);
+                    });
+                    _this8.refs.$heightUnit.val(image.backgroundSizeHeightUnit);
                 }
+
+                _this8.selectBackgroundSize(image.backgroundSize);
+                _this8.selectBackgroundRepeat(image.backgroundRepeat);
             });
         }
     }]);
@@ -13693,7 +13639,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>                \n                <ColorSampleList></ColorSampleList>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n                <BackgroundSize></BackgroundSize>\n                <BackgroundRepeat></BackgroundRepeat>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>                \n                <ColorSampleList></ColorSampleList>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15154,6 +15100,103 @@ var MoveGuide = function (_UIElement) {
     return MoveGuide;
 }(UIElement);
 
+var ImageView$2 = function (_UIElement) {
+    inherits(ImageView, _UIElement);
+
+    function ImageView() {
+        classCallCheck(this, ImageView);
+        return possibleConstructorReturn(this, (ImageView.__proto__ || Object.getPrototypeOf(ImageView)).apply(this, arguments));
+    }
+
+    createClass(ImageView, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-view'>\n\n            </div>  \n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return items;
+        }
+    }]);
+    return ImageView;
+}(UIElement);
+
+var SubFeatureControl = function (_UIElement) {
+    inherits(SubFeatureControl, _UIElement);
+
+    function SubFeatureControl() {
+        classCallCheck(this, SubFeatureControl);
+        return possibleConstructorReturn(this, (SubFeatureControl.__proto__ || Object.getPrototypeOf(SubFeatureControl)).apply(this, arguments));
+    }
+
+    createClass(SubFeatureControl, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n\n                    </div>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return _extends({ ImageSubView: ImageView$2 }, items);
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+            this.refs.$linear.toggleClass('hide', !this.isLinearShow());
+            this.refs.$radial.toggleClass('hide', !this.isRadialShow());
+        }
+    }, {
+        key: "isShow",
+        value: function isShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+            var image = this.read('/item/current/image');
+
+            if (!image) {
+                return false;
+            }
+
+            return true;
+        }
+    }, {
+        key: "isLinearShow",
+        value: function isLinearShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            if (!this.read('/image/type/isLinear', item.type)) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: "isRadialShow",
+        value: function isRadialShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var item = this.read('/item/current/image');
+            if (!item) return false;
+
+            if (!this.read('/image/type/isRadial', item.type)) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }]);
+    return SubFeatureControl;
+}(UIElement);
+
 var GradientView = function (_BaseTab) {
     inherits(GradientView, _BaseTab);
 
@@ -15165,12 +15208,13 @@ var GradientView = function (_BaseTab) {
     createClass(GradientView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n\n                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                <GradientPosition></GradientPosition>\n                <GradientAngle></GradientAngle>     \n   \n            </div>\n        ';
+            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n \n                <SubFeatureControl></SubFeatureControl>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
+                SubFeatureControl: SubFeatureControl,
                 MoveGuide: MoveGuide,
                 GradientAngle: GradientAngle,
                 GradientPosition: GradientPosition,
@@ -15310,11 +15354,10 @@ var GradientView = function (_BaseTab) {
             this.dispatch('/item/select', this.layer.id);
         }
     }, {
-        key: 'change',
-        value: function change() {
+        key: 'changePosition',
+        value: function changePosition() {
             var style1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var style2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
 
             var style = Object.assign({}, style1, style2);
 
@@ -15354,7 +15397,7 @@ var GradientView = function (_BaseTab) {
             var x = this.moveX + dx;
             var y = this.moveY + dy;
 
-            this.change({ x: x, y: y });
+            this.changePosition({ x: x, y: y });
         }
     }, {
         key: 'pointermove document',
@@ -15369,9 +15412,11 @@ var GradientView = function (_BaseTab) {
     }, {
         key: 'pointerend document',
         value: function pointerendDocument(e) {
-            this.isDown = false;
-            this.layer = null;
-            this.refs.$page.removeClass('moving');
+            if (this.isDown) {
+                this.isDown = false;
+                this.layer = null;
+                this.refs.$page.removeClass('moving');
+            }
         }
     }, {
         key: 'dragover',
@@ -15598,60 +15643,6 @@ var ImageList = function (_UIElement) {
     return ImageList;
 }(UIElement);
 
-var ImageView$2 = function (_UIElement) {
-    inherits(ImageView, _UIElement);
-
-    function ImageView() {
-        classCallCheck(this, ImageView);
-        return possibleConstructorReturn(this, (ImageView.__proto__ || Object.getPrototypeOf(ImageView)).apply(this, arguments));
-    }
-
-    createClass(ImageView, [{
-        key: "template",
-        value: function template() {
-            return "\n            <div class='property-view'>\n\n            </div>  \n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return items;
-        }
-    }]);
-    return ImageView;
-}(UIElement);
-
-var SubFeatureControl = function (_UIElement) {
-    inherits(SubFeatureControl, _UIElement);
-
-    function SubFeatureControl() {
-        classCallCheck(this, SubFeatureControl);
-        return possibleConstructorReturn(this, (SubFeatureControl.__proto__ || Object.getPrototypeOf(SubFeatureControl)).apply(this, arguments));
-    }
-
-    createClass(SubFeatureControl, [{
-        key: "template",
-        value: function template() {
-            return "\n            <div class='sub-feature-control'>         \n                <div class='feature selected image-feature' data-type='image'>\n                    <ImageSubView></ImageSubView>\n                </div>\n            </div>\n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return { ImageSubView: ImageView$2 };
-        }
-    }, {
-        key: "refresh",
-        value: function refresh() {
-            // this.$el.toggleClass('show', this.read('/item/is/mode', 'image'));
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            // this.refresh();
-        }
-    }]);
-    return SubFeatureControl;
-}(UIElement);
-
 var PropertyView = function (_UIElement) {
     inherits(PropertyView, _UIElement);
 
@@ -15759,6 +15750,28 @@ var ExportView = function (_UIElement) {
     return ExportView;
 }(UIElement);
 
+var Timeline = function (_UIElement) {
+    inherits(Timeline, _UIElement);
+
+    function Timeline() {
+        classCallCheck(this, Timeline);
+        return possibleConstructorReturn(this, (Timeline.__proto__ || Object.getPrototypeOf(Timeline)).apply(this, arguments));
+    }
+
+    createClass(Timeline, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='timeline-view'>\n                <div class=\"timeline-header\" ref=\"$header\">\n                    Timeline\n                </div>\n                <div class='timeline-body\"></div>\n            </div>\n        ";
+        }
+    }, {
+        key: 'click $header',
+        value: function click$header() {
+            this.parent.toggleTimeline();
+        }
+    }]);
+    return Timeline;
+}(UIElement);
+
 var XDImageEditor = function (_BaseImageEditor) {
     inherits(XDImageEditor, _BaseImageEditor);
 
@@ -15770,7 +15783,7 @@ var XDImageEditor = function (_BaseImageEditor) {
     createClass(XDImageEditor, [{
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <SubFeatureControl></SubFeatureControl>\n                </div>\n                <ExportView></ExportView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -15784,7 +15797,8 @@ var XDImageEditor = function (_BaseImageEditor) {
                 FeatureControl: FeatureControl,
                 LayerList: LayerList,
                 SubFeatureControl: SubFeatureControl,
-                ImageList: ImageList
+                ImageList: ImageList,
+                Timeline: Timeline
             };
         }
     }, {
@@ -15797,6 +15811,11 @@ var XDImageEditor = function (_BaseImageEditor) {
                     _this2.run('/item/add/page', true);
                 }
             });
+        }
+    }, {
+        key: 'toggleTimeline',
+        value: function toggleTimeline() {
+            this.$el.toggleClass('show-timeline');
         }
     }]);
     return XDImageEditor;

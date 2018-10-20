@@ -13,6 +13,7 @@ import {
     EDITOR_MODE_IMAGE_STATIC 
 } from '../../../module/ItemManager';
 import MoveGuide from '../../view/MoveGuide';
+import SubFeatureControl from '../SubFeatureControl';
    
 
 export default class GradientView extends BaseTab {
@@ -31,18 +32,15 @@ export default class GradientView extends BaseTab {
                         <MoveGuide></MoveGuide>                          
                     </div>          
                 </div>
-
-                <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>
-                <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
-                <GradientPosition></GradientPosition>
-                <GradientAngle></GradientAngle>     
-   
+ 
+                <SubFeatureControl></SubFeatureControl>
             </div>
         `
     } 
 
     components () {
         return {  
+            SubFeatureControl,
             MoveGuide,
             GradientAngle, 
             GradientPosition, 
@@ -174,8 +172,7 @@ export default class GradientView extends BaseTab {
         this.dispatch('/item/select', this.layer.id)
     }
 
-    change (style1 = {}, style2 = {}) {
-
+    changePosition (style1 = {}, style2 = {}) {
         let style = Object.assign({}, style1, style2);
 
         Object.keys(style).forEach(key => {
@@ -213,7 +210,7 @@ export default class GradientView extends BaseTab {
         var x = this.moveX + dx; 
         var y = this.moveY + dy; 
 
-        this.change({x, y})
+        this.changePosition({x, y})
     }    
 
 
@@ -227,9 +224,11 @@ export default class GradientView extends BaseTab {
     }
 
     'pointerend document' (e) {
-        this.isDown = false; 
-        this.layer = null;
-        this.refs.$page.removeClass('moving');        
+        if (this.isDown) {
+            this.isDown = false; 
+            this.layer = null;
+            this.refs.$page.removeClass('moving');        
+        }
     }
 
     'dragover' (e) {

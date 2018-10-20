@@ -1,0 +1,186 @@
+$pointer-color: rgba(#ececec, 0.8);
+$direction-border: 2px solid $pointer-color;
+$page-item-height: 35px;
+$button-size: 24px;
+$layer-item-padding: 4px;
+
+.sub-feature-control {
+    position: absolute;
+    bottom: 10px;
+    left : 10px;
+    height: 150px;
+    right: 10px;
+
+    > .feature {
+        height: 100%;
+        text-align: left;
+
+        > .property-view {
+            position: relative;
+            height: 100%;
+            width: 240px;
+            background-color: rgba(0, 0, 0, 0.2);     
+            display: inline-block;
+            vertical-align: middle;   
+            
+            &.hide {
+                display: none;
+            }
+
+            > .property-item {
+                border: 0px;
+
+                > .title {
+                    text-align: left; 
+                    background-image: none;
+                    border: 0px;
+                    color: rgba(255, 255, 255, 0.7);
+                    height: 20px;
+                }
+
+                > .items {
+                    display: block;
+
+                    > div {
+                        > label {
+                            width: 50px;
+
+                            &+ div {
+                                display: flex; 
+                                button, input {
+                                    padding-left: 0px;
+                                    padding-right: 0px;
+                                    border: 1px solid $border-color; 
+                                    appearance: none;
+                                    flex: 1;
+                                    border-radius: 0px;
+                                }
+
+                                input[type=number] {
+                                    flex: none !important;
+                                     width: 40px;  
+                                }
+
+                                input[type=range] {
+                                    flex: none !important;
+                                    width: 80px;
+                                    margin-right: 10px;  
+                                }
+
+
+                                select {
+                                    width: 30px;
+                                    flex: none; 
+                                    appearance: none;
+                                    border-radius: 0px;                                    
+                                }
+                            }
+                        }
+   
+                    }
+
+
+                    .size-list {
+                        display: flex; 
+                        width: 120px;
+
+                        > button {
+                            flex: 1; 
+                            outline:none;
+                            cursor: pointer;
+                            box-sizing: border-box;
+                            height: 30px;
+                            position: relative;
+
+                            &:after {
+                                content: attr(title);
+                                font-size: 8px;
+                                color: black;
+                            }
+
+                            &.selected {
+                                border: 1px solid black; 
+                            }
+                        }
+                    }
+
+                    .repeat-list {
+                        display: flex; 
+                        width: 180px;
+
+                        > button {
+                            flex: 1; 
+                            outline:none;
+                            cursor: pointer;
+                            height: 30px;
+                            position: relative;
+                            box-sizing: border-box;
+
+                            &.selected {
+                                border: 1px solid black; 
+                            }
+
+                            span {
+                                position: absolute;
+                                display: inline-block;
+                                width: 4px;
+                                height: 4px; 
+                                background-color: black; 
+                                pointer-events: none;
+                            }
+
+                            &[value="no-repeat"] {
+
+                                span {
+                                    top : 50%;
+                                    left : 50%;
+                                    transform: translateX(-50%) translateY(-50%);
+                                }
+                            }
+
+                            &[value="repeat"] {
+                                span:nth-child(1) { top : 5px; left : 5px; }
+                                span:nth-child(2) { top : 5px; left : 20px; }
+                                span:nth-child(3) { top : 20px; left : 5px; }
+                                span:nth-child(4) { top : 20px; left : 20px; }
+                            }
+
+                            &[value="repeat-x"] {
+                                span:nth-child(1) { top : 15px; left : 5px; transform: translateX(-50%) translateY(-50%); }
+                                span:nth-child(2) { top : 15px; left : 14px; transform: translateX(-50%) translateY(-50%); }
+                                span:nth-child(3) { top : 15px; left : 24px; transform: translateX(-50%) translateY(-50%); }
+                            }
+
+                            &[value="repeat-y"] {
+                                span:nth-child(1) { top : 4px; left : 15px; transform: translateX(-50%) translateY(-50%);}
+                                span:nth-child(2) { top : 14px; left : 15px; transform: translateX(-50%) translateY(-50%);}
+                                span:nth-child(3) { top : 24px; left : 15px; transform: translateX(-50%) translateY(-50%);}
+                            }
+
+                            &[value="space"] {
+                                span:nth-child(1) { top : 0px; left : 0px; width: 9px; height: 9px;}
+                                span:nth-child(2) { top : 0px; left : 10px; width: 9px; height: 9px;}
+                                span:nth-child(3) { top : 0px; left : 20px; width: 9px; height: 9px;}
+                                span:nth-child(4) { top : 20px; left : 0px; width: 9px; height: 9px;}
+                                span:nth-child(5) { top : 20px; left : 10px; width: 9px; height: 9px;}
+                                span:nth-child(6) { top : 20px; left : 20px; width: 9px; height: 9px;}
+                            }                            
+
+                            &[value="round"] {
+                                span:nth-child(1) { top : 0px; left : 0px; width: 9px; height: 6px;}
+                                span:nth-child(2) { top : 0px; left : 10px; width: 9px; height: 6px;}
+                                span:nth-child(3) { top : 0px; left : 20px; width: 9px; height: 6px;}
+                                span:nth-child(4) { top : 10px; left : 0px; width: 9px; height: 6px;}
+                                span:nth-child(5) { top : 10px; left : 10px; width: 9px; height: 6px;}
+                                span:nth-child(6) { top : 10px; left : 20px; width: 9px; height: 6px;}                                
+                                span:nth-child(7) { top : 22px; left : 0px; width: 9px; height: 6px;}
+                                span:nth-child(8) { top : 22px; left : 10px; width: 9px; height: 6px;}
+                                span:nth-child(9) { top : 22px; left : 20px; width: 9px; height: 6px;}
+                            }                                                        
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -6,7 +6,9 @@ $gutter: 8px;
 $tool-size: 40px;
 $right-size: 275px;
 $left-size: 250px;
-$timeline-size: 200px;
+$timeline-header-size: 30px;
+$timeline-size: 300px;
+$show-timeline-animation: all 0.3s linear; 
 
 .layout-main {
     position: absolute;
@@ -14,6 +16,18 @@ $timeline-size: 200px;
     top: 0px;
     right: 0px;
     bottom: 0px; 
+
+    &.show-timeline {
+        .layout-left, .layout-right, .layout-body {
+            bottom: $timeline-size;
+        }
+
+        .layout-footer {
+            height: $timeline-size;
+        }
+
+
+    }
 
     .layout-top {
         position: absolute;
@@ -32,12 +46,12 @@ $timeline-size: 200px;
         left: $left-size;
         width: $left-size;
         top: $tool-size * 2;
-        bottom: $timeline-size;
+        bottom: $timeline-header-size;
         overflow: auto;
-        z-index: 1;         
         box-sizing: border-box;
         border-right: 1px solid $border-color;
         border-left: 1px solid $border-color;
+        transition: $show-timeline-animation;
     }
 
     .layout-left {
@@ -45,13 +59,9 @@ $timeline-size: 200px;
         left: 0px;
         width: $left-size;
         top: $tool-size * 2;
-        bottom: $timeline-size;
-        // background-color: rgba(gray, 0.5);
-        z-index: 1; 
-        // background-color: white; 
-        // border-right: 1px solid $border-color;
+        bottom: $timeline-header-size;
         box-sizing: border-box;
-
+        transition: $show-timeline-animation;
     }    
 
     .layout-body {
@@ -59,7 +69,8 @@ $timeline-size: 200px;
         left: $left-size * 2;
         right: 0px;
         top: $tool-size * 2;  
-        bottom: $timeline-size;
+        bottom: $timeline-header-size;
+        transition: $show-timeline-animation;        
     }
 
     .layout-header {
@@ -99,11 +110,12 @@ $timeline-size: 200px;
         position: absolute;
         left: 0px;
         right: 0px;
-        height: $timeline-size;
+        height: $timeline-header-size;
         bottom: 0px;
         z-index: 0; 
         overflow: hidden; 
-        border-top: 1px solid $border-color;        
+        border-top: 1px solid $border-color;      
+        transition: $show-timeline-animation;  
     }
 
 }
@@ -115,6 +127,8 @@ $timeline-size: 200px;
 @import './layer-manager.scss';
 @import './images.scss';
 @import './feature-manager.scss';
+@import './sub-feature-manager.scss';
+@import './timeline-manager.scss';
 @import './gradient-types.scss';
 @import './layers-menu.scss';
 @import './layer-preview.scss';

@@ -925,6 +925,10 @@
     top: 0px;
     right: 0px;
     bottom: 0px; }
+    .imageeditor .layout-main.show-timeline .layout-left, .imageeditor .layout-main.show-timeline .layout-right, .imageeditor .layout-main.show-timeline .layout-body {
+      bottom: 300px; }
+    .imageeditor .layout-main.show-timeline .layout-footer {
+      height: 300px; }
     .imageeditor .layout-main .layout-top {
       position: absolute;
       left: 0px;
@@ -940,28 +944,32 @@
       left: 250px;
       width: 250px;
       top: 80px;
-      bottom: 200px;
+      bottom: 30px;
       overflow: auto;
-      z-index: 1;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border-right: 1px solid #c7c7c7;
-      border-left: 1px solid #c7c7c7; }
+      border-left: 1px solid #c7c7c7;
+      -webkit-transition: all 0.3s linear;
+      transition: all 0.3s linear; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
       width: 250px;
       top: 80px;
-      bottom: 200px;
-      z-index: 1;
+      bottom: 30px;
       -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
+              box-sizing: border-box;
+      -webkit-transition: all 0.3s linear;
+      transition: all 0.3s linear; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
       left: 500px;
       right: 0px;
       top: 80px;
-      bottom: 200px; }
+      bottom: 30px;
+      -webkit-transition: all 0.3s linear;
+      transition: all 0.3s linear; }
     .imageeditor .layout-main .layout-header {
       position: absolute;
       left: 0px;
@@ -1000,15 +1008,17 @@
       position: absolute;
       left: 0px;
       right: 0px;
-      height: 200px;
+      height: 30px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
-      border-top: 1px solid #c7c7c7; }
+      border-top: 1px solid #c7c7c7;
+      -webkit-transition: all 0.3s linear;
+      transition: all 0.3s linear; }
   .imageeditor [type='range'] {
     -webkit-appearance: none;
     background: transparent;
-    margin: 6px 0;
+    margin: 5px 0;
     width: 95%; }
     .imageeditor [type='range']::-moz-focus-outer {
       border: 0; }
@@ -1038,10 +1048,10 @@
       border: 0px solid #eceff1;
       border-radius: 10px;
       cursor: default;
-      height: 12px;
-      width: 12px;
+      height: 10px;
+      width: 10px;
       -webkit-appearance: none;
-      margin-top: -6.5px; }
+      margin-top: -5.5px; }
     .imageeditor [type='range']::-moz-range-track {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
       cursor: default;
@@ -1059,8 +1069,8 @@
       border: 0px solid #eceff1;
       border-radius: 10px;
       cursor: default;
-      height: 8px;
-      width: 8px; }
+      height: 6px;
+      width: 6px; }
     .imageeditor [type='range']::-ms-track {
       cursor: default;
       height: 1px;
@@ -1069,7 +1079,7 @@
       width: 95%;
       background: transparent;
       border-color: transparent;
-      border-width: 6px 0;
+      border-width: 5px 0;
       color: transparent; }
     .imageeditor [type='range']::-ms-fill-lower {
       box-shadow: 0px 0px 0px transparent, 0 0 0px rgba(13, 13, 13, 0);
@@ -1087,8 +1097,8 @@
       border: 0px solid #eceff1;
       border-radius: 10px;
       cursor: default;
-      height: 8px;
-      width: 8px;
+      height: 6px;
+      width: 6px;
       margin-top: 0.25px; }
     .imageeditor [type='range']:disabled::-webkit-slider-thumb {
       cursor: not-allowed; }
@@ -1563,27 +1573,261 @@
       top: 620px; }
   .imageeditor .sub-feature-control {
     position: absolute;
-    top: 0px;
+    bottom: 10px;
+    left: 10px;
+    height: 150px;
+    right: 10px; }
+    .imageeditor .sub-feature-control > .feature {
+      height: 100%;
+      text-align: left; }
+      .imageeditor .sub-feature-control > .feature > .property-view {
+        position: relative;
+        height: 100%;
+        width: 240px;
+        background-color: rgba(0, 0, 0, 0.2);
+        display: inline-block;
+        vertical-align: middle; }
+        .imageeditor .sub-feature-control > .feature > .property-view.hide {
+          display: none; }
+        .imageeditor .sub-feature-control > .feature > .property-view > .property-item {
+          border: 0px; }
+          .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .title {
+            text-align: left;
+            background-image: none;
+            border: 0px;
+            color: rgba(255, 255, 255, 0.7);
+            height: 20px; }
+          .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items {
+            display: block; }
+            .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label {
+              width: 50px; }
+              .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div button, .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input {
+                  padding-left: 0px;
+                  padding-right: 0px;
+                  border: 1px solid #c7c7c7;
+                  -webkit-appearance: none;
+                     -moz-appearance: none;
+                          appearance: none;
+                  -webkit-box-flex: 1;
+                      -ms-flex: 1;
+                          flex: 1;
+                  border-radius: 0px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input[type=number] {
+                  -webkit-box-flex: 0 !important;
+                      -ms-flex: none !important;
+                          flex: none !important;
+                  width: 40px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div input[type=range] {
+                  -webkit-box-flex: 0 !important;
+                      -ms-flex: none !important;
+                          flex: none !important;
+                  width: 80px;
+                  margin-right: 10px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items > div > label + div select {
+                  width: 30px;
+                  -webkit-box-flex: 0;
+                      -ms-flex: none;
+                          flex: none;
+                  -webkit-appearance: none;
+                     -moz-appearance: none;
+                          appearance: none;
+                  border-radius: 0px; }
+            .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list {
+              display: -webkit-box;
+              display: -ms-flexbox;
+              display: flex;
+              width: 120px; }
+              .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button {
+                -webkit-box-flex: 1;
+                    -ms-flex: 1;
+                        flex: 1;
+                outline: none;
+                cursor: pointer;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+                height: 30px;
+                position: relative; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button:after {
+                  content: attr(title);
+                  font-size: 8px;
+                  color: black; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button.selected {
+                  border: 1px solid black; }
+            .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list {
+              display: -webkit-box;
+              display: -ms-flexbox;
+              display: flex;
+              width: 180px; }
+              .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button {
+                -webkit-box-flex: 1;
+                    -ms-flex: 1;
+                        flex: 1;
+                outline: none;
+                cursor: pointer;
+                height: 30px;
+                position: relative;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button.selected {
+                  border: 1px solid black; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button span {
+                  position: absolute;
+                  display: inline-block;
+                  width: 4px;
+                  height: 4px;
+                  background-color: black;
+                  pointer-events: none; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="no-repeat"] span {
+                  top: 50%;
+                  left: 50%;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat"] span:nth-child(1) {
+                  top: 5px;
+                  left: 5px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat"] span:nth-child(2) {
+                  top: 5px;
+                  left: 20px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat"] span:nth-child(3) {
+                  top: 20px;
+                  left: 5px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat"] span:nth-child(4) {
+                  top: 20px;
+                  left: 20px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-x"] span:nth-child(1) {
+                  top: 15px;
+                  left: 5px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-x"] span:nth-child(2) {
+                  top: 15px;
+                  left: 14px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-x"] span:nth-child(3) {
+                  top: 15px;
+                  left: 24px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-y"] span:nth-child(1) {
+                  top: 4px;
+                  left: 15px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-y"] span:nth-child(2) {
+                  top: 14px;
+                  left: 15px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="repeat-y"] span:nth-child(3) {
+                  top: 24px;
+                  left: 15px;
+                  -webkit-transform: translateX(-50%) translateY(-50%);
+                          transform: translateX(-50%) translateY(-50%); }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(1) {
+                  top: 0px;
+                  left: 0px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(2) {
+                  top: 0px;
+                  left: 10px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(3) {
+                  top: 0px;
+                  left: 20px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(4) {
+                  top: 20px;
+                  left: 0px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(5) {
+                  top: 20px;
+                  left: 10px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="space"] span:nth-child(6) {
+                  top: 20px;
+                  left: 20px;
+                  width: 9px;
+                  height: 9px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(1) {
+                  top: 0px;
+                  left: 0px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(2) {
+                  top: 0px;
+                  left: 10px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(3) {
+                  top: 0px;
+                  left: 20px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(4) {
+                  top: 10px;
+                  left: 0px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(5) {
+                  top: 10px;
+                  left: 10px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(6) {
+                  top: 10px;
+                  left: 20px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(7) {
+                  top: 22px;
+                  left: 0px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(8) {
+                  top: 22px;
+                  left: 10px;
+                  width: 9px;
+                  height: 6px; }
+                .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(9) {
+                  top: 22px;
+                  left: 20px;
+                  width: 9px;
+                  height: 6px; }
+  .imageeditor .timeline-view {
+    position: absolute;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
     left: 0px;
     right: 0px;
+    top: 0px;
     bottom: 0px;
-    -webkit-transition: all 0.1s linear;
-    transition: all 0.1s linear; }
-    .imageeditor .sub-feature-control .image-feature .property-view {
-      border-bottom: 0px;
-      border-top: 0px; }
-      .imageeditor .sub-feature-control .image-feature .property-view .property-item {
-        border: 0px; }
-        .imageeditor .sub-feature-control .image-feature .property-view .property-item > .title {
-          display: inline-block;
-          vertical-align: middle; }
-        .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items {
-          display: inline-block;
-          vertical-align: middle; }
-          .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items .gradient-sample-list {
-            min-height: auto; }
-          .imageeditor .sub-feature-control .image-feature .property-view .property-item > .items > div label {
-            margin-right: 10px; }
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+    .imageeditor .timeline-view > * {
+      -webkit-box-flex: 1;
+          -ms-flex: 1 1 auto;
+              flex: 1 1 auto; }
+    .imageeditor .timeline-view > .timeline-header {
+      -webkit-box-flex: 0;
+          -ms-flex: none;
+              flex: none;
+      height: 30px;
+      border-bottom: 1px solid #c7c7c7; }
   .imageeditor .gradient-type {
     display: inline-block;
     vertical-align: top; }
@@ -1915,10 +2159,10 @@
       display: none;
       text-align: center;
       position: absolute;
-      bottom: 10px;
-      width: 130px;
-      height: 130px;
-      right: 10px;
+      bottom: 0px;
+      width: 100%;
+      height: 100%;
+      right: 0px;
       background-color: rgba(0, 0, 0, 0.2); }
       .imageeditor .page-view .predefined-angluar-group button {
         padding: 0px;
@@ -2318,10 +2562,10 @@
   .imageeditor .drag-angle-rect {
     position: absolute;
     display: none;
-    bottom: 10px;
-    width: 130px;
-    height: 130px;
-    right: 10px;
+    bottom: 0px;
+    width: 100%;
+    height: 100%;
+    right: 0px;
     pointer-events: none; }
     .imageeditor .drag-angle-rect .drag-angle {
       display: inline-block;
@@ -2362,10 +2606,10 @@
   .imageeditor .drag-position {
     position: absolute;
     display: none;
-    bottom: 10px;
-    width: 130px;
-    height: 130px;
-    right: 10px; }
+    bottom: 0px;
+    width: 100%;
+    height: 100%;
+    right: 0px; }
     .imageeditor .drag-position .drag-pointer {
       position: absolute;
       width: 12px;

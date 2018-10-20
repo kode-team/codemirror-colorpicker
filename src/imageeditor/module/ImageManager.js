@@ -141,11 +141,22 @@ export default class ImageManager extends BaseModule {
     }
 
     '*/image/toBackgroundSizeString' ($store, image) {
-        if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
-            return [image.backgroundSizeWidth, image.backgroundSizeHeight].join(' ')
+
+        var widthUnit = image.backgroundSizeWidthUnit || 'px'
+        var heightUnit = image.backgroundSizeHeightUnit || 'px'
+
+        if (image.backgroundSize == 'contain' || image.backgroundSize == 'cover') {
+            return image.backgroundSize; 
+        } else if (image.backgroundSizeWidth && image.backgroundSizeHeight) {
+            return [
+                image.backgroundSizeWidth + widthUnit, 
+                image.backgroundSizeHeight + heightUnit
+            ].join(' ')
         } else if (image.backgroundSizeWidth) {
-            return image.backgroundSizeWidth;
+            return image.backgroundSizeWidth + widthUnit;
         }
+
+        return 'auto'
     }   
     
     '*/image/toBackgroundRepeatString' ($store, image) {
