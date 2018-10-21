@@ -10,7 +10,6 @@ export default class LayerView extends UIElement {
                 <Name></Name>                
                 <BackgroundColor></BackgroundColor> 
                 <ColorPickerPanel></ColorPickerPanel>
-                <ColorSampleList></ColorSampleList>                
                 <size></size>
                 <position></position>
                 <radius></radius>

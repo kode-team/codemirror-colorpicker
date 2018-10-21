@@ -53,22 +53,9 @@ export default class LayerManager extends BaseModule {
     '*/layer/toExport' ($store, layer, withStyle = true) {
 
         var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+        obj.position = obj.position || 'absolute';
 
-        obj.position = 'absolute';
-
-        obj = $store.read('/css/sorting', obj);
-
-        return Object.keys(obj).filter(key => {
-
-            if (key == 'transform' && obj[key] == 'none') return false; 
-            if (key == 'mix-blend-mode' && obj[key] == 'normal') return false; 
-            if (key == 'background-blend-mode' && obj[key] == 'normal') return false; 
-            if (key == 'x') return false; 
-            if (key == 'y') return false; 
-            return obj[key];
-        }).map(key => {
-            return `${key}: ${obj[key]};`
-        }).join(' ')
+        return $store.read('/css/toString', obj);
     }    
 
     '*/layer/make/filter' ($store, filters, defaultDataObject = {}) {        

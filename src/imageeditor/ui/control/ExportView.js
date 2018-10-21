@@ -32,20 +32,8 @@ export default class ExportView extends UIElement {
             overflow: page.clip ? 'hidden' : ''
         }, page.style || {}); 
 
-        obj = this.read('/css/sorting', obj);        
 
-        var results = Object.keys(obj).filter(key => {
-
-            if (key == 'transform' && obj[key] == 'none') return false; 
-            if (key == 'x') return false; 
-            if (key == 'y') return false; 
- 
-            return obj[key];
-        }).map(key => {
-            return `${key}: ${obj[key]}`
-        })
-
-        return results.join(';'); 
+        return this.read('/css/toString', obj);
     }
 
     loadCode () {

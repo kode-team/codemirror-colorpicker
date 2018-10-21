@@ -38,7 +38,7 @@ export default class ImageManager extends BaseModule {
     '*/image/get/file' ($store, files, callback) {
         (files || []).forEach(file => {
             var ext = file.name.split('.').pop();
-            if (ext == 'jpg' || ext == 'png' || ext == 'gif') {
+            if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
                 new ImageLoader(file).getImage(image => {
                     callback (image)
                 });

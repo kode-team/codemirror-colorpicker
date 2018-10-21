@@ -1571,7 +1571,7 @@
               cursor: pointer;
               pointer-events: all;
               border-radius: 50%;
-              background-color: rgba(255, 255, 255, 0.2); }
+              background-color: rgba(255, 255, 255, 0.5); }
               .imageeditor .images .image-tools .image-list .tree-item .item-tools button.copy-item {
                 right: 1px;
                 top: 50%;

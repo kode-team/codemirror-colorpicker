@@ -23,6 +23,20 @@ export default class CssManager extends BaseModule {
     '*/css/filtering' ($store, style) {
         var newStyle = Object.assign({}, style);
 
+        // delete unused css property 
+        delete newStyle.x;
+        delete newStyle.y;
+        delete newStyle.rotate3dX;
+        delete newStyle.rotate3dY;
+        delete newStyle.rotate3dZ;
+        delete newStyle.rotate3dA;
+        delete newStyle.scale3dX;
+        delete newStyle.scale3dY;
+        delete newStyle.scale3dZ;
+        delete newStyle.translate3dX;
+        delete newStyle.translate3dY;
+        delete newStyle.translate3dZ;
+
         if (newStyle['background-blend-mode'] == 'normal') {
             delete newStyle['background-blend-mode'];
         }
@@ -38,6 +52,10 @@ export default class CssManager extends BaseModule {
         if (parseParamNumber(newStyle['top']) == 0) {
             delete newStyle['top'];
         }        
+
+        if (newStyle['transform'] == 'none') {
+            delete newStyle['transform'];
+        }
 
         return newStyle; 
     }
@@ -64,4 +82,12 @@ export default class CssManager extends BaseModule {
 
         return newStyle;
     }    
+
+    '*/css/toString' ($store, style) {
+        var newStyle = $store.read('/css/sorting', style);        
+
+        return Object.keys(newStyle).map(key => {
+            return `${key}: ${newStyle[key]}`
+        }).join(';'); 
+    }
 }

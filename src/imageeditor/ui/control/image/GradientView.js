@@ -231,33 +231,4 @@ export default class GradientView extends BaseTab {
         }
     }
 
-    'dragover' (e) {
-        e.preventDefault()
-    }
-
-    'dragstart' (e) {
-        e.preventDefault()
-    }
-
-    'dragover document' (e) {
-        // alert('a');
-        e.preventDefault() 
-    }
-
-    'drop document' (e) {
-        e.preventDefault();
-        
-        var files = [...e.dataTransfer.files]; 
-        var items = [...e.dataTransfer.items];
-        var types = [...e.dataTransfer.types].map(type => {
-            return e.dataTransfer.getData(type);
-        });
-
-        // console.log(items, types)
-        this.read('/item/current/layer', (layer) => {
-            this.read('/image/get/file', files, (img) => {
-                this.dispatch('/item/add/image/file', img, true, layer.id);
-            })
-        })
-    }
 }

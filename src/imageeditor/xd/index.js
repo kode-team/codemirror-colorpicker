@@ -9,6 +9,8 @@ import SubFeatureControl from '../ui/control/SubFeatureControl';
 import PropertyView from '../ui/control/layer/PropertyView';
 import ExportView from '../ui/control/ExportView';
 import Timeline from '../ui/control/Timeline';
+import DropView from '../ui/control/DropView';
+
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -39,13 +41,14 @@ export default class XDImageEditor extends BaseImageEditor {
                     <Timeline></Timeline>
                 </div>
                 <ExportView></ExportView>
+                <DropView></DropView>
             </div>
         `
     }
 
     components() { 
         return { 
-
+            DropView,
             ExportView,
             PropertyView,
             GradientView, 
