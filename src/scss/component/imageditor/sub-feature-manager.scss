@@ -52,7 +52,7 @@ $layer-item-padding: 4px;
 
                     .size-list {
                         display: flex; 
-                        width: 120px;
+                        width: 150px;
 
                         > button {
                             flex: 1; 
@@ -61,6 +61,10 @@ $layer-item-padding: 4px;
                             box-sizing: border-box;
                             height: 30px;
                             position: relative;
+                            background-color: #ececec;
+                            appearance: none;
+                            border: 1px solid transparent;
+                            margin-right: 1px;
 
                             &:after {
                                 content: attr(title);
@@ -70,6 +74,7 @@ $layer-item-padding: 4px;
 
                             &.selected {
                                 border: 1px solid black; 
+                                background-color: #ffffff;
                             }
                         }
                     }
@@ -85,9 +90,14 @@ $layer-item-padding: 4px;
                             height: 30px;
                             position: relative;
                             box-sizing: border-box;
+                            appearance: none;
+                            border: 1px solid transparent;
+                            background-color: #ececec;
+                            margin-right: 1px;
 
                             &.selected {
                                 border: 1px solid black; 
+                                background-color: #ffffff;
                             }
 
                             span {
@@ -137,15 +147,15 @@ $layer-item-padding: 4px;
                             }                            
 
                             &[value="round"] {
-                                span:nth-child(1) { top : 0px; left : 0px; width: 9px; height: 6px;}
-                                span:nth-child(2) { top : 0px; left : 10px; width: 9px; height: 6px;}
-                                span:nth-child(3) { top : 0px; left : 20px; width: 9px; height: 6px;}
-                                span:nth-child(4) { top : 10px; left : 0px; width: 9px; height: 6px;}
-                                span:nth-child(5) { top : 10px; left : 10px; width: 9px; height: 6px;}
-                                span:nth-child(6) { top : 10px; left : 20px; width: 9px; height: 6px;}                                
-                                span:nth-child(7) { top : 22px; left : 0px; width: 9px; height: 6px;}
-                                span:nth-child(8) { top : 22px; left : 10px; width: 9px; height: 6px;}
-                                span:nth-child(9) { top : 22px; left : 20px; width: 9px; height: 6px;}
+                                span:nth-child(1) { top : 0px; left : 0px; width: 9px; height: 8px;}
+                                span:nth-child(2) { top : 0px; left : 10px; width: 9px; height: 8px;}
+                                span:nth-child(3) { top : 0px; left : 20px; width: 9px; height: 8px;}
+                                span:nth-child(4) { top : 10px; left : 0px; width: 9px; height: 8px;}
+                                span:nth-child(5) { top : 10px; left : 10px; width: 9px; height: 8px;}
+                                span:nth-child(6) { top : 10px; left : 20px; width: 9px; height: 8px;}                                
+                                span:nth-child(7) { top : 20px; left : 0px; width: 9px; height: 8px;}
+                                span:nth-child(8) { top : 20px; left : 10px; width: 9px; height: 8px;}
+                                span:nth-child(9) { top : 20px; left : 20px; width: 9px; height: 8px;}
                             }                                                        
                         }
                     }

@@ -1270,8 +1270,15 @@
             box-shadow: none; }
     .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body {
       width: 240px; }
-      .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-chooser, .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .colorsets-contextmenu {
-        display: none; }
+      .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-list {
+        padding-top: 5px;
+        padding-left: 5px; }
+        .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .color-list .current-color-sets .color-item {
+          width: 20px;
+          height: 20px;
+          margin: 2px !important;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
       .imageeditor .colorpicker-layer .codemirror-colorpicker .colorpicker-body .wheel {
         border: 0px;
         background-color: transparent; }
@@ -1303,7 +1310,8 @@
         display: inline-block;
         vertical-align: middle;
         -webkit-box-sizing: border-box;
-                box-sizing: border-box; }
+                box-sizing: border-box;
+        border-left: 1px solid #c7c7c7; }
     .imageeditor .pages .page-list {
       -webkit-box-flex: 1;
           -ms-flex: 1 1 auto;
@@ -1660,7 +1668,7 @@
               display: -webkit-box;
               display: -ms-flexbox;
               display: flex;
-              width: 120px; }
+              width: 150px; }
               .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button {
                 -webkit-box-flex: 1;
                     -ms-flex: 1;
@@ -1670,13 +1678,20 @@
                 -webkit-box-sizing: border-box;
                         box-sizing: border-box;
                 height: 30px;
-                position: relative; }
+                position: relative;
+                background-color: #ececec;
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+                border: 1px solid transparent;
+                margin-right: 1px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button:after {
                   content: attr(title);
                   font-size: 8px;
                   color: black; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .size-list > button.selected {
-                  border: 1px solid black; }
+                  border: 1px solid black;
+                  background-color: #ffffff; }
             .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list {
               display: -webkit-box;
               display: -ms-flexbox;
@@ -1691,9 +1706,16 @@
                 height: 30px;
                 position: relative;
                 -webkit-box-sizing: border-box;
-                        box-sizing: border-box; }
+                        box-sizing: border-box;
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+                border: 1px solid transparent;
+                background-color: #ececec;
+                margin-right: 1px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button.selected {
-                  border: 1px solid black; }
+                  border: 1px solid black;
+                  background-color: #ffffff; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button span {
                   position: absolute;
                   display: inline-block;
@@ -1782,47 +1804,47 @@
                   top: 0px;
                   left: 0px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(2) {
                   top: 0px;
                   left: 10px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(3) {
                   top: 0px;
                   left: 20px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(4) {
                   top: 10px;
                   left: 0px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(5) {
                   top: 10px;
                   left: 10px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(6) {
                   top: 10px;
                   left: 20px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(7) {
-                  top: 22px;
+                  top: 20px;
                   left: 0px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(8) {
-                  top: 22px;
+                  top: 20px;
                   left: 10px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
                 .imageeditor .sub-feature-control > .feature > .property-view > .property-item > .items .repeat-list > button[value="round"] span:nth-child(9) {
-                  top: 22px;
+                  top: 20px;
                   left: 20px;
                   width: 9px;
-                  height: 6px; }
+                  height: 8px; }
   .imageeditor .timeline-view {
     position: absolute;
     -webkit-box-sizing: border-box;
@@ -3004,6 +3026,9 @@
           cursor: pointer;
           position: relative;
           margin: 3px; }
+          .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item:hover {
+            -webkit-transform: scale(1.2);
+                    transform: scale(1.2); }
       .imageeditor .property-view .property-item.gradient-steps-info .gradient-info {
         overflow: auto; }
         .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item {
@@ -3245,30 +3270,30 @@
     .imageeditor .export-view .color-view {
       position: absolute;
       width: 800px;
-      height: 500px;
+      height: 600px;
       left: 50%;
       top: 50%;
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
-      background-color: white;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex; }
-      .imageeditor .export-view .color-view textarea {
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1;
-        display: inline-block;
-        vertical-align: middle;
+      background-color: white; }
+      .imageeditor .export-view .color-view .codeview {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        height: 200px;
+        top: 0px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box; }
+        .imageeditor .export-view .color-view .codeview .CodeMirror {
+          height: 100%; }
+        .imageeditor .export-view .color-view .codeview textarea {
+          position: relative; }
       .imageeditor .export-view .color-view .preview {
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1;
+        position: absolute;
+        right: 0px;
+        left: 0px;
+        top: 200px;
+        bottom: 0px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
         overflow: auto; }

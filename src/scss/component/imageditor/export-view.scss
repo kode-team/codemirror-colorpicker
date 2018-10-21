@@ -23,25 +23,37 @@
     .color-view {
         position: absolute;
         width: 800px;
-        height: 500px;
+        height: 600px;
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
         background-color: white;
-        display: flex; 
-        textarea {
-            flex:1;
-            display: inline-block;
-            vertical-align: middle;       
-            box-sizing: border-box;     
+
+        .codeview {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            height: 200px;
+            top: 0px;
+            box-sizing: border-box;
+
+            .CodeMirror {
+                height: 100%;
+            }
+
+            textarea {
+                position: relative;
+            }
         }
 
+
         .preview {
-            flex:1;            
-            box-sizing: border-box;            
-            position: relative;
-            display: inline-block;
-            vertical-align: middle;
+            position: absolute;
+            right: 0px;
+            left: 0px;
+            top: 200px;
+            bottom: 0px;
+            box-sizing: border-box;
             overflow: auto;
         }        
     }

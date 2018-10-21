@@ -56,6 +56,8 @@ export default class LayerManager extends BaseModule {
 
         obj.position = 'absolute';
 
+        obj = $store.read('/css/sorting', obj);
+
         return Object.keys(obj).filter(key => {
 
             if (key == 'transform' && obj[key] == 'none') return false; 

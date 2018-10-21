@@ -245,9 +245,15 @@ export default class GradientView extends BaseTab {
     }
 
     'drop document' (e) {
-        return; 
         e.preventDefault();
+        
         var files = [...e.dataTransfer.files]; 
+        var items = [...e.dataTransfer.items];
+        var types = [...e.dataTransfer.types].map(type => {
+            return e.dataTransfer.getData(type);
+        });
+
+        // console.log(items, types)
         this.read('/item/current/layer', (layer) => {
             this.read('/image/get/file', files, (img) => {
                 this.dispatch('/item/add/image/file', img, true, layer.id);

@@ -1,8 +1,8 @@
 (function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
-var CodeMirrorColorPicker = (function (CodeMirror) {
+var CodeMirrorColorPicker = (function (CodeMirror$1) {
 'use strict';
 
-CodeMirror = CodeMirror && CodeMirror.hasOwnProperty('default') ? CodeMirror['default'] : CodeMirror;
+CodeMirror$1 = CodeMirror$1 && CodeMirror$1.hasOwnProperty('default') ? CodeMirror$1['default'] : CodeMirror$1;
 
 /**
  * @method format
@@ -9822,6 +9822,8 @@ var LayerManager = function (_BaseModule) {
 
             obj.position = 'absolute';
 
+            obj = $store.read('/css/sorting', obj);
+
             return Object.keys(obj).filter(function (key) {
 
                 if (key == 'transform' && obj[key] == 'none') return false;
@@ -11411,7 +11413,83 @@ var StorageManager = function (_BaseModule) {
     return StorageManager;
 }(BaseModule);
 
-var ModuleList = [StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var ordering = {
+    'position': 1,
+    'left': 2,
+    'top': 2,
+    'right': 2,
+    'bottom': 2,
+    'width': 3,
+    'height': 3,
+
+    'background-image': 100,
+    'background-size': 100,
+    'background-position': 100
+
+};
+
+var MAX_ORDER = Number.MAX_SAFE_INTEGER;
+
+var CssManager = function (_BaseModule) {
+    inherits(CssManager, _BaseModule);
+
+    function CssManager() {
+        classCallCheck(this, CssManager);
+        return possibleConstructorReturn(this, (CssManager.__proto__ || Object.getPrototypeOf(CssManager)).apply(this, arguments));
+    }
+
+    createClass(CssManager, [{
+        key: '*/css/filtering',
+        value: function cssFiltering($store, style) {
+            var newStyle = Object.assign({}, style);
+
+            if (newStyle['background-blend-mode'] == 'normal') {
+                delete newStyle['background-blend-mode'];
+            }
+
+            if (newStyle['mix-blend-mode'] == 'normal') {
+                delete newStyle['mix-blend-mode'];
+            }
+
+            if (parseParamNumber$2(newStyle['left']) == 0) {
+                delete newStyle['left'];
+            }
+
+            if (parseParamNumber$2(newStyle['top']) == 0) {
+                delete newStyle['top'];
+            }
+
+            return newStyle;
+        }
+    }, {
+        key: '*/css/sorting',
+        value: function cssSorting($store, style) {
+
+            style = $store.read('/css/filtering', style);
+
+            var keys = Object.keys(style);
+
+            keys.sort(function (a, b) {
+                var aN = ordering[a] || MAX_ORDER;
+                var bN = ordering[b] || MAX_ORDER;
+
+                if (aN == bN) return 0;
+
+                return aN < bN ? -1 : 1;
+            });
+
+            var newStyle = {};
+            keys.forEach(function (key) {
+                newStyle[key] = style[key];
+            });
+
+            return newStyle;
+        }
+    }]);
+    return CssManager;
+}(BaseModule);
+
+var ModuleList = [CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -12948,7 +13026,10 @@ var UnitRange = function (_UIElement) {
         }
     }, {
         key: "refresh",
-        value: function refresh(value) {
+        value: function refresh() {
+            var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+            value = value || '';
             var unit = 'px';
             if (value.includes('%')) {
                 unit = 'percent';
@@ -13143,11 +13224,8 @@ var BackgroundSize = function (_UIElement) {
             var _this5 = this;
 
             this.read('/item/current/image', function (image) {
-
                 image.backgroundRepeat = e.$delegateTarget.val();
-
                 _this5.selectBackgroundRepeat(image.backgroundRepeat);
-
                 _this5.dispatch('/item/set', image);
             });
         }
@@ -13162,14 +13240,8 @@ var BackgroundSize = function (_UIElement) {
             var _this6 = this;
 
             this.read('/item/current/image', function (image) {
-                if (image.backgroundSizeWidth) {
-                    _this6.children.$width.refresh(image.backgroundSizeWidth);
-                }
-
-                if (image.backgroundSizeHeight) {
-                    _this6.children.$height.refresh(image.backgroundSizeHeight);
-                }
-
+                _this6.children.$width.refresh(image.backgroundSizeWidth);
+                _this6.children.$height.refresh(image.backgroundSizeHeight);
                 _this6.selectBackgroundSize(image.backgroundSize);
                 _this6.selectBackgroundRepeat(image.backgroundRepeat);
             });
@@ -13177,48 +13249,6 @@ var BackgroundSize = function (_UIElement) {
     }]);
     return BackgroundSize;
 }(UIElement);
-
-var BackgroundRepeat = function (_BasePropertyItem) {
-    inherits(BackgroundRepeat, _BasePropertyItem);
-
-    function BackgroundRepeat() {
-        classCallCheck(this, BackgroundRepeat);
-        return possibleConstructorReturn(this, (BackgroundRepeat.__proto__ || Object.getPrototypeOf(BackgroundRepeat)).apply(this, arguments));
-    }
-
-    createClass(BackgroundRepeat, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item background-repeat\'>\n                <div class=\'title\' ref="$title">Background Repeat</div>                        \n                <div class=\'items\'>\n                    <div>\n                        <label>repeat</label>\n                        <div>\n                            <select ref="$repeat">\n                                <option value=\'repeat\'>repeat</option>\n                                <option value=\'no-repeat\'>no-repeat</option>\n                                <option value=\'repeat-x\'>repeat-x</option>\n                                <option value=\'repeat-y\'>repeat-y</option>\n                            </selct>\n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'change $repeat',
-        value: function change$repeat() {
-            var _this2 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.backgroundRepeat = _this2.refs.$repeat.val();
-                console.log(image);
-                _this2.dispatch('/item/set', image);
-            });
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var _this3 = this;
-
-            this.read('/item/current/image', function (image) {
-                _this3.refs.$repeat.val(image.backgroundRepeat || 'repeat');
-            });
-        }
-    }]);
-    return BackgroundRepeat;
-}(BasePropertyItem);
 
 var PageSize = function (_UIElement) {
     inherits(PageSize, _UIElement);
@@ -13684,7 +13714,7 @@ var items = {
     PageExport: PageExport,
     PageSize: PageSize,
     PageName: PageName,
-    BackgroundRepeat: BackgroundRepeat,
+    // BackgroundRepeat,
     BackgroundSize: BackgroundSize,
     Transform3d: Transform3d,
     Transform: Transform,
@@ -13795,7 +13825,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>                \n                <ColorSampleList></ColorSampleList>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15595,9 +15625,15 @@ var GradientView = function (_BaseTab) {
         value: function dropDocument(e) {
             var _this4 = this;
 
-            return;
             e.preventDefault();
+
             var files = [].concat(toConsumableArray(e.dataTransfer.files));
+            var items = [].concat(toConsumableArray(e.dataTransfer.items));
+            var types = [].concat(toConsumableArray(e.dataTransfer.types)).map(function (type) {
+                return e.dataTransfer.getData(type);
+            });
+
+            // console.log(items, types)
             this.read('/item/current/layer', function (layer) {
                 _this4.read('/image/get/file', files, function (img) {
                     _this4.dispatch('/item/add/image/file', img, true, layer.id);
@@ -15830,17 +15866,29 @@ var ExportView = function (_UIElement) {
     }
 
     createClass(ExportView, [{
-        key: 'template',
+        key: "template",
         value: function template() {
-            return '\n            <div class=\'export-view\'>\n                <div class="color-view">\n                    <div class="close" ref="$close">&times;</div>                \n                    <textarea ref="$code"></textarea>\n                    <div class=\'preview\' ref="$preview"></div>\n                </div>\n            </div>\n        ';
+            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview\">        \n                        <textarea ref=\"$code\"></textarea>\n                    </div>\n                    <div class='preview' ref=\"$preview\"></div>\n                </div>\n            </div>\n        ";
         }
     }, {
-        key: 'makePageCSS',
+        key: "afterRender",
+        value: function afterRender() {
+            this.cm = CodeMirror.fromTextArea(this.refs.$code.el, {
+                lineNumbers: true,
+                readOnly: true,
+                lineWrapping: true,
+                mode: "text/html"
+            });
+        }
+    }, {
+        key: "makePageCSS",
         value: function makePageCSS(page) {
             var obj = Object.assign({
                 position: 'relative',
                 overflow: page.clip ? 'hidden' : ''
             }, page.style || {});
+
+            obj = this.read('/css/sorting', obj);
 
             var results = Object.keys(obj).filter(function (key) {
 
@@ -15850,13 +15898,13 @@ var ExportView = function (_UIElement) {
 
                 return obj[key];
             }).map(function (key) {
-                return key + ': ' + obj[key];
+                return key + ": " + obj[key];
             });
 
             return results.join(';');
         }
     }, {
-        key: 'loadCode',
+        key: "loadCode",
         value: function loadCode() {
             var _this2 = this;
 
@@ -15868,16 +15916,19 @@ var ExportView = function (_UIElement) {
 
             var pageStyle = this.makePageCSS(page);
 
-            var html = '<div style="' + pageStyle + '">\n' + this.read('/item/map/children', page.id, function (item) {
-                return '<div style=\'' + _this2.read('/layer/toExport', item, true) + '\'></div>';
-            }).join('\n') + '\n</div>';
+            var html = "<div id=\"page-1\" style=\"" + pageStyle + "\">\n" + this.read('/item/map/children', page.id, function (item, index) {
+                return "\t<div id=\"layer-" + (index + 1) + "\" style=\"" + _this2.read('/layer/toExport', item, true) + "\"></div>";
+            }).join('\n') + "\n</div>";
 
-            this.refs.$code.val(html);
+            if (this.cm) {
+                this.cm.setValue(html);
+                this.cm.refresh();
+            }
 
             this.refs.$preview.html(html);
         }
     }, {
-        key: 'refresh',
+        key: "refresh",
         value: function refresh() {
             this.loadCode();
         }
@@ -15894,8 +15945,8 @@ var ExportView = function (_UIElement) {
     }, {
         key: '@showExport',
         value: function showExport() {
-            this.refresh();
             this.$el.show();
+            this.refresh();
         }
     }, {
         key: '@hideExport',
@@ -16406,8 +16457,8 @@ var ColorView$2 = function () {
 
 if (window.CodeMirror) {
 
-    CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
-        if (old && old != CodeMirror.Init) {
+    CodeMirror$1.defineOption("colorpicker", false, function (cm, val, old) {
+        if (old && old != CodeMirror$1.Init) {
 
             if (cm.state.colorpicker) {
                 cm.state.colorpicker.destroy();

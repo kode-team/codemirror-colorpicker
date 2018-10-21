@@ -6,12 +6,23 @@ export default class ExportView extends UIElement {
         return `
             <div class='export-view'>
                 <div class="color-view">
-                    <div class="close" ref="$close">&times;</div>                
-                    <textarea ref="$code"></textarea>
+                    <div class="close" ref="$close">&times;</div>        
+                    <div class="codeview">        
+                        <textarea ref="$code"></textarea>
+                    </div>
                     <div class='preview' ref="$preview"></div>
                 </div>
             </div>
         `
+    }
+
+    afterRender () {
+        this.cm = CodeMirror.fromTextArea(this.refs.$code.el, {
+            lineNumbers: true, 
+            readOnly: true,
+            lineWrapping: true,
+            mode : "text/html"
+        });
     }
  
 
@@ -20,6 +31,8 @@ export default class ExportView extends UIElement {
             position: 'relative',
             overflow: page.clip ? 'hidden' : ''
         }, page.style || {}); 
+
+        obj = this.read('/css/sorting', obj);        
 
         var results = Object.keys(obj).filter(key => {
 
@@ -44,11 +57,15 @@ export default class ExportView extends UIElement {
 
         var pageStyle = this.makePageCSS(page)
 
-        var html = `<div style="${pageStyle}">\n${this.read('/item/map/children', page.id, (item) => {
-                return `<div style='${this.read('/layer/toExport', item, true)}'></div>`
+        var html = `<div id="page-1" style="${pageStyle}">\n${this.read('/item/map/children', page.id, (item, index) => {
+                return `\t<div id="layer-${index+1}" style="${this.read('/layer/toExport', item, true)}"></div>`
             }).join('\n')}\n</div>`
 
-        this.refs.$code.val(html);
+
+        if (this.cm) {
+            this.cm.setValue(html);
+            this.cm.refresh();
+        }
 
         this.refs.$preview.html(html);
     }
@@ -66,8 +83,8 @@ export default class ExportView extends UIElement {
     }
 
     '@showExport' () {
-        this.refresh();        
         this.$el.show();
+        this.refresh();                
     }
 
     '@hideExport' () {

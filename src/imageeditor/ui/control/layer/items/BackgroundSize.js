@@ -156,13 +156,9 @@ export default class BackgroundSize extends UIElement {
     }
 
     'click $repeat button' (e) {
-        
         this.read('/item/current/image', (image) => {
-            
             image.backgroundRepeat = e.$delegateTarget.val()
-            
             this.selectBackgroundRepeat(image.backgroundRepeat);
-
             this.dispatch('/item/set', image);
         })
     }
@@ -172,20 +168,12 @@ export default class BackgroundSize extends UIElement {
     }
 
     refresh() {
-
         this.read('/item/current/image', (image) => {
-            if (image.backgroundSizeWidth) {
-                this.children.$width.refresh(image.backgroundSizeWidth);
-            }
-
-            if (image.backgroundSizeHeight) {
-                this.children.$height.refresh(image.backgroundSizeHeight);
-            }
-
+            this.children.$width.refresh(image.backgroundSizeWidth);
+            this.children.$height.refresh(image.backgroundSizeHeight);
             this.selectBackgroundSize(image.backgroundSize);
             this.selectBackgroundRepeat(image.backgroundRepeat);
-        })
-        
+        })   
     }
 
 }

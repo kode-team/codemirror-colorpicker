@@ -26,6 +26,7 @@ $layer-item-padding: 4px;
             display: inline-block;
             vertical-align: middle;
             box-sizing: border-box;
+            border-left: 1px solid $border-color;
         }
     }
 

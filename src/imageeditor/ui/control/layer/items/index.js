@@ -12,7 +12,7 @@ import ColorSampleList from "./ColorSampleList";
 import Transform from "./transform";
 import Transform3d from './transform3d';
 import BackgroundSize from "./BackgroundSize";
-import BackgroundRepeat from "./BackgroundRepeat";
+// import BackgroundRepeat from "./BackgroundRepeat";
 import PageSize from "./PageSize";
 import PageName from "./PageName";
 import PageExport from "./PageExport";
@@ -29,7 +29,7 @@ export default {
     PageExport,
     PageSize,
     PageName,
-    BackgroundRepeat,
+    // BackgroundRepeat,
     BackgroundSize,
     Transform3d,
     Transform,

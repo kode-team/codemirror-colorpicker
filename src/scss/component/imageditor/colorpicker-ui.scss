@@ -6,8 +6,18 @@
         box-shadow: none;
         .colorpicker-body {
             width: 240px;
-            .colorsets, .color-chooser, .colorsets-contextmenu {
-                display: none;
+
+            .color-list {
+                padding-top: 5px;
+                padding-left: 5px;
+                .current-color-sets {
+                    .color-item {
+                        width: 20px;
+                        height: 20px;
+                        margin: 2px !important;
+                        box-sizing: border-box;
+                    }
+                }
             }
     
             .wheel {

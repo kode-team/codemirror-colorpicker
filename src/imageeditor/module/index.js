@@ -7,9 +7,11 @@ import GradientManager from "./GradientManager";
 import ItemManager from "./ItemManager";
 import GuideManager from "./GuideManager";
 import StorageManager from "./StorageManager";
+import CssManager from "./CssManager";
 
 
 export default [
+    CssManager,
     StorageManager,
     ItemManager,
     ColorStepManager,

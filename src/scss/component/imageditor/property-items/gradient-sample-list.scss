@@ -16,6 +16,10 @@
             cursor: pointer;
             position: relative;
             margin: 3px;
+
+            &:hover {
+                transform: scale(1.2);
+            }
         }
 
     }
