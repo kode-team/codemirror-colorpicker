@@ -9636,7 +9636,7 @@ var ImageManager = function (_BaseModule) {
         value: function imageGetFile($store, files, callback) {
             (files || []).forEach(function (file) {
                 var ext = file.name.split('.').pop();
-                if (ext == 'jpg' || ext == 'png' || ext == 'gif') {
+                if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
                     new ImageLoader(file).getImage(function (image) {
                         callback(image);
                     });
@@ -9952,22 +9952,9 @@ var LayerManager = function (_BaseModule) {
 
 
             var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+            obj.position = obj.position || 'absolute';
 
-            obj.position = 'absolute';
-
-            obj = $store.read('/css/sorting', obj);
-
-            return Object.keys(obj).filter(function (key) {
-
-                if (key == 'transform' && obj[key] == 'none') return false;
-                if (key == 'mix-blend-mode' && obj[key] == 'normal') return false;
-                if (key == 'background-blend-mode' && obj[key] == 'normal') return false;
-                if (key == 'x') return false;
-                if (key == 'y') return false;
-                return obj[key];
-            }).map(function (key) {
-                return key + ': ' + obj[key] + ';';
-            }).join(' ');
+            return $store.read('/css/toString', obj);
         }
     }, {
         key: '*/layer/make/filter',
@@ -10482,6 +10469,7 @@ var LAYER_DEFAULT_OBJECT = {
     selected: true,
     visible: true,
     style: {
+        position: 'absolute',
         x: '0px',
         y: '0px',
         'background-blend-mode': 'multiply',
@@ -11576,6 +11564,20 @@ var CssManager = function (_BaseModule) {
         value: function cssFiltering($store, style) {
             var newStyle = Object.assign({}, style);
 
+            // delete unused css property 
+            delete newStyle.x;
+            delete newStyle.y;
+            delete newStyle.rotate3dX;
+            delete newStyle.rotate3dY;
+            delete newStyle.rotate3dZ;
+            delete newStyle.rotate3dA;
+            delete newStyle.scale3dX;
+            delete newStyle.scale3dY;
+            delete newStyle.scale3dZ;
+            delete newStyle.translate3dX;
+            delete newStyle.translate3dY;
+            delete newStyle.translate3dZ;
+
             if (newStyle['background-blend-mode'] == 'normal') {
                 delete newStyle['background-blend-mode'];
             }
@@ -11590,6 +11592,10 @@ var CssManager = function (_BaseModule) {
 
             if (parseParamNumber$2(newStyle['top']) == 0) {
                 delete newStyle['top'];
+            }
+
+            if (newStyle['transform'] == 'none') {
+                delete newStyle['transform'];
             }
 
             return newStyle;
@@ -11617,6 +11623,15 @@ var CssManager = function (_BaseModule) {
             });
 
             return newStyle;
+        }
+    }, {
+        key: '*/css/toString',
+        value: function cssToString($store, style) {
+            var newStyle = $store.read('/css/sorting', style);
+
+            return Object.keys(newStyle).map(function (key) {
+                return key + ": " + newStyle[key];
+            }).join(';');
         }
     }]);
     return CssManager;
@@ -13877,7 +13892,7 @@ var LayerView = function (_UIElement) {
     createClass(LayerView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSampleList></ColorSampleList>                \n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
+            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <ColorPickerPanel></ColorPickerPanel>\n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
         }
     }, {
         key: "components",
@@ -15738,42 +15753,6 @@ var GradientView = function (_BaseTab) {
                 this.refs.$page.removeClass('moving');
             }
         }
-    }, {
-        key: 'dragover',
-        value: function dragover(e) {
-            e.preventDefault();
-        }
-    }, {
-        key: 'dragstart',
-        value: function dragstart(e) {
-            e.preventDefault();
-        }
-    }, {
-        key: 'dragover document',
-        value: function dragoverDocument(e) {
-            // alert('a');
-            e.preventDefault();
-        }
-    }, {
-        key: 'drop document',
-        value: function dropDocument(e) {
-            var _this4 = this;
-
-            e.preventDefault();
-
-            var files = [].concat(toConsumableArray(e.dataTransfer.files));
-            var items = [].concat(toConsumableArray(e.dataTransfer.items));
-            var types = [].concat(toConsumableArray(e.dataTransfer.types)).map(function (type) {
-                return e.dataTransfer.getData(type);
-            });
-
-            // console.log(items, types)
-            this.read('/item/current/layer', function (layer) {
-                _this4.read('/image/get/file', files, function (img) {
-                    _this4.dispatch('/item/add/image/file', img, true, layer.id);
-                });
-            });
-        }
     }]);
     return GradientView;
 }(BaseTab);
@@ -16022,20 +16001,7 @@ var ExportView = function (_UIElement) {
                 overflow: page.clip ? 'hidden' : ''
             }, page.style || {});
 
-            obj = this.read('/css/sorting', obj);
-
-            var results = Object.keys(obj).filter(function (key) {
-
-                if (key == 'transform' && obj[key] == 'none') return false;
-                if (key == 'x') return false;
-                if (key == 'y') return false;
-
-                return obj[key];
-            }).map(function (key) {
-                return key + ": " + obj[key];
-            });
-
-            return results.join(';');
+            return this.read('/css/toString', obj);
         }
     }, {
         key: "loadCode",
@@ -16113,6 +16079,58 @@ var Timeline = function (_UIElement) {
     return Timeline;
 }(UIElement);
 
+var DropView = function (_UIElement) {
+    inherits(DropView, _UIElement);
+
+    function DropView() {
+        classCallCheck(this, DropView);
+        return possibleConstructorReturn(this, (DropView.__proto__ || Object.getPrototypeOf(DropView)).apply(this, arguments));
+    }
+
+    createClass(DropView, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'drop-view\'>\n\n            </div>\n        ';
+        }
+    }, {
+        key: 'dragover document',
+        value: function dragoverDocument(e) {
+            e.preventDefault();
+            this.$el.show();
+        }
+    }, {
+        key: 'dragout document',
+        value: function dragoutDocument(e) {
+            e.preventDefault();
+            this.$el.hide();
+        }
+    }, {
+        key: 'drop document',
+        value: function dropDocument(e) {
+            var _this2 = this;
+
+            e.preventDefault();
+
+            var files = [].concat(toConsumableArray(e.dataTransfer.files));
+            var items = [].concat(toConsumableArray(e.dataTransfer.items)).map(function (item) {
+                return { kind: item.kind, type: item.type, item: item };
+            });
+            var types = [].concat(toConsumableArray(e.dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
+            }).map(function (type) {
+                return e.dataTransfer.getData(type);
+            });
+
+            this.read('/item/current/layer', function (layer) {
+                _this2.read('/image/get/file', files, function (img) {
+                    _this2.dispatch('/item/add/image/file', img, true, layer.id);
+                });
+            });
+        }
+    }]);
+    return DropView;
+}(UIElement);
+
 var XDImageEditor = function (_BaseImageEditor) {
     inherits(XDImageEditor, _BaseImageEditor);
 
@@ -16124,13 +16142,13 @@ var XDImageEditor = function (_BaseImageEditor) {
     createClass(XDImageEditor, [{
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
-
+                DropView: DropView,
                 ExportView: ExportView,
                 PropertyView: PropertyView,
                 GradientView: GradientView,
