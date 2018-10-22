@@ -10467,7 +10467,6 @@ var LAYER_DEFAULT_OBJECT = {
     selected: true,
     visible: true,
     style: {
-        position: 'absolute',
         x: '0px',
         y: '0px',
         'background-blend-mode': 'multiply',
