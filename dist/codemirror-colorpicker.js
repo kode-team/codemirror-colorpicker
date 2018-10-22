@@ -16111,14 +16111,6 @@ var DropView = function (_UIElement) {
             e.preventDefault();
 
             var files = [].concat(toConsumableArray(e.dataTransfer.files));
-            var items = [].concat(toConsumableArray(e.dataTransfer.items)).map(function (item) {
-                return { kind: item.kind, type: item.type, item: item };
-            });
-            var types = [].concat(toConsumableArray(e.dataTransfer.types)).filter(function (type) {
-                return type == 'text/uri-list';
-            }).map(function (type) {
-                return e.dataTransfer.getData(type);
-            });
 
             this.read('/item/current/layer', function (layer) {
                 _this2.read('/image/get/file', files, function (img) {

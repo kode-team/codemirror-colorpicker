@@ -21,17 +21,9 @@ export default class DropView extends UIElement {
     }
 
     'drop document' (e) {
-        e.preventDefault();
+        e.preventDefault(); 
         
         var files = [...e.dataTransfer.files]; 
-        var items = [...e.dataTransfer.items].map(item => {
-            return { kind: item.kind, type: item.type, item } 
-        });
-        var types = [...e.dataTransfer.types].filter(type => {
-            return type == 'text/uri-list'
-        }).map(type => {
-            return e.dataTransfer.getData(type);
-        });
 
         this.read('/item/current/layer', (layer) => {
             this.read('/image/get/file', files, (img) => {
