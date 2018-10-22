@@ -57,9 +57,6 @@ export default class FilterList extends BasePropertyItem {
  
             return `
                 <div class='filter-item' data-filter="${id}">
-                    <div class="filter-item-view-container">
-                        <div class="filter-item-view" data-filter-id="${id}" style='${this.read('/layer/filter/toString', layer, id, true)}'></div>
-                    </div>
                     <div class="filter-item-input">
                         ${this.makeInputItem(id, viewObject, dataObject)}
                     </div>
@@ -74,7 +71,6 @@ export default class FilterList extends BasePropertyItem {
             if (filter) {
                 var $dom = this.$el.$(`[data-filter=${id}]`);
 
-                $dom.$(`.filter-item-view[data-filter-id=${id}]`).el.style = this.read('/layer/filter/toString', layer, id, true)
                 $dom.$(`.input [data-filter-id=${id}]`).val(filter.value)
                 $dom.$(`.range [data-filter-id=${id}]`).val(filter.value)
             }
