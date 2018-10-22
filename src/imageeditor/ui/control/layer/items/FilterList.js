@@ -6,7 +6,7 @@ export default class FilterList extends BasePropertyItem {
         return `
             <div class='property-item filters'>
                 <div class='title' ref="$title">Filter - <span class='description' ref="$desc"></span></div>
-                <div class='items'>                    
+                <div class='items no-padding'>                    
                     <div class="filter-list" ref="$filterList">
                         
                     </div>

@@ -145,11 +145,21 @@
             display: none; 
             padding: 4px 5px !important; 
             padding-top: 0px;
+
+            &.no-padding {
+                padding: 0px !important;
+            }
         }
 
         &.show {
             .items {
                 display: block; 
+
+                &.max-height {
+                    max-height: 200px;
+                    overflow: auto;
+    
+                }
             }
         }
 
@@ -209,10 +219,17 @@
                     &.color {
                         display:  block;
                         height: 100%;
-                        width: 100%;
+                        width: 40px;
                         margin-right: 0px;
                         border: 1px solid $border-color;
                     }
+
+                    &.color-text {
+                        display:  inline-block;
+                        height: 100%;
+                        margin-right: 0px;
+                        padding: 10px 0px;                        
+                    }                    
                 }
 
                 .input-text {

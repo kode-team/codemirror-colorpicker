@@ -40,6 +40,7 @@ const LAYER_DEFAULT_OBJECT = {
 const IMAGE_DEFAULT_OBJECT = {
     itemType: 'image',
     type: 'static',
+    fileType: '',       // select file type as imagefile,  png, gif, jpg, svg if type is image 
     index: 0,    
     parentId: '',    
     angle: 90,
@@ -550,9 +551,8 @@ export default class ItemManager extends BaseModule {
         item.type = 'image'; 
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER;
-        item.backgroundImage = img.src;  
-        // item.backgroundSizeWidth = img.width + 'px';  //이미지에 따라서 어떻게 바뀔 지 모르겠다. 원본 크기를 줘야할까? 
-        // item.backgroundSizeHeight = img.height + 'px';
+        item.fileType = img.fileType;
+        item.backgroundImage = img.src;
         item.backgroundSizeWidth = '100%';
 
         $store.run('/item/set', item, isSelected);

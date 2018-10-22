@@ -20,6 +20,7 @@ import BlendList from "./BlendList";
 import MixBlendList from "./MixBlendList";
 import FilterList from "./FilterList";
 import BackgroundColor from "./BackgroundColor"; 
+import LayerColorPickerPanel from "./LayerColorPickerPanel";
 
 export default {
     BackgroundColor,
@@ -35,6 +36,7 @@ export default {
     Transform,
     ColorSampleList,
     ImageTypeSelect,
+    LayerColorPickerPanel,
     ColorPickerPanel,
     ColorStepsInfo,
     ColorSteps,

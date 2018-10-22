@@ -171,18 +171,6 @@ var math = {
     caculateAngle: caculateAngle
 };
 
-/**
- * @method RGBtoHSV
- *
- * convert rgb to hsv
- *
- * 		color.RGBtoHSV(0, 0, 255) === { h : 240, s : 1, v : 1 } === '#FFFF00'
- *
- * @param {Number} R  red color value
- * @param {Number} G  green color value
- * @param {Number} B  blue color value
- * @return {Object}  hsv color code
- */
 function RGBtoHSV(r, g, b) {
 
     if (arguments.length == 1) {
@@ -494,18 +482,6 @@ var fromLAB = {
     LABtoXYZ: LABtoXYZ
 };
 
-/**
- * @method HSVtoRGB
- *
- * convert hsv to rgb
- *
- * 		color.HSVtoRGB(0,0,1) === #FFFFF === { r : 255, g : 0, b : 0 }
- *
- * @param {Number} H  hue color number  (min : 0, max : 360)
- * @param {Number} S  Saturation number  (min : 0, max : 1)
- * @param {Number} V  Value number 		(min : 0, max : 1 )
- * @returns {Object}
- */
 function HSVtoRGB(h, s, v) {
 
     if (arguments.length == 1) {
@@ -1123,15 +1099,6 @@ var parser = {
     color_split: color_split
 };
 
-/**
- * @deprecated 
- * 
- * instead of this,  use blend function 
- *  
- * @param {*} startColor 
- * @param {*} endColor 
- * @param {*} t 
- */
 function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
@@ -1959,7 +1926,6 @@ function crop() {
     };
 }
 
-// Image manupulate 
 function resize(dstWidth, dstHeight) {
     return function (bitmap, done) {
         var c = Canvas.drawPixels(bitmap);
@@ -2185,9 +2151,6 @@ function bitonal(darkColor, lightColor) {
     });
 }
 
-/*
- * @param {Number} amount  -100..100  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2215,10 +2178,6 @@ function brownie() {
     });
 }
 
-/**
- * 
- * @param {Number} amount from 0 to 100 
- */
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2233,10 +2192,6 @@ function clip() {
     }, { $C: $C });
 }
 
-/**
- * 
- * @param {*} amount   min = -128, max = 128 
- */
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2261,10 +2216,6 @@ function gamma() {
     }, { $C: $C });
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -2336,9 +2287,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -2422,10 +2370,6 @@ function matrix() {
     });
 }
 
-/**
- * 
- * @param {Number} amount 1..100
- */
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2469,9 +2413,6 @@ function polaroid() {
     });
 }
 
-/*
- * @param {Number} amount  -100..100 
- */
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
@@ -2491,9 +2432,6 @@ function saturation() {
     });
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2546,12 +2484,6 @@ function shift() {
     });
 }
 
-/**
- * change the relative darkness of (a part of an image) by overexposure to light.
- * @param {*} r 
- * @param {*} g 
- * @param {*} b 
- */
 function solarize(redValue, greenValue, blueValue) {
     var $redValue = parseParamNumber$1(redValue);
     var $greenValue = parseParamNumber$1(greenValue);
@@ -2611,9 +2543,6 @@ function thresholdColor() {
     });
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -2675,11 +2604,6 @@ function blur () {
     return convolution(createBlurMatrix(amount));
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4290,11 +4214,6 @@ function normal () {
     return convolution$1([0, 0, 0, 0, 1, 0, 0, 0, 0]);
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4302,10 +4221,6 @@ function emboss$1() {
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4422,9 +4337,6 @@ function bitonal$1(darkColor, lightColor) {
     return shader('\n        if ((pixelColor.r + pixelColor.g + pixelColor.b) > ' + checkVlue + ') {\n            outColor = vec4(' + lightColorString + '.rgb, pixelColor.a);\n        } else {\n            outColor = vec4(' + darkColorString + '.rgb, pixelColor.a);\n        }\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4462,9 +4374,6 @@ function brownie$1() {
     return matrix$3(0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount 0..1
- */
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4481,9 +4390,6 @@ function chaos() {
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..1
- */
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4492,9 +4398,6 @@ function contrast$2() {
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4503,10 +4406,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$2() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -4554,10 +4453,6 @@ function gradient$2() {
     return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4569,9 +4464,6 @@ function grayscale$1() {
 }
 
 //http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-/*
- * @param {Number} amount  0..1  ,  (real value 0..360)
- */
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4593,10 +4485,6 @@ function kodachrome$1() {
     return matrix$3(1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4607,10 +4495,6 @@ function noise$1() {
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4624,9 +4508,6 @@ function polaroid$1() {
     return matrix$3(1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4635,9 +4516,6 @@ function saturation$1() {
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4685,9 +4563,6 @@ function thresholdColor$1() {
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold$1() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -4695,12 +4570,6 @@ function threshold$1() {
   return thresholdColor$1(scale, amount, false);
 }
 
-/**
- * 
- * @param {*} redTint  0..1
- * @param {*} greenTint 0..1
- * @param {*} blueTint 0..1
- */
 function tint$1 () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -9636,6 +9505,7 @@ var ImageManager = function (_BaseModule) {
                 var ext = file.name.split('.').pop();
                 if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
                     new ImageLoader(file).getImage(function (image) {
+                        image.fileType = ext;
                         callback(image);
                     });
                 }
@@ -10478,6 +10348,7 @@ var LAYER_DEFAULT_OBJECT = {
 var IMAGE_DEFAULT_OBJECT = {
     itemType: 'image',
     type: 'static',
+    fileType: '', // select file type as imagefile,  png, gif, jpg, svg if type is image 
     index: 0,
     parentId: '',
     angle: 90,
@@ -11063,9 +10934,8 @@ var ItemManager = function (_BaseModule) {
             item.type = 'image';
             item.parentId = parentId;
             item.index = Number.MAX_SAFE_INTEGER;
+            item.fileType = img.fileType;
             item.backgroundImage = img.src;
-            // item.backgroundSizeWidth = img.width + 'px';  //이미지에 따라서 어떻게 바뀔 지 모르겠다. 원본 크기를 줘야할까? 
-            // item.backgroundSizeHeight = img.height + 'px';
             item.backgroundSizeWidth = '100%';
 
             $store.run('/item/set', item, isSelected);
@@ -11802,6 +11672,435 @@ var BaseTab = function (_UIElement) {
     return BaseTab;
 }(UIElement);
 
+var BasePropertyItem = function (_UIElement) {
+    inherits(BasePropertyItem, _UIElement);
+
+    function BasePropertyItem() {
+        classCallCheck(this, BasePropertyItem);
+        return possibleConstructorReturn(this, (BasePropertyItem.__proto__ || Object.getPrototypeOf(BasePropertyItem)).apply(this, arguments));
+    }
+
+    createClass(BasePropertyItem, [{
+        key: 'click $title',
+        value: function click$title(e) {
+            var $dom = new Dom(e.target);
+
+            if ($dom.hasClass('title')) {
+                this.$el.toggleClass('show');
+            }
+        }
+    }]);
+    return BasePropertyItem;
+}(UIElement);
+
+var Size = function (_BasePropertyItem) {
+    inherits(Size, _BasePropertyItem);
+
+    function Size() {
+        classCallCheck(this, Size);
+        return possibleConstructorReturn(this, (Size.__proto__ || Object.getPrototypeOf(Size)).apply(this, arguments));
+    }
+
+    createClass(Size, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-item size show'>\n                <div class='title' ref=\"$title\">Dimesion</div>\n                <div class='items'>\n                    <div>\n                        <label>fixed</label>\n                        <div>\n                            <button type=\"button\" ref=\"$rect\">like width</button>\n                        </div>\n                    </div>                   \n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type='number' ref=\"$width\"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type='number' ref=\"$height\"> <span>px</span>\n                        </div>\n                    </div>   \n                    <div>\n                        <label>X</label>\n                        <div>\n                            <input type='number' ref=\"$x\"> <span>px</span>\n                        </div>\n                        <label>Y</label>\n                        <div>\n                            <input type='number' ref=\"$y\"> <span>px</span>\n                        </div>\n                    </div>                                 \n                                 \n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            var item = this.read('/item/current');
+
+            if (item.itemType == 'image') return;
+            if (!item.style) return;
+            if (item.style.width) {
+                this.refs.$width.val(parseParamNumber$1(item.style.width));
+            }
+
+            if (item.style.height) {
+                this.refs.$height.val(parseParamNumber$1(item.style.height));
+            }
+
+            if (item.style.x) {
+                this.refs.$x.val(parseParamNumber$1(item.style.x));
+            }
+
+            if (item.style.y) {
+                this.refs.$y.val(parseParamNumber$1(item.style.y));
+            }
+        }
+    }, {
+        key: 'click $rect',
+        value: function click$rect(e) {
+            var item = this.read('/item/current');
+
+            if (item.itemType == 'image') return;
+
+            item.style.width = this.refs.$width.int() + 'px';
+            item.style.height = item.style.width;
+            this.dispatch('/item/set', item);
+        }
+    }, {
+        key: 'input $width',
+        value: function input$width() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.width = _this2.refs.$width.int() + 'px';
+                _this2.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'input $height',
+        value: function input$height() {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.height = _this3.refs.$height.int() + 'px';
+                _this3.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'input $x',
+        value: function input$x() {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.x = _this4.refs.$x.int() + 'px';
+                _this4.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'input $y',
+        value: function input$y() {
+            var _this5 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.y = _this5.refs.$y.int() + 'px';
+                _this5.dispatch('/item/set', item);
+            });
+        }
+    }]);
+    return Size;
+}(BasePropertyItem);
+
+var Position = function (_BasePropertyItem) {
+    inherits(Position, _BasePropertyItem);
+
+    function Position() {
+        classCallCheck(this, Position);
+        return possibleConstructorReturn(this, (Position.__proto__ || Object.getPrototypeOf(Position)).apply(this, arguments));
+    }
+
+    createClass(Position, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item position show\'>\n                <div class=\'title\' ref="$title">Position</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>X</label>\n                        <div>\n                            <input type=\'number\' ref="$x"> <span>px</span>\n                        </div>\n                        <label>Y</label>\n                        <div>\n                            <input type=\'number\' ref="$y"> <span>px</span>\n                        </div>\n                    </div>               \n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (item) {
+                if (item.style.x) {
+                    _this2.refs.$x.val(item.style.x.replace('px', ''));
+                }
+
+                if (item.style.y) {
+                    _this2.refs.$y.val(item.style.y.replace('px', ''));
+                }
+            });
+        }
+    }, {
+        key: 'input $x',
+        value: function input$x() {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.x = _this3.refs.$x.int() + 'px';
+                _this3.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'input $y',
+        value: function input$y() {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style.y = _this4.refs.$y.int() + 'px';
+                _this4.dispatch('/item/set', item);
+            });
+        }
+    }]);
+    return Position;
+}(BasePropertyItem);
+
+var Radius = function (_BasePropertyItem) {
+    inherits(Radius, _BasePropertyItem);
+
+    function Radius() {
+        classCallCheck(this, Radius);
+        return possibleConstructorReturn(this, (Radius.__proto__ || Object.getPrototypeOf(Radius)).apply(this, arguments));
+    }
+
+    createClass(Radius, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item radius show\'>\n                <div class=\'title\' ref="$title">Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span> \n                </div>\n                <div class=\'items\'>         \n                    <div>\n                        <label style="width:80px;">Top Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div>\n                        <label style="width:80px;">Bottom Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (item) {
+
+                if (item.fixedRadius) {
+                    _this2.refs.$fixedRadius.el.checked = true;
+                    var radius = item.style['border-radius'] || '';
+                    radius = radius.replace('px', '');
+                    _this2.refs.$topLeftRadius.val(radius);
+                    _this2.refs.$topRightRadius.val('');
+                    _this2.refs.$bottomLeftRadius.val('');
+                    _this2.refs.$bottomRightRadius.val('');
+
+                    // this.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''))
+                    _this2.refs.$topRightRadius.el.disabled = true;
+                    _this2.refs.$bottomLeftRadius.el.disabled = true;
+                    _this2.refs.$bottomRightRadius.el.disabled = true;
+                } else {
+                    _this2.refs.$topRightRadius.el.disabled = false;
+                    _this2.refs.$bottomLeftRadius.el.disabled = false;
+                    _this2.refs.$bottomRightRadius.el.disabled = false;
+
+                    if (item.style['border-top-left-radius']) {
+                        _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-top-right-radius']) {
+                        _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-left-radius']) {
+                        _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
+                    }
+
+                    if (item.style['border-bottom-right-radius']) {
+                        _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
+                    }
+                }
+            });
+        }
+    }, {
+        key: 'refreshValue',
+        value: function refreshValue(key, $el) {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.style[key] = $el.int() + 'px';
+                _this3.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'click $fixedRadius',
+        value: function click$fixedRadius(e) {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (item) {
+                item.fixedRadius = _this4.refs.$fixedRadius.el.checked;
+                _this4.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: 'input $topLeftRadius',
+        value: function input$topLeftRadius() {
+            var _this5 = this;
+
+            this.read('/item/current/layer', function (item) {
+                if (item.fixedRadius) {
+                    _this5.refreshValue('border-radius', _this5.refs.$topLeftRadius);
+                } else {
+                    _this5.refreshValue('border-top-left-radius', _this5.refs.$topLeftRadius);
+                }
+            });
+        }
+    }, {
+        key: 'input $topRightRadius',
+        value: function input$topRightRadius() {
+            this.refreshValue('border-top-right-radius', this.refs.$topRightRadius);
+        }
+    }, {
+        key: 'input $bottomLeftRadius',
+        value: function input$bottomLeftRadius() {
+            this.refreshValue('border-bottom-left-radius', this.refs.$bottomLeftRadius);
+        }
+    }, {
+        key: 'input $bottomRightRadius',
+        value: function input$bottomRightRadius() {
+            this.refreshValue('border-bottom-right-radius', this.refs.$bottomRightRadius);
+        }
+    }]);
+    return Radius;
+}(BasePropertyItem);
+
+var Clip = function (_UIElement) {
+    inherits(Clip, _UIElement);
+
+    function Clip() {
+        classCallCheck(this, Clip);
+        return possibleConstructorReturn(this, (Clip.__proto__ || Object.getPrototypeOf(Clip)).apply(this, arguments));
+    }
+
+    createClass(Clip, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item hidden\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Clip</label>\n                        <div>\n                            <input type=\'checkbox\' ref="$check">\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/page', function (item) {
+                _this2.refs.$check.el.checked = !!item.clip;
+            });
+        }
+    }, {
+        key: 'click $check',
+        value: function click$check() {
+            var _this3 = this;
+
+            this.read('/item/current/page', function (item) {
+                item.clip = _this3.refs.$check.el.checked;
+                _this3.dispatch('/item/set', item);
+            });
+        }
+    }]);
+    return Clip;
+}(UIElement);
+
+var GradientSampleList = function (_UIElement) {
+    inherits(GradientSampleList, _UIElement);
+
+    function GradientSampleList() {
+        classCallCheck(this, GradientSampleList);
+        return possibleConstructorReturn(this, (GradientSampleList.__proto__ || Object.getPrototypeOf(GradientSampleList)).apply(this, arguments));
+    }
+
+    createClass(GradientSampleList, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(GradientSampleList.prototype.__proto__ || Object.getPrototypeOf(GradientSampleList.prototype), 'initialize', this).call(this);
+
+            this.list = this.read('/gradient/list/sample', this.props.type);
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            var _this2 = this;
+
+            return '\n        <div class="gradient-sample-list">\n            ' + this.list.map(function (item, index) {
+                return '<div class=\'gradient-sample-item\' style=\'' + _this2.read('/image/toString', item) + '\' data-index="' + index + '"></div>';
+            }).join('') + '\n        </div>\n        ';
+        }
+    }, {
+        key: 'click $el .gradient-sample-item',
+        value: function click$elGradientSampleItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+
+            this.dispatch('/gradient/select', this.props.type, index);
+        }
+    }]);
+    return GradientSampleList;
+}(UIElement);
+
+var SampleList = function (_BasePropertyItem) {
+    inherits(SampleList, _BasePropertyItem);
+
+    function SampleList() {
+        classCallCheck(this, SampleList);
+        return possibleConstructorReturn(this, (SampleList.__proto__ || Object.getPrototypeOf(SampleList)).apply(this, arguments));
+    }
+
+    createClass(SampleList, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-item sample-list show'>\n                <div class='title' ref=\"$title\">Change Image</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { GradientSampleList: GradientSampleList };
+        }
+    }]);
+    return SampleList;
+}(BasePropertyItem);
+
+var Name = function (_UIElement) {
+    inherits(Name, _UIElement);
+
+    function Name() {
+        classCallCheck(this, Name);
+        return possibleConstructorReturn(this, (Name.__proto__ || Object.getPrototypeOf(Name)).apply(this, arguments));
+    }
+
+    createClass(Name, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item name show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var item = this.read('/item/current');
+
+            var name = '';
+            if (item) {
+                name = item.name;
+            }
+
+            this.refs.$name.val(name);
+        }
+    }, {
+        key: 'input $name',
+        value: function input$name() {
+            var item = this.read('/item/current');
+
+            if (item) {
+                item.name = this.refs.$name.val();
+                this.dispatch('/item/set', item);
+            }
+        }
+    }]);
+    return Name;
+}(UIElement);
+
 var GradientSteps = function (_UIElement) {
     inherits(GradientSteps, _UIElement);
 
@@ -12099,403 +12398,6 @@ var GradientSteps = function (_UIElement) {
         }
     }]);
     return GradientSteps;
-}(UIElement);
-
-var BasePropertyItem = function (_UIElement) {
-    inherits(BasePropertyItem, _UIElement);
-
-    function BasePropertyItem() {
-        classCallCheck(this, BasePropertyItem);
-        return possibleConstructorReturn(this, (BasePropertyItem.__proto__ || Object.getPrototypeOf(BasePropertyItem)).apply(this, arguments));
-    }
-
-    createClass(BasePropertyItem, [{
-        key: 'click $title',
-        value: function click$title() {
-            this.$el.toggleClass('show');
-        }
-    }]);
-    return BasePropertyItem;
-}(UIElement);
-
-var Size = function (_BasePropertyItem) {
-    inherits(Size, _BasePropertyItem);
-
-    function Size() {
-        classCallCheck(this, Size);
-        return possibleConstructorReturn(this, (Size.__proto__ || Object.getPrototypeOf(Size)).apply(this, arguments));
-    }
-
-    createClass(Size, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\' ref="$title">Dimesion</div>\n                <div class=\'items\'>\n                    <div>\n                        <label>fixed</label>\n                        <div>\n                            <button type="button" ref="$rect">like width</button>\n                        </div>\n                    </div>                   \n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var item = this.read('/item/current');
-
-            if (item.itemType == 'image') return;
-            if (!item.style) return;
-            if (item.style.width) {
-                this.refs.$width.val(item.style.width.replace('px', ''));
-            }
-
-            if (item.style.height) {
-                this.refs.$height.val(item.style.height.replace('px', ''));
-            }
-        }
-    }, {
-        key: 'click $rect',
-        value: function click$rect(e) {
-            var item = this.read('/item/current');
-
-            if (item.itemType == 'image') return;
-
-            item.style.width = this.refs.$width.int() + 'px';
-            item.style.height = item.style.width;
-            this.dispatch('/item/set', item);
-        }
-    }, {
-        key: 'input $width',
-        value: function input$width() {
-            var item = this.read('/item/current');
-
-            if (item.itemType == 'image') return;
-
-            item.style.width = this.refs.$width.int() + 'px';
-            this.dispatch('/item/set', item);
-        }
-    }, {
-        key: 'input $height',
-        value: function input$height() {
-            var item = this.read('/item/current');
-
-            if (item.itemType == 'image') return;
-
-            item.style.height = this.refs.$height.int() + 'px';
-            this.dispatch('/item/set', item);
-        }
-    }]);
-    return Size;
-}(BasePropertyItem);
-
-var Position = function (_BasePropertyItem) {
-    inherits(Position, _BasePropertyItem);
-
-    function Position() {
-        classCallCheck(this, Position);
-        return possibleConstructorReturn(this, (Position.__proto__ || Object.getPrototypeOf(Position)).apply(this, arguments));
-    }
-
-    createClass(Position, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item position\'>\n                <div class=\'title\' ref="$title">Position</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>X</label>\n                        <div>\n                            <input type=\'number\' ref="$x"> <span>px</span>\n                        </div>\n                        <label>Y</label>\n                        <div>\n                            <input type=\'number\' ref="$y"> <span>px</span>\n                        </div>\n                    </div>               \n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var _this2 = this;
-
-            this.read('/item/current/layer', function (item) {
-                if (item.style.x) {
-                    _this2.refs.$x.val(item.style.x.replace('px', ''));
-                }
-
-                if (item.style.y) {
-                    _this2.refs.$y.val(item.style.y.replace('px', ''));
-                }
-            });
-        }
-    }, {
-        key: 'input $x',
-        value: function input$x() {
-            var _this3 = this;
-
-            this.read('/item/current/layer', function (item) {
-                item.style.x = _this3.refs.$x.int() + 'px';
-                _this3.dispatch('/item/set', item);
-            });
-        }
-    }, {
-        key: 'input $y',
-        value: function input$y() {
-            var _this4 = this;
-
-            this.read('/item/current/layer', function (item) {
-                item.style.y = _this4.refs.$y.int() + 'px';
-                _this4.dispatch('/item/set', item);
-            });
-        }
-    }]);
-    return Position;
-}(BasePropertyItem);
-
-var Radius = function (_BasePropertyItem) {
-    inherits(Radius, _BasePropertyItem);
-
-    function Radius() {
-        classCallCheck(this, Radius);
-        return possibleConstructorReturn(this, (Radius.__proto__ || Object.getPrototypeOf(Radius)).apply(this, arguments));
-    }
-
-    createClass(Radius, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item radius\'>\n                <div class=\'title\' ref="$title">Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span>\n                </div>\n                <div class=\'items\'>         \n                    <div> <label class=\'left\'>Top</label></div>   \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div> <label class=\'left\'>Bottom</label></div>                             \n                    <div>\n                        <label>Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label>Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var _this2 = this;
-
-            this.read('/item/current/layer', function (item) {
-
-                if (item.fixedRadius) {
-                    _this2.refs.$fixedRadius.el.checked = true;
-                    var radius = item.style['border-radius'] || '';
-                    radius = radius.replace('px', '');
-                    _this2.refs.$topLeftRadius.val(radius);
-                    _this2.refs.$topRightRadius.val('');
-                    _this2.refs.$bottomLeftRadius.val('');
-                    _this2.refs.$bottomRightRadius.val('');
-
-                    // this.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''))
-                    _this2.refs.$topRightRadius.el.disabled = true;
-                    _this2.refs.$bottomLeftRadius.el.disabled = true;
-                    _this2.refs.$bottomRightRadius.el.disabled = true;
-                } else {
-                    _this2.refs.$topRightRadius.el.disabled = false;
-                    _this2.refs.$bottomLeftRadius.el.disabled = false;
-                    _this2.refs.$bottomRightRadius.el.disabled = false;
-
-                    if (item.style['border-top-left-radius']) {
-                        _this2.refs.$topLeftRadius.val(item.style['border-top-left-radius'].replace('px', ''));
-                    }
-
-                    if (item.style['border-top-right-radius']) {
-                        _this2.refs.$topRightRadius.val(item.style['border-top-right-radius'].replace('px', ''));
-                    }
-
-                    if (item.style['border-bottom-left-radius']) {
-                        _this2.refs.$bottomLeftRadius.val(item.style['border-bottom-left-radius'].replace('px', ''));
-                    }
-
-                    if (item.style['border-bottom-right-radius']) {
-                        _this2.refs.$bottomRightRadius.val(item.style['border-bottom-right-radius'].replace('px', ''));
-                    }
-                }
-            });
-        }
-    }, {
-        key: 'refreshValue',
-        value: function refreshValue(key, $el) {
-            var _this3 = this;
-
-            this.read('/item/current/layer', function (item) {
-                item.style[key] = $el.int() + 'px';
-                _this3.dispatch('/item/set', item);
-            });
-        }
-    }, {
-        key: 'click $fixedRadius',
-        value: function click$fixedRadius() {
-            var _this4 = this;
-
-            this.read('/item/current/layer', function (item) {
-                item.fixedRadius = _this4.refs.$fixedRadius.el.checked;
-                _this4.dispatch('/item/set', item);
-            });
-        }
-    }, {
-        key: 'input $topLeftRadius',
-        value: function input$topLeftRadius() {
-            var _this5 = this;
-
-            this.read('/item/current/layer', function (item) {
-                if (item.fixedRadius) {
-                    _this5.refreshValue('border-radius', _this5.refs.$topLeftRadius);
-                } else {
-                    _this5.refreshValue('border-top-left-radius', _this5.refs.$topLeftRadius);
-                }
-            });
-        }
-    }, {
-        key: 'input $topRightRadius',
-        value: function input$topRightRadius() {
-            this.refreshValue('border-top-right-radius', this.refs.$topRightRadius);
-        }
-    }, {
-        key: 'input $bottomLeftRadius',
-        value: function input$bottomLeftRadius() {
-            this.refreshValue('border-bottom-left-radius', this.refs.$bottomLeftRadius);
-        }
-    }, {
-        key: 'input $bottomRightRadius',
-        value: function input$bottomRightRadius() {
-            this.refreshValue('border-bottom-right-radius', this.refs.$bottomRightRadius);
-        }
-    }]);
-    return Radius;
-}(BasePropertyItem);
-
-var Clip = function (_UIElement) {
-    inherits(Clip, _UIElement);
-
-    function Clip() {
-        classCallCheck(this, Clip);
-        return possibleConstructorReturn(this, (Clip.__proto__ || Object.getPrototypeOf(Clip)).apply(this, arguments));
-    }
-
-    createClass(Clip, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item hidden\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Clip</label>\n                        <div>\n                            <input type=\'checkbox\' ref="$check">\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var _this2 = this;
-
-            this.read('/item/current/page', function (item) {
-                _this2.refs.$check.el.checked = !!item.clip;
-            });
-        }
-    }, {
-        key: 'click $check',
-        value: function click$check() {
-            var _this3 = this;
-
-            this.read('/item/current/page', function (item) {
-                item.clip = _this3.refs.$check.el.checked;
-                _this3.dispatch('/item/set', item);
-            });
-        }
-    }]);
-    return Clip;
-}(UIElement);
-
-var GradientSampleList = function (_UIElement) {
-    inherits(GradientSampleList, _UIElement);
-
-    function GradientSampleList() {
-        classCallCheck(this, GradientSampleList);
-        return possibleConstructorReturn(this, (GradientSampleList.__proto__ || Object.getPrototypeOf(GradientSampleList)).apply(this, arguments));
-    }
-
-    createClass(GradientSampleList, [{
-        key: 'initialize',
-        value: function initialize() {
-            get(GradientSampleList.prototype.__proto__ || Object.getPrototypeOf(GradientSampleList.prototype), 'initialize', this).call(this);
-
-            this.list = this.read('/gradient/list/sample', this.props.type);
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-            var _this2 = this;
-
-            return '\n        <div class="gradient-sample-list">\n            ' + this.list.map(function (item, index) {
-                return '<div class=\'gradient-sample-item\' style=\'' + _this2.read('/image/toString', item) + '\' data-index="' + index + '"></div>';
-            }).join('') + '\n        </div>\n        ';
-        }
-    }, {
-        key: 'click $el .gradient-sample-item',
-        value: function click$elGradientSampleItem(e) {
-            var index = +e.$delegateTarget.attr('data-index');
-
-            this.dispatch('/gradient/select', this.props.type, index);
-        }
-    }]);
-    return GradientSampleList;
-}(UIElement);
-
-var SampleList = function (_BasePropertyItem) {
-    inherits(SampleList, _BasePropertyItem);
-
-    function SampleList() {
-        classCallCheck(this, SampleList);
-        return possibleConstructorReturn(this, (SampleList.__proto__ || Object.getPrototypeOf(SampleList)).apply(this, arguments));
-    }
-
-    createClass(SampleList, [{
-        key: "template",
-        value: function template() {
-            return "\n            <div class='property-item sample-list show'>\n                <div class='title' ref=\"$title\">Change Image</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return { GradientSampleList: GradientSampleList };
-        }
-    }]);
-    return SampleList;
-}(BasePropertyItem);
-
-var Name = function (_UIElement) {
-    inherits(Name, _UIElement);
-
-    function Name() {
-        classCallCheck(this, Name);
-        return possibleConstructorReturn(this, (Name.__proto__ || Object.getPrototypeOf(Name)).apply(this, arguments));
-    }
-
-    createClass(Name, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'property-item name show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            var item = this.read('/item/current');
-
-            var name = '';
-            if (item) {
-                name = item.name;
-            }
-
-            this.refs.$name.val(name);
-        }
-    }, {
-        key: 'input $name',
-        value: function input$name() {
-            var item = this.read('/item/current');
-
-            if (item) {
-                item.name = this.refs.$name.val();
-                this.dispatch('/item/set', item);
-            }
-        }
-    }]);
-    return Name;
 }(UIElement);
 
 var ColorSteps = function (_BasePropertyItem) {
@@ -13542,7 +13444,7 @@ var BlendList = function (_BasePropertyItem) {
     createClass(BlendList, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class=\'property-item blend\'>\n            <div class=\'title\' ref="$title">Blend - <span class=\'description\' ref="$desc"></span></div>\n            <div class=\'items\'>         \n                <div class="blend-list" ref="$blendList"></div>\n            </div>\n        </div>\n        ';
+            return '\n        <div class=\'property-item blend\'>\n            <div class=\'title\' ref="$title">Blend - <span class=\'description\' ref="$desc"></span></div>\n            <div class=\'items max-height\'>         \n                <div class="blend-list" ref="$blendList"></div>\n            </div>\n        </div>\n        ';
         }
     }, {
         key: 'load $blendList',
@@ -13605,7 +13507,7 @@ var MixBlendList = function (_BasePropertyItem) {
     createClass(MixBlendList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item mix-blend-list\'>\n                <div class=\'title\' ref="$title">Mix Blend - <span class=\'description\' ref="$desc"></span></div>\n                <div class=\'items\'>                    \n                    <div class=\'mix-blend-list blend-list-tab\'>\n                        <div class="blend-list" ref="$mixBlendList"></div>            \n                    </div>   \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item mix-blend-list\'>\n                <div class=\'title\' ref="$title">Mix Blend - <span class=\'description\' ref="$desc"></span></div>\n                <div class=\'items max-height\'>                    \n                    <div class=\'mix-blend-list blend-list-tab\'>\n                        <div class="blend-list" ref="$mixBlendList"></div>            \n                    </div>   \n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'load $mixBlendList',
@@ -13668,7 +13570,7 @@ var FilterList$1 = function (_BasePropertyItem) {
     createClass(FilterList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item filters\'>\n                <div class=\'title\' ref="$title">Filter - <span class=\'description\' ref="$desc"></span></div>\n                <div class=\'items\'>                    \n                    <div class="filter-list" ref="$filterList">\n                        \n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item filters\'>\n                <div class=\'title\' ref="$title">Filter - <span class=\'description\' ref="$desc"></span></div>\n                <div class=\'items no-padding\'>                    \n                    <div class="filter-list" ref="$filterList">\n                        \n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makeInputItem',
@@ -13830,7 +13732,7 @@ var BackgroundColor = function (_UIElement) {
     createClass(BackgroundColor, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Background Color</label>\n                        <div style=\'width: 40px\'>\n                            <span class=\'color\' ref="$color"></span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Background Color</label>\n                        <div style=\'cursor:pointer;\' ref="$colorview" title="Click me!!">\n                            <span class=\'color\' ref="$color"></span>\n                            <span class=\'color-text\' ref="$colortext"></span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -13844,13 +13746,45 @@ var BackgroundColor = function (_UIElement) {
 
             this.read('/item/current/layer', function (layer) {
                 _this2.refs.$color.css('background-color', layer.style['background-color']);
+                _this2.refs.$colortext.text(layer.style['background-color']);
             });
+        }
+    }, {
+        key: 'click $colorview',
+        value: function click$colorview() {
+            this.emit('toggleLayerColorPicker');
         }
     }]);
     return BackgroundColor;
 }(UIElement);
 
-// import BackgroundRepeat from "./BackgroundRepeat";
+var LayerColorPickerPanel = function (_UIElement) {
+    inherits(LayerColorPickerPanel, _UIElement);
+
+    function LayerColorPickerPanel() {
+        classCallCheck(this, LayerColorPickerPanel);
+        return possibleConstructorReturn(this, (LayerColorPickerPanel.__proto__ || Object.getPrototypeOf(LayerColorPickerPanel)).apply(this, arguments));
+    }
+
+    createClass(LayerColorPickerPanel, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-item layer-colorpicker'>\n                <div class='items'>            \n                    <ColorPicker></ColorPicker>\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "components",
+        value: function components() {
+            return { ColorPicker: ColorPickerLayer };
+        }
+    }, {
+        key: '@toggleLayerColorPicker',
+        value: function toggleLayerColorPicker() {
+            this.$el.toggleClass('show');
+        }
+    }]);
+    return LayerColorPickerPanel;
+}(UIElement);
+
 var items = {
     BackgroundColor: BackgroundColor,
     BlendList: BlendList,
@@ -13865,6 +13799,7 @@ var items = {
     Transform: Transform,
     ColorSampleList: ColorSampleList,
     ImageTypeSelect: ImageTypeSelect,
+    LayerColorPickerPanel: LayerColorPickerPanel,
     ColorPickerPanel: ColorPickerPanel,
     ColorStepsInfo: ColorStepsInfo,
     ColorSteps: ColorSteps,
@@ -13888,7 +13823,7 @@ var LayerView = function (_UIElement) {
     createClass(LayerView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <ColorPickerPanel></ColorPickerPanel>\n                <size></size>\n                <position></position>\n                <radius></radius>\n                <transform></transform>\n                <transform3d></transform3d>\n            </div> \n        ";
+            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <LayerColorPickerPanel></LayerColorPickerPanel>                \n                <size></size>\n                <radius></radius>                \n                <transform></transform>\n                <transform3d></transform3d>                \n                <BlendList></BlendList>\n                <MixBlendList></MixBlendList>\n                <FilterList></FilterList>                \n\n            </div> \n        ";
         }
     }, {
         key: "components",
@@ -13897,28 +13832,6 @@ var LayerView = function (_UIElement) {
         }
     }]);
     return LayerView;
-}(UIElement);
-
-var LayerView2 = function (_UIElement) {
-    inherits(LayerView2, _UIElement);
-
-    function LayerView2() {
-        classCallCheck(this, LayerView2);
-        return possibleConstructorReturn(this, (LayerView2.__proto__ || Object.getPrototypeOf(LayerView2)).apply(this, arguments));
-    }
-
-    createClass(LayerView2, [{
-        key: "template",
-        value: function template() {
-            return "\n            <div class='property-view accordian'>\n                <BlendList></BlendList>\n                <MixBlendList></MixBlendList>\n                <FilterList></FilterList>\n            </div> \n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return items;
-        }
-    }]);
-    return LayerView2;
 }(UIElement);
 
 var LayerMenuTab = function (_BaseTab) {
@@ -13933,27 +13846,14 @@ var LayerMenuTab = function (_BaseTab) {
         key: 'components',
         value: function components() {
             return {
-                LayerView: LayerView,
-                LayerView2: LayerView2
+                LayerView: LayerView
             };
         }
     }, {
         key: 'template',
         value: function template() {
 
-            return '\n            <div class="tab layer-menu-tab">\n                <div class="tab-header" ref="$header">\n                    <div class="tab-item selected" data-id="property">\n                        Property\n                    </div>\n                    <div class="tab-item" data-id="background-blend" title="Blend & Filter">\n                        Blend & Filter \n                    </div>\n                </div>\n                <div class="tab-body" ref="$body">\n                    <div class=\'tab-content selected\' data-id=\'property\'>\n                        <LayerView></LayerView>\n                    </div>\n                    <div class="tab-content" data-id="background-blend">\n                        <LayerView2></LayerView2>\n                    </div>\n                </div>\n            </div>        \n        ';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            if (this.read('/item/is/mode', 'page')) {
-                this.selectTab('property');
-            }
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
+            return '\n            <div>\n                <LayerView></LayerView>\n            </div>    \n        ';
         }
     }]);
     return LayerMenuTab;

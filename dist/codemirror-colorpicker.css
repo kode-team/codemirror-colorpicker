@@ -2831,8 +2831,13 @@
         display: none;
         padding: 4px 5px !important;
         padding-top: 0px; }
+        .imageeditor .property-view .property-item > .items.no-padding {
+          padding: 0px !important; }
       .imageeditor .property-view .property-item.show .items {
         display: block; }
+        .imageeditor .property-view .property-item.show .items.max-height {
+          max-height: 200px;
+          overflow: auto; }
       .imageeditor .property-view .property-item > .items > div {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -2873,9 +2878,14 @@
             .imageeditor .property-view .property-item > .items > div > div > span.color {
               display: block;
               height: 100%;
-              width: 100%;
+              width: 40px;
               margin-right: 0px;
               border: 1px solid #c7c7c7; }
+            .imageeditor .property-view .property-item > .items > div > div > span.color-text {
+              display: inline-block;
+              height: 100%;
+              margin-right: 0px;
+              padding: 10px 0px; }
           .imageeditor .property-view .property-item > .items > div > div .input-text span {
             display: inline-block;
             width: 36px;

@@ -7,7 +7,7 @@ export default class BlendList extends BasePropertyItem {
         return `
         <div class='property-item blend'>
             <div class='title' ref="$title">Blend - <span class='description' ref="$desc"></span></div>
-            <div class='items'>         
+            <div class='items max-height'>         
                 <div class="blend-list" ref="$blendList"></div>
             </div>
         </div>

@@ -40,6 +40,7 @@ export default class ImageManager extends BaseModule {
             var ext = file.name.split('.').pop();
             if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
                 new ImageLoader(file).getImage(image => {
+                    image.fileType = ext; 
                     callback (image)
                 });
             }

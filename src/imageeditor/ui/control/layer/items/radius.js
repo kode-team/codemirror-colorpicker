@@ -3,31 +3,29 @@ import BasePropertyItem from "./BasePropertyItem";
 export default class Radius extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item radius'>
+            <div class='property-item radius show'>
                 <div class='title' ref="$title">Radius 
                     <span>
                         <label><input type='checkbox' ref="$fixedRadius" /> fixed</label>
-                    </span>
+                    </span> 
                 </div>
                 <div class='items'>         
-                    <div> <label class='left'>Top</label></div>   
                     <div>
-                        <label>Left</label>
+                        <label style="width:80px;">Top Left</label>
                         <div>
                             <input type='number' ref="$topLeftRadius"> <span>px</span>
                         </div>
-                        <label>Right</label>
+                        <label style="width:50px;">Right</label>
                         <div>
                             <input type='number' ref="$topRightRadius"> <span>px</span>
                         </div>
                     </div>          
-                    <div> <label class='left'>Bottom</label></div>                             
                     <div>
-                        <label>Left</label>
+                        <label style="width:80px;">Bottom Left</label>
                         <div>
                             <input type='number' ref="$bottomLeftRadius"> <span>px</span>
                         </div>
-                        <label>Right</label>
+                        <label style="width:50px;">Right</label>
                         <div>
                             <input type='number' ref="$bottomRightRadius"> <span>px</span>
                         </div>
@@ -91,7 +89,7 @@ export default class Radius extends BasePropertyItem {
         })
     }
 
-    'click $fixedRadius' () {
+    'click $fixedRadius' (e) {
         this.read('/item/current/layer', (item) => {
             item.fixedRadius = this.refs.$fixedRadius.el.checked; 
             this.dispatch('/item/set', item);

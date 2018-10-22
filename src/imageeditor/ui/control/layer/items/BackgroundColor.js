@@ -7,8 +7,9 @@ export default class BackgroundColor extends UIElement {
                 <div class='items'>            
                     <div>
                         <label>Background Color</label>
-                        <div style='width: 40px'>
+                        <div style='cursor:pointer;' ref="$colorview" title="Click me!!">
                             <span class='color' ref="$color"></span>
+                            <span class='color-text' ref="$colortext"></span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +24,12 @@ export default class BackgroundColor extends UIElement {
     refresh() {
         this.read('/item/current/layer', (layer) => {
             this.refs.$color.css('background-color', layer.style['background-color'])
+            this.refs.$colortext.text(layer.style['background-color'])
         });
+    }
+
+    'click $colorview' () {
+        this.emit('toggleLayerColorPicker')
     }
 
 }

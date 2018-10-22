@@ -3,7 +3,7 @@ import BasePropertyItem from "./BasePropertyItem";
 export default class Position extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item position'>
+            <div class='property-item position show'>
                 <div class='title' ref="$title">Position</div>
                 <div class='items'>            
                     <div>

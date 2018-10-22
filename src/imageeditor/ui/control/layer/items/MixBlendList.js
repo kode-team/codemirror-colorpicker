@@ -6,7 +6,7 @@ export default class MixBlendList extends BasePropertyItem {
         return `
             <div class='property-item mix-blend-list'>
                 <div class='title' ref="$title">Mix Blend - <span class='description' ref="$desc"></span></div>
-                <div class='items'>                    
+                <div class='items max-height'>                    
                     <div class='mix-blend-list blend-list-tab'>
                         <div class="blend-list" ref="$mixBlendList"></div>            
                     </div>   
