@@ -5,7 +5,7 @@ export default class DropView extends UIElement {
     template () {
         return `
             <div class='drop-view'>
-
+                <div class='drop-overview'></div>
             </div>
         `
     }

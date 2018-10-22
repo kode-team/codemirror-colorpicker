@@ -15955,7 +15955,7 @@ var DropView = function (_UIElement) {
     createClass(DropView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'drop-view\'>\n\n            </div>\n        ';
+            return '\n            <div class=\'drop-view\'>\n                <div class=\'drop-overview\'></div>\n            </div>\n        ';
         }
     }, {
         key: 'dragover document',
