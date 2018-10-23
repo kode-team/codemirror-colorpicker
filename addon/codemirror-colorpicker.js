@@ -10993,8 +10993,6 @@ var ItemManager = function (_BaseModule) {
             item.parentId = parentId;
             item.index = Number.MAX_SAFE_INTEGER;
 
-            console.log($store.items);
-
             $store.run('/item/set', item, isSelected);
             $store.run('/item/sort', id);
         }
@@ -12869,7 +12867,7 @@ var PredefinedRadialGradientAngle = function (_UIElement) {
     createClass(PredefinedRadialGradientAngle, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class="inline-block">\n                <button ref="$center" type="button" data-value="center" title="center"><span class=\'circle\'></span></button>            \n                <select class="radial-type-list" ref="$select">\n                    <option value="circle">circle</option>\n                    <option value="ellipse">ellipse</option>\n                    <option value="closest-side">closest-side</option> \n                    <option value="closest-corner">closest-corner</option>\n                    <option value="farthest-side">farthest-side</option>\n                    <option value="farthest-corner">farthest-corner</option>                    \n                </select>\n            </div>\n        ';
+            return '\n            <div class="predefined-radial-gradient-angle">\n                <button ref="$center" type="button" data-value="center" title="center"><span class=\'circle\'></span></button>            \n                <select class="radial-type-list" ref="$select">\n                    <option value="circle">circle</option>\n                    <option value="ellipse">ellipse</option>\n                    <option value="closest-side">closest-side</option> \n                    <option value="closest-corner">closest-corner</option>\n                    <option value="farthest-side">farthest-side</option>\n                    <option value="farthest-corner">farthest-corner</option>                    \n                </select>\n            </div>\n        ';
         }
     }, {
         key: 'change $select',
@@ -14024,7 +14022,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ColorPickerPanel></ColorPickerPanel>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15498,28 +15496,6 @@ var MoveGuide = function (_UIElement) {
     return MoveGuide;
 }(UIElement);
 
-var ImageView$2 = function (_UIElement) {
-    inherits(ImageView, _UIElement);
-
-    function ImageView() {
-        classCallCheck(this, ImageView);
-        return possibleConstructorReturn(this, (ImageView.__proto__ || Object.getPrototypeOf(ImageView)).apply(this, arguments));
-    }
-
-    createClass(ImageView, [{
-        key: "template",
-        value: function template() {
-            return "\n            <div class='property-view'>\n\n            </div>  \n        ";
-        }
-    }, {
-        key: "components",
-        value: function components() {
-            return items;
-        }
-    }]);
-    return ImageView;
-}(UIElement);
-
 var SubFeatureControl = function (_UIElement) {
     inherits(SubFeatureControl, _UIElement);
 
@@ -15531,12 +15507,18 @@ var SubFeatureControl = function (_UIElement) {
     createClass(SubFeatureControl, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
         value: function components() {
-            return _extends({ ImageSubView: ImageView$2 }, items);
+            return _extends({
+                PredefinedRadialGradientAngle: PredefinedRadialGradientAngle,
+                GradientAngle: GradientAngle,
+                GradientPosition: GradientPosition,
+                PredefinedLinearGradientAngle: PredefinedLinearGradientAngle,
+                PredefinedRadialGradientPosition: PredefinedRadialGradientPosition
+            }, items);
         }
     }, {
         key: "refresh",
@@ -15614,10 +15596,6 @@ var GradientView = function (_BaseTab) {
             return {
                 SubFeatureControl: SubFeatureControl,
                 MoveGuide: MoveGuide,
-                GradientAngle: GradientAngle,
-                GradientPosition: GradientPosition,
-                PredefinedLinearGradientAngle: PredefinedLinearGradientAngle,
-                PredefinedRadialGradientPosition: PredefinedRadialGradientPosition,
                 PredefinedPageResizer: PredefinedPageResizer,
                 PredefinedLayerResizer: PredefinedLayerResizer
             };

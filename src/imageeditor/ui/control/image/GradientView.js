@@ -42,10 +42,6 @@ export default class GradientView extends BaseTab {
         return {  
             SubFeatureControl,
             MoveGuide,
-            GradientAngle, 
-            GradientPosition, 
-            PredefinedLinearGradientAngle, 
-            PredefinedRadialGradientPosition, 
             PredefinedPageResizer,
             PredefinedLayerResizer
         }

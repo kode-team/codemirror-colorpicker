@@ -1,6 +1,10 @@
 import UIElement from "../../../colorpicker/UIElement";
-import ImageSubView from "./layer/ImageSubView";
 import items from './layer/items/index';
+import GradientAngle from "../view/GradientAngle";
+import GradientPosition from "../view/GradientPosition";
+import PredefinedLinearGradientAngle from "../view/PredefinedLinearGradientAngle";
+import PredefinedRadialGradientPosition from "../view/PredefinedRadialGradientPosition";
+import PredefinedRadialGradientAngle from "../view/PredefinedRadialGradientAngle";
 
 
 export default class SubFeatureControl extends UIElement {
@@ -17,9 +21,9 @@ export default class SubFeatureControl extends UIElement {
                         <GradientAngle></GradientAngle>                            
                     </div>
                     <div class="property-view" ref="$radial">
+                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    
                         <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>
                         <GradientPosition></GradientPosition>
-
                     </div>
                 </div>
             </div>
@@ -27,7 +31,14 @@ export default class SubFeatureControl extends UIElement {
     }
 
     components () {
-        return { ImageSubView, ...items } 
+        return { 
+            PredefinedRadialGradientAngle,
+            GradientAngle, 
+            GradientPosition, 
+            PredefinedLinearGradientAngle, 
+            PredefinedRadialGradientPosition, 
+            ...items
+        } 
     }
 
 

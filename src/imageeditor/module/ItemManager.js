@@ -609,8 +609,6 @@ export default class ItemManager extends BaseModule {
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER; 
 
-        console.log($store.items);
-
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
     }    
