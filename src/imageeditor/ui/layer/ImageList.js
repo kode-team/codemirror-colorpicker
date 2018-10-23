@@ -31,15 +31,13 @@ export default class ImageList extends UIElement {
     makeItemNodeImage (item) {
         var selected = item.selected ? 'selected' : '' 
         return `
-            <div class='tree-item ${selected}' id="${item.id}" >
+            <div class='tree-item ${selected}' id="${item.id}" draggable="true" >
                 <div class="item-view-container">
                     <div class="item-view"  style='${this.read('/image/toString', item)}'></div>
                 </div>
                 <div class='item-tools'>
-                    <button type="button" class='copy-item' item-id='${item.id}'>&times;</button>
-                    <button type="button" class='delete-item' item-id='${item.id}'>&times;</button>
-                    <button type="button" class='left-item' item-id='${item.id}'>&lt;</button>
-                    <button type="button" class='right-item' item-id='${item.id}'>&gt;</button>
+                    <button type="button" class='delete-item' item-id='${item.id}' title="Remove">&times;</button>                
+                    <button type="button" class='copy-item' item-id='${item.id}' title="Copy">&times;</button>
                 </div>            
             </div>
             ` 
@@ -98,24 +96,56 @@ export default class ImageList extends UIElement {
         }); 
     }       
 
+
+
+    'dragstart $imageList .tree-item' (e) {
+        this.draggedImage = e.$delegateTarget;
+        this.draggedImage.css('opacity', 0.5);
+        // e.preventDefault();
+    }
+
+    'dragend $imageList .tree-item' (e) {
+
+        if (this.draggedImage) {
+            this.draggedImage.css('opacity', 1);        
+        }
+    }    
+
+    'dragover $imageList .tree-item' (e) {
+        e.preventDefault();        
+    }        
+
+    'drop.self $imageList .tree-item' (e) {
+        e.preventDefault();        
+
+        var destId = e.$delegateTarget.attr('id')
+        var sourceId = this.draggedImage.attr('id')
+
+        this.draggedImage = null; 
+        this.dispatch('/item/move/in', destId, sourceId)
+        this.refresh()
+    }       
+    
+    'drop $imageList' (e) {
+        e.preventDefault();        
+
+        if (this.draggedImage) {
+            var sourceId = this.draggedImage.attr('id')
+
+            this.draggedImage = null; 
+            this.dispatch('/item/move/last', sourceId)
+            this.refresh()
+        }
+
+    }           
+
     'click $imageList .copy-item' (e) {
-        this.dispatch('/item/addCopy', e.$delegateTarget.attr('item-id'))
+        this.dispatch('/item/addCopy/image', e.$delegateTarget.attr('item-id'))
         this.refresh()
     }
 
     'click $imageList .delete-item' (e) {
         this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
         this.refresh()
-    }
-
-    'click $imageList .left-item' (e) {
-        this.dispatch('/item/move/prev', e.$delegateTarget.attr('item-id'))
-        this.refresh()
-    }
-
-    'click $imageList .right-item' (e) {
-        this.dispatch('/item/move/next', e.$delegateTarget.attr('item-id'))
-        this.refresh()
-    }
-
+    }    
 }

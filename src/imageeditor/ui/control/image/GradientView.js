@@ -60,7 +60,7 @@ export default class GradientView extends BaseTab {
 
         var editMode = this.read('/item/get/editMode');
 
-        return this.read('/item/map/children', page.id, (item) => {
+        return this.read('/item/map/children', page.id, (item, index) => {
 
             switch (editMode) {
             case EDITOR_MODE_IMAGE_IMAGE:
@@ -71,11 +71,11 @@ export default class GradientView extends BaseTab {
                 var image = this.read('/item/current/image')
 
                 if (image.parentId == item.id) {
-                    return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item, true, image)}'></div>`
+                    return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true, image)}'></div>`
                 }
             }
 
-            return `<div class='layer' item-id="${item.id}" style='${this.read('/layer/toString', item, true)}'></div>`
+            return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true)}'></div>`
         });
     }
 
@@ -127,7 +127,7 @@ export default class GradientView extends BaseTab {
     }
 
     'click.self $page .layer' (e) {
-        var id = e.$delegateTarget.attr('item-id')
+        var id = e.$delegateTarget.attr('item-layer-id')
         if (id) {
             this.run('/item/select/mode', 'layer')
             this.dispatch('/item/select', id);
@@ -165,7 +165,7 @@ export default class GradientView extends BaseTab {
         this.isDown = true; 
         this.xy = e.xy;
         this.$layer = e.$delegateTarget;
-        this.layer = this.read('/item/get', e.$delegateTarget.attr('item-id'))
+        this.layer = this.read('/item/get', e.$delegateTarget.attr('item-layer-id'))
         this.moveX = +(this.layer.style.x || 0).replace('px', '')
         this.moveY = +(this.layer.style.y || 0).replace('px', '')
 

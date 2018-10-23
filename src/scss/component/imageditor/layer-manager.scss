@@ -71,17 +71,19 @@ $layer-item-padding: 4px;
         box-sizing: border-box;
         
         button {
-            display: inline-block;
-            height: $page-item-height;            
+            display: inline-block;      
             vertical-align: middle;
             box-sizing: border-box;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             padding: 5px;
-            min-width: 100px;
             margin-right: 5px;
             text-align: center;
+            appearance: none;
+            background-color: transparent;
+            border:0px;
+            line-height: 0;
         }
         
         
@@ -131,6 +133,33 @@ $layer-item-padding: 4px;
                 pointer-events: none;
             }
 
+            &:hover {
+                .item-tools {
+                    display: block;
+
+                    button {
+
+                        &.copy-item {
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+
+            .item-tools {
+                display: none;
+                button {
+                    height: 20px;
+                    display: inline-block;
+
+                    &.copy-item {
+                        position: absolute;
+                        right: 0px;
+                        top: 50%;
+                        transform: translateY(-50%);                        
+                    }
+                }
+            }
 
         }
 

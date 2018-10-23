@@ -94,6 +94,74 @@ export default class ItemManager extends BaseModule {
         this.$store.emit('changeEditor')
     }
 
+    '*/item/collect/colorsteps' ($store, imageId) {
+        return $store.read('/item/map/children', imageId, (colorstep) => {
+            var colorstep = $store.read('/clone', $store.items[colorstep.id]);
+            delete colorstep.id;
+            delete colorstep.parentId;
+    
+            return colorstep
+        })
+    }
+
+    '*/item/collect/image/one' ($store, imageId) {
+        var image = $store.read('/clone', $store.items[imageId]);
+        delete image.id;
+        delete image.parentId;
+
+        return {
+            image,
+            colorsteps: $store.read('/item/collect/colorsteps', imageId)
+        }
+    }
+
+    '*/item/collect/images' ($store, layerId) {
+        return $store.read('/item/map/children', layerId, (image) => {
+            return $store.read('/item/collect/image/one', image.id)
+        })
+    }
+
+    '*/item/collect/layer/one' ($store, layerId) {
+        var results = {} 
+
+        if (!$store.items[layerId]) {
+            return results; 
+        }
+
+        var layer = $store.read('/clone', $store.items[layerId]);
+        delete layer.id;
+        delete layer.parentId;
+
+        return {
+            layer,
+            images: $store.read('/item/collect/images', layerId)
+        }
+    }
+
+    '*/item/collect/layers' ($store, pageId) {
+        return $store.read('/item/map/children', pageId, (layer) => {
+            return $store.read('/item/collect/layer/one', layer.id)
+        })
+    }
+
+    '*/item/collect/page' ($store, pageId) {
+        var results = {} 
+
+        if (!$store.items[pageId]) {
+            return results; 
+        }
+
+        var page = $store.read('/clone', $store.items[pageId]);
+        delete page.id;
+        delete page.parentId;
+
+        return {
+            page,
+            layers: $store.read('/item/collect/layers', pageId)
+        }
+
+    }
+
     '*/item/create/object' ($store, obj, defaultObj = {}) {
         obj = Object.assign({}, $store.read('/clone', defaultObj), obj);         
         obj.id = Date.now() + '-' + uuid();
@@ -352,11 +420,11 @@ export default class ItemManager extends BaseModule {
         return $store.editMode
     }    
 
-    '*/item/rect' ($store, id) {
-        var dom = document.querySelector('[item-id="' + id + '"]');
+    '*/item/dom' ($store, id) {
+        var dom = document.querySelector('[item-layer-id="' + id + '"]');
 
         if (dom) {
-            return new Dom(dom).rect()
+            return new Dom(dom)
         }
     }
 
@@ -541,6 +609,8 @@ export default class ItemManager extends BaseModule {
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER; 
 
+        console.log($store.items);
+
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
     }    
@@ -582,14 +652,69 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/set', image, isSelected);        
     }
 
-    '/item/addCopy' ($store, id, isSelected = false) {
-        var copyId = $store.read('/item/copy', id)
+    '/item/addCopy' ($store, sourceId, isSelected = false) {
+        var newItemId = $store.read('/item/copy', sourceId)
+        $store.run('/item/move/to', sourceId, newItemId);
+    }
 
-        var copyItem = $store.read('/item/get', copyId);
-        copyItem.index = Number.MAX_SAFE_INTEGER; 
+    '/item/move/to' ($store, sourceId, newItemId) {
 
-        $store.run('/item/set', copyItem, copyItem.selected || isSelected);
-        $store.run('/item/sort', copyId);
+        var currentItem = $store.read('/item/get', sourceId);
+
+        var newItem = $store.read('/item/get', newItemId);
+        newItem.index = currentItem.index + COPY_INDEX_DIST;
+
+        $store.run('/item/set', newItem, true);
+        $store.run('/item/sort', newItemId);
+
+    }    
+
+    '/item/addCopy/page' ($store, sourceId) {
+        var page = $store.read('/item/collect/page', sourceId);
+        var newPageId = $store.read('/item/create/object', page.page);
+
+        page.layers.forEach( layer => {
+            var newLayerId = $store.read('/item/create/object', Object.assign({}, layer.layer, {parentId: newPageId}));
+            layer.images.forEach(image => {
+                var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, {parentId: newLayerId}));
+                
+                image.colorsteps.forEach(step => {
+                    $store.read('/item/create/object', Object.assign({}, step, {parentId: newImageId}))
+                })
+    
+            })
+    
+        })
+
+        $store.run('/item/move/to', sourceId, newPageId);
+    }
+
+    '/item/addCopy/layer' ($store, sourceId) {
+        var currentLayer = $store.read('/item/get', sourceId);
+        var layer = $store.read('/item/collect/layer/one', sourceId);
+        var newLayerId = $store.read('/item/create/object', Object.assign({parentId: currentLayer.parentId}, layer.layer));
+        layer.images.forEach(image => {
+            var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, {parentId: newLayerId}));
+            
+            image.colorsteps.forEach(step => {
+                $store.read('/item/create/object', Object.assign({}, step, {parentId: newImageId}))
+            })
+
+        })
+
+        $store.run('/item/move/to', sourceId, newLayerId);        
+
+    }
+
+    '/item/addCopy/image' ($store, sourceId) {
+        var currentImage = $store.read('/item/get', sourceId);
+        var image = $store.read('/item/collect/image/one', sourceId);
+        var newImageId = $store.read('/item/create/object', Object.assign({parentId: currentImage.parentId}, image.image));
+        image.colorsteps.forEach(step => {
+            $store.read('/item/create/object', Object.assign({}, step, {parentId: newImageId}))
+        })
+        $store.run('/item/move/to', sourceId, newImageId); 
+
     }
 
     '/item/move/next' ($store, id) {
@@ -599,6 +724,31 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/set', item, item.selected);
         $store.run('/item/sort', id);
     }
+
+    '/item/move/last' ($store, id) {
+        var item = $store.read('/item/get', id);
+        item.index = Number.MAX_SAFE_INTEGER;
+
+        $store.run('/item/set', item, item.selected);
+        $store.run('/item/sort', id);
+    }   
+    
+    '/item/move/first' ($store, id) {
+        var item = $store.read('/item/get', id);
+        item.index = -1 * COPY_INDEX_DIST;
+
+        $store.run('/item/set', item, item.selected);
+        $store.run('/item/sort', id);
+    }       
+
+    '/item/move/in' ($store, destId, sourceId) {
+        var destItem = $store.read('/item/get', destId);
+        var sourceItem = $store.read('/item/get', sourceId);
+        sourceItem.index = destItem.index - COPY_INDEX_DIST;
+
+        $store.run('/item/set', sourceItem, true);
+        $store.run('/item/sort', sourceId);
+    }    
 
     '/item/move/prev' ($store, id) {
         var item = $store.read('/item/get', id);

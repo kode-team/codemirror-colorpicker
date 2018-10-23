@@ -87,15 +87,23 @@ $show-timeline-animation: all 0.3s linear;
 
         .header-title {
             width: $left-size;
-            padding: 4px;
+            padding: 0px 4px;
             margin: 0px;
-            text-align: left;
-            font-size: 20px;
-            text-shadow: 1px 1px 8px rgba(70, 11, 123, 0.54);        
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 8px; 
             flex: none;
             display: block; 
             box-sizing: border-box;
+            font-weight: 900;
             line-height: 1.6;
+            background-image: linear-gradient(to top, #C6FFDD 0%,#FBD786 50%,#f7797d 100%);
+            background-size: auto;
+            background-blend-mode: multiply;
+            background-color: rgba(245,0,255,0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
         }
 
         .page-tab-menu {

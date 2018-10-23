@@ -16,7 +16,7 @@ export default class LayerList extends UIElement {
         `
     }
 
-    makeItemNode (node) {
+    makeItemNode (node, index) {
         var item = this.read('/item/get', node.id);
 
         var layer = this.read('/item/current/layer')
@@ -25,19 +25,25 @@ export default class LayerList extends UIElement {
         if (layer) selectedId = layer.id ; 
 
         if (item.itemType == 'layer') {
-            return this.makeItemNodeLayer(item, selectedId);
+            return this.makeItemNodeLayer(item, selectedId, index);
         }
 
     }
  
-    makeItemNodeLayer (item, selectedId) {
+    makeItemNodeLayer (item, selectedId, index = 0) {
         var selected = item.id == selectedId ? 'selected' : ''; 
         return `
-            <div class='tree-item ${selected}' id="${item.id}" type='layer'>
+            <div class='tree-item ${selected}' id="${item.id}" type='layer' draggable="true">
                 <div class="item-view-container">
                     <div class="item-view"  style='${this.read('/layer/toString', item, false)}'></div>
                 </div>
-                <div class="item-title"> ${item.name || `Layer `} </div>
+                <div class="item-title"> 
+                    ${index+1}. ${item.name || `Layer `} 
+                    <button type="button" class='delete-item' item-id='${item.id}' title="Remove">&times;</button>
+                </div>
+                <div class='item-tools'>
+                    <button type="button" class='copy-item' item-id='${item.id}' title="Copy">+</button>
+                </div>                            
             </div>
             `
     }    
@@ -50,7 +56,7 @@ export default class LayerList extends UIElement {
         }
 
         return this.read('/item/map/children', page.id, (item, index) => {
-            return this.makeItemNode(item); 
+            return this.makeItemNode(item, index); 
         })
     }
 
@@ -78,5 +84,56 @@ export default class LayerList extends UIElement {
             this.emit('@selectLayer')
         }
         
+    }
+
+    'dragstart $layerList .tree-item' (e) {
+        this.draggedLayer = e.$delegateTarget;
+        this.draggedLayer.css('opacity', 0.5);
+        // e.preventDefault();
+    }
+
+    'dragend $layerList .tree-item' (e) {
+
+        if (this.draggedLayer) {
+            this.draggedLayer.css('opacity', 1);        
+        }
+    }    
+
+    'dragover $layerList .tree-item' (e) {
+        e.preventDefault();        
+    }        
+
+    'drop.self $layerList .tree-item' (e) {
+        e.preventDefault();        
+
+        var destId = e.$delegateTarget.attr('id')
+        var sourceId = this.draggedLayer.attr('id')
+
+        this.draggedLayer = null; 
+        this.dispatch('/item/move/in', destId, sourceId)
+        this.refresh()
+    }       
+    
+    'drop $layerList' (e) {
+        e.preventDefault();        
+
+        if (this.draggedLayer) {
+            var sourceId = this.draggedLayer.attr('id')
+
+            this.draggedLayer = null; 
+            this.dispatch('/item/move/last', sourceId)
+            this.refresh()
+        }
+
+    }           
+
+    'click $layerList .copy-item' (e) {
+        this.dispatch('/item/addCopy/layer', e.$delegateTarget.attr('item-id'))
+        this.refresh()
+    }
+
+    'click $layerList .delete-item' (e) {
+        this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
+        this.refresh()
     }
 }
