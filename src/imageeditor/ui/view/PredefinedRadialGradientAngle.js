@@ -18,6 +18,17 @@ export default class PredefinedRadialGradientAngle extends UIElement {
             </div>
         `
     }
+
+    refresh () {
+        this.read('/item/current/image', (image) => {
+            this.refs.$select.val(image.radialType);
+        })
+    }
+
+    '@changeEditor' () {
+        this.refresh();
+    }
+
     'change $select' (e) {
         this.read('/item/current/image', (image) => {
             image.radialType = this.refs.$select.val()

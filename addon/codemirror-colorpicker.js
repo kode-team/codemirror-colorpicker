@@ -12856,43 +12856,6 @@ var ColorPickerPanel = function (_UIElement) {
     return ColorPickerPanel;
 }(UIElement);
 
-var PredefinedRadialGradientAngle = function (_UIElement) {
-    inherits(PredefinedRadialGradientAngle, _UIElement);
-
-    function PredefinedRadialGradientAngle() {
-        classCallCheck(this, PredefinedRadialGradientAngle);
-        return possibleConstructorReturn(this, (PredefinedRadialGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientAngle)).apply(this, arguments));
-    }
-
-    createClass(PredefinedRadialGradientAngle, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class="predefined-radial-gradient-angle">\n                <button ref="$center" type="button" data-value="center" title="center"><span class=\'circle\'></span></button>            \n                <select class="radial-type-list" ref="$select">\n                    <option value="circle">circle</option>\n                    <option value="ellipse">ellipse</option>\n                    <option value="closest-side">closest-side</option> \n                    <option value="closest-corner">closest-corner</option>\n                    <option value="farthest-side">farthest-side</option>\n                    <option value="farthest-corner">farthest-corner</option>                    \n                </select>\n            </div>\n        ';
-        }
-    }, {
-        key: 'change $select',
-        value: function change$select(e) {
-            var _this2 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.radialType = _this2.refs.$select.val();
-                _this2.dispatch('/item/set', image);
-            });
-        }
-    }, {
-        key: 'click $center',
-        value: function click$center(e) {
-            var _this3 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.radialPosition = 'center';
-                _this3.dispatch('/item/set', image);
-            });
-        }
-    }]);
-    return PredefinedRadialGradientAngle;
-}(UIElement);
-
 var ImageTypeSelect = function (_BasePropertyItem) {
     inherits(ImageTypeSelect, _BasePropertyItem);
 
@@ -12902,14 +12865,9 @@ var ImageTypeSelect = function (_BasePropertyItem) {
     }
 
     createClass(ImageTypeSelect, [{
-        key: 'components',
-        value: function components() {
-            return { PredefinedRadialGradientAngle: PredefinedRadialGradientAngle };
-        }
-    }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class=\'property-item gradient-tools show\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n                <div ref="$angular" class=\'gradient-angular linear\'>\n                    <div class="gradient-angular-item radial">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>\n                    </div>\n                    <div class="gradient-angular-item image">\n                        \n                    </div>                \n                </div>\n            </div>\n        </div>\n\n          \n        ';
+            return '\n        <div class=\'property-item gradient-tools show\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -12951,10 +12909,6 @@ var ImageTypeSelect = function (_BasePropertyItem) {
             this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
             this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
             this.refs.$image.toggleClass('selected', type == 'image');
-
-            this.refs.$angular.toggleClass('linear', this.read('/image/type/isLinear', type));
-            this.refs.$angular.toggleClass('radial', this.read('/image/type/isRadial', type));
-            this.refs.$angular.toggleClass('image', this.read('/image/type/isImage', type));
         }
     }, {
         key: 'click $gradientType .gradient-item',
@@ -15494,6 +15448,57 @@ var MoveGuide = function (_UIElement) {
         }
     }]);
     return MoveGuide;
+}(UIElement);
+
+var PredefinedRadialGradientAngle = function (_UIElement) {
+    inherits(PredefinedRadialGradientAngle, _UIElement);
+
+    function PredefinedRadialGradientAngle() {
+        classCallCheck(this, PredefinedRadialGradientAngle);
+        return possibleConstructorReturn(this, (PredefinedRadialGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientAngle)).apply(this, arguments));
+    }
+
+    createClass(PredefinedRadialGradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="predefined-radial-gradient-angle">\n                <button ref="$center" type="button" data-value="center" title="center"><span class=\'circle\'></span></button>            \n                <select class="radial-type-list" ref="$select">\n                    <option value="circle">circle</option>\n                    <option value="ellipse">ellipse</option>\n                    <option value="closest-side">closest-side</option> \n                    <option value="closest-corner">closest-corner</option>\n                    <option value="farthest-side">farthest-side</option>\n                    <option value="farthest-corner">farthest-corner</option>                    \n                </select>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (image) {
+                _this2.refs.$select.val(image.radialType);
+            });
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'change $select',
+        value: function change$select(e) {
+            var _this3 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.radialType = _this3.refs.$select.val();
+                _this3.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: 'click $center',
+        value: function click$center(e) {
+            var _this4 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.radialPosition = 'center';
+                _this4.dispatch('/item/set', image);
+            });
+        }
+    }]);
+    return PredefinedRadialGradientAngle;
 }(UIElement);
 
 var SubFeatureControl = function (_UIElement) {

@@ -1,11 +1,6 @@
-import PredefinedRadialGradientAngle from '../../../view/PredefinedRadialGradientAngle'
 import BasePropertyItem from './BasePropertyItem';
 
 export default class ImageTypeSelect extends BasePropertyItem {
-
-    components () {
-        return { PredefinedRadialGradientAngle }
-    } 
 
     template () {
         return `
@@ -24,18 +19,8 @@ export default class ImageTypeSelect extends BasePropertyItem {
                         <div class="m3"></div>
                     </div>
                 </div>
-                <div ref="$angular" class='gradient-angular linear'>
-                    <div class="gradient-angular-item radial">
-                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>
-                    </div>
-                    <div class="gradient-angular-item image">
-                        
-                    </div>                
-                </div>
             </div>
         </div>
-
-          
         `
     }
 
@@ -76,10 +61,6 @@ export default class ImageTypeSelect extends BasePropertyItem {
         this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
         this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
         this.refs.$image.toggleClass('selected', type == 'image');
-
-        this.refs.$angular.toggleClass('linear', this.read('/image/type/isLinear', type)); 
-        this.refs.$angular.toggleClass('radial',  this.read('/image/type/isRadial', type));
-        this.refs.$angular.toggleClass('image',  this.read('/image/type/isImage', type));
     }
 
     'click $gradientType .gradient-item' (e) {
