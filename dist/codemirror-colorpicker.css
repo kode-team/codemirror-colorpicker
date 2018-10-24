@@ -1705,7 +1705,7 @@
                 cursor: pointer;
                 -webkit-box-sizing: border-box;
                         box-sizing: border-box;
-                height: 30px;
+                height: 20px;
                 position: relative;
                 background-color: #ececec;
                 -webkit-appearance: none;
@@ -3214,70 +3214,6 @@
           vertical-align: middle;
           padding: 10px 0px;
           font-size: 12px; }
-        .imageeditor .property-view .property-item.gradient-tools .gradient-angular {
-          display: block;
-          -webkit-user-select: none;
-             -moz-user-select: none;
-              -ms-user-select: none;
-                  user-select: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.linear {
-            display: block; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.radial {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.linear .gradient-angular-item.image {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.linear {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.radial {
-            display: block; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.radial .gradient-angular-item.image {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.linear {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.radial {
-            display: none; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular.image .gradient-angular-item.image {
-            display: block; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.linear .predefined-angluar-group {
-            display: inline-block;
-            width: 142px;
-            text-align: center; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block {
-            position: relative;
-            display: inline-block; }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial .inline-block select {
-              -webkit-appearance: none;
-                 -moz-appearance: none;
-                      appearance: none;
-              display: inline-block;
-              -webkit-box-sizing: border-box;
-                      box-sizing: border-box;
-              padding: 5px 5px;
-              border: 0px;
-              background-color: white;
-              width: 110px;
-              outline: none;
-              height: 34px;
-              font-size: 15px;
-              height: 100%; }
-          .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial button {
-            padding: 0px;
-            margin: 1px;
-            background-color: transparent;
-            border: 0px;
-            -webkit-appearance: none;
-               -moz-appearance: none;
-                    appearance: none;
-            outline: none;
-            cursor: pointer;
-            padding-top: 5px;
-            padding-bottom: 5px;
-            display: inline-block;
-            width: 8px;
-            height: 18px;
-            vertical-align: middle; }
-            .imageeditor .property-view .property-item.gradient-tools .gradient-angular .gradient-angular-item.radial button[data-value='center'] {
-              background-image: radial-gradient(circle, black, #FFFFFF 50%); }
       .imageeditor .property-view .property-item .gradient-type .gradient-item {
         margin-right: 3px; }
     .imageeditor .property-view .gradient-view {
