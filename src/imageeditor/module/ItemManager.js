@@ -473,6 +473,9 @@ export default class ItemManager extends BaseModule {
             $store.items[id].index = NONE_INDEX;
             $store.read('/item/sort', id);
 
+            if ($store.items[id].backgroundImage) {
+                URL.revokeObjectURL($store.items[id].backgroundImage);
+            }
             delete $store.items[id]
         }
     }
@@ -620,12 +623,26 @@ export default class ItemManager extends BaseModule {
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER;
         item.fileType = img.fileType;
-        item.backgroundImage = img.src;
+        item.backgroundImage = img.url;
+        item.backgroundImageDataURI = img.datauri,
         item.backgroundSizeWidth = '100%';
 
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
-    }        
+    }     
+    
+    '/item/add/image/url' ($store, url, isSelected = false, parentId = '') {
+        var id = $store.read('/item/create/image');
+        var item = $store.read('/item/get', id);
+        item.type = 'image'; 
+        item.parentId = parentId; 
+        item.index = Number.MAX_SAFE_INTEGER;
+        item.backgroundImage = url;
+        item.backgroundSizeWidth = '100%';
+
+        $store.run('/item/set', item, isSelected);
+        $store.run('/item/sort', id); 
+    }         
 
     '/item/add/page' ($store, isSelected = false) {
         var pageId = $store.read('/item/create', 'page');        

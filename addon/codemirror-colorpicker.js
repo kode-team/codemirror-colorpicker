@@ -9504,11 +9504,24 @@ var ImageManager = function (_BaseModule) {
             (files || []).forEach(function (file) {
                 var ext = file.name.split('.').pop();
                 if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
-                    new ImageLoader(file).getImage(function (image) {
-                        image.fileType = ext;
-                        callback(image);
-                    });
+
+                    if (typeof callback == 'function') {
+                        new ImageLoader(file).getImage(function (image) {
+                            callback({
+                                datauri: image.src, // export 용 
+                                url: URL.createObjectURL(file), // 화면 제어용 
+                                fileType: ext
+                            });
+                        });
+                    }
                 }
+            });
+        }
+    }, {
+        key: '*/image/get/url',
+        value: function imageGetUrl($store, urls, callback) {
+            (urls || []).forEach(function (url) {
+                callback(url);
             });
         }
     }, {
@@ -9581,12 +9594,13 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/toCSS',
         value: function imageToCSS($store) {
             var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+            var isExport = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
 
             var results = {};
-            var backgroundImage = $store.read('/image/toImageString', image);
-            var backgroundSize = $store.read('/image/toBackgroundSizeString', image);
-            var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image);
+            var backgroundImage = $store.read('/image/toImageString', image, isExport);
+            var backgroundSize = $store.read('/image/toBackgroundSizeString', image, isExport);
+            var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image, isExport);
 
             if (backgroundImage) {
                 results['background-image'] = backgroundImage; // size, position, origin, attachment and etc 
@@ -9617,16 +9631,18 @@ var ImageManager = function (_BaseModule) {
     }, {
         key: '*/image/toImageString',
         value: function imageToImageString($store, image) {
+            var isExport = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
             var type = image.type;
 
             if (type == 'linear' || type == 'repeating-linear') {
-                return $store.read('/image/toLinear', image);
+                return $store.read('/image/toLinear', image, isExport);
             } else if (type == 'radial' || type == 'repeating-radial') {
-                return $store.read('/image/toRadial', image);
+                return $store.read('/image/toRadial', image, isExport);
             } else if (type == 'image') {
-                return $store.read('/image/toImage', image);
+                return $store.read('/image/toImage', image, isExport);
             } else if (type == 'static') {
-                return $store.read('/image/toStatic', image);
+                return $store.read('/image/toStatic', image, isExport);
             }
         }
     }, {
@@ -9744,11 +9760,14 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/toImage',
         value: function imageToImage($store) {
             var image = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+            var isExport = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
             var url = image.backgroundImage;
 
-            if (url) {
+            if (!isExport && url) {
                 return 'url(' + url + ')';
+            } else if (isExport) {
+                return 'url(' + image.backgroundImageDataURI + ')';
             }
 
             return null;
@@ -9819,7 +9838,7 @@ var LayerManager = function (_BaseModule) {
             var withStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
 
-            var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+            var obj = $store.read('/layer/toCSS', layer, withStyle, null, true) || {};
             obj.position = obj.position || 'absolute';
 
             return $store.read('/css/toString', obj);
@@ -9882,9 +9901,11 @@ var LayerManager = function (_BaseModule) {
     }, {
         key: '*/layer/toImageCSS',
         value: function layerToImageCSS($store, layer) {
+            var isExport = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
             var results = {};
             $store.read('/item/each/children', layer.id, function (item) {
-                var css = $store.read('/image/toCSS', item);
+                var css = $store.read('/image/toCSS', item, isExport);
 
                 Object.keys(css).forEach(function (key) {
                     if (!results[key]) {
@@ -9980,6 +10001,7 @@ var LayerManager = function (_BaseModule) {
             var layer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
             var withStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
             var image = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+            var isExport = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
             var css = Object.assign({}, withStyle ? layer.style || {} : {});
 
@@ -10011,9 +10033,7 @@ var LayerManager = function (_BaseModule) {
             css['transform'] = $store.read('/layer/make/transform', layer);
             css['filter'] = $store.read('/layer/make/filter', layer.filters);
 
-            var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer));
-            delete results.x;
-            delete results.y;
+            var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport));
 
             var realCSS = {};
             Object.keys(results).filter(function (key) {
@@ -10834,6 +10854,9 @@ var ItemManager = function (_BaseModule) {
                 $store.items[id].index = NONE_INDEX;
                 $store.read('/item/sort', id);
 
+                if ($store.items[id].backgroundImage) {
+                    URL.revokeObjectURL($store.items[id].backgroundImage);
+                }
                 delete $store.items[id];
             }
         }
@@ -11008,7 +11031,24 @@ var ItemManager = function (_BaseModule) {
             item.parentId = parentId;
             item.index = Number.MAX_SAFE_INTEGER;
             item.fileType = img.fileType;
-            item.backgroundImage = img.src;
+            item.backgroundImage = img.url;
+            item.backgroundImageDataURI = img.datauri, item.backgroundSizeWidth = '100%';
+
+            $store.run('/item/set', item, isSelected);
+            $store.run('/item/sort', id);
+        }
+    }, {
+        key: '/item/add/image/url',
+        value: function itemAddImageUrl($store, url) {
+            var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
+            var id = $store.read('/item/create/image');
+            var item = $store.read('/item/get', id);
+            item.type = 'image';
+            item.parentId = parentId;
+            item.index = Number.MAX_SAFE_INTEGER;
+            item.backgroundImage = url;
             item.backgroundSizeWidth = '100%';
 
             $store.run('/item/set', item, isSelected);
@@ -12852,6 +12892,25 @@ var ColorPickerPanel = function (_UIElement) {
         value: function components() {
             return { ColorPicker: ColorPickerLayer };
         }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: "isShow",
+        value: function isShow() {
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            return this.read('/image/type/isImage', item.type) == false;
+        }
     }]);
     return ColorPickerPanel;
 }(UIElement);
@@ -13891,7 +13950,58 @@ var LayerColorPickerPanel = function (_UIElement) {
     return LayerColorPickerPanel;
 }(UIElement);
 
+var ImageResource = function (_BasePropertyItem) {
+    inherits(ImageResource, _BasePropertyItem);
+
+    function ImageResource() {
+        classCallCheck(this, ImageResource);
+        return possibleConstructorReturn(this, (ImageResource.__proto__ || Object.getPrototypeOf(ImageResource)).apply(this, arguments));
+    }
+
+    createClass(ImageResource, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item image-resource show\'>\n                <div class=\'title\'>Image Resource</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>File Type</label>\n                        <div>\n                            <input type="text" readonly ref="$fileType" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var isShow = this.isShow();
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.updateView();
+            }
+        }
+    }, {
+        key: 'updateView',
+        value: function updateView() {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (image) {
+                _this2.refs.$fileType.val(image.fileType);
+            });
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            return this.read('/image/type/isImage', item.type);
+        }
+    }]);
+    return ImageResource;
+}(BasePropertyItem);
+
 var items = {
+    ImageResource: ImageResource,
     BackgroundColor: BackgroundColor,
     BlendList: BlendList,
     MixBlendList: MixBlendList,
@@ -13976,7 +14086,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -16249,13 +16359,34 @@ var DropView = function (_UIElement) {
 
             e.preventDefault();
 
-            var files = [].concat(toConsumableArray(e.dataTransfer.files));
-
-            this.read('/item/current/layer', function (layer) {
-                _this2.read('/image/get/file', files, function (img) {
-                    _this2.dispatch('/item/add/image/file', img, true, layer.id);
-                });
+            var items = [].concat(toConsumableArray(e.dataTransfer.items));
+            var types = [].concat(toConsumableArray(e.dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
             });
+
+            var dataList = types.map(function (type) {
+                return e.dataTransfer.getData(type);
+            });
+
+            if (dataList.length) {
+
+                this.read('/item/current/layer', function (layer) {
+                    _this2.read('/image/get/url', dataList, function (url) {
+                        _this2.dispatch('/item/add/image/url', url, true, layer.id);
+                    });
+                });
+            }
+
+            console.log(items, types, dataList);
+            var files = [].concat(toConsumableArray(e.dataTransfer.files));
+            if (files.length) {
+
+                this.read('/item/current/layer', function (layer) {
+                    _this2.read('/image/get/file', files, function (img) {
+                        _this2.dispatch('/item/add/image/file', img, true, layer.id);
+                    });
+                });
+            }
         }
     }]);
     return DropView;

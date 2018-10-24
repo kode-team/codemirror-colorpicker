@@ -39,13 +39,27 @@ export default class ImageManager extends BaseModule {
         (files || []).forEach(file => {
             var ext = file.name.split('.').pop();
             if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
-                new ImageLoader(file).getImage(image => {
-                    image.fileType = ext; 
-                    callback (image)
-                });
+
+                if (typeof callback == 'function') {
+                    new ImageLoader(file).getImage(image => {
+                        callback ({
+                            datauri: image.src,                 // export 용 
+                            url: URL.createObjectURL(file),     // 화면 제어용 
+                            fileType: ext 
+                        })
+    
+                    })
+
+                }
             }
         });
     }
+
+    '*/image/get/url' ($store, urls, callback) {
+        (urls || []).forEach(url => {
+            callback (url)
+        });
+    }    
 
     '/image/setAngle' ($store, angle = '') {
         angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : ( +angle % 360);
@@ -95,12 +109,12 @@ export default class ImageManager extends BaseModule {
         return position || $store.read('/image/get', 'radialPosition');
     }
 
-    '*/image/toCSS' ($store, image = null) {
+    '*/image/toCSS' ($store, image = null, isExport = false) {
 
         var results = {} 
-        var backgroundImage = $store.read('/image/toImageString', image)
-        var backgroundSize = $store.read('/image/toBackgroundSizeString', image)
-        var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image)
+        var backgroundImage = $store.read('/image/toImageString', image, isExport)
+        var backgroundSize = $store.read('/image/toBackgroundSizeString', image, isExport)
+        var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image, isExport)
 
         if (backgroundImage) {
             results['background-image'] = backgroundImage;  // size, position, origin, attachment and etc 
@@ -127,17 +141,17 @@ export default class ImageManager extends BaseModule {
 
     } 
 
-    '*/image/toImageString' ($store, image) {
+    '*/image/toImageString' ($store, image, isExport = false) {
         var type = image.type
 
         if (type == 'linear' || type == 'repeating-linear') {
-            return $store.read('/image/toLinear', image)
+            return $store.read('/image/toLinear', image, isExport)
         } else if (type == 'radial' || type == 'repeating-radial') {
-            return $store.read('/image/toRadial', image)
+            return $store.read('/image/toRadial', image, isExport)
         } else if (type == 'image' ) {
-            return $store.read('/image/toImage', image)
+            return $store.read('/image/toImage', image, isExport)
         } else if (type == 'static' ) {
-            return $store.read('/image/toStatic', image)
+            return $store.read('/image/toStatic', image, isExport)
         }
     }
 
@@ -241,11 +255,13 @@ export default class ImageManager extends BaseModule {
         return `${gradientType}-gradient(${opt}, ${colors})`
     }
 
-    '*/image/toImage' ($store, image = null) {
+    '*/image/toImage' ($store, image = null, isExport = false) {
         var url = image.backgroundImage
 
-        if (url) {
+        if (!isExport && url) {
             return `url(${url})`
+        } else if (isExport) {
+            return `url(${image.backgroundImageDataURI})`
         }
         
         return null;

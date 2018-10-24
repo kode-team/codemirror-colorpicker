@@ -17,4 +17,22 @@ export default class ColorPickerPanel extends UIElement {
         return { ColorPicker }
     }
 
+
+    refresh () {
+        this.$el.toggle(this.isShow())
+    }
+
+    '@changeEditor' () {
+        this.refresh()
+    }
+
+    isShow () {
+        var item = this.read('/item/current/image')
+
+        if (!item) return false; 
+
+        return this.read('/image/type/isImage', item.type) == false; 
+    }
+
+
 }

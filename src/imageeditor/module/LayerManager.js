@@ -52,7 +52,7 @@ export default class LayerManager extends BaseModule {
 
     '*/layer/toExport' ($store, layer, withStyle = true) {
 
-        var obj = $store.read('/layer/toCSS', layer, withStyle) || {};
+        var obj = $store.read('/layer/toCSS', layer, withStyle, null, true) || {};
         obj.position = obj.position || 'absolute';
 
         return $store.read('/css/toString', obj);
@@ -106,10 +106,10 @@ export default class LayerManager extends BaseModule {
         }).join(' ')
     }    
 
-    '*/layer/toImageCSS' ($store, layer) {    
+    '*/layer/toImageCSS' ($store, layer, isExport = false) {    
         var results = {}
         $store.read('/item/each/children', layer.id, (item)  => {
-            var css = $store.read('/image/toCSS', item);
+            var css = $store.read('/image/toCSS', item, isExport);
 
             Object.keys(css).forEach(key => {
                 if (!results[key]) {
@@ -199,7 +199,7 @@ export default class LayerManager extends BaseModule {
         return results.length ? results.join(' ') : 'none';
     }
 
-    '*/layer/toCSS' ($store, layer = null, withStyle = true, image = null) {
+    '*/layer/toCSS' ($store, layer = null, withStyle = true, image = null, isExport = false) {
         var css = Object.assign({}, withStyle ? (layer.style || {}) : {});
 
 
@@ -234,10 +234,8 @@ export default class LayerManager extends BaseModule {
         css['filter'] = $store.read('/layer/make/filter', layer.filters);
 
         var results = Object.assign(css, 
-             (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer)
+             (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport)
         )
-        delete results.x;
-        delete results.y;
 
         var realCSS = {}
         Object.keys(results).filter(key => {

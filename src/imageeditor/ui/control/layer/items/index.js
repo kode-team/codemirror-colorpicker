@@ -21,8 +21,11 @@ import MixBlendList from "./MixBlendList";
 import FilterList from "./FilterList";
 import BackgroundColor from "./BackgroundColor"; 
 import LayerColorPickerPanel from "./LayerColorPickerPanel";
+import ImageResource from "./ImageResource";
+
 
 export default {
+    ImageResource,
     BackgroundColor,
     BlendList,
     MixBlendList,
