@@ -34,8 +34,8 @@ export default class DropView extends UIElement {
 
         if (dataList.length) {
             this.read('/item/current/layer', (layer) => {
-                this.read('/image/get/url', dataList, (url) => {
-                    this.dispatch('/item/add/image/url', url, true, layer.id);
+                this.read('/image/get/url', dataList, (img) => {
+                    this.dispatch('/item/add/image/url', img, true, layer.id);
                 })
             })            
         }

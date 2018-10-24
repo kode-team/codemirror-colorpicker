@@ -64,7 +64,9 @@ export default class XDImageEditor extends BaseImageEditor {
     loadStart (isAdd) {
         this.dispatch('/storage/load', (isLoaded) => {
             if (!isLoaded && isAdd) { 
-                this.run('/item/add/page', true)
+                this.dispatch('/item/add/page', true)
+            } else {
+                this.dispatch('/item/load');
             }
         });
     }

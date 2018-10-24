@@ -61,8 +61,6 @@ export default class GradientInfo extends UIElement {
             if (step.selected) step.selected = false; 
         })
 
-        console.log(e, item);
-
         item.selected = true; 
 
         this.initColor(item.color)     

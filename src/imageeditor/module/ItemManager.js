@@ -586,7 +586,10 @@ export default class ItemManager extends BaseModule {
 
     '*/item/prev/index' ($store, id) {
         return $store.read('/item/add/index', id, -1 * (INDEX_DIST + COPY_INDEX_DIST));
-    }        
+    }   
+    
+    // initialize items 
+    '/item/load' ($store) { }  
 
     '/item/add' ($store, itemType, isSelected = false, parentId = '') {
         var id = $store.read('/item/create', itemType);
@@ -622,6 +625,7 @@ export default class ItemManager extends BaseModule {
         item.type = 'image'; 
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER;
+        item.colors = img.colors;         
         item.fileType = img.fileType;
         item.backgroundImage = img.url;
         item.backgroundImageDataURI = img.datauri,
@@ -631,13 +635,15 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/sort', id); 
     }     
     
-    '/item/add/image/url' ($store, url, isSelected = false, parentId = '') {
+    '/item/add/image/url' ($store, img, isSelected = false, parentId = '') {
         var id = $store.read('/item/create/image');
         var item = $store.read('/item/get', id);
         item.type = 'image'; 
         item.parentId = parentId; 
         item.index = Number.MAX_SAFE_INTEGER;
-        item.backgroundImage = url;
+        item.colors = img.colors;         
+        item.fileType = img.fileType;
+        item.backgroundImage = img.url;
         item.backgroundSizeWidth = '100%';
 
         $store.run('/item/set', item, isSelected);

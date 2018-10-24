@@ -36,6 +36,7 @@ export default class ImageTypeSelect extends BasePropertyItem {
     }
 
     isShow () {
+        return false;
         var item = this.read('/item/current/image')
 
         if (!item) return false; 

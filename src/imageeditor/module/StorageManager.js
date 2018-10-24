@@ -14,11 +14,21 @@ export default class StorageManager extends BaseModule {
     }
 
     afterDispatch () {
-        this.$store.emit('changeEditor')
+        this.$store.emit('changeStorage')
     }
 
-    '*/storage/layers' ($store) {
+    '*/storage/layers' ($store, index = undefined) {
+        if (typeof index !== 'undefined' ) {
+            return $store.cachedLayers[index];
+        }
         return $store.cachedLayers;
+    }
+
+    '*/storage/images' ($store, index = undefined) {
+        if (typeof index !== 'undefined' ) {
+            return $store.cachedImages[index];
+        }
+        return $store.cachedImages;
     }
 
     '/storage/unshift/layer' ($store, layer) {
@@ -30,14 +40,14 @@ export default class StorageManager extends BaseModule {
 
     '/storage/add/layer' ($store, layer) {
         var item = $store.read('/clone', layer);
-        $store.cachedLayers.add(item);
+        $store.cachedLayers.push(item);
 
         $store.run('/storage/save/layer');
     }    
 
     '/storage/add/image' ($store, image) {
         var item = $store.read('/clone', image);
-        $store.cachedImages.add(item);
+        $store.cachedImages.push(item);
 
         $store.run('/storage/save/image');
     }        
@@ -80,8 +90,9 @@ export default class StorageManager extends BaseModule {
 
     '/storage/load/image' ($store) {
         $store.cachedImages = JSON.parse(localStorage.getItem(CACHED_IMAGE_SAVE_ID) || "[]");
-    }            
-
+    }      
+    
+    
     '/storage/load' ($store, callback) {
         var obj = JSON.parse(localStorage.getItem(SAVE_ID) || "{}");
 

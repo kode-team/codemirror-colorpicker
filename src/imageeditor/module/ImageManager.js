@@ -1,5 +1,6 @@
 import ImageLoader from '../../util/ImageLoader'
 import BaseModule from "../../colorpicker/BaseModule";
+import { ImageToRGB, palette } from '../../util/functions/image';
 
 const DEFINED_ANGLES = {
     'to top': 0,
@@ -35,19 +36,23 @@ const DEFINED_POSITIONS = {
 
 export default class ImageManager extends BaseModule { 
  
-    '*/image/get/file' ($store, files, callback) {
+    '*/image/get/file' ($store, files, callback, colorCount = 16) {
         (files || []).forEach(file => {
             var fileType = file.name.split('.').pop();
             if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
 
                 if (typeof callback == 'function') {
                     new ImageLoader(file).getImage(image => {
-                        callback ({
-                            datauri: image.src,                 // export 용 
-                            url: URL.createObjectURL(file),     // 화면 제어용 
-                            fileType 
+
+                        ImageToRGB(file, { maxWidth: 100 }, (results) => {
+                            callback ({
+                                datauri: image.src,                 // export 용 
+                                colors: palette(results, colorCount),    
+                                url: URL.createObjectURL(file),     // 화면 제어용 
+                                fileType 
+                            })
+                            
                         })
-    
                     })
 
                 }
@@ -55,15 +60,19 @@ export default class ImageManager extends BaseModule {
         });
     }
 
-    '*/image/get/url' ($store, urls, callback) {
+    '*/image/get/url' ($store, urls, callback, colorCount = 16) {
         (urls || []).forEach(url => {
             var fileType = url.split('.').pop();
             if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
 
                 if (typeof callback == 'function') {
-                    callback ({
-                        url,
-                        fileType 
+                    ImageToRGB(url, { maxWidth: 100 }, (results) => {
+                        callback ({
+                            colors: palette(results, colorCount),    
+                            url,
+                            fileType 
+                        })
+                        
                     })
                 }
             }

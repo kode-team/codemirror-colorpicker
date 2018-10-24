@@ -8,17 +8,42 @@
         text-align: left;
         display: inline-block;
     
-        .gradient-sample-item {
+        .gradient-sample-item, 
+        .gradient-cached-item {
             display: inline-block;
             vertical-align: middle;
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             cursor: pointer;
             position: relative;
-            margin: 3px;
+            margin: 2px;
 
             &:hover {
                 transform: scale(1.2);
+            }
+        }
+
+        .cached-list {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .tools {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: -3px;
+
+            button {
+                appearance: none;
+                border: 1px solid $border-color;
+                background-color: #ffffff;
+                display: inline-block;
+                vertical-align: middle;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+                position: relative;
+                margin: 2px;
             }
         }
 

@@ -1409,7 +1409,7 @@
       -webkit-box-sizing: border-box;
               box-sizing: border-box; }
       .imageeditor .layers > .title h1 {
-        font-size: 15px;
+        font-size: 12px;
         float: left;
         vertical-align: middle;
         margin: 0px; }
@@ -2087,62 +2087,6 @@
             width: 2px;
             height: 2px;
             background-color: black; }
-  .imageeditor .layer-preview button {
-    border: 1px solid #dedede; }
-  .imageeditor .layer-preview:empty:before {
-    content: "Layer Preview";
-    color: #dadada;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: block;
-    padding: 30px;
-    text-align: center;
-    font-size: 30px;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box; }
-  .imageeditor .layer-preview .tree-item {
-    display: inline-block;
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    cursor: pointer;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-    overflow: hidden;
-    border: 5px solid #dedede; }
-    .imageeditor .layer-preview .tree-item.selected {
-      border: 5px solid #333; }
-    .imageeditor .layer-preview .tree-item .item-view-container {
-      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-      pointer-events: none;
-      display: inline-block;
-      vertical-align: middle;
-      -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      position: absolute;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px; }
-      .imageeditor .layer-preview .tree-item .item-view-container .item-view {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        bottom: 0px; }
-      .imageeditor .layer-preview .tree-item .item-view-container .item-view-background-color {
-        position: absolute;
-        left: 10px;
-        bottom: 10px;
-        width: 30px;
-        height: 30px;
-        border-radius: 5px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid rgba(0, 0, 0, 0.2); }
   .imageeditor .page-view {
     position: absolute;
     left: 0px;
@@ -2156,15 +2100,6 @@
       top: 0px;
       height: 160px;
       z-index: 5; }
-      .imageeditor .page-view .page-menu .layer-preview {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        bottom: 0px;
-        width: 160px;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-        border: 1px solid #ececec; }
       .imageeditor .page-view .page-menu .layer-menu-tab {
         position: absolute;
         right: 0px;
@@ -3103,17 +3038,39 @@
                 box-sizing: border-box;
         text-align: left;
         display: inline-block; }
-        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item {
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item,
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-cached-item {
           display: inline-block;
           vertical-align: middle;
-          width: 20px;
-          height: 20px;
+          width: 30px;
+          height: 30px;
           cursor: pointer;
           position: relative;
-          margin: 3px; }
-          .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item:hover {
+          margin: 2px; }
+          .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-sample-item:hover,
+          .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-cached-item:hover {
             -webkit-transform: scale(1.2);
                     transform: scale(1.2); }
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .cached-list {
+          display: inline-block;
+          vertical-align: middle; }
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .tools {
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: -3px; }
+          .imageeditor .property-view .property-item.sample-list .gradient-sample-list .tools button {
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            border: 1px solid #c7c7c7;
+            background-color: #ffffff;
+            display: inline-block;
+            vertical-align: middle;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            position: relative;
+            margin: 2px; }
       .imageeditor .property-view .property-item.gradient-steps-info .gradient-info {
         overflow: auto; }
         .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item {
