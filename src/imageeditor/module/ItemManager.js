@@ -628,12 +628,24 @@ export default class ItemManager extends BaseModule {
         item.colors = img.colors;         
         item.fileType = img.fileType;
         item.backgroundImage = img.url;
-        item.backgroundImageDataURI = img.datauri,
+        item.backgroundImageDataURI = img.datauri;
         item.backgroundSizeWidth = '100%';
 
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
     }     
+
+    '/item/set/image/file' ($store, id, img) {
+        var item = $store.read('/item/get', id);
+        item.type = 'image'; 
+        item.colors = img.colors;         
+        item.fileType = img.fileType || 'svg';
+        item.backgroundImage = img.url;
+        item.backgroundImageDataURI = img.datauri;
+        item.backgroundSizeWidth = '100%';
+
+        $store.run('/item/set', item);
+    }         
     
     '/item/add/image/url' ($store, img, isSelected = false, parentId = '') {
         var id = $store.read('/item/create/image');

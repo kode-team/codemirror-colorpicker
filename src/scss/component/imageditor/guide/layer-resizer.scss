@@ -10,7 +10,8 @@
         height: 100%;
         pointer-events: none;
         z-index: 100;
-        border:2px solid $editor-line-color;
+        // border:2px solid $editor-line-color;
+        box-shadow: 0 0 0 1px $editor-line-color;
         box-sizing: border-box;      
         
         .guide-horizontal {

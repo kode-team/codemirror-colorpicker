@@ -5,31 +5,22 @@ export default class ImageResource extends BasePropertyItem {
         return `
             <div class='property-item image-resource show'>
                 <div class='title'>Image Resource</div>            
-                <div class='items'>            
-                    <div>
-                        <label>File Type</label>
-                        <div>
-                            <input type="text" readonly ref="$fileType" />
-                        </div>
-                    </div>
+                <div class='items' ref="$imageList">
+
                 </div>
             </div>
         `
     }
 
+    'load $imageList' () {
+        return this.read('/svg/list').map((svg, index) => {
+            return `<div class='svg-item' data-index="${index}">${svg}</div>`
+        })
+    }
+
     refresh () {
         var isShow = this.isShow();
         this.$el.toggle(isShow)
-
-        if (isShow) {
-            this.updateView();
-        }
-    }
-
-    updateView () {
-        this.read('/item/current/image', (image) => {
-            this.refs.$fileType.val(image.fileType); 
-        })
     }
 
     '@changeEditor' () {
@@ -44,5 +35,14 @@ export default class ImageResource extends BasePropertyItem {
         return this.read('/image/type/isImage', item.type); 
     }
 
+    'click $imageList .svg-item' (e) {
+        var index = +e.$delegateTarget.attr('data-index')
+        this.read('/item/current/image', (image) => {
+            var file = this.read('/svg/get/blob', index);
+            this.read('/image/get/blob', [file], (newImage) => {
+                this.dispatch('/item/set/image/file', image.id, newImage)
+            });
+        })
+    }
 
 }

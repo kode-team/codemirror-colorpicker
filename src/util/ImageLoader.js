@@ -50,6 +50,10 @@ class ImageLoader {
             callback && callback(img);
         };
 
+        img.onerror = (e) => {
+            console.log(e);
+        }
+
         this.getImageUrl(function (url) {
             img.src = url;
         });

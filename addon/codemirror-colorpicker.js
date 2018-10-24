@@ -171,18 +171,6 @@ var math = {
     caculateAngle: caculateAngle
 };
 
-/**
- * @method RGBtoHSV
- *
- * convert rgb to hsv
- *
- * 		color.RGBtoHSV(0, 0, 255) === { h : 240, s : 1, v : 1 } === '#FFFF00'
- *
- * @param {Number} R  red color value
- * @param {Number} G  green color value
- * @param {Number} B  blue color value
- * @return {Object}  hsv color code
- */
 function RGBtoHSV(r, g, b) {
 
     if (arguments.length == 1) {
@@ -494,18 +482,6 @@ var fromLAB = {
     LABtoXYZ: LABtoXYZ
 };
 
-/**
- * @method HSVtoRGB
- *
- * convert hsv to rgb
- *
- * 		color.HSVtoRGB(0,0,1) === #FFFFF === { r : 255, g : 0, b : 0 }
- *
- * @param {Number} H  hue color number  (min : 0, max : 360)
- * @param {Number} S  Saturation number  (min : 0, max : 1)
- * @param {Number} V  Value number 		(min : 0, max : 1 )
- * @returns {Object}
- */
 function HSVtoRGB(h, s, v) {
 
     if (arguments.length == 1) {
@@ -1123,15 +1099,6 @@ var parser = {
     color_split: color_split
 };
 
-/**
- * @deprecated 
- * 
- * instead of this,  use blend function 
- *  
- * @param {*} startColor 
- * @param {*} endColor 
- * @param {*} t 
- */
 function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
@@ -1736,6 +1703,10 @@ var ImageLoader = function () {
                 callback && callback(img);
             };
 
+            img.onerror = function (e) {
+                console.log(e);
+            };
+
             this.getImageUrl(function (url) {
                 img.src = url;
             });
@@ -1961,7 +1932,6 @@ function crop() {
     };
 }
 
-// Image manupulate 
 function resize(dstWidth, dstHeight) {
     return function (bitmap, done) {
         var c = Canvas.drawPixels(bitmap);
@@ -2187,9 +2157,6 @@ function bitonal(darkColor, lightColor) {
     });
 }
 
-/*
- * @param {Number} amount  -100..100  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2217,10 +2184,6 @@ function brownie() {
     });
 }
 
-/**
- * 
- * @param {Number} amount from 0 to 100 
- */
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2235,10 +2198,6 @@ function clip() {
     }, { $C: $C });
 }
 
-/**
- * 
- * @param {*} amount   min = -128, max = 128 
- */
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2263,10 +2222,6 @@ function gamma() {
     }, { $C: $C });
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -2338,9 +2293,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -2424,10 +2376,6 @@ function matrix() {
     });
 }
 
-/**
- * 
- * @param {Number} amount 1..100
- */
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2471,9 +2419,6 @@ function polaroid() {
     });
 }
 
-/*
- * @param {Number} amount  -100..100 
- */
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
@@ -2493,9 +2438,6 @@ function saturation() {
     });
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2548,12 +2490,6 @@ function shift() {
     });
 }
 
-/**
- * change the relative darkness of (a part of an image) by overexposure to light.
- * @param {*} r 
- * @param {*} g 
- * @param {*} b 
- */
 function solarize(redValue, greenValue, blueValue) {
     var $redValue = parseParamNumber$1(redValue);
     var $greenValue = parseParamNumber$1(greenValue);
@@ -2613,9 +2549,6 @@ function thresholdColor() {
     });
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -2677,11 +2610,6 @@ function blur () {
     return convolution(createBlurMatrix(amount));
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4292,11 +4220,6 @@ function normal () {
     return convolution$1([0, 0, 0, 0, 1, 0, 0, 0, 0]);
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4304,10 +4227,6 @@ function emboss$1() {
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4424,9 +4343,6 @@ function bitonal$1(darkColor, lightColor) {
     return shader('\n        if ((pixelColor.r + pixelColor.g + pixelColor.b) > ' + checkVlue + ') {\n            outColor = vec4(' + lightColorString + '.rgb, pixelColor.a);\n        } else {\n            outColor = vec4(' + darkColorString + '.rgb, pixelColor.a);\n        }\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4464,9 +4380,6 @@ function brownie$1() {
     return matrix$3(0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount 0..1
- */
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4483,9 +4396,6 @@ function chaos() {
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..1
- */
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4494,9 +4404,6 @@ function contrast$2() {
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4505,10 +4412,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$2() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -4556,10 +4459,6 @@ function gradient$2() {
     return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4571,9 +4470,6 @@ function grayscale$1() {
 }
 
 //http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-/*
- * @param {Number} amount  0..1  ,  (real value 0..360)
- */
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4595,10 +4491,6 @@ function kodachrome$1() {
     return matrix$3(1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4609,10 +4501,6 @@ function noise$1() {
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4626,9 +4514,6 @@ function polaroid$1() {
     return matrix$3(1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4637,9 +4522,6 @@ function saturation$1() {
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4687,9 +4569,6 @@ function thresholdColor$1() {
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold$1() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -4697,12 +4576,6 @@ function threshold$1() {
   return thresholdColor$1(scale, amount, false);
 }
 
-/**
- * 
- * @param {*} redTint  0..1
- * @param {*} greenTint 0..1
- * @param {*} blueTint 0..1
- */
 function tint$1 () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -6473,7 +6346,7 @@ var State = function () {
   return State;
 }();
 
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt|paste)/ig;
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt|paste|resize)/ig;
 var CHECK_LOAD_PATTERN = /^load (.*)/ig;
 var EVENT_SAPARATOR = ' ';
 var EVENT_NAME_SAPARATOR = ':';
@@ -6812,19 +6685,26 @@ var EventMachin = function () {
         return !!_this6[code];
       });
 
-      // const delay = arr.filter(code => {
-      //   return (+code) + '' == code
-      // })
+      // TODO: split debounce check code 
+      var delay = arr.filter(function (code) {
+        if (code.indexOf('debounce(') > -1) {
+          return true;
+        }
+        return false;
+      });
 
-      // const debounce = delay.length ? +delay[0] : 0;   // 0 은 debounce 하지 않음 . 
       var debounceTime = 0;
+      if (delay.length) {
+        debounceTime = delay[0].replace('debounce(', '').replace(')', '');
+      }
 
       arr = arr.filter(function (code) {
-        return checkMethodList.includes(code) === false;
-        // && delay.includes(code) === false; 
+        return checkMethodList.includes(code) === false && delay.includes(code) === false;
       }).map(function (code) {
         return code.toLowerCase();
       });
+
+      // TODO: split debounce check code     
 
       return {
         eventName: realEventName,
@@ -9678,6 +9558,20 @@ var ImageManager = function (_BaseModule) {
             });
         }
     }, {
+        key: '*/image/get/blob',
+        value: function imageGetBlob($store, blobs, callback) {
+            (blobs || []).forEach(function (file) {
+                if (typeof callback == 'function') {
+                    new ImageLoader(file).getImage(function (image$$1) {
+                        callback({
+                            datauri: image$$1.src, // export 용 
+                            url: URL.createObjectURL(file) // 화면 제어용 
+                        });
+                    });
+                }
+            });
+        }
+    }, {
         key: '/image/setAngle',
         value: function imageSetAngle($store) {
             var angle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
@@ -11202,10 +11096,24 @@ var ItemManager = function (_BaseModule) {
             item.colors = img.colors;
             item.fileType = img.fileType;
             item.backgroundImage = img.url;
-            item.backgroundImageDataURI = img.datauri, item.backgroundSizeWidth = '100%';
+            item.backgroundImageDataURI = img.datauri;
+            item.backgroundSizeWidth = '100%';
 
             $store.run('/item/set', item, isSelected);
             $store.run('/item/sort', id);
+        }
+    }, {
+        key: '/item/set/image/file',
+        value: function itemSetImageFile($store, id, img) {
+            var item = $store.read('/item/get', id);
+            item.type = 'image';
+            item.colors = img.colors;
+            item.fileType = img.fileType || 'svg';
+            item.backgroundImage = img.url;
+            item.backgroundImageDataURI = img.datauri;
+            item.backgroundSizeWidth = '100%';
+
+            $store.run('/item/set', item);
         }
     }, {
         key: '/item/add/image/url',
@@ -11927,7 +11835,42 @@ var ExternalResourceManager = function (_BaseModule) {
     return ExternalResourceManager;
 }(BaseModule);
 
-var ModuleList = [ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var sample1$1 = "\n<svg xmlns='http://www.w3.org/2000/svg'>\n    <rect width=\"30px\" height=\"30px\" fill=\"black\" />\n</svg>\n";
+
+var cloud = "<svg version=\"1.1\" id=\"Capa_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t viewBox=\"0 0 60 60\" style=\"enable-background:new 0 0 60 60;\" xml:space=\"preserve\">\n<path style=\"fill:#7FABDA;stroke:#7383BF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;\" d=\"M50.003,27\n\tc-0.115-8.699-7.193-16-15.919-16c-5.559,0-10.779,3.005-13.661,7.336C19.157,17.493,17.636,17,16,17c-4.418,0-8,3.582-8,8\n\tc0,0.153,0.014,0.302,0.023,0.454C8.013,25.636,8,25.82,8,26c-3.988,1.912-7,6.457-7,11.155C1,43.67,6.33,49,12.845,49h24.507\n\tc0.138,0,0.272-0.016,0.408-0.021C37.897,48.984,38.031,49,38.169,49h9.803C54.037,49,59,44.037,59,37.972\n\tC59,32.601,55.106,27.961,50.003,27z\"/>\n<path style=\"fill:#7FABDA;stroke:#7383BF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;\" d=\"M50.003,27\n\tc0,0-2.535-0.375-5.003,0\"/>\n<path style=\"fill:#7FABDA;stroke:#7383BF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;\" d=\"M8,25c0-4.418,3.582-8,8-8\n\ts8,3.582,8,8\"/>\n</svg>\n";
+
+var SVGList = [sample1$1, cloud];
+
+var SVGManager = function (_BaseModule) {
+    inherits(SVGManager, _BaseModule);
+
+    function SVGManager() {
+        classCallCheck(this, SVGManager);
+        return possibleConstructorReturn(this, (SVGManager.__proto__ || Object.getPrototypeOf(SVGManager)).apply(this, arguments));
+    }
+
+    createClass(SVGManager, [{
+        key: "afterDispatch",
+        value: function afterDispatch() {
+            this.$store.emit('changeEditor');
+        }
+    }, {
+        key: '*/svg/list',
+        value: function svgList($store) {
+            return SVGList;
+        }
+    }, {
+        key: '*/svg/get/blob',
+        value: function svgGetBlob($store, index) {
+            var svg = "" + SVGList[index];
+
+            return new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        }
+    }]);
+    return SVGManager;
+}(BaseModule);
+
+var ModuleList = [SVGManager, ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -14268,18 +14211,18 @@ var LayerColorPickerPanel = function (_UIElement) {
     return LayerColorPickerPanel;
 }(UIElement);
 
-var ImageResource = function (_BasePropertyItem) {
-    inherits(ImageResource, _BasePropertyItem);
+var ImageInfo = function (_BasePropertyItem) {
+    inherits(ImageInfo, _BasePropertyItem);
 
-    function ImageResource() {
-        classCallCheck(this, ImageResource);
-        return possibleConstructorReturn(this, (ImageResource.__proto__ || Object.getPrototypeOf(ImageResource)).apply(this, arguments));
+    function ImageInfo() {
+        classCallCheck(this, ImageInfo);
+        return possibleConstructorReturn(this, (ImageInfo.__proto__ || Object.getPrototypeOf(ImageInfo)).apply(this, arguments));
     }
 
-    createClass(ImageResource, [{
+    createClass(ImageInfo, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item image-resource show\'>\n                <div class=\'title\'>Image Resource</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>File Type</label>\n                        <div>\n                            <input type="text" readonly ref="$fileType" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item image-info show\'>\n                <div class=\'title\'>Image Information</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>File Type</label>\n                        <div>\n                            <input type="text" readonly ref="$fileType" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -14315,12 +14258,69 @@ var ImageResource = function (_BasePropertyItem) {
             return this.read('/image/type/isImage', item.type);
         }
     }]);
+    return ImageInfo;
+}(BasePropertyItem);
+
+var ImageResource = function (_BasePropertyItem) {
+    inherits(ImageResource, _BasePropertyItem);
+
+    function ImageResource() {
+        classCallCheck(this, ImageResource);
+        return possibleConstructorReturn(this, (ImageResource.__proto__ || Object.getPrototypeOf(ImageResource)).apply(this, arguments));
+    }
+
+    createClass(ImageResource, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item image-resource show\'>\n                <div class=\'title\'>Image Resource</div>            \n                <div class=\'items\' ref="$imageList">\n\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            return this.read('/svg/list').map(function (svg, index) {
+                return '<div class=\'svg-item\' data-index="' + index + '">' + svg + '</div>';
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var isShow = this.isShow();
+            this.$el.toggle(isShow);
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            return this.read('/image/type/isImage', item.type);
+        }
+    }, {
+        key: 'click $imageList .svg-item',
+        value: function click$imageListSvgItem(e) {
+            var _this2 = this;
+
+            var index = +e.$delegateTarget.attr('data-index');
+            this.read('/item/current/image', function (image) {
+                var file = _this2.read('/svg/get/blob', index);
+                _this2.read('/image/get/blob', [file], function (newImage) {
+                    _this2.dispatch('/item/set/image/file', image.id, newImage);
+                });
+            });
+        }
+    }]);
     return ImageResource;
 }(BasePropertyItem);
 
-// import BackgroundRepeat from "./BackgroundRepeat";
 var items = {
     ImageResource: ImageResource,
+    ImageInfo: ImageInfo,
     BackgroundColor: BackgroundColor,
     BlendList: BlendList,
     MixBlendList: MixBlendList,
@@ -14405,7 +14405,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15807,6 +15807,11 @@ var PredefinedLayerResizer = function (_UIElement) {
             this.moveX = null;
             this.moveY = null;
             this.$page.removeClass('moving');
+        }
+    }, {
+        key: 'resize window',
+        value: function resizeWindow(e) {
+            this.refresh();
         }
     }]);
     return PredefinedLayerResizer;

@@ -3,7 +3,7 @@ import Dom from './Dom'
 import State from './State'
 import { debounce } from './functions/func';
 
-const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt|paste)/ig;
+const CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt|paste|resize)/ig;
 const CHECK_LOAD_PATTERN = /^load (.*)/ig;
 const CHECK_FUNCTION_PATTERN = /^([^ \t]*)(\((.*)\))?$/ig;
 const EVENT_SAPARATOR = ' '
@@ -294,22 +294,30 @@ export default class EventMachin {
     });
     
     const checkMethodList = arr.filter(code => {
-      return !!this[code];
+        return !!this[code];
     });
 
-    // const delay = arr.filter(code => {
-    //   return (+code) + '' == code
-    // })
+    // TODO: split debounce check code 
+    const delay = arr.filter(code => {
+      if (code.indexOf('debounce(')  > -1) {
+        return true; 
+      } 
+      return false; 
+    })
 
-    // const debounce = delay.length ? +delay[0] : 0;   // 0 은 debounce 하지 않음 . 
-    const debounceTime = 0;
+    let debounceTime = 0; 
+    if (delay.length) {
+      debounceTime = delay[0].replace('debounce(', '').replace(')', '');
+    }
     
     arr = arr.filter(code => {
       return checkMethodList.includes(code) === false 
-            // && delay.includes(code) === false; 
+            && delay.includes(code) === false; 
     }).map(code => {
       return code.toLowerCase() 
     });
+
+    // TODO: split debounce check code     
 
     return {
       eventName : realEventName,

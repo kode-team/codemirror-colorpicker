@@ -2476,7 +2476,8 @@
       width: 100%;
       height: 100%;
       z-index: 10;
-      border: 1px solid #c7c7c7;
+      -webkit-box-shadow: 0 0 0 1px #c7c7c7;
+              box-shadow: 0 0 0 1px #c7c7c7;
       -webkit-box-sizing: border-box;
               box-sizing: border-box; }
       .imageeditor .page-view .predefined-page-resizer button {
@@ -2548,7 +2549,8 @@
       height: 100%;
       pointer-events: none;
       z-index: 100;
-      border: 2px solid #5f80de;
+      -webkit-box-shadow: 0 0 0 1px #5f80de;
+              box-shadow: 0 0 0 1px #5f80de;
       -webkit-box-sizing: border-box;
               box-sizing: border-box; }
       .imageeditor .page-view .predefined-layer-resizer .guide-horizontal {
@@ -3258,6 +3260,19 @@
           font-size: 12px; }
       .imageeditor .property-view .property-item .gradient-type .gradient-item {
         margin-right: 3px; }
+      .imageeditor .property-view .property-item.image-resource .items .svg-item {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        vertical-align: middle;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #c7c7c7;
+        cursor: pointer;
+        margin: 2px; }
+        .imageeditor .property-view .property-item.image-resource .items .svg-item svg {
+          width: 100%;
+          height: 100%; }
     .imageeditor .property-view .gradient-view {
       height: 230px;
       width: 100%; }

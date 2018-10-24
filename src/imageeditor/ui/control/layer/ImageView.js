@@ -12,6 +12,7 @@ export default class ImageView extends UIElement {
                 <ColorPickerPanel></ColorPickerPanel>
                 <!--<ColorSteps></ColorSteps>-->
                 <ColorStepsInfo></ColorStepsInfo>
+                <ImageInfo></ImageInfo>
                 <ImageResource></ImageResource>
             </div>  
         `

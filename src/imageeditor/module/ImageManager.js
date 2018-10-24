@@ -79,6 +79,19 @@ export default class ImageManager extends BaseModule {
         });
     }    
 
+    '*/image/get/blob' ($store, blobs, callback) {
+        (blobs || []).forEach(file => {
+            if (typeof callback == 'function') {
+                new ImageLoader(file).getImage(image => {
+                    callback ({
+                        datauri: image.src,                 // export 용 
+                        url: URL.createObjectURL(file)     // 화면 제어용 
+                    })
+                })
+            }
+        });
+    }    
+
     '/image/setAngle' ($store, angle = '') {
         angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : ( +angle % 360);
 

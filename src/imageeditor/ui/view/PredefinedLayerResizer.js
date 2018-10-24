@@ -319,4 +319,8 @@ export default class PredefinedLayerResizer extends UIElement {
         this.moveY = null; 
         this.$page.removeClass('moving')        
     }
+
+    'resize window' (e) {
+        this.refresh();
+    }
 }
