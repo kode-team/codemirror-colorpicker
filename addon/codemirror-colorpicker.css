@@ -2949,8 +2949,7 @@
             display: inline-block;
             margin-left: 4px;
             margin-right: 10px;
-            vertical-align: middle;
-            display: none; }
+            vertical-align: middle; }
             .imageeditor .property-view .property-item > .items > div > div > span.color {
               display: block;
               height: 100%;

@@ -12049,7 +12049,7 @@ var Radius = function (_BasePropertyItem) {
     createClass(Radius, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item radius show\'>\n                <div class=\'title\' ref="$title">Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span> \n                </div>\n                <div class=\'items\'>         \n                    <div>\n                        <label style="width:80px;">Top Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div>\n                        <label style="width:80px;">Bottom Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item radius show\'>\n                <div class=\'title\' ref="$title">Radius \n                    <span>\n                        <label><input type=\'checkbox\' ref="$fixedRadius" /> fixed</label>\n                    </span> \n                </div>\n                <div class=\'items\'>         \n                    <div>\n                        <label style="width:80px;">T Left</label>\n                        <div>\n                            <input type=\'number\' ref="$topLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$topRightRadius"> <span>px</span>\n                        </div>\n                    </div>          \n                    <div>\n                        <label style="width:80px;">B Left</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomLeftRadius"> <span>px</span>\n                        </div>\n                        <label style="width:50px;">Right</label>\n                        <div>\n                            <input type=\'number\' ref="$bottomRightRadius"> <span>px</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -13471,9 +13471,9 @@ var PageSize = function (_UIElement) {
     }
 
     createClass(PageSize, [{
-        key: 'template',
+        key: "template",
         value: function template() {
-            return '\n            <div class=\'property-item size\'>\n                <div class=\'title\'>page size\n                    <span>\n                        <button type="button" ref="$rect">rect</button>\n                    </span>\n                </div>\n                <div class=\'items\'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type=\'number\' ref="$width"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type=\'number\' ref="$height"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+            return "\n            <div class='property-item size'>\n                <div class='title'>page size\n                    <span>\n                        <button type=\"button\" ref=\"$rect\">rect</button>\n                    </span>\n                </div>\n                <div class='items'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type='number' ref=\"$width\"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type='number' ref=\"$height\"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ";
         }
     }, {
         key: '@changeEditor',
@@ -13481,17 +13481,17 @@ var PageSize = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'refresh',
+        key: "refresh",
         value: function refresh() {
             var _this2 = this;
 
             this.read('/item/current/page', function (item) {
                 if (item.style && item.style.width) {
-                    _this2.refs.$width.val(item.style.width.replace('px', ''));
+                    _this2.refs.$width.val(parseParamNumber$2(item.style.width));
                 }
 
                 if (item.style && item.style.height) {
-                    _this2.refs.$height.val(item.style.height.replace('px', ''));
+                    _this2.refs.$height.val(parseParamNumber$2(item.style.height));
                 }
             });
         }
@@ -13522,7 +13522,7 @@ var PageSize = function (_UIElement) {
             var _this5 = this;
 
             this.read('/item/current/page', function (item) {
-                item.style.height = item.style.width;
+                item.style.height = _this5.refs.$height.int() + 'px';
                 _this5.dispatch('/item/set', item);
             });
         }
@@ -13630,15 +13630,30 @@ var BlendList = function (_BasePropertyItem) {
             }).join('') + '</div>';
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            var image = this.read('/item/current/image');
+
+            if (image) return false;
+
+            return true;
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
 
-            this.load();
+            var isShow = this.isShow();
 
-            this.read('/item/current/layer', function (layer) {
-                _this3.refs.$desc.html(layer.style['background-blend-mode']);
-            });
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.load();
+
+                this.read('/item/current/layer', function (layer) {
+                    _this3.refs.$desc.html(layer.style['background-blend-mode']);
+                });
+            }
         }
     }, {
         key: '@changeEditor',
@@ -13692,15 +13707,30 @@ var MixBlendList = function (_BasePropertyItem) {
             }).join('') + '</div>';
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            var image = this.read('/item/current/image');
+
+            if (image) return false;
+
+            return true;
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
 
-            this.load();
+            var isShow = this.isShow();
 
-            this.read('/item/current/layer', function (layer) {
-                _this3.refs.$desc.html(layer.style['mix-blend-mode']);
-            });
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.load();
+
+                this.read('/item/current/layer', function (layer) {
+                    _this3.refs.$desc.html(layer.style['mix-blend-mode']);
+                });
+            }
         }
     }, {
         key: '@changeEditor',
@@ -13795,10 +13825,26 @@ var FilterList$1 = function (_BasePropertyItem) {
             this.refresh();
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+            var image = this.read('/item/current/image');
+
+            if (image) return false;
+
+            return true;
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
-            this.load();
-            this.refreshFilterList();
+
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.load();
+                this.refreshFilterList();
+            }
         }
     }, {
         key: 'refreshFilterList',

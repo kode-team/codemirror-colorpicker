@@ -11,7 +11,7 @@ export default class Radius extends BasePropertyItem {
                 </div>
                 <div class='items'>         
                     <div>
-                        <label style="width:80px;">Top Left</label>
+                        <label style="width:80px;">T Left</label>
                         <div>
                             <input type='number' ref="$topLeftRadius"> <span>px</span>
                         </div>
@@ -21,7 +21,7 @@ export default class Radius extends BasePropertyItem {
                         </div>
                     </div>          
                     <div>
-                        <label style="width:80px;">Bottom Left</label>
+                        <label style="width:80px;">B Left</label>
                         <div>
                             <input type='number' ref="$bottomLeftRadius"> <span>px</span>
                         </div>

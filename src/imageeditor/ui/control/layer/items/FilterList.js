@@ -82,9 +82,26 @@ export default class FilterList extends BasePropertyItem {
         this.refresh()
     }
 
+
+
+    isShow () {
+        var image = this.read('/item/current/image')
+
+        if (image) return false; 
+
+        return true; 
+    }    
+
     refresh () {
-        this.load()
-        this.refreshFilterList()
+
+        var isShow = this.isShow();
+
+        this.$el.toggle(isShow);
+
+        if(isShow) {
+            this.load()
+            this.refreshFilterList()
+        }
     }
 
     refreshFilterList() {

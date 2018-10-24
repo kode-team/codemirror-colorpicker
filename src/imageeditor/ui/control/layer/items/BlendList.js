@@ -34,13 +34,29 @@ export default class BlendList extends BasePropertyItem {
                 }).join('')}</div>`
     }
 
-    refresh () {
-        this.load()
 
-        this.read('/item/current/layer', (layer) => {
-            this.refs.$desc.html(layer.style['background-blend-mode'])
-        })
-        
+
+    isShow () {
+        var image = this.read('/item/current/image')
+
+        if (image) return false; 
+
+        return true; 
+    }    
+
+    refresh () {
+
+        var isShow = this.isShow();
+
+        this.$el.toggle(isShow);
+
+        if(isShow) {
+            this.load()
+
+            this.read('/item/current/layer', (layer) => {
+                this.refs.$desc.html(layer.style['background-blend-mode'])
+            })
+        }
     }
 
     '@changeEditor' () {
