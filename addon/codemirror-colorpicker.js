@@ -1677,6 +1677,7 @@ var ImageLoader = function () {
             var _this = this;
 
             this.getImage(function (img) {
+                var ctx = _this.context;
                 var ratio = img.height / img.width;
 
                 if (_this.opt.canvasWidth && _this.opt.canvasHeight) {
@@ -1695,7 +1696,7 @@ var ImageLoader = function () {
     }, {
         key: 'getImage',
         value: function getImage(callback) {
-            var ctx = this.context;
+
             this.newImage = new Image();
             var img = this.newImage;
             img.onload = function () {
@@ -14272,7 +14273,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <ColorSteps></ColorSteps>\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -16611,6 +16612,49 @@ var DropView = function (_UIElement) {
     return DropView;
 }(UIElement);
 
+var VerticalColorStep = function (_UIElement) {
+    inherits(VerticalColorStep, _UIElement);
+
+    function VerticalColorStep() {
+        classCallCheck(this, VerticalColorStep);
+        return possibleConstructorReturn(this, (VerticalColorStep.__proto__ || Object.getPrototypeOf(VerticalColorStep)).apply(this, arguments));
+    }
+
+    createClass(VerticalColorStep, [{
+        key: "components",
+        value: function components() {
+            return {
+                GradientSteps: GradientSteps
+            };
+        }
+    }, {
+        key: "template",
+        value: function template() {
+            return "\n            <div class='vertical-colorstep'>\n                <GradientSteps></GradientSteps>\n            </div>\n        ";
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: "isShow",
+        value: function isShow() {
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            return this.read('/image/type/isGradient', item.type);
+        }
+    }]);
+    return VerticalColorStep;
+}(UIElement);
+
 var XDImageEditor = function (_BaseImageEditor) {
     inherits(XDImageEditor, _BaseImageEditor);
 
@@ -16622,12 +16666,13 @@ var XDImageEditor = function (_BaseImageEditor) {
     createClass(XDImageEditor, [{
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
+                VerticalColorStep: VerticalColorStep,
                 DropView: DropView,
                 ExportView: ExportView,
                 PropertyView: PropertyView,

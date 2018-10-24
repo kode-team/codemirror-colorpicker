@@ -142,7 +142,9 @@ $show-timeline-animation: all 0.3s linear;
 @import './timeline-manager.scss';
 @import './gradient-types.scss';
 @import './layers-menu.scss'; 
-@import './view.scss';        
+@import './vertical-colorstep.scss';
+@import './view.scss';       
+
 @import './drag-angle.scss';
 @import './drag-position.scss';
 @import './blends.scss';

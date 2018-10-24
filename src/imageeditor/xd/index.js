@@ -10,6 +10,7 @@ import PropertyView from '../ui/control/layer/PropertyView';
 import ExportView from '../ui/control/ExportView';
 import Timeline from '../ui/control/Timeline';
 import DropView from '../ui/control/DropView';
+import VerticalColorStep from '../ui/control/VerticalColorStep';
 
 
 export default class XDImageEditor extends BaseImageEditor {
@@ -32,6 +33,7 @@ export default class XDImageEditor extends BaseImageEditor {
                     <ImageList></ImageList>
                 </div>
                 <div class="layout-body">
+                    <VerticalColorStep></VerticalColorStep>
                     <GradientView></GradientView>                      
                 </div>                
                 <div class="layout-right">
@@ -48,6 +50,7 @@ export default class XDImageEditor extends BaseImageEditor {
 
     components() { 
         return { 
+            VerticalColorStep, 
             DropView,
             ExportView,
             PropertyView,

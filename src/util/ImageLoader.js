@@ -25,6 +25,7 @@ class ImageLoader {
     loadImage (callback) {
 
         this.getImage( (img) => {
+            var ctx = this.context;             
             var ratio = img.height / img.width;
 
             if (this.opt.canvasWidth && this.opt.canvasHeight) {
@@ -42,7 +43,7 @@ class ImageLoader {
     }
 
     getImage (callback) {
-        var ctx = this.context; 
+
         this.newImage = new Image();
         const img = this.newImage
         img.onload = () => {
