@@ -22,18 +22,17 @@ export default class DropView extends UIElement {
 
     'drop document' (e) {
         e.preventDefault(); 
-        
 
+        var dataTransfer = e.dataTransfer;
 
-        var items = [...e.dataTransfer.items]
-        var types = [...e.dataTransfer.types].filter(type => type == 'text/uri-list');
+        var items = [...dataTransfer.items]
+        var types = [...dataTransfer.types].filter(type => type == 'text/uri-list');
         
         var dataList = types.map(type => {
-            return e.dataTransfer.getData(type);
+            return dataTransfer.getData(type);
         })
 
         if (dataList.length) {
-
             this.read('/item/current/layer', (layer) => {
                 this.read('/image/get/url', dataList, (url) => {
                     this.dispatch('/item/add/image/url', url, true, layer.id);
@@ -41,10 +40,8 @@ export default class DropView extends UIElement {
             })            
         }
 
-        console.log(items, types, dataList);
-        var files = [...e.dataTransfer.files]; 
+        var files = [...dataTransfer.files]; 
         if (files.length) {
-
             this.read('/item/current/layer', (layer) => {
                 this.read('/image/get/file', files, (img) => {
                     this.dispatch('/item/add/image/file', img, true, layer.id);

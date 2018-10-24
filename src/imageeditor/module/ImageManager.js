@@ -37,15 +37,15 @@ export default class ImageManager extends BaseModule {
  
     '*/image/get/file' ($store, files, callback) {
         (files || []).forEach(file => {
-            var ext = file.name.split('.').pop();
-            if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
+            var fileType = file.name.split('.').pop();
+            if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
 
                 if (typeof callback == 'function') {
                     new ImageLoader(file).getImage(image => {
                         callback ({
                             datauri: image.src,                 // export 용 
                             url: URL.createObjectURL(file),     // 화면 제어용 
-                            fileType: ext 
+                            fileType 
                         })
     
                     })
@@ -57,7 +57,16 @@ export default class ImageManager extends BaseModule {
 
     '*/image/get/url' ($store, urls, callback) {
         (urls || []).forEach(url => {
-            callback (url)
+            var fileType = url.split('.').pop();
+            if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
+
+                if (typeof callback == 'function') {
+                    callback ({
+                        url,
+                        fileType 
+                    })
+                }
+            }
         });
     }    
 

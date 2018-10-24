@@ -8,9 +8,11 @@ import ItemManager from "./ItemManager";
 import GuideManager from "./GuideManager";
 import StorageManager from "./StorageManager";
 import CssManager from "./CssManager";
+import ExternalResourceManager from "./ExternalResourceManager";
 
 
 export default [
+    ExternalResourceManager,
     CssManager,
     StorageManager,
     ItemManager,

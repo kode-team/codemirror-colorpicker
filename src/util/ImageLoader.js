@@ -57,6 +57,7 @@ class ImageLoader {
     load (callback) {
         this.newImage = new Image();
         const img = this.newImage
+        img.crossOrigin = "Anonymous";
         img.onload = () => {
             this.isLoaded = true; 
             callback && callback();

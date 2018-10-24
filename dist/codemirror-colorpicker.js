@@ -1748,6 +1748,7 @@ var ImageLoader = function () {
 
             this.newImage = new Image();
             var img = this.newImage;
+            img.crossOrigin = "Anonymous";
             img.onload = function () {
                 _this2.isLoaded = true;
                 callback && callback();
@@ -6473,7 +6474,7 @@ var State = function () {
   return State;
 }();
 
-var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt)/ig;
+var CHECK_EVENT_PATTERN = /^(click|mouse(down|up|move|over|out|enter|leave)|pointer(start|move|end)|touch(start|move|end)|key(down|up|press)|drag|dragstart|drop|dragover|dragenter|dragleave|dragexit|dragend|contextmenu|change|input|ttingttong|tt|paste)/ig;
 var CHECK_LOAD_PATTERN = /^load (.*)/ig;
 var EVENT_SAPARATOR = ' ';
 var EVENT_NAME_SAPARATOR = ':';
@@ -9635,15 +9636,15 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/get/file',
         value: function imageGetFile($store, files, callback) {
             (files || []).forEach(function (file) {
-                var ext = file.name.split('.').pop();
-                if (ext == 'jpg' || ext == 'png' || ext == 'gif' || ext == 'svg') {
+                var fileType = file.name.split('.').pop();
+                if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
 
                     if (typeof callback == 'function') {
                         new ImageLoader(file).getImage(function (image) {
                             callback({
                                 datauri: image.src, // export 용 
                                 url: URL.createObjectURL(file), // 화면 제어용 
-                                fileType: ext
+                                fileType: fileType
                             });
                         });
                     }
@@ -9654,7 +9655,16 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/get/url',
         value: function imageGetUrl($store, urls, callback) {
             (urls || []).forEach(function (url) {
-                callback(url);
+                var fileType = url.split('.').pop();
+                if (['jpg', 'png', 'gif', 'svg'].includes(fileType)) {
+
+                    if (typeof callback == 'function') {
+                        callback({
+                            url: url,
+                            fileType: fileType
+                        });
+                    }
+                }
             });
         }
     }, {
@@ -11829,7 +11839,51 @@ var CssManager = function (_BaseModule) {
     return CssManager;
 }(BaseModule);
 
-var ModuleList = [CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var ExternalResourceManager = function (_BaseModule) {
+    inherits(ExternalResourceManager, _BaseModule);
+
+    function ExternalResourceManager() {
+        classCallCheck(this, ExternalResourceManager);
+        return possibleConstructorReturn(this, (ExternalResourceManager.__proto__ || Object.getPrototypeOf(ExternalResourceManager)).apply(this, arguments));
+    }
+
+    createClass(ExternalResourceManager, [{
+        key: 'afterDispatch',
+        value: function afterDispatch() {
+            this.$store.emit('changeEditor');
+        }
+    }, {
+        key: '/external/paste',
+        value: function externalPaste($store, dataTransfer, layerId) {
+            var items = [].concat(toConsumableArray(dataTransfer.items));
+            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
+            });
+
+            var dataList = types.map(function (type) {
+                return dataTransfer.getData(type);
+            });
+
+            if (dataList.length) {
+                $store.read('/image/get/url', dataList, function (url) {
+
+                    $store.run('/item/add/image/url', url, true, layerId);
+                });
+            }
+
+            var files = [].concat(toConsumableArray(dataTransfer.files));
+            if (files.length) {
+
+                $store.read('/image/get/file', files, function (img) {
+                    $store.dispatch('/item/add/image/file', img, true, layerId);
+                });
+            }
+        }
+    }]);
+    return ExternalResourceManager;
+}(BaseModule);
+
+var ModuleList = [ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -16372,6 +16426,40 @@ var ImageList = function (_UIElement) {
             this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
             this.refresh();
         }
+    }, {
+        key: 'paste document',
+        value: function pasteDocument(e) {
+            var _this4 = this;
+
+            var dataTransfer = e.clipboardData;
+
+            var items = [].concat(toConsumableArray(dataTransfer.items));
+            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
+            });
+
+            var dataList = types.map(function (type) {
+                return dataTransfer.getData(type);
+            });
+
+            if (dataList.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this4.read('/image/get/url', dataList, function (url) {
+                        _this4.dispatch('/item/add/image/url', url, true, layer.id);
+                    });
+                });
+            }
+
+            var files = [].concat(toConsumableArray(dataTransfer.files));
+            if (files.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this4.read('/image/get/file', files, function (img) {
+                        _this4.dispatch('/item/add/image/file', img, true, layer.id);
+                        _this4.refresh();
+                    });
+                });
+            }
+        }
     }]);
     return ImageList;
 }(UIElement);
@@ -16539,17 +16627,18 @@ var DropView = function (_UIElement) {
 
             e.preventDefault();
 
-            var items = [].concat(toConsumableArray(e.dataTransfer.items));
-            var types = [].concat(toConsumableArray(e.dataTransfer.types)).filter(function (type) {
+            var dataTransfer = e.dataTransfer;
+
+            var items = [].concat(toConsumableArray(dataTransfer.items));
+            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
                 return type == 'text/uri-list';
             });
 
             var dataList = types.map(function (type) {
-                return e.dataTransfer.getData(type);
+                return dataTransfer.getData(type);
             });
 
             if (dataList.length) {
-
                 this.read('/item/current/layer', function (layer) {
                     _this2.read('/image/get/url', dataList, function (url) {
                         _this2.dispatch('/item/add/image/url', url, true, layer.id);
@@ -16557,10 +16646,8 @@ var DropView = function (_UIElement) {
                 });
             }
 
-            console.log(items, types, dataList);
-            var files = [].concat(toConsumableArray(e.dataTransfer.files));
+            var files = [].concat(toConsumableArray(dataTransfer.files));
             if (files.length) {
-
                 this.read('/item/current/layer', function (layer) {
                     _this2.read('/image/get/file', files, function (img) {
                         _this2.dispatch('/item/add/image/file', img, true, layer.id);
