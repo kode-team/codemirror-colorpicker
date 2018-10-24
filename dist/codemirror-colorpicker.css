@@ -1668,7 +1668,8 @@
     right: 10px; }
     .imageeditor .sub-feature-control > .feature {
       height: 100%;
-      text-align: left; }
+      text-align: left;
+      white-space: nowrap; }
       .imageeditor .sub-feature-control > .feature > .property-view {
         position: relative;
         height: 100%;
