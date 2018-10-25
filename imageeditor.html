@@ -4,6 +4,7 @@
     <meta charset="utf-8" /> 
     <title>CSS Gradient Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.css" />
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.js" ></script>
@@ -28,15 +29,22 @@
      
 
 <script type="text/javascript">
-    var nodes = document.querySelectorAll(".colorpicker-gradient");
-    for(var i = 0, len = nodes.length; i < len; i++) {
-        var item = nodes[i];
 
-        var type = item.getAttribute('data-type');
+    var picker = new CodeMirrorColorPicker.createImageEditor();
+    picker.loadStart(true);
 
-        var picker = new CodeMirrorColorPicker.createImageEditor();
-        picker.loadStart(true);
-    }    
+    axios.get('https://openclipart.org/search/json/?query=play')
+        .then(function (response) {
+            picker.dispatch('/svg/list/load', response.data.payload.map(item => {
+                return {
+                    key: item.title, 
+                    url: item.svg.url
+                }
+            }));
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 </script>
 
 </body>

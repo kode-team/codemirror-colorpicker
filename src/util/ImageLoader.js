@@ -51,7 +51,7 @@ class ImageLoader {
         };
 
         img.onerror = (e) => {
-            console.log(e);
+            console.log(e, img.src);
         }
 
         this.getImageUrl(function (url) {

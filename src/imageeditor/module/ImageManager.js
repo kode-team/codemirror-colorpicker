@@ -83,9 +83,15 @@ export default class ImageManager extends BaseModule {
         (blobs || []).forEach(file => {
             if (typeof callback == 'function') {
                 new ImageLoader(file).getImage(image => {
+                    var url = file; 
+
+                    if (url instanceof Blob) {
+                        url = URL.createObjectURL(file)
+                    }
+
                     callback ({
                         datauri: image.src,                 // export 용 
-                        url: URL.createObjectURL(file)     // 화면 제어용 
+                        url     // 화면 제어용 
                     })
                 })
             }

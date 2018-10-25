@@ -14,16 +14,27 @@ export default class ImageResource extends BasePropertyItem {
 
     'load $imageList' () {
         return this.read('/svg/list').map((svg, index) => {
-            return `<div class='svg-item' data-index="${index}">${svg}</div>`
+            if (typeof svg == 'object') {
+                return `<div class='svg-item' data-key="${svg.key}"><img src="${svg.url}" /></div>`
+            }  else {
+                return `<div class='svg-item' data-index="${index}">${svg}</div>`
+            }
+            
         })
     }
 
     refresh () {
         var isShow = this.isShow();
         this.$el.toggle(isShow)
+
+        this.load();
     }
 
     '@changeEditor' () {
+        this.refresh();
+    }
+
+    '@changeSvgList' () {
         this.refresh()
     }
 
@@ -36,13 +47,26 @@ export default class ImageResource extends BasePropertyItem {
     }
 
     'click $imageList .svg-item' (e) {
-        var index = +e.$delegateTarget.attr('data-index')
-        this.read('/item/current/image', (image) => {
-            var file = this.read('/svg/get/blob', index);
-            this.read('/image/get/blob', [file], (newImage) => {
-                this.dispatch('/item/set/image/file', image.id, newImage)
-            });
-        })
+        var index = e.$delegateTarget.attr('data-index')
+        var key = e.$delegateTarget.attr('data-key')
+
+        if (index) {
+            this.read('/item/current/image', (image) => {
+                var file = this.read('/svg/get/blob', +index);
+                this.read('/image/get/blob', [file], (newImage) => {
+                    this.dispatch('/item/set/image/file', image.id, newImage)
+                });
+            })
+        } else if (key) {
+
+            this.read('/item/current/image', (image) => {
+                var file = this.read('/svg/get/blob', Number.MAX_SAFE_INTEGER, key);
+                this.read('/image/get/blob', [file], (newImage) => {
+                    this.dispatch('/item/set/image/file', image.id, newImage)
+                });
+            })
+        } 
+
     }
 
 }

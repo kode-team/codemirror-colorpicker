@@ -664,6 +664,22 @@ var ColorNames = {
     getColorByName: getColorByName
 };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1739,7 +1755,7 @@ var ImageLoader = function () {
             };
 
             img.onerror = function (e) {
-                console.log(e);
+                console.log(e, img.src);
             };
 
             this.getImageUrl(function (url) {
@@ -9696,9 +9712,15 @@ var ImageManager = function (_BaseModule) {
             (blobs || []).forEach(function (file) {
                 if (typeof callback == 'function') {
                     new ImageLoader(file).getImage(function (image$$1) {
+                        var url = file;
+
+                        if (url instanceof Blob) {
+                            url = URL.createObjectURL(file);
+                        }
+
                         callback({
                             datauri: image$$1.src, // export 용 
-                            url: URL.createObjectURL(file) // 화면 제어용 
+                            url: url // 화면 제어용 
                         });
                     });
                 }
@@ -11983,21 +12005,47 @@ var SVGManager = function (_BaseModule) {
     }
 
     createClass(SVGManager, [{
+        key: "initialize",
+        value: function initialize() {
+            get(SVGManager.prototype.__proto__ || Object.getPrototypeOf(SVGManager.prototype), "initialize", this).call(this);
+
+            this.$store.svgList = [];
+        }
+    }, {
         key: "afterDispatch",
         value: function afterDispatch() {
-            this.$store.emit('changeEditor');
+            this.$store.emit('changeSvgList');
         }
     }, {
         key: '*/svg/list',
         value: function svgList($store) {
-            return SVGList;
+            return [].concat(toConsumableArray(SVGList), toConsumableArray($store.svgList));
+        }
+    }, {
+        key: '/svg/list/load',
+        value: function svgListLoad($store) {
+            var loadList = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+            $store.svgList = loadList;
         }
     }, {
         key: '*/svg/get/blob',
-        value: function svgGetBlob($store, index) {
-            var svg = "" + SVGList[index];
+        value: function svgGetBlob($store, index, key) {
+            if (SVGList[index]) {
+                var svg = "" + SVGList[index];
 
-            return new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+                return new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+            } else {
+                var list = $store.svgList.filter(function (item) {
+                    return item.key == key;
+                });
+
+                if (list.length) {
+                    return list[0].url;
+                }
+            }
+
+            return '';
         }
     }]);
     return SVGManager;
@@ -14411,7 +14459,11 @@ var ImageResource = function (_BasePropertyItem) {
         key: 'load $imageList',
         value: function load$imageList() {
             return this.read('/svg/list').map(function (svg, index) {
-                return '<div class=\'svg-item\' data-index="' + index + '">' + svg + '</div>';
+                if ((typeof svg === 'undefined' ? 'undefined' : _typeof(svg)) == 'object') {
+                    return '<div class=\'svg-item\' data-key="' + svg.key + '"><img src="' + svg.url + '" /></div>';
+                } else {
+                    return '<div class=\'svg-item\' data-index="' + index + '">' + svg + '</div>';
+                }
             });
         }
     }, {
@@ -14419,10 +14471,17 @@ var ImageResource = function (_BasePropertyItem) {
         value: function refresh() {
             var isShow = this.isShow();
             this.$el.toggle(isShow);
+
+            this.load();
         }
     }, {
         key: '@changeEditor',
         value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeSvgList',
+        value: function changeSvgList() {
             this.refresh();
         }
     }, {
@@ -14439,13 +14498,25 @@ var ImageResource = function (_BasePropertyItem) {
         value: function click$imageListSvgItem(e) {
             var _this2 = this;
 
-            var index = +e.$delegateTarget.attr('data-index');
-            this.read('/item/current/image', function (image) {
-                var file = _this2.read('/svg/get/blob', index);
-                _this2.read('/image/get/blob', [file], function (newImage) {
-                    _this2.dispatch('/item/set/image/file', image.id, newImage);
+            var index = e.$delegateTarget.attr('data-index');
+            var key = e.$delegateTarget.attr('data-key');
+
+            if (index) {
+                this.read('/item/current/image', function (image) {
+                    var file = _this2.read('/svg/get/blob', +index);
+                    _this2.read('/image/get/blob', [file], function (newImage) {
+                        _this2.dispatch('/item/set/image/file', image.id, newImage);
+                    });
                 });
-            });
+            } else if (key) {
+
+                this.read('/item/current/image', function (image) {
+                    var file = _this2.read('/svg/get/blob', Number.MAX_SAFE_INTEGER, key);
+                    _this2.read('/image/get/blob', [file], function (newImage) {
+                        _this2.dispatch('/item/set/image/file', image.id, newImage);
+                    });
+                });
+            }
         }
     }]);
     return ImageResource;
