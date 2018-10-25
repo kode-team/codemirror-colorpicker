@@ -33,12 +33,12 @@
     var picker = new CodeMirrorColorPicker.createImageEditor();
     picker.loadStart(true);
 
-    axios.get('https://openclipart.org/search/json/?query=play')
+    axios.get('/resources/icons.json')
         .then(function (response) {
-            picker.dispatch('/svg/list/load', response.data.payload.map(item => {
+            picker.dispatch('/svg/list/load', Object.keys(response.data).map(key => {
                 return {
-                    key: item.title, 
-                    url: item.svg.url
+                    key: key , 
+                    url: 'https://cdn.jsdelivr.net/npm/feather-icons@4.7.3/dist/icons/' + key + '.svg'
                 }
             }));
         })

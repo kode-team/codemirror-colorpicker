@@ -13080,8 +13080,6 @@ var GradientInfo = function (_UIElement) {
 
             item.selected = true;
 
-            console.log(item);
-
             this.initColor(item.color);
             this.dispatch('/item/set', item);
             this.refresh();

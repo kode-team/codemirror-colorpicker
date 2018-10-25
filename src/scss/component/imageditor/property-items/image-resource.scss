@@ -1,5 +1,7 @@
 &.image-resource {
     .items {
+        max-height: 300px;
+        overflow: auto;
         .svg-item {
             display: inline-block;
             width: 50px;
