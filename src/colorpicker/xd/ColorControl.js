@@ -2,8 +2,6 @@ import Hue from '../ui/control/VerticalHue';
 import Opacity from '../ui/control/VerticalOpacity'
 import UIElement from '../UIElement';
 
-const source = 'xd-control';
-
 export default class ColorControl extends UIElement {
 
     components () {
@@ -28,10 +26,8 @@ export default class ColorControl extends UIElement {
         this.Opacity.setColorUI()
     }    
 
-    '@changeColor' (sourceType) {
-        if (source != sourceType) {
-            this.refresh()
-        }
+    '@changeColor' () {
+        this.refresh()
     }
 
     '@initColor' () { this.refresh() }    

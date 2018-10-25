@@ -1,5 +1,8 @@
-import CodeMirror from 'codemirror'
 import CodeMirrorColorView from './colorview' 
+
+try {
+    var CodeMirror = require('codemirror')
+} catch(e) { }
 
 const CHECK_CODEMIRROR_OBJECT = () => (CodeMirror || window.CodeMirror);
 function LOAD_CODEMIRROR_COLORPICKER () {

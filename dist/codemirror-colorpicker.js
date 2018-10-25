@@ -1,10 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('codemirror')) :
-	typeof define === 'function' && define.amd ? define(['codemirror'], factory) :
-	(global['codemirror-colorpicker'] = factory(global.CodeMirror));
-}(this, (function (CodeMirror) { 'use strict';
-
-CodeMirror = CodeMirror && CodeMirror.hasOwnProperty('default') ? CodeMirror['default'] : CodeMirror;
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global['codemirror-colorpicker'] = factory());
+}(this, (function () { 'use strict';
 
 /**
  * @method format
@@ -9285,8 +9283,6 @@ var RingColorPicker = function (_BaseColorPicker) {
     return RingColorPicker;
 }(BaseColorPicker);
 
-var source$8 = 'xd-control';
-
 var ColorControl$10 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
 
@@ -9318,10 +9314,8 @@ var ColorControl$10 = function (_UIElement) {
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$8 != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -9818,6 +9812,10 @@ var ColorView = function () {
     }]);
     return ColorView;
 }();
+
+try {
+    var CodeMirror = require('codemirror');
+} catch (e) {}
 
 var CHECK_CODEMIRROR_OBJECT = function CHECK_CODEMIRROR_OBJECT() {
     return CodeMirror || window.CodeMirror;

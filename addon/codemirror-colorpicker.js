@@ -1,8 +1,6 @@
 (function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
-var CodeMirrorColorPicker = (function (CodeMirror) {
+var CodeMirrorColorPicker = (function () {
 'use strict';
-
-CodeMirror = CodeMirror && CodeMirror.hasOwnProperty('default') ? CodeMirror['default'] : CodeMirror;
 
 /**
  * @method format
@@ -9151,8 +9149,6 @@ var RingColorPicker = function (_BaseColorPicker) {
     return RingColorPicker;
 }(BaseColorPicker);
 
-var source$8 = 'xd-control';
-
 var ColorControl$10 = function (_UIElement) {
     inherits(ColorControl, _UIElement);
 
@@ -9184,10 +9180,8 @@ var ColorControl$10 = function (_UIElement) {
         }
     }, {
         key: '@changeColor',
-        value: function changeColor(sourceType) {
-            if (source$8 != sourceType) {
-                this.refresh();
-            }
+        value: function changeColor() {
+            this.refresh();
         }
     }, {
         key: '@initColor',
@@ -9685,6 +9679,10 @@ var ColorView = function () {
     return ColorView;
 }();
 
+try {
+    var CodeMirror = require('codemirror');
+} catch (e) {}
+
 var CHECK_CODEMIRROR_OBJECT = function CHECK_CODEMIRROR_OBJECT() {
     return CodeMirror || window.CodeMirror;
 };
@@ -9719,4 +9717,4 @@ var index = _extends({}, Util, ColorPicker, CodeMirrorExtension);
 
 return index;
 
-}(window.CodeMirror));
+}());
