@@ -12,13 +12,21 @@ import Timeline from '../ui/control/Timeline';
 import DropView from '../ui/control/DropView';
 import VerticalColorStep from '../ui/control/VerticalColorStep';
 
+const screenModes = ['expertor', 'beginner']
 
 export default class XDImageEditor extends BaseImageEditor {
+
+
+    afterRender() {
+        this.refs.$layoutMain.removeClass('beginner-mode')
+        this.refs.$layoutMain.removeClass('expertor-mode')
+        this.refs.$layoutMain.addClass(this.read('/storage/get', 'layout') + '-mode')
+    }
 
     template () {
         return `
 
-            <div class="layout-main">
+            <div class="layout-main" ref="$layoutMain">
                 <div class="layout-header">
                     <h1 class="header-title">EASYLOGIC</h1>
                     <div class="page-tab-menu">
@@ -76,5 +84,15 @@ export default class XDImageEditor extends BaseImageEditor {
 
     toggleTimeline () {
         this.$el.toggleClass('show-timeline')
+    } 
+
+    '@updateLayout' (layout) {
+        screenModes.filter(key => key != layout).forEach(key => {
+            this.refs.$layoutMain.removeClass(`${key}-mode`)
+        })
+
+        this.refs.$layoutMain.addClass(`${layout}-mode`)
     }
+
+
 }

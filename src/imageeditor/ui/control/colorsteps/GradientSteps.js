@@ -46,7 +46,24 @@ export default class GradientSteps extends UIElement {
         })
     }
 
+    isShow() {
+
+        var item = this.read('/item/current');
+
+        if (!this.read('/image/type/isGradient', item.type)) {
+            return false; 
+        }
+
+        if (!this.read('/item/is/mode', 'image')) {
+            return false; 
+        }
+
+        return true; 
+    }
+
     refresh () {
+
+        this.$el.toggle(this.isShow())
 
 
         this.read('/item/current/image', item => {

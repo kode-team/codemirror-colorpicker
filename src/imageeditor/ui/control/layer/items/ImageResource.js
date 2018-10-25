@@ -24,8 +24,12 @@ export default class ImageResource extends BasePropertyItem {
     }
 
     refresh () {
-        this.$el.toggleClass('show', this.isShow())
+        this.$el.toggle(this.isShow())
         this.load();
+    }
+
+    '@changeEditor' () {
+        this.$el.toggle(this.isShow())
     }
 
     '@changeSvgList' () {
@@ -33,7 +37,7 @@ export default class ImageResource extends BasePropertyItem {
     }
 
     '@selectImage' () {
-        this.$el.toggleClass('show', this.isShow())
+        this.$el.toggle(this.isShow())
     }    
 
     isShow () {

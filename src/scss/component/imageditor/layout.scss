@@ -4,11 +4,11 @@ $font-color: black;
 $pointer-color: rgba(#ececec, 0.8);
 $gutter: 8px;
 $tool-size: 40px;
-$right-size: 275px;
 $left-size: 250px;
+$right-size: 250px;
 $timeline-header-size: 30px;
 $timeline-size: 300px;
-$show-timeline-animation: all 0.3s linear; 
+$show-timeline-animation: all 0.15s linear; 
 
 .layout-main {
     position: absolute;
@@ -27,6 +27,27 @@ $show-timeline-animation: all 0.3s linear;
         }
 
 
+    }
+
+    &.beginner-mode {
+
+    }
+
+    &.expertor-mode {
+        .layout-left {
+            border-right: 1px solid $border-color;
+        }
+        .layout-right {
+            right: 0px;
+            width: $right-size;
+            left: auto;
+            border-right: 0px;
+        } 
+        
+        .layout-body {
+            left: $left-size;
+            right: $right-size;
+        }
     }
 
     .layout-top {

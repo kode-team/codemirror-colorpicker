@@ -8,7 +8,6 @@ $layer-item-padding: 4px;
     position: absolute;
     bottom: 10px;
     left : 10px;
-    height: 150px;
     right: 10px;
 
     > .feature {
@@ -18,7 +17,7 @@ $layer-item-padding: 4px;
 
         > .property-view {
             position: relative;
-            height: 100%;
+            height: 150px;
             width: 240px;
             background-color: rgba(0, 0, 0, 0.2);     
             display: inline-block;
@@ -158,6 +157,26 @@ $layer-item-padding: 4px;
                                 span:nth-child(8) { top : 20px; left : 10px; width: 9px; height: 8px;}
                                 span:nth-child(9) { top : 20px; left : 20px; width: 9px; height: 8px;}
                             }                                                        
+                        }
+                    }
+                }
+            }
+
+            &.image-list {
+                background-color: transparent;
+                height: 120px;
+                width: 100%;
+                .images {
+                    top: 0px;
+                    overflow: auto;
+
+                    .image-tools {
+                        .menu-buttons {
+                            border: 0px;
+                        }
+
+                        .image-list {
+                            border:0px;
                         }
                     }
                 }

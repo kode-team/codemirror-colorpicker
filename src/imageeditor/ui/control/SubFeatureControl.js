@@ -13,7 +13,7 @@ export default class SubFeatureControl extends UIElement {
         return `
             <div class='sub-feature-control'>         
                 <div class='feature'>
-                    <div class="property-view">
+                    <div class="property-view" ref="$background">
                         <BackgroundSize></BackgroundSize>
                     </div>
                     <div class="property-view" ref="$linear">
@@ -44,17 +44,15 @@ export default class SubFeatureControl extends UIElement {
 
     refresh () {
         this.$el.toggle(this.isShow())
+        this.refs.$background.toggleClass('hide', !this.isBackgroundShow())
+        // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
         this.refs.$linear.toggleClass('hide', !this.isLinearShow())
         this.refs.$radial.toggleClass('hide', !this.isRadialShow())
     }
 
 
     isShow () {
-        if (!this.read('/item/is/mode', 'image')) return false;         
-        var image = this.read('/item/current/image')
-
-        if (!image) { return false; }
-
+        //if (!this.read('/item/is/mode', 'image')) return false;         
         return true;
     }
 
@@ -83,6 +81,23 @@ export default class SubFeatureControl extends UIElement {
         }
 
         return this.read('/tool/get', 'guide.angle')
+    }
+
+    isBackgroundShow () {
+        if (!this.read('/item/is/mode', 'image')) return false; 
+
+        var item = this.read('/item/current/image')
+        if (!item) return false; 
+
+        return this.read('/tool/get', 'guide.angle')
+    }    
+
+    isImageListShow () {
+        var layer = this.read('/item/current/layer');
+
+        if (!layer) return false; 
+
+        return true; 
     }
 
     '@changeEditor' () {

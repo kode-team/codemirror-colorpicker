@@ -17,6 +17,14 @@ export default class StorageManager extends BaseModule {
         this.$store.emit('changeStorage')
     }
 
+    '*/storage/get' ($store, key) {
+        return JSON.parse(localStorage.getItem(`${SAVE_ID}-${key}`))
+    }
+
+    '/storage/set' ($store, key, value) {
+        localStorage.setItem(`${SAVE_ID}-${key}`, JSON.stringify(value))
+    }
+
     '*/storage/layers' ($store, index = undefined) {
         if (typeof index !== 'undefined' ) {
             return $store.cachedLayers[index];

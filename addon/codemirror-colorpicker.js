@@ -11611,6 +11611,16 @@ var StorageManager = function (_BaseModule) {
             this.$store.emit('changeStorage');
         }
     }, {
+        key: '*/storage/get',
+        value: function storageGet($store, key) {
+            return JSON.parse(localStorage.getItem(SAVE_ID + '-' + key));
+        }
+    }, {
+        key: '/storage/set',
+        value: function storageSet($store, key, value) {
+            localStorage.setItem(SAVE_ID + '-' + key, JSON.stringify(value));
+        }
+    }, {
         key: '*/storage/layers',
         value: function storageLayers($store) {
             var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
@@ -12051,45 +12061,6 @@ var PageList = function (_UIElement) {
         }
     }]);
     return PageList;
-}(UIElement);
-
-var BaseTab = function (_UIElement) {
-    inherits(BaseTab, _UIElement);
-
-    function BaseTab() {
-        classCallCheck(this, BaseTab);
-        return possibleConstructorReturn(this, (BaseTab.__proto__ || Object.getPrototypeOf(BaseTab)).apply(this, arguments));
-    }
-
-    createClass(BaseTab, [{
-        key: 'template',
-        value: function template() {
-            return '\n        <div class="tab">\n            <div class="tab-header" ref="$header">\n                <div class="tab-item selected" data-id="1">1</div>\n                <div class="tab-item" data-id="2">2</div>\n            </div>\n            <div class="tab-body" ref="$body">\n                <div class="tab-content selected" data-id="1"></div>\n                <div class="tab-content" data-id="2"></div>\n            </div>\n        </div>\n        ';
-        }
-    }, {
-        key: 'isNotSelectedTab',
-        value: function isNotSelectedTab(e) {
-            return !e.$delegateTarget.hasClass('selected');
-        }
-    }, {
-        key: 'click.isNotSelectedTab $header .tab-item',
-        value: function clickIsNotSelectedTab$headerTabItem(e) {
-            this.selectTab(e.$delegateTarget.attr('data-id'));
-        }
-    }, {
-        key: 'selectTab',
-        value: function selectTab(id) {
-
-            this.refs.$header.children().forEach(function ($dom) {
-                $dom.toggleClass('selected', $dom.attr('data-id') == id);
-            });
-
-            this.refs.$body.children().forEach(function ($dom) {
-                $dom.toggleClass('selected', $dom.attr('data-id') == id);
-            });
-        }
-    }]);
-    return BaseTab;
 }(UIElement);
 
 var BasePropertyItem = function (_UIElement) {
@@ -12608,9 +12579,27 @@ var GradientSteps = function (_UIElement) {
             });
         }
     }, {
+        key: 'isShow',
+        value: function isShow() {
+
+            var item = this.read('/item/current');
+
+            if (!this.read('/image/type/isGradient', item.type)) {
+                return false;
+            }
+
+            if (!this.read('/item/is/mode', 'image')) {
+                return false;
+            }
+
+            return true;
+        }
+    }, {
         key: 'refresh',
         value: function refresh() {
             var _this3 = this;
+
+            this.$el.toggle(this.isShow());
 
             this.read('/item/current/image', function (item) {
                 var type = item ? item.type : '';
@@ -13720,12 +13709,24 @@ var BackgroundSize = function (_UIElement) {
         value: function refresh() {
             var _this6 = this;
 
-            this.read('/item/current/image', function (image) {
-                _this6.children.$width.refresh(image.backgroundSizeWidth);
-                _this6.children.$height.refresh(image.backgroundSizeHeight);
-                _this6.selectBackgroundSize(image.backgroundSize);
-                _this6.selectBackgroundRepeat(image.backgroundRepeat);
-            });
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.read('/item/current/image', function (image) {
+                    _this6.children.$width.refresh(image.backgroundSizeWidth);
+                    _this6.children.$height.refresh(image.backgroundSizeHeight);
+                    _this6.selectBackgroundSize(image.backgroundSize);
+                    _this6.selectBackgroundRepeat(image.backgroundRepeat);
+                });
+            }
+        }
+    }, {
+        key: "isShow",
+        value: function isShow() {
+
+            return true;
         }
     }]);
     return BackgroundSize;
@@ -14342,8 +14343,13 @@ var ImageResource = function (_BasePropertyItem) {
     }, {
         key: 'refresh',
         value: function refresh() {
-            this.$el.toggleClass('show', this.isShow());
+            this.$el.toggle(this.isShow());
             this.load();
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.$el.toggle(this.isShow());
         }
     }, {
         key: '@changeSvgList',
@@ -14353,7 +14359,7 @@ var ImageResource = function (_BasePropertyItem) {
     }, {
         key: '@selectImage',
         value: function selectImage() {
-            this.$el.toggleClass('show', this.isShow());
+            this.$el.toggle(this.isShow());
         }
     }, {
         key: 'isShow',
@@ -14393,7 +14399,55 @@ var ImageResource = function (_BasePropertyItem) {
     return ImageResource;
 }(BasePropertyItem);
 
+var PageLayout = function (_UIElement) {
+    inherits(PageLayout, _UIElement);
+
+    function PageLayout() {
+        classCallCheck(this, PageLayout);
+        return possibleConstructorReturn(this, (PageLayout.__proto__ || Object.getPrototypeOf(PageLayout)).apply(this, arguments));
+    }
+
+    createClass(PageLayout, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item layout\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>Layout</label>\n                        <div class=\'layout-buttons\' ref="$buttons">\n                            <button type="button" class=\'beginner\' ref="$beginner">B</button>\n                            <button type="button" class=\'expertor\' ref="$expertor">E</button>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.refs.$buttons.removeClass('beginner-mode').removeClass('expertor-mode');
+            this.refs.$buttons.addClass(this.read('/storage/get', 'layout') + '-mode');
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeStorage',
+        value: function changeStorage() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $beginner',
+        value: function click$beginner(e) {
+            this.emit('updateLayout', 'beginner');
+            this.dispatch('/storage/set', 'layout', 'beginner');
+            this.refresh();
+        }
+    }, {
+        key: 'click $expertor',
+        value: function click$expertor(e) {
+            this.emit('updateLayout', 'expertor');
+            this.dispatch('/storage/set', 'layout', 'expertor');
+            this.refresh();
+        }
+    }]);
+    return PageLayout;
+}(UIElement);
+
 var items = {
+    PageLayout: PageLayout,
     ImageResource: ImageResource,
     ImageInfo: ImageInfo,
     BackgroundColor: BackgroundColor,
@@ -14444,31 +14498,6 @@ var LayerView = function (_UIElement) {
     return LayerView;
 }(UIElement);
 
-var LayerMenuTab = function (_BaseTab) {
-    inherits(LayerMenuTab, _BaseTab);
-
-    function LayerMenuTab() {
-        classCallCheck(this, LayerMenuTab);
-        return possibleConstructorReturn(this, (LayerMenuTab.__proto__ || Object.getPrototypeOf(LayerMenuTab)).apply(this, arguments));
-    }
-
-    createClass(LayerMenuTab, [{
-        key: 'components',
-        value: function components() {
-            return {
-                LayerView: LayerView
-            };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-
-            return '\n            <div>\n                <LayerView></LayerView>\n            </div>    \n        ';
-        }
-    }]);
-    return LayerMenuTab;
-}(BaseTab);
-
 var ImageView = function (_UIElement) {
     inherits(ImageView, _UIElement);
 
@@ -14491,31 +14520,6 @@ var ImageView = function (_UIElement) {
     return ImageView;
 }(UIElement);
 
-var ImageMenuTab = function (_BaseTab) {
-    inherits(ImageMenuTab, _BaseTab);
-
-    function ImageMenuTab() {
-        classCallCheck(this, ImageMenuTab);
-        return possibleConstructorReturn(this, (ImageMenuTab.__proto__ || Object.getPrototypeOf(ImageMenuTab)).apply(this, arguments));
-    }
-
-    createClass(ImageMenuTab, [{
-        key: 'components',
-        value: function components() {
-            return {
-                ImageView: ImageView
-            };
-        }
-    }, {
-        key: 'template',
-        value: function template() {
-
-            return '<div>\n                    <ImageView></ImageView>\n            </div>\n        ';
-        }
-    }]);
-    return ImageMenuTab;
-}(BaseTab);
-
 var FeatureControl = function (_UIElement) {
     inherits(FeatureControl, _UIElement);
 
@@ -14527,14 +14531,14 @@ var FeatureControl = function (_UIElement) {
     createClass(FeatureControl, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='feature-control'>\n                <div class='feature layer-feature' data-type='layer'>\n                    <LayerMenuTab></LayerMenuTab>\n                </div>              \n                <div class='feature image-feature' data-type='image'>\n                    <ImageMenuTab></ImageMenuTab>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='feature-control'>\n                <div class='feature layer-feature' data-type='layer'>\n                    <LayerView></LayerView>\n                </div>              \n                <div class='feature image-feature' data-type='image'>\n                    <ImageView></ImageView>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
         value: function components() {
             return {
-                LayerMenuTab: LayerMenuTab,
-                ImageMenuTab: ImageMenuTab
+                LayerView: LayerView,
+                ImageView: ImageView
             };
         }
     }, {
@@ -14570,489 +14574,43 @@ var FeatureControl = function (_UIElement) {
     return FeatureControl;
 }(UIElement);
 
-var GradientAngle = function (_UIElement) {
-    inherits(GradientAngle, _UIElement);
+var BaseTab = function (_UIElement) {
+    inherits(BaseTab, _UIElement);
 
-    function GradientAngle() {
-        classCallCheck(this, GradientAngle);
-        return possibleConstructorReturn(this, (GradientAngle.__proto__ || Object.getPrototypeOf(GradientAngle)).apply(this, arguments));
+    function BaseTab() {
+        classCallCheck(this, BaseTab);
+        return possibleConstructorReturn(this, (BaseTab.__proto__ || Object.getPrototypeOf(BaseTab)).apply(this, arguments));
     }
 
-    createClass(GradientAngle, [{
+    createClass(BaseTab, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'drag-angle-rect\'>\n                <div class="drag-angle" ref="$dragAngle">\n                    <div ref="$angleText" class="angle-text"></div>\n                    <div ref="$dragPointer" class="drag-pointer"></div>\n                </div>\n            </div>\n        ';
+            return '\n        <div class="tab">\n            <div class="tab-header" ref="$header">\n                <div class="tab-item selected" data-id="1">1</div>\n                <div class="tab-item" data-id="2">2</div>\n            </div>\n            <div class="tab-body" ref="$body">\n                <div class="tab-content selected" data-id="1"></div>\n                <div class="tab-content" data-id="2"></div>\n            </div>\n        </div>\n        ';
         }
     }, {
-        key: 'refresh',
-        value: function refresh() {
-
-            if (this.isShow()) {
-                this.$el.show();
-
-                this.refreshUI();
-            } else {
-                this.$el.hide();
-            }
+        key: 'isNotSelectedTab',
+        value: function isNotSelectedTab(e) {
+            return !e.$delegateTarget.hasClass('selected');
         }
     }, {
-        key: 'isShow',
-        value: function isShow() {
-            if (!this.read('/item/is/mode', 'image')) return false;
-
-            var item = this.read('/item/current/image');
-
-            if (!item) return false;
-
-            if (!this.read('/image/type/isLinear', item.type)) {
-                return false;
-            }
-
-            return this.read('/tool/get', 'guide.angle');
+        key: 'click.isNotSelectedTab $header .tab-item',
+        value: function clickIsNotSelectedTab$headerTabItem(e) {
+            this.selectTab(e.$delegateTarget.attr('data-id'));
         }
     }, {
-        key: 'getCurrentXY',
-        value: function getCurrentXY(e, angle, radius, centerX, centerY) {
-            return e ? e.xy : getXYInCircle(angle, radius, centerX, centerY);
-        }
-    }, {
-        key: 'getRectangle',
-        value: function getRectangle() {
-            var width = this.refs.$dragAngle.width();
-            var height = this.refs.$dragAngle.height();
-            var radius = Math.floor(width / 2 * 0.7);
+        key: 'selectTab',
+        value: function selectTab(id) {
 
-            var _refs$$dragAngle$offs = this.refs.$dragAngle.offset(),
-                left = _refs$$dragAngle$offs.left,
-                top = _refs$$dragAngle$offs.top;
-
-            var minX = left;
-            var minY = top;
-            var centerX = minX + width / 2;
-            var centerY = minY + height / 2;
-
-            return { minX: minX, minY: minY, width: width, height: height, radius: radius, centerX: centerX, centerY: centerY };
-        }
-    }, {
-        key: 'getDefaultValue',
-        value: function getDefaultValue() {
-            var image = this.read('/item/current/image');
-            if (!image) return 0;
-
-            var angle = this.read('/image/angle', image.angle);
-            return angle - 90;
-        }
-    }, {
-        key: 'refreshAngleText',
-        value: function refreshAngleText(angleText) {
-            this.refs.$angleText.text(angleText + ' °');
-        }
-    }, {
-        key: 'refreshUI',
-        value: function refreshUI(e) {
-            var _getRectangle = this.getRectangle(),
-                minX = _getRectangle.minX,
-                minY = _getRectangle.minY,
-                radius = _getRectangle.radius,
-                centerX = _getRectangle.centerX,
-                centerY = _getRectangle.centerY;
-
-            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue(), radius, centerX, centerY),
-                x = _getCurrentXY.x,
-                y = _getCurrentXY.y;
-
-            var rx = x - centerX,
-                ry = y - centerY,
-                angle = caculateAngle(rx, ry);
-
-            {
-                var _getCurrentXY2 = this.getCurrentXY(null, angle, radius, centerX, centerY),
-                    x = _getCurrentXY2.x,
-                    y = _getCurrentXY2.y;
-            }
-
-            // set drag pointer position 
-            this.refs.$dragPointer.px('left', x - minX);
-            this.refs.$dragPointer.px('top', y - minY);
-
-            var lastAngle = Math.round(angle + 90) % 360;
-
-            this.refreshAngleText(lastAngle);
-
-            if (e) {
-
-                this.setAngle(lastAngle);
-            }
-        }
-    }, {
-        key: 'setAngle',
-        value: function setAngle(angle) {
-            var _this2 = this;
-
-            this.read('/item/current/image', function (item) {
-                item.angle = angle;
-
-                _this2.dispatch('/item/set', item);
-            });
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: '@changeTool',
-        value: function changeTool() {
-            this.$el.toggle(this.isShow());
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'pointerend document',
-        value: function pointerendDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'pointermove document',
-        value: function pointermoveDocument(e) {
-            if (this.isDown) {
-                this.refreshUI(e);
-            }
-        }
-    }, {
-        key: 'pointerstart $drag_pointer',
-        value: function pointerstart$drag_pointer(e) {
-            e.preventDefault();
-            this.isDown = true;
-        }
-    }, {
-        key: 'pointerstart $dragAngle',
-        value: function pointerstart$dragAngle(e) {
-            this.isDown = true;
-            this.refreshUI(e);
-        }
-    }]);
-    return GradientAngle;
-}(UIElement);
-
-var DEFINE_POSITIONS = {
-    'center': ['center', 'center'],
-    'right': ['right', 'center'],
-    'top': ['center', 'top'],
-    'left': ['left', 'center'],
-    'bottom': ['center', 'bottom']
-};
-
-var GradientPosition = function (_UIElement) {
-    inherits(GradientPosition, _UIElement);
-
-    function GradientPosition() {
-        classCallCheck(this, GradientPosition);
-        return possibleConstructorReturn(this, (GradientPosition.__proto__ || Object.getPrototypeOf(GradientPosition)).apply(this, arguments));
-    }
-
-    createClass(GradientPosition, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class="drag-position">\n                <div ref="$dragPointer" class="drag-pointer"></div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-
-            if (this.isShow()) {
-                this.$el.show();
-                this.refreshUI();
-            } else {
-                this.$el.hide();
-            }
-        }
-    }, {
-        key: 'isShow',
-        value: function isShow() {
-            if (!this.read('/item/is/mode', 'image')) return false;
-
-            var item = this.read('/item/current/image');
-            if (!item) return false;
-
-            if (!this.read('/image/type/isRadial', item.type)) {
-                return false;
-            }
-
-            return this.read('/tool/get', 'guide.angle');
-        }
-    }, {
-        key: 'getCurrentXY',
-        value: function getCurrentXY(e, position) {
-
-            if (e) {
-                var xy = e.xy;
-
-                return [xy.x, xy.y];
-            }
-
-            var _getRectangle = this.getRectangle(),
-                minX = _getRectangle.minX,
-                minY = _getRectangle.minY,
-                maxX = _getRectangle.maxX,
-                maxY = _getRectangle.maxY,
-                width = _getRectangle.width,
-                height = _getRectangle.height;
-
-            var p = position;
-            if (typeof p == 'string' && DEFINE_POSITIONS[p]) {
-                p = DEFINE_POSITIONS[p];
-            } else if (typeof p === 'string') {
-                p = p.split(' ');
-            }
-
-            p = p.map(function (item, index) {
-                if (item == 'center') {
-                    if (index == 0) {
-                        return minX + width / 2;
-                    } else if (index == 1) {
-                        return minY + height / 2;
-                    }
-                } else if (item === 'left') {
-                    return minX;
-                } else if (item === 'right') {
-                    return maxX;
-                } else if (item === 'top') {
-                    return minY;
-                } else if (item === 'bottom') {
-                    return maxY;
-                } else {
-                    if (index == 0) {
-                        return minX * width * (+item / 100);
-                    } else if (index == 1) {
-                        return minY * height * (+item / 100);
-                    }
-                }
+            this.refs.$header.children().forEach(function ($dom) {
+                $dom.toggleClass('selected', $dom.attr('data-id') == id);
             });
 
-            return p;
-        }
-    }, {
-        key: 'getRectangle',
-        value: function getRectangle() {
-            var width = this.$el.width();
-            var height = this.$el.height();
-            var minX = this.$el.offsetLeft();
-            var minY = this.$el.offsetTop();
-
-            var maxX = minX + width;
-            var maxY = minY + height;
-
-            return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, width: width, height: height };
-        }
-    }, {
-        key: 'getDefaultValue',
-        value: function getDefaultValue() {
-
-            var item = this.read('/item/current/image');
-
-            if (!item) return '';
-
-            return item.radialPosition || '';
-        }
-    }, {
-        key: 'refreshUI',
-        value: function refreshUI(e) {
-            var _getRectangle2 = this.getRectangle(),
-                minX = _getRectangle2.minX,
-                minY = _getRectangle2.minY,
-                maxX = _getRectangle2.maxX,
-                maxY = _getRectangle2.maxY,
-                width = _getRectangle2.width,
-                height = _getRectangle2.height;
-
-            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue()),
-                _getCurrentXY2 = slicedToArray(_getCurrentXY, 2),
-                x = _getCurrentXY2[0],
-                y = _getCurrentXY2[1];
-
-            x = Math.max(Math.min(maxX, x), minX);
-            y = Math.max(Math.min(maxY, y), minY);
-
-            var left = x - minX;
-            var top = y - minY;
-
-            this.refs.$dragPointer.px('left', left);
-            this.refs.$dragPointer.px('top', top);
-
-            if (e) {
-
-                this.setRadialPosition([Math.floor(left / width * 100) + '%', Math.floor(top / height * 100) + '%']);
-            }
-        }
-    }, {
-        key: 'setRadialPosition',
-        value: function setRadialPosition(radialPosition) {
-            var _this2 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.radialPosition = radialPosition;
-                _this2.dispatch('/item/set', image);
+            this.refs.$body.children().forEach(function ($dom) {
+                $dom.toggleClass('selected', $dom.attr('data-id') == id);
             });
         }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: '@changeTool',
-        value: function changeTool() {
-            this.$el.toggle(this.isShow());
-        }
-
-        // Event Bindings 
-
-    }, {
-        key: 'pointerend document',
-        value: function pointerendDocument(e) {
-            this.isDown = false;
-        }
-    }, {
-        key: 'pointermove document',
-        value: function pointermoveDocument(e) {
-            if (this.isDown) {
-                this.refreshUI(e);
-            }
-        }
-    }, {
-        key: 'pointerstart $dragPointer',
-        value: function pointerstart$dragPointer(e) {
-            e.preventDefault();
-            this.isDown = true;
-        }
-    }, {
-        key: 'pointerstart $el',
-        value: function pointerstart$el(e) {
-            this.isDown = true;
-            // this.refreshUI(e);        
-        }
-    }, {
-        key: 'dblclick $dragPointer',
-        value: function dblclick$dragPointer(e) {
-            e.preventDefault();
-            this.setRadialPosition('center');
-            this.refreshUI();
-        }
     }]);
-    return GradientPosition;
-}(UIElement);
-
-var PredefinedLinearGradientAngle = function (_UIElement) {
-    inherits(PredefinedLinearGradientAngle, _UIElement);
-
-    function PredefinedLinearGradientAngle() {
-        classCallCheck(this, PredefinedLinearGradientAngle);
-        return possibleConstructorReturn(this, (PredefinedLinearGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedLinearGradientAngle)).apply(this, arguments));
-    }
-
-    createClass(PredefinedLinearGradientAngle, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class="predefined-angluar-group">\n                <button type="button" data-value="to right"></button>                          \n                <button type="button" data-value="to left"></button>                                                  \n                <button type="button" data-value="to top"></button>                            \n                <button type="button" data-value="to bottom"></button>                                        \n                <button type="button" data-value="to top right"></button>                                \n                <button type="button" data-value="to bottom right"></button>                                    \n                <button type="button" data-value="to bottom left"></button>\n                <button type="button" data-value="to top left"></button>\n            </div>\n        ';
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.$el.toggle(this.isShow());
-        }
-    }, {
-        key: 'isShow',
-        value: function isShow() {
-            if (!this.read('/item/is/mode', 'image')) return false;
-            var image = this.read('/item/current/image');
-
-            if (!image) {
-                return false;
-            }
-
-            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isLinear', image.type);
-        }
-    }, {
-        key: 'click.self $el button',
-        value: function clickSelf$elButton(e) {
-            var _this2 = this;
-
-            this.read('/item/current/image', function (item) {
-                item.angle = e.$delegateTarget.attr('data-value');
-
-                _this2.dispatch('/item/set', item);
-            });
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: '@changeTool',
-        value: function changeTool() {
-            this.refresh();
-        }
-    }]);
-    return PredefinedLinearGradientAngle;
-}(UIElement);
-
-var PredefinedRadialGradientPosition = function (_UIElement) {
-    inherits(PredefinedRadialGradientPosition, _UIElement);
-
-    function PredefinedRadialGradientPosition() {
-        classCallCheck(this, PredefinedRadialGradientPosition);
-        return possibleConstructorReturn(this, (PredefinedRadialGradientPosition.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientPosition)).apply(this, arguments));
-    }
-
-    createClass(PredefinedRadialGradientPosition, [{
-        key: 'template',
-        value: function template() {
-            return ' \n            <div class="predefined-angluar-group radial-position">\n                <button type="button" data-value="top"></button>                          \n                <button type="button" data-value="left"></button>                                                  \n                <button type="button" data-value="bottom"></button>                            \n                <button type="button" data-value="right"></button>                                        \n            </div>\n        ';
-        }
-    }, {
-        key: 'click $el button',
-        value: function click$elButton(e) {
-
-            var item = this.read('/item/current/image');
-
-            if (item) {
-                item.radialPosition = e.$delegateTarget.attr('data-value');
-                this.dispatch('/item/set', item);
-            }
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.$el.toggle(this.isShow());
-        }
-    }, {
-        key: 'isShow',
-        value: function isShow() {
-            if (!this.read('/item/is/mode', 'image')) return false;
-
-            var image = this.read('/item/current/image');
-
-            if (!image) {
-                return false;
-            }
-
-            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isRadial', image.type);
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: '@changeTool',
-        value: function changeTool() {
-            this.refresh();
-        }
-    }]);
-    return PredefinedRadialGradientPosition;
+    return BaseTab;
 }(UIElement);
 
 var PredefinedPageResizer = function (_UIElement) {
@@ -15959,6 +15517,491 @@ var MoveGuide = function (_UIElement) {
     return MoveGuide;
 }(UIElement);
 
+var GradientAngle = function (_UIElement) {
+    inherits(GradientAngle, _UIElement);
+
+    function GradientAngle() {
+        classCallCheck(this, GradientAngle);
+        return possibleConstructorReturn(this, (GradientAngle.__proto__ || Object.getPrototypeOf(GradientAngle)).apply(this, arguments));
+    }
+
+    createClass(GradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'drag-angle-rect\'>\n                <div class="drag-angle" ref="$dragAngle">\n                    <div ref="$angleText" class="angle-text"></div>\n                    <div ref="$dragPointer" class="drag-pointer"></div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+
+            if (this.isShow()) {
+                this.$el.show();
+
+                this.refreshUI();
+            } else {
+                this.$el.hide();
+            }
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var item = this.read('/item/current/image');
+
+            if (!item) return false;
+
+            if (!this.read('/image/type/isLinear', item.type)) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: 'getCurrentXY',
+        value: function getCurrentXY(e, angle, radius, centerX, centerY) {
+            return e ? e.xy : getXYInCircle(angle, radius, centerX, centerY);
+        }
+    }, {
+        key: 'getRectangle',
+        value: function getRectangle() {
+            var width = this.refs.$dragAngle.width();
+            var height = this.refs.$dragAngle.height();
+            var radius = Math.floor(width / 2 * 0.7);
+
+            var _refs$$dragAngle$offs = this.refs.$dragAngle.offset(),
+                left = _refs$$dragAngle$offs.left,
+                top = _refs$$dragAngle$offs.top;
+
+            var minX = left;
+            var minY = top;
+            var centerX = minX + width / 2;
+            var centerY = minY + height / 2;
+
+            return { minX: minX, minY: minY, width: width, height: height, radius: radius, centerX: centerX, centerY: centerY };
+        }
+    }, {
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+            var image = this.read('/item/current/image');
+            if (!image) return 0;
+
+            var angle = this.read('/image/angle', image.angle);
+            return angle - 90;
+        }
+    }, {
+        key: 'refreshAngleText',
+        value: function refreshAngleText(angleText) {
+            this.refs.$angleText.text(angleText + ' °');
+        }
+    }, {
+        key: 'refreshUI',
+        value: function refreshUI(e) {
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                radius = _getRectangle.radius,
+                centerX = _getRectangle.centerX,
+                centerY = _getRectangle.centerY;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue(), radius, centerX, centerY),
+                x = _getCurrentXY.x,
+                y = _getCurrentXY.y;
+
+            var rx = x - centerX,
+                ry = y - centerY,
+                angle = caculateAngle(rx, ry);
+
+            {
+                var _getCurrentXY2 = this.getCurrentXY(null, angle, radius, centerX, centerY),
+                    x = _getCurrentXY2.x,
+                    y = _getCurrentXY2.y;
+            }
+
+            // set drag pointer position 
+            this.refs.$dragPointer.px('left', x - minX);
+            this.refs.$dragPointer.px('top', y - minY);
+
+            var lastAngle = Math.round(angle + 90) % 360;
+
+            this.refreshAngleText(lastAngle);
+
+            if (e) {
+
+                this.setAngle(lastAngle);
+            }
+        }
+    }, {
+        key: 'setAngle',
+        value: function setAngle(angle) {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (item) {
+                item.angle = angle;
+
+                _this2.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.$el.toggle(this.isShow());
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            if (this.isDown) {
+                this.refreshUI(e);
+            }
+        }
+    }, {
+        key: 'pointerstart $drag_pointer',
+        value: function pointerstart$drag_pointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'pointerstart $dragAngle',
+        value: function pointerstart$dragAngle(e) {
+            this.isDown = true;
+            this.refreshUI(e);
+        }
+    }]);
+    return GradientAngle;
+}(UIElement);
+
+var DEFINE_POSITIONS = {
+    'center': ['center', 'center'],
+    'right': ['right', 'center'],
+    'top': ['center', 'top'],
+    'left': ['left', 'center'],
+    'bottom': ['center', 'bottom']
+};
+
+var GradientPosition = function (_UIElement) {
+    inherits(GradientPosition, _UIElement);
+
+    function GradientPosition() {
+        classCallCheck(this, GradientPosition);
+        return possibleConstructorReturn(this, (GradientPosition.__proto__ || Object.getPrototypeOf(GradientPosition)).apply(this, arguments));
+    }
+
+    createClass(GradientPosition, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="drag-position">\n                <div ref="$dragPointer" class="drag-pointer"></div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+
+            if (this.isShow()) {
+                this.$el.show();
+                this.refreshUI();
+            } else {
+                this.$el.hide();
+            }
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var item = this.read('/item/current/image');
+            if (!item) return false;
+
+            if (!this.read('/image/type/isRadial', item.type)) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: 'getCurrentXY',
+        value: function getCurrentXY(e, position) {
+
+            if (e) {
+                var xy = e.xy;
+
+                return [xy.x, xy.y];
+            }
+
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                maxX = _getRectangle.maxX,
+                maxY = _getRectangle.maxY,
+                width = _getRectangle.width,
+                height = _getRectangle.height;
+
+            var p = position;
+            if (typeof p == 'string' && DEFINE_POSITIONS[p]) {
+                p = DEFINE_POSITIONS[p];
+            } else if (typeof p === 'string') {
+                p = p.split(' ');
+            }
+
+            p = p.map(function (item, index) {
+                if (item == 'center') {
+                    if (index == 0) {
+                        return minX + width / 2;
+                    } else if (index == 1) {
+                        return minY + height / 2;
+                    }
+                } else if (item === 'left') {
+                    return minX;
+                } else if (item === 'right') {
+                    return maxX;
+                } else if (item === 'top') {
+                    return minY;
+                } else if (item === 'bottom') {
+                    return maxY;
+                } else {
+                    if (index == 0) {
+                        return minX * width * (+item / 100);
+                    } else if (index == 1) {
+                        return minY * height * (+item / 100);
+                    }
+                }
+            });
+
+            return p;
+        }
+    }, {
+        key: 'getRectangle',
+        value: function getRectangle() {
+            var width = this.$el.width();
+            var height = this.$el.height();
+            var minX = this.$el.offsetLeft();
+            var minY = this.$el.offsetTop();
+
+            var maxX = minX + width;
+            var maxY = minY + height;
+
+            return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, width: width, height: height };
+        }
+    }, {
+        key: 'getDefaultValue',
+        value: function getDefaultValue() {
+
+            var item = this.read('/item/current/image');
+
+            if (!item) return '';
+
+            return item.radialPosition || '';
+        }
+    }, {
+        key: 'refreshUI',
+        value: function refreshUI(e) {
+            var _getRectangle2 = this.getRectangle(),
+                minX = _getRectangle2.minX,
+                minY = _getRectangle2.minY,
+                maxX = _getRectangle2.maxX,
+                maxY = _getRectangle2.maxY,
+                width = _getRectangle2.width,
+                height = _getRectangle2.height;
+
+            var _getCurrentXY = this.getCurrentXY(e, this.getDefaultValue()),
+                _getCurrentXY2 = slicedToArray(_getCurrentXY, 2),
+                x = _getCurrentXY2[0],
+                y = _getCurrentXY2[1];
+
+            x = Math.max(Math.min(maxX, x), minX);
+            y = Math.max(Math.min(maxY, y), minY);
+
+            var left = x - minX;
+            var top = y - minY;
+
+            this.refs.$dragPointer.px('left', left);
+            this.refs.$dragPointer.px('top', top);
+
+            if (e) {
+
+                this.setRadialPosition([Math.floor(left / width * 100) + '%', Math.floor(top / height * 100) + '%']);
+            }
+        }
+    }, {
+        key: 'setRadialPosition',
+        value: function setRadialPosition(radialPosition) {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.radialPosition = radialPosition;
+                _this2.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.$el.toggle(this.isShow());
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            if (this.isDown) {
+                this.refreshUI(e);
+            }
+        }
+    }, {
+        key: 'pointerstart $dragPointer',
+        value: function pointerstart$dragPointer(e) {
+            e.preventDefault();
+            this.isDown = true;
+        }
+    }, {
+        key: 'pointerstart $el',
+        value: function pointerstart$el(e) {
+            this.isDown = true;
+            // this.refreshUI(e);        
+        }
+    }, {
+        key: 'dblclick $dragPointer',
+        value: function dblclick$dragPointer(e) {
+            e.preventDefault();
+            this.setRadialPosition('center');
+            this.refreshUI();
+        }
+    }]);
+    return GradientPosition;
+}(UIElement);
+
+var PredefinedLinearGradientAngle = function (_UIElement) {
+    inherits(PredefinedLinearGradientAngle, _UIElement);
+
+    function PredefinedLinearGradientAngle() {
+        classCallCheck(this, PredefinedLinearGradientAngle);
+        return possibleConstructorReturn(this, (PredefinedLinearGradientAngle.__proto__ || Object.getPrototypeOf(PredefinedLinearGradientAngle)).apply(this, arguments));
+    }
+
+    createClass(PredefinedLinearGradientAngle, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="predefined-angluar-group">\n                <button type="button" data-value="to right"></button>                          \n                <button type="button" data-value="to left"></button>                                                  \n                <button type="button" data-value="to top"></button>                            \n                <button type="button" data-value="to bottom"></button>                                        \n                <button type="button" data-value="to top right"></button>                                \n                <button type="button" data-value="to bottom right"></button>                                    \n                <button type="button" data-value="to bottom left"></button>\n                <button type="button" data-value="to top left"></button>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+            var image = this.read('/item/current/image');
+
+            if (!image) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isLinear', image.type);
+        }
+    }, {
+        key: 'click.self $el button',
+        value: function clickSelf$elButton(e) {
+            var _this2 = this;
+
+            this.read('/item/current/image', function (item) {
+                item.angle = e.$delegateTarget.attr('data-value');
+
+                _this2.dispatch('/item/set', item);
+            });
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.refresh();
+        }
+    }]);
+    return PredefinedLinearGradientAngle;
+}(UIElement);
+
+var PredefinedRadialGradientPosition = function (_UIElement) {
+    inherits(PredefinedRadialGradientPosition, _UIElement);
+
+    function PredefinedRadialGradientPosition() {
+        classCallCheck(this, PredefinedRadialGradientPosition);
+        return possibleConstructorReturn(this, (PredefinedRadialGradientPosition.__proto__ || Object.getPrototypeOf(PredefinedRadialGradientPosition)).apply(this, arguments));
+    }
+
+    createClass(PredefinedRadialGradientPosition, [{
+        key: 'template',
+        value: function template() {
+            return ' \n            <div class="predefined-angluar-group radial-position">\n                <button type="button" data-value="top"></button>                          \n                <button type="button" data-value="left"></button>                                                  \n                <button type="button" data-value="bottom"></button>                            \n                <button type="button" data-value="right"></button>                                        \n            </div>\n        ';
+        }
+    }, {
+        key: 'click $el button',
+        value: function click$elButton(e) {
+
+            var item = this.read('/item/current/image');
+
+            if (item) {
+                item.radialPosition = e.$delegateTarget.attr('data-value');
+                this.dispatch('/item/set', item);
+            }
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.$el.toggle(this.isShow());
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var image = this.read('/item/current/image');
+
+            if (!image) {
+                return false;
+            }
+
+            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isRadial', image.type);
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeTool',
+        value: function changeTool() {
+            this.refresh();
+        }
+    }]);
+    return PredefinedRadialGradientPosition;
+}(UIElement);
+
 var PredefinedRadialGradientAngle = function (_UIElement) {
     inherits(PredefinedRadialGradientAngle, _UIElement);
 
@@ -16021,7 +16064,7 @@ var SubFeatureControl = function (_UIElement) {
     createClass(SubFeatureControl, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\" ref=\"$background\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -16038,19 +16081,15 @@ var SubFeatureControl = function (_UIElement) {
         key: "refresh",
         value: function refresh() {
             this.$el.toggle(this.isShow());
+            this.refs.$background.toggleClass('hide', !this.isBackgroundShow());
+            // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
             this.refs.$linear.toggleClass('hide', !this.isLinearShow());
             this.refs.$radial.toggleClass('hide', !this.isRadialShow());
         }
     }, {
         key: "isShow",
         value: function isShow() {
-            if (!this.read('/item/is/mode', 'image')) return false;
-            var image = this.read('/item/current/image');
-
-            if (!image) {
-                return false;
-            }
-
+            //if (!this.read('/item/is/mode', 'image')) return false;         
             return true;
         }
     }, {
@@ -16081,6 +16120,25 @@ var SubFeatureControl = function (_UIElement) {
             }
 
             return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: "isBackgroundShow",
+        value: function isBackgroundShow() {
+            if (!this.read('/item/is/mode', 'image')) return false;
+
+            var item = this.read('/item/current/image');
+            if (!item) return false;
+
+            return this.read('/tool/get', 'guide.angle');
+        }
+    }, {
+        key: "isImageListShow",
+        value: function isImageListShow() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return false;
+
+            return true;
         }
     }, {
         key: '@changeEditor',
@@ -16129,18 +16187,17 @@ var GradientView = function (_BaseTab) {
 
             return this.read('/item/map/children', page.id, function (item, index) {
 
+                /*
                 switch (editMode) {
-                    case EDITOR_MODE_IMAGE_IMAGE:
-                    case EDITOR_MODE_IMAGE_LINEAR:
-                    case EDITOR_MODE_IMAGE_RADIAL:
-                    case EDITOR_MODE_IMAGE_STATIC:
-
-                        var image = _this2.read('/item/current/image');
-
-                        if (image.parentId == item.id) {
-                            return '<div class=\'layer\' item-layer-id="' + item.id + '" title="' + (index + 1) + '. ' + (item.name || 'Layer') + '" style=\'' + _this2.read('/layer/toString', item, true, image) + '\'></div>';
-                        }
-                }
+                case EDITOR_MODE_IMAGE_IMAGE:
+                case EDITOR_MODE_IMAGE_LINEAR:
+                case EDITOR_MODE_IMAGE_RADIAL:
+                case EDITOR_MODE_IMAGE_STATIC:
+                     var image = this.read('/item/current/image')
+                     if (image.parentId == item.id) {
+                        return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true, image)}'></div>`
+                    }
+                }*/
 
                 return '<div class=\'layer\' item-layer-id="' + item.id + '" title="' + (index + 1) + '. ' + (item.name || 'Layer') + '" style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
             });
@@ -16507,13 +16564,8 @@ var ImageList = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'isNotSelected',
-        value: function isNotSelected(e) {
-            return !e.$delegateTarget.hasClass('selected');
-        }
-    }, {
-        key: 'click.self.isNotSelected $imageList .tree-item',
-        value: function clickSelfIsNotSelected$imageListTreeItem(e) {
+        key: 'click.self $imageList .tree-item',
+        value: function clickSelf$imageListTreeItem(e) {
             var id = e.$delegateTarget.attr('id');
 
             if (id) {
@@ -16640,7 +16692,7 @@ var PropertyView = function (_UIElement) {
     createClass(PropertyView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view inline'>\n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n                <PageExport></PageExport>\n            </div>\n        ";
+            return "\n            <div class='property-view inline'>\n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n                <PageExport></PageExport>\n                <PageLayout></PageLayout>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -16867,6 +16919,8 @@ var VerticalColorStep = function (_UIElement) {
     return VerticalColorStep;
 }(UIElement);
 
+var screenModes = ['expertor', 'beginner'];
+
 var XDImageEditor = function (_BaseImageEditor) {
     inherits(XDImageEditor, _BaseImageEditor);
 
@@ -16876,9 +16930,16 @@ var XDImageEditor = function (_BaseImageEditor) {
     }
 
     createClass(XDImageEditor, [{
+        key: 'afterRender',
+        value: function afterRender() {
+            this.refs.$layoutMain.removeClass('beginner-mode');
+            this.refs.$layoutMain.removeClass('expertor-mode');
+            this.refs.$layoutMain.addClass(this.read('/storage/get', 'layout') + '-mode');
+        }
+    }, {
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -16914,6 +16975,19 @@ var XDImageEditor = function (_BaseImageEditor) {
         key: 'toggleTimeline',
         value: function toggleTimeline() {
             this.$el.toggleClass('show-timeline');
+        }
+    }, {
+        key: '@updateLayout',
+        value: function updateLayout(layout) {
+            var _this3 = this;
+
+            screenModes.filter(function (key) {
+                return key != layout;
+            }).forEach(function (key) {
+                _this3.refs.$layoutMain.removeClass(key + '-mode');
+            });
+
+            this.refs.$layoutMain.addClass(layout + '-mode');
         }
     }]);
     return XDImageEditor;

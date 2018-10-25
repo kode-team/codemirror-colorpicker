@@ -168,12 +168,25 @@ export default class BackgroundSize extends UIElement {
     }
 
     refresh() {
-        this.read('/item/current/image', (image) => {
-            this.children.$width.refresh(image.backgroundSizeWidth);
-            this.children.$height.refresh(image.backgroundSizeHeight);
-            this.selectBackgroundSize(image.backgroundSize);
-            this.selectBackgroundRepeat(image.backgroundRepeat);
-        })   
+
+        var isShow = this.isShow()
+
+        this.$el.toggle(isShow)
+
+        if (isShow) {
+            this.read('/item/current/image', (image) => {
+                this.children.$width.refresh(image.backgroundSizeWidth);
+                this.children.$height.refresh(image.backgroundSizeHeight);
+                this.selectBackgroundSize(image.backgroundSize);
+                this.selectBackgroundRepeat(image.backgroundRepeat);
+            })   
+        }
+
+    }
+
+    isShow () {
+
+        return true; 
     }
 
 }

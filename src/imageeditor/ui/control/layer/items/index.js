@@ -23,9 +23,11 @@ import BackgroundColor from "./BackgroundColor";
 import LayerColorPickerPanel from "./LayerColorPickerPanel";
 import ImageInfo from "./ImageInfo";
 import ImageResource from "./ImageResource";
+import PageLayout from "./PageLayout";
 
 
 export default {
+    PageLayout,  
     ImageResource,
     ImageInfo,
     BackgroundColor,

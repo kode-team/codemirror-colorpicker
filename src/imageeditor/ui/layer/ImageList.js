@@ -72,11 +72,7 @@ export default class ImageList extends UIElement {
         this.refresh()
     }
 
-    isNotSelected (e) {
-        return !e.$delegateTarget.hasClass('selected')
-    }
-
-    'click.self.isNotSelected $imageList .tree-item' (e) { 
+    'click.self $imageList .tree-item' (e) { 
         var id = e.$delegateTarget.attr('id')
 
         if (id) {

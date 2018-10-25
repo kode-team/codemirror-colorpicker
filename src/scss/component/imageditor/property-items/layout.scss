@@ -1,0 +1,35 @@
+&.layout {
+    .items {
+
+        .layout-buttons {
+            button {
+                outline: none;
+                cursor: pointer;
+            }
+            &.beginner-mode {
+                .beginner {
+                    background: white;
+                    border: 1px solid #333;
+                }
+
+                .expertor {
+                    border-left: 0px;
+                }
+
+            }
+
+            &.expertor-mode {
+                .expertor {
+                    background: white;
+                    border: 1px solid #333;
+                }
+
+                .beginner {
+                    border-right: 0px;
+                }
+
+            }
+        }
+        
+    }
+}

@@ -1,7 +1,3 @@
-import GradientAngle from '../../view/GradientAngle'
-import GradientPosition from '../../view/GradientPosition' 
-import PredefinedLinearGradientAngle from '../../view/PredefinedLinearGradientAngle'
-import PredefinedRadialGradientPosition from '../../view/PredefinedRadialGradientPosition'
 import BaseTab from '../../BaseTab';
 import PredefinedPageResizer from '../../view/PredefinedPageResizer';
 import PredefinedLayerResizer from '../../view/PredefinedLayerResizer';
@@ -58,6 +54,7 @@ export default class GradientView extends BaseTab {
 
         return this.read('/item/map/children', page.id, (item, index) => {
 
+            /*
             switch (editMode) {
             case EDITOR_MODE_IMAGE_IMAGE:
             case EDITOR_MODE_IMAGE_LINEAR:
@@ -69,7 +66,7 @@ export default class GradientView extends BaseTab {
                 if (image.parentId == item.id) {
                     return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true, image)}'></div>`
                 }
-            }
+            }*/
 
             return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true)}'></div>`
         });
