@@ -509,6 +509,12 @@ export default class ItemManager extends BaseModule {
             $store.selectedId = selectedId
             $store.run('/item/select/mode', 'board');
         }
+
+        var item = $store.items[$store.selectedId]
+
+        if (item.itemType == 'image' && item.type == 'image') {
+            $store.emit('selectImage');
+        }
     }
 
     '/item/select/mode' ($store, mode, editMode) {

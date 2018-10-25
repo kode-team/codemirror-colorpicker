@@ -11105,6 +11105,12 @@ var ItemManager = function (_BaseModule) {
                 $store.selectedId = selectedId;
                 $store.run('/item/select/mode', 'board');
             }
+
+            var item = $store.items[$store.selectedId];
+
+            if (item.itemType == 'image' && item.type == 'image') {
+                $store.emit('selectImage');
+            }
         }
     }, {
         key: '/item/select/mode',
@@ -12026,7 +12032,7 @@ var SVGManager = function (_BaseModule) {
         value: function svgListLoad($store) {
             var loadList = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-            $store.svgList = loadList;
+            $store.svgList = $store.read('/clone', loadList);
         }
     }, {
         key: '*/svg/get/blob',
@@ -14470,18 +14476,18 @@ var ImageResource = function (_BasePropertyItem) {
         key: 'refresh',
         value: function refresh() {
             var isShow = this.isShow();
-            this.$el.toggle(isShow);
+            this.$el.toggleClass('show', isShow);
 
             this.load();
         }
     }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
+        key: '@changeSvgList',
+        value: function changeSvgList() {
             this.refresh();
         }
     }, {
-        key: '@changeSvgList',
-        value: function changeSvgList() {
+        key: '@selectImage',
+        value: function selectImage() {
             this.refresh();
         }
     }, {

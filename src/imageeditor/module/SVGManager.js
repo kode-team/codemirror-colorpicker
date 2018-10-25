@@ -18,7 +18,7 @@ export default class SVGManager extends BaseModule {
     } 
 
     '/svg/list/load' ($store, loadList = []) {
-        $store.svgList = loadList;
+        $store.svgList = $store.read('/clone', loadList);
     }
 
     '*/svg/get/blob' ($store, index, key) {

@@ -24,19 +24,17 @@ export default class ImageResource extends BasePropertyItem {
     }
 
     refresh () {
-        var isShow = this.isShow();
-        this.$el.toggle(isShow)
-
+        this.$el.toggleClass('show', this.isShow())
         this.load();
-    }
-
-    '@changeEditor' () {
-        this.refresh();
     }
 
     '@changeSvgList' () {
         this.refresh()
     }
+
+    '@selectImage' () {
+        this.$el.toggleClass('show', this.isShow())
+    }    
 
     isShow () {
         var item = this.read('/item/current/image')
