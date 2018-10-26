@@ -3197,8 +3197,8 @@
         .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-cached-item {
           display: inline-block;
           vertical-align: middle;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           cursor: pointer;
           position: relative;
           margin: 2px; }
@@ -3206,6 +3206,8 @@
           .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-cached-item:hover {
             -webkit-transform: scale(1.2);
                     transform: scale(1.2); }
+        .imageeditor .property-view .property-item.sample-list .gradient-sample-list .gradient-cached-item:first-child {
+          margin-left: 0px; }
         .imageeditor .property-view .property-item.sample-list .gradient-sample-list .cached-list {
           display: inline-block;
           vertical-align: middle; }
@@ -3221,11 +3223,13 @@
             background-color: #ffffff;
             display: inline-block;
             vertical-align: middle;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             position: relative;
-            margin: 2px; }
+            margin: 2px;
+            padding: 2px;
+            line-height: 0; }
       .imageeditor .property-view .property-item.gradient-steps-info .gradient-info {
         overflow: auto; }
         .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item {

@@ -12,8 +12,8 @@
         .gradient-cached-item {
             display: inline-block;
             vertical-align: middle;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             position: relative;
             margin: 2px;
@@ -21,6 +21,10 @@
             &:hover {
                 transform: scale(1.2);
             }
+        }
+
+        .gradient-cached-item:first-child {
+            margin-left: 0px;
         }
 
         .cached-list {
@@ -39,11 +43,13 @@
                 background-color: #ffffff;
                 display: inline-block;
                 vertical-align: middle;
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
                 cursor: pointer;
                 position: relative;
                 margin: 2px;
+                padding : 2px;
+                line-height: 0;
             }
         }
 
