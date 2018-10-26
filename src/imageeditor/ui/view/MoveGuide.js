@@ -18,15 +18,16 @@ export default class MoveGuide extends UIElement {
     }
 
     'load $el' () {
-        var list = this.read('/guide/line/layer');
+        var layer = this.read('/item/current/layer');
+        if (!layer) return []; 
+
+        var list = this.read('/guide/line/layer', 3, layer.id);        
 
         var bo = this.$board.offset()
         var po = this.$page.offset()
 
         var top = po.top - bo.top + this.$board.scrollTop();
         var left = po.left - bo.left + this.$board.scrollLeft(); 
-
-        // console.log(top, left, bo, po);
 
         return list.map(axis => {
             if (axis.type == '-') {

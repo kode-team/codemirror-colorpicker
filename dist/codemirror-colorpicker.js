@@ -11570,6 +11570,7 @@ var GuideManager = function (_BaseModule) {
         key: '*/guide/line/layer',
         value: function guideLineLayer($store) {
             var dist = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : MAX_DIST;
+            var selectedId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
 
             var page = $store.read('/item/current/page');
@@ -11595,7 +11596,9 @@ var GuideManager = function (_BaseModule) {
                     height: item.style.height
                 });
 
-                if (item.selected) {
+                if (selectedId == item.id) {
+                    selectedItem = newItem;
+                } else if (item.selected) {
                     selectedItem = newItem;
                 } else {
                     list$1[index++] = newItem;
@@ -15363,7 +15366,7 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'isShow',
         value: function isShow() {
-            return this.read('/item/is/mode', 'layer');
+            return !this.read('/item/is/mode', 'page');
         }
     }, {
         key: '@changeEditor',
@@ -15415,8 +15418,8 @@ var PredefinedLayerResizer = function (_UIElement) {
             }
         }
     }, {
-        key: 'resizeItem',
-        value: function resizeItem(item, list) {
+        key: 'cacualteSizeItem',
+        value: function cacualteSizeItem(item, list) {
             if (this.currentType == 'to right') {
                 // 오른쪽 왼쪽 크기를 맞추기 
                 this.caculateRightSize(item, list);
@@ -15447,17 +15450,19 @@ var PredefinedLayerResizer = function (_UIElement) {
         key: 'caculateSnap',
         value: function caculateSnap(item) {
 
-            var list = this.read('/guide/line/layer', 3);
+            var layer = this.read('/item/current/layer');
+            if (!layer) return item;
+            var list = this.read('/guide/line/layer', 3, layer.id);
 
             if (list.length) {
-                this.resizeItem(item, list);
+                this.cacualteSizeItem(item, list);
             }
 
             return item;
         }
     }, {
-        key: 'change',
-        value: function change() {
+        key: 'updatePosition',
+        value: function updatePosition() {
             var style1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var style2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -15541,25 +15546,25 @@ var PredefinedLayerResizer = function (_UIElement) {
             }
         }
     }, {
-        key: 'resize',
-        value: function resize() {
+        key: 'resizeComponent',
+        value: function resizeComponent() {
 
             if (this.currentType == 'to top') {
-                this.change(this.toTop());
+                this.updatePosition(this.toTop());
             } else if (this.currentType == 'to bottom') {
-                this.change(this.toBottom());
+                this.updatePosition(this.toBottom());
             } else if (this.currentType == 'to right') {
-                this.change(this.toRight());
+                this.updatePosition(this.toRight());
             } else if (this.currentType == 'to left') {
-                this.change(this.toLeft());
+                this.updatePosition(this.toLeft());
             } else if (this.currentType == 'to bottom left') {
-                this.change(this.toBottom(), this.toLeft());
+                this.updatePosition(this.toBottom(), this.toLeft());
             } else if (this.currentType == 'to bottom right') {
-                this.change(this.toBottom(), this.toRight());
+                this.updatePosition(this.toBottom(), this.toRight());
             } else if (this.currentType == 'to top right') {
-                this.change(this.toTop(), this.toRight());
+                this.updatePosition(this.toTop(), this.toRight());
             } else if (this.currentType == 'to top left') {
-                this.change(this.toTop(), this.toLeft());
+                this.updatePosition(this.toTop(), this.toLeft());
             }
         }
     }, {
@@ -15567,7 +15572,6 @@ var PredefinedLayerResizer = function (_UIElement) {
         value: function pointerstart$elDataValue(e) {
 
             var layer = this.read('/item/current/layer');
-
             if (!layer) return;
 
             var type = e.$delegateTarget.attr('data-value');
@@ -15586,7 +15590,7 @@ var PredefinedLayerResizer = function (_UIElement) {
                 this.targetXY = e.xy;
                 this.$page.addClass('moving');
 
-                this.resize();
+                this.resizeComponent();
             }
         }
     }, {
@@ -15599,8 +15603,8 @@ var PredefinedLayerResizer = function (_UIElement) {
             this.$page.removeClass('moving');
         }
     }, {
-        key: 'resize window',
-        value: function resizeWindow(e) {
+        key: 'resize.debounce(300) window',
+        value: function resizeDebounce300Window(e) {
             this.refresh();
         }
     }]);
@@ -15631,15 +15635,16 @@ var MoveGuide = function (_UIElement) {
     }, {
         key: 'load $el',
         value: function load$el() {
-            var list = this.read('/guide/line/layer');
+            var layer = this.read('/item/current/layer');
+            if (!layer) return [];
+
+            var list = this.read('/guide/line/layer', 3, layer.id);
 
             var bo = this.$board.offset();
             var po = this.$page.offset();
 
             var top = po.top - bo.top + this.$board.scrollTop();
             var left = po.left - bo.left + this.$board.scrollLeft();
-
-            // console.log(top, left, bo, po);
 
             return list.map(function (axis) {
                 if (axis.type == '-') {

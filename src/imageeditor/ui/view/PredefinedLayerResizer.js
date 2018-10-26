@@ -104,7 +104,7 @@ export default class PredefinedLayerResizer extends UIElement {
     }
 
     isShow () {
-        return this.read('/item/is/mode', 'layer');
+        return !this.read('/item/is/mode', 'page');
     }
 
     '@changeEditor' () { this.refresh(); }
@@ -149,7 +149,7 @@ export default class PredefinedLayerResizer extends UIElement {
         }
     }
 
-    resizeItem (item, list) {
+    cacualteSizeItem (item, list) {
         if (this.currentType == 'to right') {   // 오른쪽 왼쪽 크기를 맞추기 
             this.caculateRightSize(item, list);
         } else if (this.currentType == 'to bottom') {   // 아래위 크기 맞추기 
@@ -175,16 +175,18 @@ export default class PredefinedLayerResizer extends UIElement {
 
     caculateSnap (item) {
 
-        var list = this.read('/guide/line/layer', 3);
+        var layer = this.read('/item/current/layer');
+        if (!layer) return item; 
+        var list = this.read('/guide/line/layer', 3, layer.id);
 
         if (list.length) {
-            this.resizeItem(item, list);
+            this.cacualteSizeItem(item, list);
         }
 
         return item; 
     }
 
-    change (style1 = {}, style2 = {}) { 
+    updatePosition (style1 = {}, style2 = {}) { 
 
         let style = Object.assign({}, style1, style2);
 
@@ -196,9 +198,7 @@ export default class PredefinedLayerResizer extends UIElement {
 
         item.style = Object.assign(item.style, style);
 
-
         item = this.caculateSnap(item)
-
 
         this.dispatch('/item/set', item);
         this.setPosition();
@@ -264,31 +264,30 @@ export default class PredefinedLayerResizer extends UIElement {
         }  
     }        
 
-    resize () {
+    resizeComponent () {
 
         if (this.currentType == 'to top') {
-            this.change(this.toTop())
+            this.updatePosition(this.toTop())
         } else if (this.currentType == 'to bottom') {
-            this.change(this.toBottom())
+            this.updatePosition(this.toBottom())
         } else if (this.currentType == 'to right') {
-            this.change(this.toRight())            
+            this.updatePosition(this.toRight())            
         } else if (this.currentType == 'to left') {
-            this.change(this.toLeft())   
+            this.updatePosition(this.toLeft())   
         } else if (this.currentType == 'to bottom left') {
-            this.change(this.toBottom(), this.toLeft())
+            this.updatePosition(this.toBottom(), this.toLeft())
         } else if (this.currentType == 'to bottom right') {
-            this.change(this.toBottom(), this.toRight())
+            this.updatePosition(this.toBottom(), this.toRight())
         } else if (this.currentType == 'to top right') {
-            this.change(this.toTop(), this.toRight())
+            this.updatePosition(this.toTop(), this.toRight())
         } else if (this.currentType == 'to top left') {
-            this.change(this.toTop(), this.toLeft())
+            this.updatePosition(this.toTop(), this.toLeft())
         }
     }
 
     'pointerstart $el [data-value]' (e) {
 
         var layer = this.read('/item/current/layer')
-
         if (!layer) return; 
 
         var type = e.$delegateTarget.attr('data-value');
@@ -307,7 +306,7 @@ export default class PredefinedLayerResizer extends UIElement {
             this.targetXY = e.xy; 
             this.$page.addClass('moving')
 
-            this.resize();
+            this.resizeComponent();
         }
 
     }
@@ -320,7 +319,7 @@ export default class PredefinedLayerResizer extends UIElement {
         this.$page.removeClass('moving')        
     }
 
-    'resize window' (e) {
+    'resize.debounce(300) window' (e) {
         this.refresh();
     }
 }

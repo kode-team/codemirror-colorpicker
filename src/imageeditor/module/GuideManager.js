@@ -65,7 +65,7 @@ export default class GuideManager extends BaseModule {
 
     } 
 
-    '*/guide/line/layer' ($store , dist = MAX_DIST) {
+    '*/guide/line/layer' ($store , dist = MAX_DIST, selectedId = '') {
 
         var page = $store.read('/item/current/page');
 
@@ -91,7 +91,9 @@ export default class GuideManager extends BaseModule {
                 height: item.style.height
             })
 
-            if (item.selected) {
+            if (selectedId == item.id) {
+                selectedItem = newItem
+            } else if (item.selected) {
                 selectedItem = newItem
             } else {
                 list[index++] = newItem
