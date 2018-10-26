@@ -1,5 +1,4 @@
 import UIElement from "../../../../colorpicker/UIElement";
-
 import items  from './items/index'
 
 export default class ImageView extends UIElement {
@@ -7,6 +6,7 @@ export default class ImageView extends UIElement {
     template () {
         return `
             <div class='property-view'>
+                <ImageListView></ImageListView>
                 <SampleList></SampleList>                                   
                 <ImageTypeSelect></ImageTypeSelect>            
                 <ColorPickerPanel></ColorPickerPanel>
@@ -19,6 +19,6 @@ export default class ImageView extends UIElement {
     }
 
     components () {
-        return items 
+        return items
     }
 }

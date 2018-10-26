@@ -10778,6 +10778,11 @@ var ItemManager = function (_BaseModule) {
             });
         }
     }, {
+        key: '*/item/count/children',
+        value: function itemCountChildren($store, parentId) {
+            return $store.read('/item/list/children', parentId).length;
+        }
+    }, {
         key: '*/item/map/children',
         value: function itemMapChildren($store, parentId, callback) {
             return $store.read('/item/filter', function (id) {
@@ -12479,7 +12484,7 @@ var SampleList = function (_BasePropertyItem) {
     createClass(SampleList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item sample-list show'>\n                <div class='title' ref=\"$title\">Change Image</div>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item sample-list show'>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -14446,7 +14451,25 @@ var PageLayout = function (_UIElement) {
     return PageLayout;
 }(UIElement);
 
+var ImageListView = function (_BasePropertyItem) {
+    inherits(ImageListView, _BasePropertyItem);
+
+    function ImageListView() {
+        classCallCheck(this, ImageListView);
+        return possibleConstructorReturn(this, (ImageListView.__proto__ || Object.getPrototypeOf(ImageListView)).apply(this, arguments));
+    }
+
+    createClass(ImageListView, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-item image-list-view show'>\n                <div class='items'>            \n                    <ImageList></ImageList>\n                </div>\n            </div>\n        ";
+        }
+    }]);
+    return ImageListView;
+}(BasePropertyItem);
+
 var items = {
+    ImageListView: ImageListView,
     PageLayout: PageLayout,
     ImageResource: ImageResource,
     ImageInfo: ImageInfo,
@@ -14509,7 +14532,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <ImageListView></ImageListView>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -16053,6 +16076,176 @@ var PredefinedRadialGradientAngle = function (_UIElement) {
     return PredefinedRadialGradientAngle;
 }(UIElement);
 
+var ImageList = function (_UIElement) {
+    inherits(ImageList, _UIElement);
+
+    function ImageList() {
+        classCallCheck(this, ImageList);
+        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
+    }
+
+    createClass(ImageList, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'makeItemNodeImage',
+        value: function makeItemNodeImage(item) {
+            var selected = item.selected ? 'selected' : '';
+            return '\n            <div class=\'tree-item ' + selected + '\' id="' + item.id + '" draggable="true" >\n                <div class="item-view-container">\n                    <div class="item-view"  style=\'' + this.read('/image/toString', item) + '\'></div>\n                </div>\n                <div class=\'item-tools\'>\n                    <button type="button" class=\'delete-item\' item-id=\'' + item.id + '\' title="Remove">&times;</button>                \n                    <button type="button" class=\'copy-item\' item-id=\'' + item.id + '\' title="Copy">&times;</button>\n                </div>            \n            </div>\n            ';
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            var _this2 = this;
+
+            var item = this.read('/item/current/layer');
+
+            if (!item) {
+                var page = this.read('/item/current/page');
+                if (page) {
+                    var list = this.read('/item/list/children', page.id);
+                    if (list.length) {
+                        item = { id: list[0] };
+                    } else {
+                        return '';
+                    }
+                }
+            }
+
+            return this.read('/item/map/children', item.id, function (item) {
+                return _this2.makeItemNodeImage(item);
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $imageList .tree-item',
+        value: function clickSelf$imageListTreeItem(e) {
+            var id = e.$delegateTarget.attr('id');
+
+            if (id) {
+                this.dispatch('/item/select', id);
+                this.refresh();
+            }
+        }
+    }, {
+        key: 'click $gradientType .gradient-item',
+        value: function click$gradientTypeGradientItem(e) {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (item) {
+
+                var type = e.$delegateTarget.attr('data-type');
+
+                _this3.dispatch('/item/add/image', type, true, item.id);
+                _this3.refresh();
+            });
+        }
+    }, {
+        key: 'dragstart $imageList .tree-item',
+        value: function dragstart$imageListTreeItem(e) {
+            this.draggedImage = e.$delegateTarget;
+            this.draggedImage.css('opacity', 0.5);
+            // e.preventDefault();
+        }
+    }, {
+        key: 'dragend $imageList .tree-item',
+        value: function dragend$imageListTreeItem(e) {
+
+            if (this.draggedImage) {
+                this.draggedImage.css('opacity', 1);
+            }
+        }
+    }, {
+        key: 'dragover $imageList .tree-item',
+        value: function dragover$imageListTreeItem(e) {
+            e.preventDefault();
+        }
+    }, {
+        key: 'drop.self $imageList .tree-item',
+        value: function dropSelf$imageListTreeItem(e) {
+            e.preventDefault();
+
+            var destId = e.$delegateTarget.attr('id');
+            var sourceId = this.draggedImage.attr('id');
+
+            this.draggedImage = null;
+            this.dispatch('/item/move/in', destId, sourceId);
+            this.refresh();
+        }
+    }, {
+        key: 'drop $imageList',
+        value: function drop$imageList(e) {
+            e.preventDefault();
+
+            if (this.draggedImage) {
+                var sourceId = this.draggedImage.attr('id');
+
+                this.draggedImage = null;
+                this.dispatch('/item/move/last', sourceId);
+                this.refresh();
+            }
+        }
+    }, {
+        key: 'click $imageList .copy-item',
+        value: function click$imageListCopyItem(e) {
+            this.dispatch('/item/addCopy/image', e.$delegateTarget.attr('item-id'));
+            this.refresh();
+        }
+    }, {
+        key: 'click $imageList .delete-item',
+        value: function click$imageListDeleteItem(e) {
+            this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
+            this.refresh();
+        }
+    }, {
+        key: 'paste document',
+        value: function pasteDocument(e) {
+            var _this4 = this;
+
+            var dataTransfer = e.clipboardData;
+
+            var items = [].concat(toConsumableArray(dataTransfer.items));
+            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
+            });
+
+            var dataList = types.map(function (type) {
+                return dataTransfer.getData(type);
+            });
+
+            if (dataList.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this4.read('/image/get/url', dataList, function (url) {
+                        _this4.dispatch('/item/add/image/url', url, true, layer.id);
+                    });
+                });
+            }
+
+            var files = [].concat(toConsumableArray(dataTransfer.files));
+            if (files.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this4.read('/image/get/file', files, function (img) {
+                        _this4.dispatch('/item/add/image/file', img, true, layer.id);
+                        _this4.refresh();
+                    });
+                });
+            }
+        }
+    }]);
+    return ImageList;
+}(UIElement);
+
 var SubFeatureControl = function (_UIElement) {
     inherits(SubFeatureControl, _UIElement);
 
@@ -16064,12 +16257,13 @@ var SubFeatureControl = function (_UIElement) {
     createClass(SubFeatureControl, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view\" ref=\"$background\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view image-list\" ref=\"$imageList\">\n                        <ImageList></ImageList>\n                    </div>\n                    <div class=\"property-view\" ref=\"$background\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
         value: function components() {
             return _extends({
+                ImageList: ImageList,
                 PredefinedRadialGradientAngle: PredefinedRadialGradientAngle,
                 GradientAngle: GradientAngle,
                 GradientPosition: GradientPosition,
@@ -16082,7 +16276,7 @@ var SubFeatureControl = function (_UIElement) {
         value: function refresh() {
             this.$el.toggle(this.isShow());
             this.refs.$background.toggleClass('hide', !this.isBackgroundShow());
-            // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
+            this.refs.$imageList.toggleClass('hide', !this.isImageListShow());
             this.refs.$linear.toggleClass('hide', !this.isLinearShow());
             this.refs.$radial.toggleClass('hide', !this.isRadialShow());
         }
@@ -16137,6 +16331,10 @@ var SubFeatureControl = function (_UIElement) {
             var layer = this.read('/item/current/layer');
 
             if (!layer) return false;
+
+            var count = this.read('/item/count/children', layer.id);
+
+            if (!count) return false;
 
             return true;
         }
@@ -16511,176 +16709,6 @@ var LayerList = function (_UIElement) {
     return LayerList;
 }(UIElement);
 
-var ImageList = function (_UIElement) {
-    inherits(ImageList, _UIElement);
-
-    function ImageList() {
-        classCallCheck(this, ImageList);
-        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
-    }
-
-    createClass(ImageList, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'makeItemNodeImage',
-        value: function makeItemNodeImage(item) {
-            var selected = item.selected ? 'selected' : '';
-            return '\n            <div class=\'tree-item ' + selected + '\' id="' + item.id + '" draggable="true" >\n                <div class="item-view-container">\n                    <div class="item-view"  style=\'' + this.read('/image/toString', item) + '\'></div>\n                </div>\n                <div class=\'item-tools\'>\n                    <button type="button" class=\'delete-item\' item-id=\'' + item.id + '\' title="Remove">&times;</button>                \n                    <button type="button" class=\'copy-item\' item-id=\'' + item.id + '\' title="Copy">&times;</button>\n                </div>            \n            </div>\n            ';
-        }
-    }, {
-        key: 'load $imageList',
-        value: function load$imageList() {
-            var _this2 = this;
-
-            var item = this.read('/item/current/layer');
-
-            if (!item) {
-                var page = this.read('/item/current/page');
-                if (page) {
-                    var list = this.read('/item/list/children', page.id);
-                    if (list.length) {
-                        item = { id: list[0] };
-                    } else {
-                        return '';
-                    }
-                }
-            }
-
-            return this.read('/item/map/children', item.id, function (item) {
-                return _this2.makeItemNodeImage(item);
-            });
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.load();
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'click.self $imageList .tree-item',
-        value: function clickSelf$imageListTreeItem(e) {
-            var id = e.$delegateTarget.attr('id');
-
-            if (id) {
-                this.dispatch('/item/select', id);
-                this.refresh();
-            }
-        }
-    }, {
-        key: 'click $gradientType .gradient-item',
-        value: function click$gradientTypeGradientItem(e) {
-            var _this3 = this;
-
-            this.read('/item/current/layer', function (item) {
-
-                var type = e.$delegateTarget.attr('data-type');
-
-                _this3.dispatch('/item/add/image', type, true, item.id);
-                _this3.refresh();
-            });
-        }
-    }, {
-        key: 'dragstart $imageList .tree-item',
-        value: function dragstart$imageListTreeItem(e) {
-            this.draggedImage = e.$delegateTarget;
-            this.draggedImage.css('opacity', 0.5);
-            // e.preventDefault();
-        }
-    }, {
-        key: 'dragend $imageList .tree-item',
-        value: function dragend$imageListTreeItem(e) {
-
-            if (this.draggedImage) {
-                this.draggedImage.css('opacity', 1);
-            }
-        }
-    }, {
-        key: 'dragover $imageList .tree-item',
-        value: function dragover$imageListTreeItem(e) {
-            e.preventDefault();
-        }
-    }, {
-        key: 'drop.self $imageList .tree-item',
-        value: function dropSelf$imageListTreeItem(e) {
-            e.preventDefault();
-
-            var destId = e.$delegateTarget.attr('id');
-            var sourceId = this.draggedImage.attr('id');
-
-            this.draggedImage = null;
-            this.dispatch('/item/move/in', destId, sourceId);
-            this.refresh();
-        }
-    }, {
-        key: 'drop $imageList',
-        value: function drop$imageList(e) {
-            e.preventDefault();
-
-            if (this.draggedImage) {
-                var sourceId = this.draggedImage.attr('id');
-
-                this.draggedImage = null;
-                this.dispatch('/item/move/last', sourceId);
-                this.refresh();
-            }
-        }
-    }, {
-        key: 'click $imageList .copy-item',
-        value: function click$imageListCopyItem(e) {
-            this.dispatch('/item/addCopy/image', e.$delegateTarget.attr('item-id'));
-            this.refresh();
-        }
-    }, {
-        key: 'click $imageList .delete-item',
-        value: function click$imageListDeleteItem(e) {
-            this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
-            this.refresh();
-        }
-    }, {
-        key: 'paste document',
-        value: function pasteDocument(e) {
-            var _this4 = this;
-
-            var dataTransfer = e.clipboardData;
-
-            var items = [].concat(toConsumableArray(dataTransfer.items));
-            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
-                return type == 'text/uri-list';
-            });
-
-            var dataList = types.map(function (type) {
-                return dataTransfer.getData(type);
-            });
-
-            if (dataList.length) {
-                this.read('/item/current/layer', function (layer) {
-                    _this4.read('/image/get/url', dataList, function (url) {
-                        _this4.dispatch('/item/add/image/url', url, true, layer.id);
-                    });
-                });
-            }
-
-            var files = [].concat(toConsumableArray(dataTransfer.files));
-            if (files.length) {
-                this.read('/item/current/layer', function (layer) {
-                    _this4.read('/image/get/file', files, function (img) {
-                        _this4.dispatch('/item/add/image/file', img, true, layer.id);
-                        _this4.refresh();
-                    });
-                });
-            }
-        }
-    }]);
-    return ImageList;
-}(UIElement);
-
 var PropertyView = function (_UIElement) {
     inherits(PropertyView, _UIElement);
 
@@ -16714,7 +16742,7 @@ var ExportView = function (_UIElement) {
     createClass(ExportView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview\">        \n                        <textarea ref=\"$code\"></textarea>\n                    </div>\n                    <div class='preview' ref=\"$preview\"></div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview-container\">\n\n                        <div class=\"title\">Code</div>\n                        <div class=\"codeview\">\n                            <textarea ref=\"$code\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"preview-container\">\n                        <div class=\"title\">Preview</div>\n                        <div class='preview' ref=\"$preview\"></div>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "afterRender",

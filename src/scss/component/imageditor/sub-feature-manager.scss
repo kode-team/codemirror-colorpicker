@@ -164,19 +164,72 @@ $layer-item-padding: 4px;
 
             &.image-list {
                 background-color: transparent;
-                height: 120px;
-                width: 100%;
+                position: absolute;
+                bottom: auto;
+                top: 0%;
+                height: 20px;
+                width: auto;
+                display: inline-block;
+                left: 50%;
+                transform: translateX(-50%) translateY(-30px);
                 .images {
-                    top: 0px;
+                    top: auto;
+                    left: auto;
+                    right: auto;
+                    bottom: auto;
                     overflow: auto;
-
+                    position: relative;
+                    height: 100%;
                     .image-tools {
+                        display: inline-block;
+                        position: relative;
+                        top: auto;
+                        left: auto;
+                        right: auto;
+                        bottom: auto;      
+                        height: 100%;                  
                         .menu-buttons {
+                            position: relative;
                             border: 0px;
+                            display: inline-block;
+                            vertical-align: middle;    
+                            border-right: 1px solid $border-color;
+                            height: 100%;
+                            padding-right: 10px;
+                            margin-right: 10px;
+                            
+                            .gradient-type {
+                                padding: 0px;
+                                .gradient-item {
+                                    border:0px;
+                                    width: 20px;
+                                    height: 20px;
+                                    border: 1px solid $border-color;
+                                }
+                            }
                         }
 
-                        .image-list {
+                        .image-list {                     
+                            position: relative;
                             border:0px;
+                            vertical-align: middle;
+                            display: inline-block;
+
+                            .tree-item {
+                                width: 10px;
+                                height: 10px;
+                                border-radius: 10px;
+                                border-color: #fff !important;
+
+                                &.selected {
+                                    border-width: 2px !important;
+                                    border-color: #333 !important;
+                                }
+
+                                .item-tools {
+                                    display: none;
+                                }
+                            }
                         }
                     }
                 }

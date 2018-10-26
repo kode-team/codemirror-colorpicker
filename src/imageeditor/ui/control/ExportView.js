@@ -7,10 +7,17 @@ export default class ExportView extends UIElement {
             <div class='export-view'>
                 <div class="color-view">
                     <div class="close" ref="$close">&times;</div>        
-                    <div class="codeview">        
-                        <textarea ref="$code"></textarea>
+                    <div class="codeview-container">
+
+                        <div class="title">Code</div>
+                        <div class="codeview">
+                            <textarea ref="$code"></textarea>
+                        </div>
                     </div>
-                    <div class='preview' ref="$preview"></div>
+                    <div class="preview-container">
+                        <div class="title">Preview</div>
+                        <div class='preview' ref="$preview"></div>
+                    </div>
                 </div>
             </div>
         `

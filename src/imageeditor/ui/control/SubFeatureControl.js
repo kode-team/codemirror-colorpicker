@@ -5,6 +5,7 @@ import GradientPosition from "../view/GradientPosition";
 import PredefinedLinearGradientAngle from "../view/PredefinedLinearGradientAngle";
 import PredefinedRadialGradientPosition from "../view/PredefinedRadialGradientPosition";
 import PredefinedRadialGradientAngle from "../view/PredefinedRadialGradientAngle";
+import ImageList from "../layer/ImageList";
 
 
 export default class SubFeatureControl extends UIElement {
@@ -13,6 +14,9 @@ export default class SubFeatureControl extends UIElement {
         return `
             <div class='sub-feature-control'>         
                 <div class='feature'>
+                    <div class="property-view image-list" ref="$imageList">
+                        <ImageList></ImageList>
+                    </div>
                     <div class="property-view" ref="$background">
                         <BackgroundSize></BackgroundSize>
                     </div>
@@ -32,6 +36,7 @@ export default class SubFeatureControl extends UIElement {
 
     components () {
         return { 
+            ImageList,
             PredefinedRadialGradientAngle,
             GradientAngle, 
             GradientPosition, 
@@ -45,7 +50,7 @@ export default class SubFeatureControl extends UIElement {
     refresh () {
         this.$el.toggle(this.isShow())
         this.refs.$background.toggleClass('hide', !this.isBackgroundShow())
-        // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
+        this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
         this.refs.$linear.toggleClass('hide', !this.isLinearShow())
         this.refs.$radial.toggleClass('hide', !this.isRadialShow())
     }
@@ -96,6 +101,10 @@ export default class SubFeatureControl extends UIElement {
         var layer = this.read('/item/current/layer');
 
         if (!layer) return false; 
+
+        var count = this.read('/item/count/children', layer.id);
+
+        if (!count) return false; 
 
         return true; 
     }

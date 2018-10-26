@@ -330,6 +330,10 @@ export default class ItemManager extends BaseModule {
         });
     }
 
+    '*/item/count/children' ($store, parentId) {
+        return $store.read('/item/list/children', parentId).length;
+    }    
+
     '*/item/map/children' ($store, parentId, callback) {
         return $store.read('/item/filter', function (id) {
             return $store.items[id].parentId == parentId

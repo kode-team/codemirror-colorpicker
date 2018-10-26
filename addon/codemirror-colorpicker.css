@@ -1885,15 +1885,62 @@
                   height: 8px; }
         .imageeditor .sub-feature-control > .feature > .property-view.image-list {
           background-color: transparent;
-          height: 120px;
-          width: 100%; }
+          position: absolute;
+          bottom: auto;
+          top: 0%;
+          height: 20px;
+          width: auto;
+          display: inline-block;
+          left: 50%;
+          -webkit-transform: translateX(-50%) translateY(-30px);
+                  transform: translateX(-50%) translateY(-30px); }
           .imageeditor .sub-feature-control > .feature > .property-view.image-list .images {
-            top: 0px;
-            overflow: auto; }
-            .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons {
-              border: 0px; }
-            .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .image-list {
-              border: 0px; }
+            top: auto;
+            left: auto;
+            right: auto;
+            bottom: auto;
+            overflow: auto;
+            position: relative;
+            height: 100%; }
+            .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools {
+              display: inline-block;
+              position: relative;
+              top: auto;
+              left: auto;
+              right: auto;
+              bottom: auto;
+              height: 100%; }
+              .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons {
+                position: relative;
+                border: 0px;
+                display: inline-block;
+                vertical-align: middle;
+                border-right: 1px solid #c7c7c7;
+                height: 100%;
+                padding-right: 10px;
+                margin-right: 10px; }
+                .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type {
+                  padding: 0px; }
+                  .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type .gradient-item {
+                    border: 0px;
+                    width: 20px;
+                    height: 20px;
+                    border: 1px solid #c7c7c7; }
+              .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .image-list {
+                position: relative;
+                border: 0px;
+                vertical-align: middle;
+                display: inline-block; }
+                .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .image-list .tree-item {
+                  width: 10px;
+                  height: 10px;
+                  border-radius: 10px;
+                  border-color: #fff !important; }
+                  .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .image-list .tree-item.selected {
+                    border-width: 2px !important;
+                    border-color: #333 !important; }
+                  .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .image-list .tree-item .item-tools {
+                    display: none; }
   .imageeditor .timeline-view {
     position: absolute;
     -webkit-box-sizing: border-box;
@@ -3300,6 +3347,14 @@
           .imageeditor .property-view .property-item.image-resource .items .svg-item img {
             max-width: 100%;
             max-height: 100%; }
+      .imageeditor .property-view .property-item.image-list-view .items {
+        height: 200px;
+        overflow: auto;
+        padding: 0px !important;
+        position: relative; }
+        .imageeditor .property-view .property-item.image-list-view .items .images {
+          top: 0px;
+          bottom: 0px; }
       .imageeditor .property-view .property-item.layout .items .layout-buttons button {
         outline: none;
         cursor: pointer; }
@@ -3395,7 +3450,7 @@
       -webkit-transform: translateX(-50%) translateY(-50%);
               transform: translateX(-50%) translateY(-50%);
       background-color: white; }
-      .imageeditor .export-view .color-view .codeview {
+      .imageeditor .export-view .color-view .codeview-container {
         position: absolute;
         left: 0px;
         right: 0px;
@@ -3403,11 +3458,30 @@
         top: 0px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box; }
-        .imageeditor .export-view .color-view .codeview .CodeMirror {
-          height: 100%; }
-        .imageeditor .export-view .color-view .codeview textarea {
-          position: relative; }
-      .imageeditor .export-view .color-view .preview {
+        .imageeditor .export-view .color-view .codeview-container .title {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          height: 22px;
+          background-color: #ececec;
+          font-size: 12px;
+          padding: 5px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+        .imageeditor .export-view .color-view .codeview-container .codeview {
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          top: 22px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+          .imageeditor .export-view .color-view .codeview-container .codeview .CodeMirror {
+            height: 100%; }
+          .imageeditor .export-view .color-view .codeview-container .codeview textarea {
+            position: relative; }
+      .imageeditor .export-view .color-view .preview-container {
         position: absolute;
         right: 0px;
         left: 0px;
@@ -3416,3 +3490,23 @@
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         overflow: auto; }
+        .imageeditor .export-view .color-view .preview-container .title {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          height: 22px;
+          background-color: #ececec;
+          font-size: 12px;
+          padding: 5px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+        .imageeditor .export-view .color-view .preview-container .preview {
+          position: absolute;
+          right: 0px;
+          left: 0px;
+          top: 22px;
+          bottom: 0px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          overflow: auto; }

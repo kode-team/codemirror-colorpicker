@@ -1,3 +1,5 @@
+$title-height: 22px;
+
 .export-view {
     position: absolute;
     left: 0px;
@@ -29,7 +31,7 @@
         transform: translateX(-50%) translateY(-50%);
         background-color: white;
 
-        .codeview {
+        .codeview-container {
             position: absolute;
             left: 0px;
             right: 0px;
@@ -37,17 +39,37 @@
             top: 0px;
             box-sizing: border-box;
 
-            .CodeMirror {
-                height: 100%;
+            .title {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                height: $title-height;
+                background-color: #ececec;
+                font-size: 12px;
+                padding: 5px;
+                box-sizing: border-box;                                
             }
-
-            textarea {
-                position: relative;
+            .codeview {
+                position: absolute;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                top: $title-height;
+                box-sizing: border-box;
+    
+                .CodeMirror {
+                    height: 100%;
+                }
+    
+                textarea {
+                    position: relative;
+                }
             }
+    
         }
 
-
-        .preview {
+        .preview-container {
             position: absolute;
             right: 0px;
             left: 0px;
@@ -55,6 +77,28 @@
             bottom: 0px;
             box-sizing: border-box;
             overflow: auto;
-        }        
+
+            .title {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                height: $title-height;
+                background-color: #ececec;
+                font-size: 12px;
+                padding: 5px;
+                box-sizing: border-box;                
+            }
+
+            .preview {
+                position: absolute;
+                right: 0px;
+                left: 0px;
+                top: $title-height;
+                bottom: 0px;
+                box-sizing: border-box;
+                overflow: auto;
+            }        
+        }         
     }
 }
