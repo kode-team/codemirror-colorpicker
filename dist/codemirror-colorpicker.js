@@ -9584,22 +9584,24 @@ var ColorView = function () {
     }, {
         key: 'open_color_picker',
         value: function open_color_picker(el) {
+            var _this = this;
+
             var lineNo = el.lineNo;
             var ch = el.ch;
             var nameColor = el.nameColor;
             var color = el.color;
 
             if (this.colorpicker) {
-                var self = this;
                 var prevColor = color;
                 var pos = this.cm.charCoords({ line: lineNo, ch: ch });
                 this.colorpicker.show({
                     left: pos.left,
                     top: pos.bottom,
                     isShortCut: el.isShortCut || false,
-                    hideDelay: self.opt.hideDelay || 2000
+                    hideDelay: this.opt.hideDelay || 2000
                 }, nameColor || color, function (newColor) {
-                    self.cm.replaceRange(newColor, { line: lineNo, ch: ch }, { line: lineNo, ch: ch + prevColor.length }, '*colorpicker');
+                    _this.cm.replaceRange(newColor, { line: lineNo, ch: ch }, { line: lineNo, ch: ch + prevColor.length }, '*colorpicker');
+                    _this.cm.focus();
                     prevColor = newColor;
                 });
             }
@@ -9675,7 +9677,7 @@ var ColorView = function () {
     }, {
         key: 'submatch',
         value: function submatch(lineNo, lineHandle) {
-            var _this = this;
+            var _this2 = this;
 
             this.empty_marker(lineNo, lineHandle);
 
@@ -9683,7 +9685,7 @@ var ColorView = function () {
             var obj = { next: 0 };
 
             result.forEach(function (item) {
-                _this.render(obj, lineNo, lineHandle, item.color, item.nameColor);
+                _this2.render(obj, lineNo, lineHandle, item.color, item.nameColor);
             });
         }
     }, {
