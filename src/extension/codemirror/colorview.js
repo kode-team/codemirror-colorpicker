@@ -212,16 +212,16 @@ export default class ColorView {
 
 
         if (this.colorpicker) {
-            var self = this;
             var prevColor = color;
             var pos = this.cm.charCoords({line : lineNo, ch : ch });
             this.colorpicker.show({
                 left : pos.left,
                 top : pos.bottom,
                 isShortCut : el.isShortCut || false,
-                hideDelay : self.opt.hideDelay || 2000
-            }, nameColor || color, function (newColor) {
-                self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
+                hideDelay : this.opt.hideDelay || 2000
+            }, nameColor || color, (newColor) => {
+                this.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
+                this.cm.focus();
                 prevColor = newColor;
             });
 
