@@ -10,7 +10,8 @@ import {
 } from '../../../module/ItemManager';
 import MoveGuide from '../../view/MoveGuide';
 import SubFeatureControl from '../SubFeatureControl';
-   
+import ColorPickerLayer from '../color/ColorPicker';
+
 
 export default class GradientView extends BaseTab {
 
@@ -29,6 +30,7 @@ export default class GradientView extends BaseTab {
                     </div>          
                 </div>
  
+                <ColorPickerLayer></ColorPickerLayer>
                 <SubFeatureControl></SubFeatureControl>
             </div>
         `
@@ -36,6 +38,7 @@ export default class GradientView extends BaseTab {
 
     components () {
         return {  
+            ColorPickerLayer,
             SubFeatureControl,
             MoveGuide,
             PredefinedPageResizer,
