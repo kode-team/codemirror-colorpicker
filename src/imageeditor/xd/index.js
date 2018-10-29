@@ -11,6 +11,7 @@ import ExportView from '../ui/control/ExportView';
 import Timeline from '../ui/control/Timeline';
 import DropView from '../ui/control/DropView';
 import VerticalColorStep from '../ui/control/VerticalColorStep';
+import Animation from '../../util/animation/Animation';
 
 const screenModes = ['expertor', 'beginner']
 
@@ -21,6 +22,7 @@ export default class XDImageEditor extends BaseImageEditor {
         this.refs.$layoutMain.removeClass('beginner-mode')
         this.refs.$layoutMain.removeClass('expertor-mode')
         this.refs.$layoutMain.addClass(this.read('/storage/get', 'layout') + '-mode')
+
     }
 
     template () {
@@ -71,6 +73,43 @@ export default class XDImageEditor extends BaseImageEditor {
             Timeline
         }
     } 
+
+    '@changeEditor' () {
+        /*
+        this.read('/item/current/layer', (layer) => {
+            var self = this; 
+            var obj = layer.style
+            var aniObject = Animation.createTimeline([{
+                duration: 1000, 
+                obj,
+                timing: 'ease-out-sine',
+                iteration: 3, 
+                direction: 'alternate',
+                keyframes : {
+                    '0%': {
+                        'x': '0px',
+                        'background-color': 'rgba(255, 255, 255, 0.5)',
+                    },
+                    '100%': {
+                        'x': '250px',
+                        'background-color': 'rgba(255, 0, 255, 1)'
+                    }
+                } 
+
+            }], {
+                callback() {
+                    self.run('/item/set', layer);
+                    self.emit('animationEditor')
+                }
+            });
+
+            aniObject.start();
+    
+        })
+        */
+
+
+    }
 
     loadStart (isAdd) {
         this.dispatch('/storage/load', (isLoaded) => {

@@ -163,6 +163,34 @@ function uuid() {
     return uuid;
 }
 
+var bezierCalc = {
+    B1: function B1(t) {
+        return t * t * t;
+    },
+    B2: function B2(t) {
+        return 3 * t * t * (1 - t);
+    },
+    B3: function B3(t) {
+        return 3 * t * (1 - t) * (1 - t);
+    },
+    B4: function B4(t) {
+        return (1 - t) * (1 - t) * (1 - t);
+    }
+};
+
+function cubicBezier(x1, y1, x2, y2) {
+    var C2 = { x: x1, y: y1 };
+    var C3 = { x: x2, y: y2 };
+    return function (progress) {
+        // var x = C1.x * bezierCalc.B1(p) + C2.x*bezierCalc.B2(p) + C3.x*bezierCalc.B3(p) + C4.x*bezierCalc.B4(p);
+        // var y = C1.y * bezierCalc.B1(progress) + C2.y*bezierCalc.B2(progress) + C3.y*bezierCalc.B3(progress) + C4.y*bezierCalc.B4(progress);
+
+        var y = C2.y * bezierCalc.B2(progress) + C3.y * bezierCalc.B3(progress) + bezierCalc.B4(progress);
+
+        return 1 - y;
+    };
+}
+
 var math = {
     round: round,
     uuid: uuid,
@@ -170,7 +198,8 @@ var math = {
     degreeToRadian: degreeToRadian,
     getXInCircle: getXInCircle,
     getYInCircle: getYInCircle,
-    caculateAngle: caculateAngle
+    caculateAngle: caculateAngle,
+    cubicBezier: cubicBezier
 };
 
 /**
@@ -1154,14 +1183,20 @@ function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
 
-    var obj = {
+    var obj = interpolateRGBObject(startColor, endColor, t);
+
+    return format(obj, obj.a < 1 ? 'rgb' : exportFormat);
+}
+
+function interpolateRGBObject(startColor, endColor) {
+    var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+
+    return {
         r: round(startColor.r + (endColor.r - startColor.r) * t),
         g: round(startColor.g + (endColor.g - startColor.g) * t),
         b: round(startColor.b + (endColor.b - startColor.b) * t),
         a: round(startColor.a + (endColor.a - startColor.a) * t, 100)
     };
-
-    return format(obj, obj.a < 1 ? 'rgb' : exportFormat);
 }
 
 function scale(scale) {
@@ -3659,7 +3694,7 @@ function putBitmap(bitmap, subBitmap, area) {
 
 function parseParamNumber$1(param, callback) {
     if (typeof param === 'string') {
-        param = param.replace(/deg|px/g, '');
+        param = param.replace(/deg|px|\%|em/g, '');
     }
     if (typeof callback == 'function') {
         return callback(+param);
@@ -12620,7 +12655,7 @@ var SampleList = function (_BasePropertyItem) {
     createClass(SampleList, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item sample-list show'>\n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item sample-list show'>\n                <div class='title' ref=\"$title\">Gradient Sample List</div>            \n                <div class='items'>            \n                    <GradientSampleList></GradientSampleList>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -13340,7 +13375,6 @@ var ImageTypeSelect = function (_BasePropertyItem) {
     }, {
         key: 'isShow',
         value: function isShow() {
-            return false;
             var item = this.read('/item/current/image');
 
             if (!item) return false;
@@ -14587,6 +14621,142 @@ var PageLayout = function (_UIElement) {
     return PageLayout;
 }(UIElement);
 
+var ImageList = function (_UIElement) {
+    inherits(ImageList, _UIElement);
+
+    function ImageList() {
+        classCallCheck(this, ImageList);
+        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
+    }
+
+    createClass(ImageList, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'makeItemNodeImage',
+        value: function makeItemNodeImage(item) {
+            var selected = item.selected ? 'selected' : '';
+            return '\n            <div class=\'tree-item ' + selected + '\' data-id="' + item.id + '" draggable="true" >\n                <div class="item-view-container">\n                    <div class="item-view"  style=\'' + this.read('/image/toString', item) + '\'></div>\n                </div>\n                <div class=\'item-tools\'>\n                    <button type="button" class=\'delete-item\' item-id=\'' + item.id + '\' title="Remove">&times;</button>                \n                    <button type="button" class=\'copy-item\' item-id=\'' + item.id + '\' title="Copy">&times;</button>\n                </div>            \n            </div>\n            ';
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            var _this2 = this;
+
+            var item = this.read('/item/current/layer');
+
+            if (!item) {
+                var page = this.read('/item/current/page');
+                if (page) {
+                    var list = this.read('/item/list/children', page.id);
+                    if (list.length) {
+                        item = { id: list[0] };
+                    } else {
+                        return '';
+                    }
+                }
+            }
+
+            return this.read('/item/map/children', item.id, function (item) {
+                return _this2.makeItemNodeImage(item);
+            });
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'click.self $imageList .tree-item',
+        value: function clickSelf$imageListTreeItem(e) {
+            var id = e.$delegateTarget.attr('data-id');
+
+            if (id) {
+                this.dispatch('/item/select', id);
+                this.refresh();
+            }
+        }
+    }, {
+        key: 'click $gradientType .gradient-item',
+        value: function click$gradientTypeGradientItem(e) {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (item) {
+
+                var type = e.$delegateTarget.attr('data-type');
+
+                _this3.dispatch('/item/add/image', type, true, item.id);
+                _this3.refresh();
+            });
+        }
+    }, {
+        key: 'dragstart $imageList .tree-item',
+        value: function dragstart$imageListTreeItem(e) {
+            this.draggedImage = e.$delegateTarget;
+            this.draggedImage.css('opacity', 0.5);
+            // e.preventDefault();
+        }
+    }, {
+        key: 'dragend $imageList .tree-item',
+        value: function dragend$imageListTreeItem(e) {
+
+            if (this.draggedImage) {
+                this.draggedImage.css('opacity', 1);
+            }
+        }
+    }, {
+        key: 'dragover $imageList .tree-item',
+        value: function dragover$imageListTreeItem(e) {
+            e.preventDefault();
+        }
+    }, {
+        key: 'drop.self $imageList .tree-item',
+        value: function dropSelf$imageListTreeItem(e) {
+            e.preventDefault();
+
+            var destId = e.$delegateTarget.attr('data-id');
+            var sourceId = this.draggedImage.attr('data-id');
+
+            this.draggedImage = null;
+            this.dispatch('/item/move/in', destId, sourceId);
+            this.refresh();
+        }
+    }, {
+        key: 'drop $imageList',
+        value: function drop$imageList(e) {
+            e.preventDefault();
+
+            if (this.draggedImage) {
+                var sourceId = this.draggedImage.attr('data-id');
+
+                this.draggedImage = null;
+                this.dispatch('/item/move/last', sourceId);
+                this.refresh();
+            }
+        }
+    }, {
+        key: 'click $imageList .copy-item',
+        value: function click$imageListCopyItem(e) {
+            this.dispatch('/item/addCopy/image', e.$delegateTarget.attr('item-id'));
+            this.refresh();
+        }
+    }, {
+        key: 'click $imageList .delete-item',
+        value: function click$imageListDeleteItem(e) {
+            this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
+            this.refresh();
+        }
+    }]);
+    return ImageList;
+}(UIElement);
+
 var ImageListView = function (_BasePropertyItem) {
     inherits(ImageListView, _BasePropertyItem);
 
@@ -14596,6 +14766,11 @@ var ImageListView = function (_BasePropertyItem) {
     }
 
     createClass(ImageListView, [{
+        key: "components",
+        value: function components() {
+            return { ImageList: ImageList };
+        }
+    }, {
         key: "template",
         value: function template() {
             return "\n            <div class='property-item image-list-view show'>\n                <div class='items'>            \n                    <ImageList></ImageList>\n                </div>\n            </div>\n        ";
@@ -14669,7 +14844,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ImageListView></ImageListView>\n                <SampleList></SampleList>                                   \n                <ImageTypeSelect></ImageTypeSelect>            \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <ImageTypeSelect></ImageTypeSelect>                        \n                <!-- <ImageListView></ImageListView> -->\n                <SampleList></SampleList>                                   \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -16215,176 +16390,6 @@ var PredefinedRadialGradientAngle = function (_UIElement) {
     return PredefinedRadialGradientAngle;
 }(UIElement);
 
-var ImageList = function (_UIElement) {
-    inherits(ImageList, _UIElement);
-
-    function ImageList() {
-        classCallCheck(this, ImageList);
-        return possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).apply(this, arguments));
-    }
-
-    createClass(ImageList, [{
-        key: 'template',
-        value: function template() {
-            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
-        }
-    }, {
-        key: 'makeItemNodeImage',
-        value: function makeItemNodeImage(item) {
-            var selected = item.selected ? 'selected' : '';
-            return '\n            <div class=\'tree-item ' + selected + '\' id="' + item.id + '" draggable="true" >\n                <div class="item-view-container">\n                    <div class="item-view"  style=\'' + this.read('/image/toString', item) + '\'></div>\n                </div>\n                <div class=\'item-tools\'>\n                    <button type="button" class=\'delete-item\' item-id=\'' + item.id + '\' title="Remove">&times;</button>                \n                    <button type="button" class=\'copy-item\' item-id=\'' + item.id + '\' title="Copy">&times;</button>\n                </div>            \n            </div>\n            ';
-        }
-    }, {
-        key: 'load $imageList',
-        value: function load$imageList() {
-            var _this2 = this;
-
-            var item = this.read('/item/current/layer');
-
-            if (!item) {
-                var page = this.read('/item/current/page');
-                if (page) {
-                    var list = this.read('/item/list/children', page.id);
-                    if (list.length) {
-                        item = { id: list[0] };
-                    } else {
-                        return '';
-                    }
-                }
-            }
-
-            return this.read('/item/map/children', item.id, function (item) {
-                return _this2.makeItemNodeImage(item);
-            });
-        }
-    }, {
-        key: 'refresh',
-        value: function refresh() {
-            this.load();
-        }
-    }, {
-        key: '@changeEditor',
-        value: function changeEditor() {
-            this.refresh();
-        }
-    }, {
-        key: 'click.self $imageList .tree-item',
-        value: function clickSelf$imageListTreeItem(e) {
-            var id = e.$delegateTarget.attr('id');
-
-            if (id) {
-                this.dispatch('/item/select', id);
-                this.refresh();
-            }
-        }
-    }, {
-        key: 'click $gradientType .gradient-item',
-        value: function click$gradientTypeGradientItem(e) {
-            var _this3 = this;
-
-            this.read('/item/current/layer', function (item) {
-
-                var type = e.$delegateTarget.attr('data-type');
-
-                _this3.dispatch('/item/add/image', type, true, item.id);
-                _this3.refresh();
-            });
-        }
-    }, {
-        key: 'dragstart $imageList .tree-item',
-        value: function dragstart$imageListTreeItem(e) {
-            this.draggedImage = e.$delegateTarget;
-            this.draggedImage.css('opacity', 0.5);
-            // e.preventDefault();
-        }
-    }, {
-        key: 'dragend $imageList .tree-item',
-        value: function dragend$imageListTreeItem(e) {
-
-            if (this.draggedImage) {
-                this.draggedImage.css('opacity', 1);
-            }
-        }
-    }, {
-        key: 'dragover $imageList .tree-item',
-        value: function dragover$imageListTreeItem(e) {
-            e.preventDefault();
-        }
-    }, {
-        key: 'drop.self $imageList .tree-item',
-        value: function dropSelf$imageListTreeItem(e) {
-            e.preventDefault();
-
-            var destId = e.$delegateTarget.attr('id');
-            var sourceId = this.draggedImage.attr('id');
-
-            this.draggedImage = null;
-            this.dispatch('/item/move/in', destId, sourceId);
-            this.refresh();
-        }
-    }, {
-        key: 'drop $imageList',
-        value: function drop$imageList(e) {
-            e.preventDefault();
-
-            if (this.draggedImage) {
-                var sourceId = this.draggedImage.attr('id');
-
-                this.draggedImage = null;
-                this.dispatch('/item/move/last', sourceId);
-                this.refresh();
-            }
-        }
-    }, {
-        key: 'click $imageList .copy-item',
-        value: function click$imageListCopyItem(e) {
-            this.dispatch('/item/addCopy/image', e.$delegateTarget.attr('item-id'));
-            this.refresh();
-        }
-    }, {
-        key: 'click $imageList .delete-item',
-        value: function click$imageListDeleteItem(e) {
-            this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
-            this.refresh();
-        }
-    }, {
-        key: 'paste document',
-        value: function pasteDocument(e) {
-            var _this4 = this;
-
-            var dataTransfer = e.clipboardData;
-
-            var items = [].concat(toConsumableArray(dataTransfer.items));
-            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
-                return type == 'text/uri-list';
-            });
-
-            var dataList = types.map(function (type) {
-                return dataTransfer.getData(type);
-            });
-
-            if (dataList.length) {
-                this.read('/item/current/layer', function (layer) {
-                    _this4.read('/image/get/url', dataList, function (url) {
-                        _this4.dispatch('/item/add/image/url', url, true, layer.id);
-                    });
-                });
-            }
-
-            var files = [].concat(toConsumableArray(dataTransfer.files));
-            if (files.length) {
-                this.read('/item/current/layer', function (layer) {
-                    _this4.read('/image/get/file', files, function (img) {
-                        _this4.dispatch('/item/add/image/file', img, true, layer.id);
-                        _this4.refresh();
-                    });
-                });
-            }
-        }
-    }]);
-    return ImageList;
-}(UIElement);
-
 var SubFeatureControl = function (_UIElement) {
     inherits(SubFeatureControl, _UIElement);
 
@@ -16497,7 +16502,7 @@ var GradientView = function (_BaseTab) {
     createClass(GradientView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n \n                <ColorPickerLayer></ColorPickerLayer>\n                <SubFeatureControl></SubFeatureControl>\n            </div>\n        ';
+            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n \n                <!--<ColorPickerLayer></ColorPickerLayer>-->\n                <SubFeatureControl></SubFeatureControl>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -16539,6 +16544,11 @@ var GradientView = function (_BaseTab) {
 
                 return '<div class=\'layer\' item-layer-id="' + item.id + '" title="' + (index + 1) + '. ' + (item.name || 'Layer') + '" style=\'' + _this2.read('/layer/toString', item, true) + '\'></div>';
             });
+        }
+    }, {
+        key: '@animationEditor',
+        value: function animationEditor() {
+            this.load();
         }
     }, {
         key: 'refresh',
@@ -17040,6 +17050,40 @@ var DropView = function (_UIElement) {
                 });
             }
         }
+    }, {
+        key: 'paste document',
+        value: function pasteDocument(e) {
+            var _this3 = this;
+
+            var dataTransfer = e.clipboardData;
+
+            var items = [].concat(toConsumableArray(dataTransfer.items));
+            var types = [].concat(toConsumableArray(dataTransfer.types)).filter(function (type) {
+                return type == 'text/uri-list';
+            });
+
+            var dataList = types.map(function (type) {
+                return dataTransfer.getData(type);
+            });
+
+            if (dataList.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this3.read('/image/get/url', dataList, function (url) {
+                        _this3.dispatch('/item/add/image/url', url, true, layer.id);
+                    });
+                });
+            }
+
+            var files = [].concat(toConsumableArray(dataTransfer.files));
+            if (files.length) {
+                this.read('/item/current/layer', function (layer) {
+                    _this3.read('/image/get/file', files, function (img) {
+                        _this3.dispatch('/item/add/image/file', img, true, layer.id);
+                        _this3.refresh();
+                    });
+                });
+            }
+        }
     }]);
     return DropView;
 }(UIElement);
@@ -17087,6 +17131,49 @@ var VerticalColorStep = function (_UIElement) {
     return VerticalColorStep;
 }(UIElement);
 
+var bezierList = [[0, 0, 1, 1, 'linear'], [0.25, 0.1, 0.25, 1, 'ease'], [0.42, 0, 1, 1, 'ease-in'], [0.47, 0, 0.745, 0.715, 'ease-in-sine'], [0.55, 0.085, 0.68, 0.53, 'ease-in-quad'], [0.55, 0.055, 0.675, 0.19, 'ease-in-cubic'], [0.895, 0.03, 0.685, 0.22, 'ease-in-quart'], [0.755, 0.05, 0.855, 0.06, 'ease-in-quint'], [0.95, 0.05, 0.795, 0.035, 'ease-in-expo'], [0.60, 0.04, 0.98, 0.335, 'ease-in-circ'], [0.60, -0.28, 0.735, 0.045, 'ease-in-back'], [0.42, 0, 0.58, 1, 'ease-in-out'], [0.445, 0.05, 0.55, 0.95, 'ease-in-out-sine'], [0.455, 0.03, 0.515, 0.955, 'ease-in-out-quad'], [0.645, 0.045, 0.355, 1, 'ease-in-out-cubic'], [0.77, 0, 0.175, 1, 'ease-in-out-quart'], [0.86, 0, 0.07, 1, 'ease-in-out-quint'], [1, 0, 0, 1, 'ease-in-out-expo'], [0.785, 0.135, 0.15, 0.86, 'ease-in-out-circ'], [0.68, -0.55, 0.265, 1.55, 'ease-in-out-back'], [0, 0, 0.58, 1, 'ease-out'], [0.39, 0.575, 0.565, 1, 'ease-out-sine'], [0.25, 0.46, 0.45, 0.94, 'ease-out-quad'], [0.215, 0.61, 0.355, 1, 'ease-out-cubic'], [0.165, 0.84, 0.44, 1, 'ease-out-quart'], [0.23, 1, 0.32, 1, 'ease-out-quint'], [0.19, 1, 0.22, 1, 'ease-out-expo'], [0.075, 0.82, 0.165, 1, 'ease-out-circ'], [0.175, 0.885, 0.32, 1.275, 'ease-out-back']];
+
+var stepTimingFunction = function stepTimingFunction() {
+    var step = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
+
+    return function (progress) {
+        var stepDist = 1 / step;
+
+        if (position == 'start') {
+            return stepDist * Math.ceil(progress / stepDist);
+        } else if (position == 'end') {
+            return stepDist * Math.floor(progress / stepDist);
+        }
+    };
+};
+
+var Timing = {
+    'ease-out-elastic': function easeOutElastic(progress, duration, start, end) {
+        return Math.pow(2, -10 * progress) * Math.sin((progress - .1) * 5 * Math.PI) + 1;
+    },
+    'cubic-bezier': function cubicBezier$$1(x1, y1, x2, y2) {
+        return cubicBezier(x1, y1, x2, y2);
+    },
+    'step': function step() {
+        var step = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+        var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'end';
+
+        return stepTimingFunction(step, position);
+    },
+    'step-start': function stepStart(progress) {
+        return stepTimingFunction(1, 'start')(progress);
+    },
+    'step-end': function stepEnd(progress) {
+        return stepTimingFunction(1, 'end')(progress);
+    }
+};
+
+// setup bezier functions
+bezierList.forEach(function (arr) {
+    Timing[arr[4]] = cubicBezier(arr[0], arr[1], arr[2], arr[3]);
+});
+
 var screenModes = ['expertor', 'beginner'];
 
 var XDImageEditor = function (_BaseImageEditor) {
@@ -17125,6 +17212,40 @@ var XDImageEditor = function (_BaseImageEditor) {
                 ImageList: ImageList,
                 Timeline: Timeline
             };
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            /*
+            this.read('/item/current/layer', (layer) => {
+                var self = this; 
+                var obj = layer.style
+                var aniObject = Animation.createTimeline([{
+                    duration: 1000, 
+                    obj,
+                    timing: 'ease-out-sine',
+                    iteration: 3, 
+                    direction: 'alternate',
+                    keyframes : {
+                        '0%': {
+                            'x': '0px',
+                            'background-color': 'rgba(255, 255, 255, 0.5)',
+                        },
+                        '100%': {
+                            'x': '250px',
+                            'background-color': 'rgba(255, 0, 255, 1)'
+                        }
+                    } 
+                 }], {
+                    callback() {
+                        self.run('/item/set', layer);
+                        self.emit('animationEditor')
+                    }
+                });
+                 aniObject.start();
+                 })
+            */
+
         }
     }, {
         key: 'loadStart',

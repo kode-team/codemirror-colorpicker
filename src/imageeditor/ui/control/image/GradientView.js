@@ -30,7 +30,7 @@ export default class GradientView extends BaseTab {
                     </div>          
                 </div>
  
-                <ColorPickerLayer></ColorPickerLayer>
+                <!--<ColorPickerLayer></ColorPickerLayer>-->
                 <SubFeatureControl></SubFeatureControl>
             </div>
         `
@@ -73,6 +73,10 @@ export default class GradientView extends BaseTab {
 
             return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true)}'></div>`
         });
+    }
+
+    '@animationEditor' () {
+        this.load();
     }
 
     refresh (isDrag) {

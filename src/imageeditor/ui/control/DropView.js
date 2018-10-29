@@ -50,4 +50,36 @@ export default class DropView extends UIElement {
         }
 
     }
+
+
+    'paste document' (e) {
+
+        var dataTransfer = e.clipboardData;
+
+        var items = [...dataTransfer.items]
+        var types = [...dataTransfer.types].filter(type => type == 'text/uri-list');
+        
+        var dataList = types.map(type => {
+            return dataTransfer.getData(type);
+        })
+
+        if (dataList.length) {
+            this.read('/item/current/layer', (layer) => {
+                this.read('/image/get/url', dataList, (url) => {
+                    this.dispatch('/item/add/image/url', url, true, layer.id);
+                })
+            })            
+        }
+
+        var files = [...dataTransfer.files]; 
+        if (files.length) {
+            this.read('/item/current/layer', (layer) => {
+                this.read('/image/get/file', files, (img) => {
+                    this.dispatch('/item/add/image/file', img, true, layer.id);
+                    this.refresh();
+                })
+            })
+        }
+
+    }
 }

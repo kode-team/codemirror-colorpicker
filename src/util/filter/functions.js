@@ -291,7 +291,7 @@ export function putBitmap(bitmap, subBitmap, area) {
 
 export function parseParamNumber (param, callback) {
     if (typeof param === 'string') {
-        param = param.replace(/deg|px/g, '')
+        param = param.replace(/deg|px|\%|em/g, '')
     }
     if (typeof callback  == 'function') {
         return callback(+param);

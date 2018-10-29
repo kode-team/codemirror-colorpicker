@@ -31,7 +31,7 @@ export default class ImageList extends UIElement {
     makeItemNodeImage (item) {
         var selected = item.selected ? 'selected' : '' 
         return `
-            <div class='tree-item ${selected}' id="${item.id}" draggable="true" >
+            <div class='tree-item ${selected}' data-id="${item.id}" draggable="true" >
                 <div class="item-view-container">
                     <div class="item-view"  style='${this.read('/image/toString', item)}'></div>
                 </div>
@@ -73,7 +73,7 @@ export default class ImageList extends UIElement {
     }
 
     'click.self $imageList .tree-item' (e) { 
-        var id = e.$delegateTarget.attr('id')
+        var id = e.$delegateTarget.attr('data-id')
 
         if (id) {
             this.dispatch('/item/select', id);
@@ -114,8 +114,8 @@ export default class ImageList extends UIElement {
     'drop.self $imageList .tree-item' (e) {
         e.preventDefault();        
 
-        var destId = e.$delegateTarget.attr('id')
-        var sourceId = this.draggedImage.attr('id')
+        var destId = e.$delegateTarget.attr('data-id')
+        var sourceId = this.draggedImage.attr('data-id')
 
         this.draggedImage = null; 
         this.dispatch('/item/move/in', destId, sourceId)
@@ -126,7 +126,7 @@ export default class ImageList extends UIElement {
         e.preventDefault();        
 
         if (this.draggedImage) {
-            var sourceId = this.draggedImage.attr('id')
+            var sourceId = this.draggedImage.attr('data-id')
 
             this.draggedImage = null; 
             this.dispatch('/item/move/last', sourceId)
@@ -143,36 +143,5 @@ export default class ImageList extends UIElement {
     'click $imageList .delete-item' (e) {
         this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
         this.refresh()
-    }    
-
-    'paste document' (e) {
-
-        var dataTransfer = e.clipboardData;
-
-        var items = [...dataTransfer.items]
-        var types = [...dataTransfer.types].filter(type => type == 'text/uri-list');
-        
-        var dataList = types.map(type => {
-            return dataTransfer.getData(type);
-        })
-
-        if (dataList.length) {
-            this.read('/item/current/layer', (layer) => {
-                this.read('/image/get/url', dataList, (url) => {
-                    this.dispatch('/item/add/image/url', url, true, layer.id);
-                })
-            })            
-        }
-
-        var files = [...dataTransfer.files]; 
-        if (files.length) {
-            this.read('/item/current/layer', (layer) => {
-                this.read('/image/get/file', files, (img) => {
-                    this.dispatch('/item/add/image/file', img, true, layer.id);
-                    this.refresh();
-                })
-            })
-        }
-
-    }
+    }   
 }

@@ -128,7 +128,7 @@ export default class EventMachin {
             var instance = new Component(this, props);
             this.children[refName] = instance
             this.refs[refName] = instance.$el
-      
+
             if (instance) {
               instance.render()
   

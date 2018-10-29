@@ -56,6 +56,29 @@ export function uuid(){
     return uuid;
 }
 
+const bezierCalc = {
+    B1 : function (t) { return t*t*t },
+    B2 : function (t) { return 3*t*t*(1-t) },
+    B3 : function (t) { return 3*t*(1-t)*(1-t) },
+    B4 : function (t) { return (1-t)*(1-t)*(1-t) }
+}
+
+export function cubicBezier (x1, y1, x2, y2) {
+    var C1 = { x : 0, y : 0 };
+    var C2 = { x : x1, y : y1 };
+    var C3 = { x : x2, y : y2 };
+    var C4 = { x : 1, y : 1 };
+
+    return function (progress) {
+        // var x = C1.x * bezierCalc.B1(p) + C2.x*bezierCalc.B2(p) + C3.x*bezierCalc.B3(p) + C4.x*bezierCalc.B4(p);
+        // var y = C1.y * bezierCalc.B1(progress) + C2.y*bezierCalc.B2(progress) + C3.y*bezierCalc.B3(progress) + C4.y*bezierCalc.B4(progress);
+
+        var y = C2.y*bezierCalc.B2(progress) + C3.y*bezierCalc.B3(progress) + bezierCalc.B4(progress);
+
+        return 1 - y;
+    }
+}
+
 
 export default {
     round,
@@ -64,5 +87,6 @@ export default {
     degreeToRadian,
     getXInCircle,
     getYInCircle,
-    caculateAngle
+    caculateAngle,
+    cubicBezier
 }

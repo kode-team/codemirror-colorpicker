@@ -14,15 +14,19 @@ import { HSVtoRGB } from './fromHSV'
  * @param {*} t 
  */
 export function interpolateRGB(startColor, endColor, t = 0.5, exportFormat = 'hex') {
-    var obj = {
+    var obj = interpolateRGBObject(startColor, endColor, t);
+
+    return format(obj, obj.a < 1 ? 'rgb' : exportFormat);
+
+}
+
+export function interpolateRGBObject(startColor, endColor, t = 0.5) {
+    return {
         r: round(startColor.r + (endColor.r - startColor.r) * t),
         g: round(startColor.g + (endColor.g - startColor.g) * t),
         b: round(startColor.b + (endColor.b - startColor.b) * t),
         a: round(startColor.a + (endColor.a - startColor.a) * t, 100 )
     };  
-
-    return format(obj, obj.a < 1 ? 'rgb' : exportFormat);
-
 }
 
 export function scale(scale, count = 5) {
