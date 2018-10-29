@@ -15,7 +15,7 @@ export default class ImageResource extends BasePropertyItem {
     'load $imageList' () {
         return this.read('/svg/list').map((svg, index) => {
             if (typeof svg == 'object') {
-                return `<div class='svg-item' data-key="${svg.key}"><img src="${svg.url}" /></div>`
+                return `<div class='svg-item' data-key="${svg.key}">${svg.svg}</div>`
             }  else {
                 return `<div class='svg-item' data-index="${index}">${svg}</div>`
             }

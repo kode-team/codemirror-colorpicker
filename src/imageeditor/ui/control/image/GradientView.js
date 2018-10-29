@@ -71,7 +71,13 @@ export default class GradientView extends BaseTab {
                 }
             }*/
 
-            return `<div class='layer' item-layer-id="${item.id}" title="${index+1}. ${item.name || 'Layer'}" style='${this.read('/layer/toString', item, true)}'></div>`
+            return `<div 
+                class='layer' 
+                item-layer-id="${item.id}" 
+                title="${index+1}. ${item.name || 'Layer'}" 
+                style='${this.read('/layer/toString', item, true)}'>
+                    ${this.read('/layer/toStringClipPath', item)}
+                </div>`
         });
     }
 

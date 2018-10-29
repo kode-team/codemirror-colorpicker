@@ -48,6 +48,7 @@ const IMAGE_DEFAULT_OBJECT = {
     radialType: 'circle',
     radialPosition: 'center',
     visible: true,
+    isClipPath: false, 
     backgroundRepeat: null,
     backgroundSize: null,
     backgroundSizeWidth: 0,
@@ -650,6 +651,8 @@ export default class ItemManager extends BaseModule {
         item.type = 'image'; 
         item.colors = img.colors;         
         item.fileType = img.fileType || 'svg';
+        if (img.clipPathSvg) item.clipPathSvg = img.clipPathSvg; 
+        if (img.clipPathSvgId) item.clipPathSvgId = img.clipPathSvgId; 
         item.backgroundImage = img.url;
         item.backgroundImageDataURI = img.datauri;
         item.backgroundSizeWidth = '100%';

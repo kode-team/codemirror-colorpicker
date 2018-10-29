@@ -109,6 +109,8 @@ export default class LayerManager extends BaseModule {
     '*/layer/toImageCSS' ($store, layer, isExport = false) {    
         var results = {}
         $store.read('/item/each/children', layer.id, (item)  => {
+
+            if (item.isClipPath) return;
             var css = $store.read('/image/toCSS', item, isExport);
 
             Object.keys(css).forEach(key => {
@@ -180,7 +182,7 @@ export default class LayerManager extends BaseModule {
             results.push(`translateY(${layer.style['translateY']}px)`)
         }
 
-        if (layer.style['translateZ']) {
+        if (layer.style['translateZ']) { 
             results.push(`translateZ(${layer.style['translateZ']}px)`)
         }
 
@@ -197,6 +199,26 @@ export default class LayerManager extends BaseModule {
         }                
 
         return results.length ? results.join(' ') : 'none';
+    }
+
+    '*/layer/toStringClipPath' ($store, layer) {
+        var image = $store.read('/layer/getClipPath', layer);
+
+        if (image) {
+            return image.clipPathSvg;
+        }
+
+        return '' 
+    }
+
+    '*/layer/getClipPath' ($store, layer) {
+        var items = $store.read('/item/filter/children', layer.id, function (image) {
+            return image.isClipPath
+        }).map(id => {
+            return $store.items[id]
+        })
+
+        return items.length ? items[0] : null;
     }
 
     '*/layer/toCSS' ($store, layer = null, withStyle = true, image = null, isExport = false) {
@@ -232,6 +254,12 @@ export default class LayerManager extends BaseModule {
 
         css['transform'] = $store.read('/layer/make/transform', layer)
         css['filter'] = $store.read('/layer/make/filter', layer.filters);
+
+        var clipPathImage = $store.read('/layer/getClipPath', layer);
+
+        if (clipPathImage) {
+            css['clip-path'] = `url(#${clipPathImage.clipPathSvgId})`
+        }
 
         var results = Object.assign(css, 
              (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport)

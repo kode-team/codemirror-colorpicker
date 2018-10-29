@@ -47,13 +47,13 @@ export default class ExportView extends UIElement {
         var page = this.read('/item/current/page')
 
         if (!page) {
-            return ''; 
+            return '';  
         }
 
         var pageStyle = this.makePageCSS(page)
 
         var html = `<div id="page-1" style="${pageStyle}">\n${this.read('/item/map/children', page.id, (item, index) => {
-                return `\t<div id="layer-${index+1}" style="${this.read('/layer/toExport', item, true)}"></div>`
+                return `\t<div id="layer-${index+1}" style="${this.read('/layer/toExport', item, true)}">\t\t\n${this.read('/layer/toStringClipPath', item)}</div>`
             }).join('\n')}\n</div>`
 
 

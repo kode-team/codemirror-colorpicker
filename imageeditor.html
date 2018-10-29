@@ -12,6 +12,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/htmlmixed/htmlmixed.min.js" ></script>
     <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
     <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>    
 
     <style type="text/css">
     html, body {
@@ -33,18 +34,13 @@
     var picker = new CodeMirrorColorPicker.createImageEditor();
     picker.loadStart(true);
 
-    axios.get('/resources/icons.json')
-        .then(function (response) {
-            picker.dispatch('/svg/list/load', Object.keys(response.data).map(key => {
-                return {
-                    key: key , 
-                    url: 'https://cdn.jsdelivr.net/npm/feather-icons@4.7.3/dist/icons/' + key + '.svg'
-                }
-            }));
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+
+    var icons = Object.keys(feather.icons).map(key => {
+        return { key: key, svg: feather.icons[key].toSvg() }        
+    });
+
+    picker.dispatch('/svg/list/load', icons);
+
 </script>
 
 </body>

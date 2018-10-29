@@ -82,17 +82,37 @@ export default class ImageManager extends BaseModule {
     '*/image/get/blob' ($store, blobs, callback) {
         (blobs || []).forEach(file => {
             if (typeof callback == 'function') {
-                new ImageLoader(file).getImage(image => {
+                new ImageLoader(file, { 
+                    forceDataURI: true
+                }).getImage(image => {
                     var url = file; 
+                    var svg = ''; 
+                    var svgContent = image.src.split('data:image/svg+xml;charset=utf-8;base64,'); 
+
+                    if (svgContent.length > 1) {
+                        svg = atob(svgContent[1]);
+                    }
 
                     if (url instanceof Blob) {
                         url = URL.createObjectURL(file)
                     }
 
-                    callback ({
-                        datauri: image.src,                 // export 용 
-                        url     // 화면 제어용 
-                    })
+                    if (svg) {
+                        $store.read('/svg/get/clipPath', svg, (clipPathSvg, clipPathSvgId) => {
+                            callback ({
+                                clipPathSvgId,
+                                clipPathSvg, 
+                                datauri: image.src,                 // export 용 
+                                url     // 화면 제어용 
+                            })
+                        });
+                    } else {
+                        callback ({
+                            datauri: image.src,                 // export 용 
+                            url     // 화면 제어용 
+                        })
+    
+                    }
                 })
             }
         });
