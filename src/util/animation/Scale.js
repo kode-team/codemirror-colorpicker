@@ -61,7 +61,7 @@ const Scale = {
         var check = this.makeCheckFunction(start, end, isLast);
         var scale = this.makeScaleFunction(start, end, isLast);
 
-        if (start.type == 'color') {
+        if (start.itemType == 'color') {
             return function (ani, progress) {
                 if (check(progress)) {
                     ani.obj[start.key] = rgb(scale(ani.timing(progress, ani.duration, start, end)));

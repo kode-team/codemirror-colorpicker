@@ -23,19 +23,12 @@ export default class SVGManager extends BaseModule {
         $store.svgList = $store.read('/clone', loadList);
     }
 
-    '*/svg/get/clipPath' ($store, svg, callback) {
+    '*/svg/get/clipPath' ($store, svg, id, callback, transform = "") {
 
         var $div = new Dom('div');
         var paths = $div.html(svg).$('svg').html();
 
-        var id = uuid();
-        var svg = `<svg height="0" width="0">
-                <defs>
-                <clipPath id="${id}">
-                    ${paths}
-                </clipPath>
-                </defs>
-            </svg>`
+        var svg = `<svg height="0" width="0"><defs><clipPath id="${id}" ${transform ? `transform="${transform}"` : ""} >${paths}</clipPath></defs></svg>`
 
         callback && callback(svg, id);
     }
@@ -55,5 +48,19 @@ export default class SVGManager extends BaseModule {
 
         return ''; 
     }
+
+    '*/svg/get' ($store, index, key) {
+        if (SVGList[index]) {
+            return SVGList[index];
+        } else {
+            var list = $store.svgList.filter(item => item.key == key);
+
+            if (list.length) {
+                return list[0].svg
+            }
+        }
+
+        return ''; 
+    }    
 
 }

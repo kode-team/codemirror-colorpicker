@@ -10085,7 +10085,7 @@ var LayerManager = function (_BaseModule) {
             }
 
             return Object.keys(obj).map(function (key) {
-                return key + ': ' + obj[key] + ';';
+                return key + ": " + obj[key] + ";";
             }).join(' ');
         }
     }, {
@@ -10118,7 +10118,7 @@ var LayerManager = function (_BaseModule) {
                     value = viewObject.defaultValue;
                 }
 
-                return id + '(' + value + viewObject.unit + ')';
+                return id + "(" + value + viewObject.unit + ")";
             }).join(' ');
         }
     }, {
@@ -10151,7 +10151,7 @@ var LayerManager = function (_BaseModule) {
             obj.filter = $store.read('/layer/make/filter', filters);
 
             return Object.keys(obj).map(function (key) {
-                return key + ': ' + obj[key] + ';';
+                return key + ": " + obj[key] + ";";
             }).join(' ');
         }
     }, {
@@ -10161,8 +10161,6 @@ var LayerManager = function (_BaseModule) {
 
             var results = {};
             $store.read('/item/each/children', layer.id, function (item) {
-
-                if (item.isClipPath) return;
                 var css = $store.read('/image/toCSS', item, isExport);
 
                 Object.keys(css).forEach(function (key) {
@@ -10212,43 +10210,43 @@ var LayerManager = function (_BaseModule) {
             var results = [];
 
             if (layer.style['rotate']) {
-                results.push('rotate(' + layer.style['rotate'] + 'deg)');
+                results.push("rotate(" + layer.style['rotate'] + "deg)");
             }
 
             if (layer.style['skewX']) {
-                results.push('skewX(' + layer.style['skewX'] + 'deg)');
+                results.push("skewX(" + layer.style['skewX'] + "deg)");
             }
 
             if (layer.style['skewY']) {
-                results.push('skewY(' + layer.style['skewY'] + 'deg)');
+                results.push("skewY(" + layer.style['skewY'] + "deg)");
             }
 
             if (layer.style['scale']) {
-                results.push('scale(' + layer.style['scale'] + ')');
+                results.push("scale(" + layer.style['scale'] + ")");
             }
 
             if (layer.style['translateX']) {
-                results.push('translateX(' + layer.style['translateX'] + 'px)');
+                results.push("translateX(" + layer.style['translateX'] + "px)");
             }
 
             if (layer.style['translateY']) {
-                results.push('translateY(' + layer.style['translateY'] + 'px)');
+                results.push("translateY(" + layer.style['translateY'] + "px)");
             }
 
             if (layer.style['translateZ']) {
-                results.push('translateZ(' + layer.style['translateZ'] + 'px)');
+                results.push("translateZ(" + layer.style['translateZ'] + "px)");
             }
 
             if (layer.style['rotate3dX'] || layer.style['rotate3dY'] || layer.style['rotate3dZ'] || layer.style['rotate3dA']) {
-                results.push('rotate3d( ' + (layer.style['rotate3dX'] || 0) + ', ' + (layer.style['rotate3dY'] || 0) + ', ' + (layer.style['rotate3dZ'] || 0) + ', ' + (layer.style['rotate3dA'] || 0) + 'deg  )');
+                results.push("rotate3d( " + (layer.style['rotate3dX'] || 0) + ", " + (layer.style['rotate3dY'] || 0) + ", " + (layer.style['rotate3dZ'] || 0) + ", " + (layer.style['rotate3dA'] || 0) + "deg  )");
             }
 
             if (layer.style['scale3dX'] || layer.style['scale3dY'] || layer.style['scale3dZ']) {
-                results.push('scale3d( ' + (layer.style['scale3dX'] || 1) + ', ' + (layer.style['scale3dY'] || 1) + ', ' + (layer.style['scale3dZ'] || 1) + ')');
+                results.push("scale3d( " + (layer.style['scale3dX'] || 1) + ", " + (layer.style['scale3dY'] || 1) + ", " + (layer.style['scale3dZ'] || 1) + ")");
             }
 
             if (layer.style['translate3dX'] || layer.style['translate3dY'] || layer.style['translate3dZ']) {
-                results.push('translate3d( ' + (layer.style['translate3dX'] || 0) + 'px, ' + (layer.style['translate3dY'] || 0) + 'px, ' + (layer.style['translate3dZ'] || 0) + 'px)');
+                results.push("translate3d( " + (layer.style['translate3dX'] || 0) + "px, " + (layer.style['translate3dY'] || 0) + "px, " + (layer.style['translate3dZ'] || 0) + "px)");
             }
 
             return results.length ? results.join(' ') : 'none';
@@ -10256,13 +10254,23 @@ var LayerManager = function (_BaseModule) {
     }, {
         key: '*/layer/toStringClipPath',
         value: function layerToStringClipPath($store, layer) {
-            var image = $store.read('/layer/getClipPath', layer);
 
-            if (image) {
-                return image.clipPathSvg;
+            if (!layer.clipPathSvg) return '';
+
+            var transform = '';
+
+            if (layer.fitClipPathSize) {
+                var widthScale = parseParamNumber$1(layer.style.width) / layer.clipPathSvgWidth;
+                var heightScale = parseParamNumber$1(layer.style.height) / layer.clipPathSvgHeight;
+
+                transform = "scale(" + widthScale + " " + heightScale + ")";
             }
 
-            return '';
+            var $div = new Dom('div');
+            var paths = $div.html(layer.clipPathSvg).$('svg').html();
+            var svg = "<svg height=\"0\" width=\"0\"><defs><clipPath id=\"clippath-" + layer.id + "\" " + (transform ? "transform=\"" + transform + "\"" : "") + " >" + paths + "</clipPath></defs></svg>";
+
+            return svg;
         }
     }, {
         key: '*/layer/getClipPath',
@@ -10312,11 +10320,8 @@ var LayerManager = function (_BaseModule) {
 
             css['transform'] = $store.read('/layer/make/transform', layer);
             css['filter'] = $store.read('/layer/make/filter', layer.filters);
-
-            var clipPathImage = $store.read('/layer/getClipPath', layer);
-
-            if (clipPathImage) {
-                css['clip-path'] = 'url(#' + clipPathImage.clipPathSvgId + ')';
+            if (layer.clipPathSvg) {
+                css['clip-path'] = "url(#clippath-" + layer.id + ")";
             }
 
             var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport));
@@ -10652,6 +10657,10 @@ var LAYER_DEFAULT_OBJECT = {
     mixBlendMode: 'normal',
     selected: true,
     visible: true,
+    clipPathSvg: '',
+    clipPathWidth: '',
+    clipPathHeight: '',
+    fitClipPathSize: false,
     style: {
         x: '0px',
         y: '0px',
@@ -12141,13 +12150,14 @@ var SVGManager = function (_BaseModule) {
         }
     }, {
         key: '*/svg/get/clipPath',
-        value: function svgGetClipPath($store, svg, callback) {
+        value: function svgGetClipPath($store, svg, id, callback) {
+            var transform = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "";
+
 
             var $div = new Dom('div');
             var paths = $div.html(svg).$('svg').html();
 
-            var id = uuid();
-            var svg = "<svg height=\"0\" width=\"0\">\n                <defs>\n                <clipPath id=\"" + id + "\">\n                    " + paths + "\n                </clipPath>\n                </defs>\n            </svg>";
+            var svg = "<svg height=\"0\" width=\"0\"><defs><clipPath id=\"" + id + "\" " + (transform ? "transform=\"" + transform + "\"" : "") + " >" + paths + "</clipPath></defs></svg>";
 
             callback && callback(svg, id);
         }
@@ -12165,6 +12175,23 @@ var SVGManager = function (_BaseModule) {
 
                 if (list.length) {
                     return new Blob([list[0].svg], { type: "image/svg+xml;charset=utf-8" });
+                }
+            }
+
+            return '';
+        }
+    }, {
+        key: '*/svg/get',
+        value: function svgGet($store, index, key) {
+            if (SVGList[index]) {
+                return SVGList[index];
+            } else {
+                var list = $store.svgList.filter(function (item) {
+                    return item.key == key;
+                });
+
+                if (list.length) {
+                    return list[0].svg;
                 }
             }
 
@@ -13322,11 +13349,13 @@ var ColorPickerLayer = function (_UIElement) {
         value: function changeColor(color) {
             var _this3 = this;
 
+            console.log(color);
             var item = this.read('/item/current');
 
             if (!item) return;
 
             if (this.read('/item/is/mode', 'layer')) {
+                console.log(color);
                 item.style['background-color'] = color;
                 this.dispatch('/item/set', item);
             } else if (this.read('/item/is/mode', 'image')) {
@@ -13357,7 +13386,10 @@ var ColorPickerLayer = function (_UIElement) {
 
             if (this.read('/item/is/mode', 'layer')) {
                 this.read('/item/current/layer', function (layer) {
-                    _this4.colorPicker.initColorWithoutChangeEvent(layer.style['background-color']);
+                    if (layer.style['background-color']) {
+                        if (layer.style['background-color'].includes('rgb')) return;
+                        _this4.colorPicker.initColorWithoutChangeEvent(layer.style['background-color']);
+                    }
                 });
             } else if (this.read('/item/is/mode', 'image')) {
                 this.read('/item/current/image', function (image) {
@@ -14516,7 +14548,7 @@ var ImageInfo = function (_BasePropertyItem) {
     createClass(ImageInfo, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item image-info show\'>\n                <div class=\'title\'>Image Information</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>File Type</label>\n                        <div>\n                            <input type="text" readonly ref="$fileType" />\n                        </div>\n                    </div>\n                    <div>\n                        <label>Clip</label>\n                        <div>\n                            <input type="checkbox" ref="$clipPath" /> is clip path \n                        </div>\n                    </div>                    \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item image-info show\'>\n                <div class=\'title\'>Image Information</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>File Type</label>\n                        <div>\n                            <input type="text" readonly ref="$fileType" />\n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -14535,23 +14567,12 @@ var ImageInfo = function (_BasePropertyItem) {
 
             this.read('/item/current/image', function (image) {
                 _this2.refs.$fileType.val(image.fileType);
-                _this2.refs.$clipPath.el.checked = image.isClipPath;
             });
         }
     }, {
         key: '@changeEditor',
         value: function changeEditor() {
             this.refresh();
-        }
-    }, {
-        key: 'click $clipPath',
-        value: function click$clipPath(e) {
-            var _this3 = this;
-
-            this.read('/item/current/image', function (image) {
-                image.isClipPath = _this3.refs.$clipPath.el.checked;
-                _this3.dispatch('/item/set', image);
-            });
         }
     }, {
         key: 'isShow',
@@ -14854,8 +14875,165 @@ var ImageListView = function (_BasePropertyItem) {
     return ImageListView;
 }(BasePropertyItem);
 
+var ClipPath = function (_BasePropertyItem) {
+    inherits(ClipPath, _BasePropertyItem);
+
+    function ClipPath() {
+        classCallCheck(this, ClipPath);
+        return possibleConstructorReturn(this, (ClipPath.__proto__ || Object.getPrototypeOf(ClipPath)).apply(this, arguments));
+    }
+
+    createClass(ClipPath, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'title\' ref="$title">Clip Image</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Fit Size</label>\n                        <div >\n                            <input type="checkbox" ref="$fit" /> fit to layer\n                        </div>\n                    </div>                \n                    <div>\n                        <label>Clip</label>\n                        <div style=\'cursor:pointer;width: 50px;height:50px;\' ref="$clippath" title="Click me!!">\n\n                        </div>\n                    </div>\n                    \n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                if (layer.clipPathSvg) {
+                    _this2.refs.$clippath.html(layer.clipPathSvg);
+                }
+
+                _this2.refs.$fit.el.checked = !!layer.fitClipPathSize;
+            });
+        }
+    }, {
+        key: 'click $clippath',
+        value: function click$clippath() {
+            this.emit('toggleClipPathImageResource');
+        }
+    }, {
+        key: 'click $fit',
+        value: function click$fit() {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                layer.fitClipPathSize = _this3.refs.$fit.el.checked;
+                _this3.dispatch('/item/set', layer);
+            });
+        }
+    }]);
+    return ClipPath;
+}(BasePropertyItem);
+
+var ClipPathImageResource = function (_BasePropertyItem) {
+    inherits(ClipPathImageResource, _BasePropertyItem);
+
+    function ClipPathImageResource() {
+        classCallCheck(this, ClipPathImageResource);
+        return possibleConstructorReturn(this, (ClipPathImageResource.__proto__ || Object.getPrototypeOf(ClipPathImageResource)).apply(this, arguments));
+    }
+
+    createClass(ClipPathImageResource, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='property-item image-resource show'>\n                <div class='items' ref=\"$imageList\">\n\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: 'load $imageList',
+        value: function load$imageList() {
+            return this.read('/svg/list').map(function (svg, index) {
+                if ((typeof svg === "undefined" ? "undefined" : _typeof(svg)) == 'object') {
+                    return "<div class='svg-item' data-key=\"" + svg.key + "\">" + svg.svg + "</div>";
+                } else {
+                    return "<div class='svg-item' data-index=\"" + index + "\">" + svg + "</div>";
+                }
+            });
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeSvgList',
+        value: function changeSvgList() {
+            this.refresh();
+        }
+    }, {
+        key: '@toggleClipPathImageResource',
+        value: function toggleClipPathImageResource() {
+            this.$el.toggleClass('show');
+        }
+    }, {
+        key: "setClipPathSvg",
+        value: function setClipPathSvg(layer, svg, callback) {
+
+            layer.clipPathSvg = svg;
+
+            var $temp = new Dom('div');
+            $temp.html(svg);
+
+            var $svg = $temp.$("svg");
+
+            var width = 0;
+            var height = 0;
+            if ($svg.attr('width')) {
+                width = parseParamNumber$1($svg.attr('width'));
+            }
+
+            if ($svg.attr('height')) {
+                height = parseParamNumber$1($svg.attr('height'));
+            }
+
+            if ($svg.attr('viewBox')) {
+                var box = $svg.attr('viewBox').split(' ');
+
+                width = parseParamNumber$1(box[2]);
+                height = parseParamNumber$1(box[3]);
+            }
+
+            layer.clipPathSvgWidth = width;
+            layer.clipPathSvgHeight = height;
+
+            $temp.remove();
+
+            callback && callback();
+        }
+    }, {
+        key: 'click $imageList .svg-item',
+        value: function click$imageListSvgItem(e) {
+            var _this2 = this;
+
+            var index = e.$delegateTarget.attr('data-index');
+            var key = e.$delegateTarget.attr('data-key');
+
+            if (index) {
+                this.read('/item/current/layer', function (layer) {
+                    var svg = _this2.read('/svg/get', +index);
+
+                    _this2.setClipPathSvg(layer, svg, function () {
+                        _this2.dispatch('/item/set', layer);
+                    });
+                });
+            } else if (key) {
+
+                this.read('/item/current/layer', function (layer) {
+                    var svg = _this2.read('/svg/get', Number.MAX_SAFE_INTEGER, key);
+
+                    _this2.setClipPathSvg(layer, svg, function () {
+                        _this2.dispatch('/item/set', layer);
+                    });
+                });
+            }
+        }
+    }]);
+    return ClipPathImageResource;
+}(BasePropertyItem);
+
 // import BackgroundRepeat from "./BackgroundRepeat";
 var items = {
+    ClipPath: ClipPath,
+    ClipPathImageResource: ClipPathImageResource,
     ImageListView: ImageListView,
     PageLayout: PageLayout,
     ImageResource: ImageResource,
@@ -14897,7 +15075,7 @@ var LayerView = function (_UIElement) {
     createClass(LayerView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <LayerColorPickerPanel></LayerColorPickerPanel>                \n                <size></size>\n                <radius></radius>                \n                <transform></transform>\n                <transform3d></transform3d>                \n                <BlendList></BlendList>\n                <MixBlendList></MixBlendList>\n                <FilterList></FilterList>                \n\n            </div> \n        ";
+            return "\n            <div class='property-view'>\n                <Name></Name>                \n                <BackgroundColor></BackgroundColor> \n                <LayerColorPickerPanel></LayerColorPickerPanel>                \n                <ClipPath></ClipPath>                 \n                <ClipPathImageResource></ClipPathImageResource>\n                <size></size>\n                <radius></radius>                \n                <transform></transform>\n                <transform3d></transform3d>                \n                <BlendList></BlendList>\n                <MixBlendList></MixBlendList>\n                <FilterList></FilterList>                \n\n            </div> \n        ";
         }
     }, {
         key: "components",

@@ -1,4 +1,6 @@
 import BaseModule from "../../colorpicker/BaseModule";
+import { parseParamNumber } from "../../util/filter/functions";
+import Dom from "../../util/Dom";
 
 const filterInfo = {
 
@@ -109,8 +111,6 @@ export default class LayerManager extends BaseModule {
     '*/layer/toImageCSS' ($store, layer, isExport = false) {    
         var results = {}
         $store.read('/item/each/children', layer.id, (item)  => {
-
-            if (item.isClipPath) return;
             var css = $store.read('/image/toCSS', item, isExport);
 
             Object.keys(css).forEach(key => {
@@ -202,13 +202,23 @@ export default class LayerManager extends BaseModule {
     }
 
     '*/layer/toStringClipPath' ($store, layer) {
-        var image = $store.read('/layer/getClipPath', layer);
+        
+        if (!layer.clipPathSvg) return ''; 
 
-        if (image) {
-            return image.clipPathSvg;
+        let transform = '';
+
+        if (layer.fitClipPathSize) {
+            const widthScale = parseParamNumber(layer.style.width) / layer.clipPathSvgWidth;
+            const heightScale = parseParamNumber(layer.style.height) / layer.clipPathSvgHeight;
+    
+            transform = `scale(${widthScale} ${heightScale})`    
         }
 
-        return '' 
+        var $div = new Dom ('div');
+        var paths = $div.html(layer.clipPathSvg).$('svg').html();
+        var svg = `<svg height="0" width="0"><defs><clipPath id="clippath-${layer.id}" ${transform ? `transform="${transform}"` : ""} >${paths}</clipPath></defs></svg>`
+
+        return svg 
     }
 
     '*/layer/getClipPath' ($store, layer) {
@@ -254,11 +264,8 @@ export default class LayerManager extends BaseModule {
 
         css['transform'] = $store.read('/layer/make/transform', layer)
         css['filter'] = $store.read('/layer/make/filter', layer.filters);
-
-        var clipPathImage = $store.read('/layer/getClipPath', layer);
-
-        if (clipPathImage) {
-            css['clip-path'] = `url(#${clipPathImage.clipPathSvgId})`
+        if (layer.clipPathSvg) {
+            css['clip-path'] = `url(#clippath-${layer.id})`
         }
 
         var results = Object.assign(css, 

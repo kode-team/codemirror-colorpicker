@@ -108,7 +108,6 @@ export default class XDImageEditor extends BaseImageEditor {
         })
         */
 
-
     }
 
     loadStart (isAdd) {

@@ -28,6 +28,10 @@ const LAYER_DEFAULT_OBJECT = {
     mixBlendMode: 'normal',
     selected: true,
     visible: true,
+    clipPathSvg: '',
+    clipPathWidth: '',
+    clipPathHeight: '',
+    fitClipPathSize: false,
     style: {
         x: '0px',
         y: '0px',
