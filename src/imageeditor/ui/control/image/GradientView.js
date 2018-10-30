@@ -11,6 +11,7 @@ import {
 import MoveGuide from '../../view/MoveGuide';
 import SubFeatureControl from '../SubFeatureControl';
 import ColorPickerLayer from '../color/ColorPicker';
+import LayerShapeEditor from '../../view/LayerShapeEditor';
 
 
 export default class GradientView extends BaseTab {
@@ -26,6 +27,7 @@ export default class GradientView extends BaseTab {
                         </div>       
                         <PredefinedPageResizer></PredefinedPageResizer>
                         <PredefinedLayerResizer></PredefinedLayerResizer>                        
+                        <LayerShapeEditor></LayerShapeEditor>
                         <MoveGuide></MoveGuide>                          
                     </div>          
                 </div>
@@ -38,11 +40,12 @@ export default class GradientView extends BaseTab {
 
     components () {
         return {  
-            ColorPickerLayer,
+            ColorPickerLayer, 
             SubFeatureControl,
             MoveGuide,
             PredefinedPageResizer,
-            PredefinedLayerResizer
+            PredefinedLayerResizer, 
+            LayerShapeEditor
         }
     }
 

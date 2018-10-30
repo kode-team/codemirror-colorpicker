@@ -7,6 +7,15 @@ export default class ClipPath extends BasePropertyItem {
                 <div class='title' ref="$title">Clip Image</div>
                 <div class='items'>            
                     <div>
+                        <label>Type</label>
+                        <div >
+                            <select ref="$clipType">
+                                <option value="none">none</option>
+                                <option value="circle">circle</option>
+                            </select>
+                        </div>
+                    </div>                                
+                    <div>
                         <label>Fit Size</label>
                         <div >
                             <input type="checkbox" ref="$fit" /> fit to layer
@@ -45,6 +54,13 @@ export default class ClipPath extends BasePropertyItem {
     'click $fit' () {
         this.read('/item/current/layer', (layer) => {
             layer.fitClipPathSize = this.refs.$fit.el.checked;
+            this.dispatch('/item/set', layer);
+        })
+    }
+
+    'change $clipType' () {
+        this.read('/item/current/layer', (layer) => {
+            layer.clipPathType = this.refs.$clipType.val();
             this.dispatch('/item/set', layer);
         })
     }

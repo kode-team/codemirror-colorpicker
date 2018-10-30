@@ -10100,6 +10100,36 @@ var LayerManager = function (_BaseModule) {
             return $store.read('/css/toString', obj);
         }
     }, {
+        key: '*/layer/make/clip-path',
+        value: function layerMakeClipPath($store, layer) {
+
+            if (layer.clipPathType == 'circle') {
+
+                console.log(layer);
+
+                if (!layer.clipPathCenter) return;
+                if (!layer.clipPathRadius) return;
+
+                var width = parseParamNumber$1(layer.style.width);
+                var height = parseParamNumber$1(layer.style.height);
+
+                var placeCenter = [Math.floor(layer.clipPathCenter[0] / width * 100) + '%', // centerX 
+                Math.floor(layer.clipPathCenter[1] / height * 100) + '%' // centerY
+                ];
+
+                var radiusSize = Math.sqrt(Math.pow(layer.clipPathRadius[0] - layer.clipPathCenter[0], 2) + Math.pow(layer.clipPathRadius[1] - layer.clipPathCenter[1], 2));
+
+                var dist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+                var radiusPercent = Math.floor(radiusSize / dist * 100) + '%';
+
+                return "circle(" + radiusPercent + " at " + placeCenter.join(' ') + ")";
+            } else {
+                if (layer.clipPathSvg) {
+                    return "url(#clippath-" + layer.id + ")";
+                }
+            }
+        }
+    }, {
         key: '*/layer/make/filter',
         value: function layerMakeFilter($store, filters) {
             var defaultDataObject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -10255,6 +10285,7 @@ var LayerManager = function (_BaseModule) {
         key: '*/layer/toStringClipPath',
         value: function layerToStringClipPath($store, layer) {
 
+            if (['circle'].includes(layer.clipPathType)) return '';
             if (!layer.clipPathSvg) return '';
 
             var transform = '';
@@ -10320,9 +10351,7 @@ var LayerManager = function (_BaseModule) {
 
             css['transform'] = $store.read('/layer/make/transform', layer);
             css['filter'] = $store.read('/layer/make/filter', layer.filters);
-            if (layer.clipPathSvg) {
-                css['clip-path'] = "url(#clippath-" + layer.id + ")";
-            }
+            css['clip-path'] = $store.read('/layer/make/clip-path', layer);
 
             var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport));
 
@@ -14886,7 +14915,7 @@ var ClipPath = function (_BasePropertyItem) {
     createClass(ClipPath, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'title\' ref="$title">Clip Image</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Fit Size</label>\n                        <div >\n                            <input type="checkbox" ref="$fit" /> fit to layer\n                        </div>\n                    </div>                \n                    <div>\n                        <label>Clip</label>\n                        <div style=\'cursor:pointer;width: 50px;height:50px;\' ref="$clippath" title="Click me!!">\n\n                        </div>\n                    </div>\n                    \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'title\' ref="$title">Clip Image</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Type</label>\n                        <div >\n                            <select ref="$clipType">\n                                <option value="none">none</option>\n                                <option value="circle">circle</option>\n                            </select>\n                        </div>\n                    </div>                                \n                    <div>\n                        <label>Fit Size</label>\n                        <div >\n                            <input type="checkbox" ref="$fit" /> fit to layer\n                        </div>\n                    </div>                \n                    <div>\n                        <label>Clip</label>\n                        <div style=\'cursor:pointer;width: 50px;height:50px;\' ref="$clippath" title="Click me!!">\n\n                        </div>\n                    </div>\n                    \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -14919,6 +14948,16 @@ var ClipPath = function (_BasePropertyItem) {
             this.read('/item/current/layer', function (layer) {
                 layer.fitClipPathSize = _this3.refs.$fit.el.checked;
                 _this3.dispatch('/item/set', layer);
+            });
+        }
+    }, {
+        key: 'change $clipType',
+        value: function change$clipType() {
+            var _this4 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                layer.clipPathType = _this4.refs.$clipType.val();
+                _this4.dispatch('/item/set', layer);
             });
         }
     }]);
@@ -14968,6 +15007,7 @@ var ClipPathImageResource = function (_BasePropertyItem) {
         key: "setClipPathSvg",
         value: function setClipPathSvg(layer, svg, callback) {
 
+            layer.clipPathType = 'svg';
             layer.clipPathSvg = svg;
 
             var $temp = new Dom('div');
@@ -15723,7 +15763,7 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div>\n        ';
+            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div> \n        ';
         }
     }, {
         key: 'refresh',
@@ -16744,6 +16784,245 @@ var SubFeatureControl = function (_UIElement) {
     return SubFeatureControl;
 }(UIElement);
 
+var CircleEditor = function (_UIElement) {
+    inherits(CircleEditor, _UIElement);
+
+    function CircleEditor() {
+        classCallCheck(this, CircleEditor);
+        return possibleConstructorReturn(this, (CircleEditor.__proto__ || Object.getPrototypeOf(CircleEditor)).apply(this, arguments));
+    }
+
+    createClass(CircleEditor, [{
+        key: "template",
+        value: function template() {
+            return "\n            <div class='layer-shape-circle-editor'>\n                <div class=\"drag-item center\" data-type=\"center\" ref=\"$center\"></div>\n                <div class=\"drag-item radius\" data-type=\"radius\" ref=\"$radius\"></div>\n            </div>\n        ";
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            var isShow = this.isShow();
+
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.refreshPointer();
+            }
+        }
+    }, {
+        key: "refreshPointer",
+        value: function refreshPointer() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (layer) {
+
+                if (!layer.clipPathType) return;
+                if (!layer.clipPathCenter) return;
+                if (!layer.clipPathRadius) return;
+
+                var _layer$clipPathCenter = slicedToArray(layer.clipPathCenter, 2),
+                    x = _layer$clipPathCenter[0],
+                    y = _layer$clipPathCenter[1];
+
+                _this2.refs.$center.px('left', x);
+                _this2.refs.$center.px('top', y);
+
+                var _layer$clipPathRadius = slicedToArray(layer.clipPathRadius, 2),
+                    x = _layer$clipPathRadius[0],
+                    y = _layer$clipPathRadius[1];
+
+                _this2.refs.$radius.px('left', x);
+                _this2.refs.$radius.px('top', y);
+            });
+        }
+    }, {
+        key: "isShow",
+        value: function isShow() {
+            var item = this.read('/item/current/layer');
+
+            if (!item) return false;
+
+            return item.clipPathType == 'circle';
+        }
+    }, {
+        key: "getRectangle",
+        value: function getRectangle() {
+            var width = this.$el.width();
+            var height = this.$el.height();
+            var minX = this.$el.offsetLeft();
+            var minY = this.$el.offsetTop();
+
+            var maxX = minX + width;
+            var maxY = minY + height;
+
+            return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, width: width, height: height };
+        }
+    }, {
+        key: "refreshUI",
+        value: function refreshUI(e) {
+            var _getRectangle = this.getRectangle(),
+                minX = _getRectangle.minX,
+                minY = _getRectangle.minY,
+                maxX = _getRectangle.maxX,
+                maxY = _getRectangle.maxY,
+                width = _getRectangle.width,
+                height = _getRectangle.height;
+
+            var _e$xy = e.xy,
+                x = _e$xy.x,
+                y = _e$xy.y;
+
+
+            x = Math.max(Math.min(maxX, x), minX);
+            y = Math.max(Math.min(maxY, y), minY);
+
+            var left = x - minX;
+            var top = y - minY;
+
+            this.refs['$' + this.currentType].px('left', left);
+            this.refs['$' + this.currentType].px('top', top);
+
+            if (e) {
+
+                this[this.currentType + "pos"] = [left, top];
+
+                this.updateClipPath();
+            }
+        }
+    }, {
+        key: "updateClipPath",
+        value: function updateClipPath() {
+            var radius = this.radiuspos || [0, 0];
+            var center = this.centerpos || [0, 0];
+
+            var item = this.layer;
+            item.clipPathType = 'circle';
+            item.clipPathCenter = center;
+            item.clipPathRadius = radius;
+
+            this.dispatch('/item/set', item);
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+
+        // Event Bindings 
+
+    }, {
+        key: 'pointerend document',
+        value: function pointerendDocument(e) {
+            this.isDown = false;
+        }
+    }, {
+        key: 'pointermove document',
+        value: function pointermoveDocument(e) {
+            if (this.isDown) {
+                this.refreshUI(e);
+            }
+        }
+    }, {
+        key: 'pointerstart $el .drag-item',
+        value: function pointerstart$elDragItem(e) {
+            e.preventDefault();
+            this.currentType = e.$delegateTarget.attr('data-type');
+            this.isDown = true;
+        }
+    }, {
+        key: 'pointerstart $el',
+        value: function pointerstart$el(e) {
+            this.isDown = true;
+            this.layer = this.read('/item/current/layer');
+            // this.refreshUI(e);        
+        }
+    }]);
+    return CircleEditor;
+}(UIElement);
+
+var shapeEditor = {
+    CircleEditor: CircleEditor
+};
+
+var LayerShapeEditor = function (_UIElement) {
+    inherits(LayerShapeEditor, _UIElement);
+
+    function LayerShapeEditor() {
+        classCallCheck(this, LayerShapeEditor);
+        return possibleConstructorReturn(this, (LayerShapeEditor.__proto__ || Object.getPrototypeOf(LayerShapeEditor)).apply(this, arguments));
+    }
+
+    createClass(LayerShapeEditor, [{
+        key: 'initialize',
+        value: function initialize() {
+            get(LayerShapeEditor.prototype.__proto__ || Object.getPrototypeOf(LayerShapeEditor.prototype), 'initialize', this).call(this);
+
+            this.$board = this.parent.refs.$board;
+            this.$page = this.parent.refs.$page;
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return shapeEditor;
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return '\n            <div class="layer-shape-editor">\n                <CircleEditor></CircleEditor>\n                <RectEditor></RectEditor>\n                <PolygonEditor></PolygonEditor>\n                <PathEditor></PathEditor>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var isShow = this.isShow();
+            this.$el.toggle(isShow);
+
+            if (isShow) {
+                this.setPosition();
+            }
+        }
+    }, {
+        key: 'setPosition',
+        value: function setPosition() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return;
+
+            var style = layer.style;
+
+            var width = style.width;
+            var height = style.height;
+            var x = style.x;
+            var y = style.y;
+
+            var boardOffset = this.$board.offset();
+            var pageOffset = this.$page.offset();
+
+            x = parseParamNumber$1(x, function (x) {
+                return x + pageOffset.left - boardOffset.left;
+            }) + 'px';
+            y = parseParamNumber$1(y, function (y) {
+                return y + pageOffset.top - boardOffset.top;
+            }) + 'px';
+
+            this.$el.css({
+                width: width, height: height,
+                left: x, top: y,
+                transform: this.read('/layer/make/transform', layer)
+            });
+        }
+    }, {
+        key: 'isShow',
+        value: function isShow() {
+            return !this.read('/item/is/mode', 'page');
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }]);
+    return LayerShapeEditor;
+}(UIElement);
+
 var GradientView = function (_BaseTab) {
     inherits(GradientView, _BaseTab);
 
@@ -16755,7 +17034,7 @@ var GradientView = function (_BaseTab) {
     createClass(GradientView, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n \n                <!--<ColorPickerLayer></ColorPickerLayer>-->\n                <SubFeatureControl></SubFeatureControl>\n            </div>\n        ';
+            return '\n            <div class=\'page-view\'>\n                <div class=\'page-content\' ref="$board">\n                    <div class="page-canvas">\n                        <div class="gradient-color-view-container" ref="$page">\n                            <div class="gradient-color-view" ref="$colorview"></div>            \n\n                        </div>       \n                        <PredefinedPageResizer></PredefinedPageResizer>\n                        <PredefinedLayerResizer></PredefinedLayerResizer>                        \n                        <LayerShapeEditor></LayerShapeEditor>\n                        <MoveGuide></MoveGuide>                          \n                    </div>          \n                </div>\n \n                <!--<ColorPickerLayer></ColorPickerLayer>-->\n                <SubFeatureControl></SubFeatureControl>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -16765,7 +17044,8 @@ var GradientView = function (_BaseTab) {
                 SubFeatureControl: SubFeatureControl,
                 MoveGuide: MoveGuide,
                 PredefinedPageResizer: PredefinedPageResizer,
-                PredefinedLayerResizer: PredefinedLayerResizer
+                PredefinedLayerResizer: PredefinedLayerResizer,
+                LayerShapeEditor: LayerShapeEditor
             };
         }
     }, {

@@ -2740,6 +2740,47 @@
           right: -6px;
           -webkit-transform: translateX(50%);
                   transform: translateX(50%); }
+    .imageeditor .page-view .layer-shape-editor {
+      text-align: center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10000;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box; }
+      .imageeditor .page-view .layer-shape-editor .layer-shape-circle-editor {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px; }
+        .imageeditor .page-view .layer-shape-editor .layer-shape-circle-editor .center {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-transform: translateX(-50%) translateY(-50%);
+                  transform: translateX(-50%) translateY(-50%);
+          background-color: rgba(255, 0, 0, 0.8);
+          pointer-events: all;
+          cursor: pointer;
+          border: 2px solid white; }
+        .imageeditor .page-view .layer-shape-editor .layer-shape-circle-editor .radius {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -webkit-transform: translateX(-50%) translateY(-50%);
+                  transform: translateX(-50%) translateY(-50%);
+          background-color: rgba(0, 128, 0, 0.8);
+          pointer-events: all;
+          cursor: pointer;
+          border: 2px solid white; }
     .imageeditor .page-view .move-guide {
       position: absolute;
       left: 0px;

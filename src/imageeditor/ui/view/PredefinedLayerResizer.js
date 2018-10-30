@@ -45,9 +45,9 @@ export default class PredefinedLayerResizer extends UIElement {
 
                 <div class="guide-horizontal"></div>
                 <div class="guide-vertical"></div>
-            </div>
+            </div> 
         `
-    }
+    } 
 
     refresh () {
         var isShow = this.isShow();

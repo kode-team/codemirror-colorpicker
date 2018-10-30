@@ -38,6 +38,7 @@ export default class ClipPathImageResource extends BasePropertyItem {
 
     setClipPathSvg (layer, svg, callback) {
 
+        layer.clipPathType = 'svg';
         layer.clipPathSvg = svg; 
 
         var $temp = new Dom('div')

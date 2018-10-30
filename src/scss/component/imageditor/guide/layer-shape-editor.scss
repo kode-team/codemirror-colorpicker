@@ -1,0 +1,46 @@
+
+.layer-shape-editor {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+    box-sizing: border-box;      
+    // border: 1px solid black; 
+    
+
+    .layer-shape-circle-editor {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+
+        .center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-sizing: border-box;
+            transform: translateX(-50%) translateY(-50%);
+            background-color: rgba(red, 0.8); 
+            pointer-events: all;
+            cursor: pointer;       
+            border: 2px solid white;     
+        }
+
+        .radius {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-sizing: border-box;            
+            transform: translateX(-50%) translateY(-50%);
+            background-color: rgba(green, 0.8); 
+            pointer-events: all;
+            cursor: pointer;
+            border: 2px solid white;            
+        }        
+    }
+}      

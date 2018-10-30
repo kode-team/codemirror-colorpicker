@@ -79,4 +79,4 @@ export default class PageList extends UIElement {
         this.run('/storage/save');
     }
 
-}
+} 
