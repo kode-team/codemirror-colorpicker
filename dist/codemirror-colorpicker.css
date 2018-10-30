@@ -3013,7 +3013,8 @@
       padding: 0px;
       border-bottom: 1px solid #ececec;
       font-size: 12px;
-      overflow: hidden; }
+      overflow: hidden;
+      margin-bottom: 2px; }
       .imageeditor .property-view .property-item > .title {
         font-size: 12px;
         font-weight: bold;

@@ -77,10 +77,12 @@ export default class LayerManager extends BaseModule {
             ]
     
             var radiusSize = Math.sqrt(
-                Math.pow(layer.clipPathRadius[0] - layer.clipPathCenter[0], 2)  + Math.pow(layer.clipPathRadius[1] - layer.clipPathCenter[1], 2)
-            )
+                Math.pow(layer.clipPathRadius[0] - layer.clipPathCenter[0], 2)  
+                + 
+                Math.pow(layer.clipPathRadius[1] - layer.clipPathCenter[1], 2)
+            )/Math.sqrt(2);
     
-            var dist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+            var dist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))/Math.sqrt(2)
             var radiusPercent = Math.floor(radiusSize / dist * 100) + '%';  
     
             return `circle(${radiusPercent} at ${placeCenter.join(' ')})`;

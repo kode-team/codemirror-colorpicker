@@ -10,20 +10,23 @@ export default class ClipPath extends BasePropertyItem {
                         <label>Type</label>
                         <div >
                             <select ref="$clipType">
-                                <option value="none">none</option>
-                                <option value="circle">circle</option>
+                                <option value="">none</option>
+                                <!-- <option value="circle">circle</option>-->
+                                <!-- <option value="inset">inset</option> -->
+                                <!-- <option value="polygon">polygon</option> -->
+                                <option value="svg">svg</option>
                             </select>
                         </div>
                     </div>                                
                     <div>
                         <label>Fit Size</label>
                         <div >
-                            <input type="checkbox" ref="$fit" /> fit to layer
+                            <label><input type="checkbox" ref="$fit" /> fit to layer</label>
                         </div>
                     </div>                
                     <div>
                         <label>Clip</label>
-                        <div style='cursor:pointer;width: 50px;height:50px;' ref="$clippath" title="Click me!!">
+                        <div style='cursor:pointer;width: 50px;height:50px;' ref="$clipPath" title="Click me!!">
 
                         </div>
                     </div>
@@ -40,14 +43,15 @@ export default class ClipPath extends BasePropertyItem {
     refresh() {
         this.read('/item/current/layer', (layer) => {
             if (layer.clipPathSvg) {
-                this.refs.$clippath.html(layer.clipPathSvg)
+                this.refs.$clipPath.html(layer.clipPathSvg)
             }
 
             this.refs.$fit.el.checked = !!layer.fitClipPathSize
+            this.refs.$clipType.val(layer.clipPathType);
         });
     }
 
-    'click $clippath' () {
+    'click $clipPath' () {
         this.emit('toggleClipPathImageResource')
     }
 

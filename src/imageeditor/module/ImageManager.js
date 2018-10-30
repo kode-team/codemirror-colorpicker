@@ -97,22 +97,10 @@ export default class ImageManager extends BaseModule {
                         url = URL.createObjectURL(file)
                     }
 
-                    if (svg) {
-                        $store.read('/svg/get/clipPath', svg, (clipPathSvg, clipPathSvgId) => {
-                            callback ({
-                                clipPathSvgId,
-                                clipPathSvg, 
-                                datauri: image.src,                 // export 용 
-                                url     // 화면 제어용 
-                            })
-                        });
-                    } else {
-                        callback ({
-                            datauri: image.src,                 // export 용 
-                            url     // 화면 제어용 
-                        })
-    
-                    }
+                    callback ({
+                        datauri: image.src,                 // export 용 
+                        url     // 화면 제어용 
+                    })
                 })
             }
         });

@@ -9628,21 +9628,10 @@ var ImageManager = function (_BaseModule) {
                             url = URL.createObjectURL(file);
                         }
 
-                        if (svg) {
-                            $store.read('/svg/get/clipPath', svg, function (clipPathSvg, clipPathSvgId) {
-                                callback({
-                                    clipPathSvgId: clipPathSvgId,
-                                    clipPathSvg: clipPathSvg,
-                                    datauri: image$$1.src, // export 용 
-                                    url: url // 화면 제어용 
-                                });
-                            });
-                        } else {
-                            callback({
-                                datauri: image$$1.src, // export 용 
-                                url: url // 화면 제어용 
-                            });
-                        }
+                        callback({
+                            datauri: image$$1.src, // export 용 
+                            url: url // 화면 제어용 
+                        });
                     });
                 }
             });
@@ -9972,8 +9961,6 @@ var LayerManager = function (_BaseModule) {
 
             if (layer.clipPathType == 'circle') {
 
-                console.log(layer);
-
                 if (!layer.clipPathCenter) return;
                 if (!layer.clipPathRadius) return;
 
@@ -9984,9 +9971,9 @@ var LayerManager = function (_BaseModule) {
                 Math.floor(layer.clipPathCenter[1] / height * 100) + '%' // centerY
                 ];
 
-                var radiusSize = Math.sqrt(Math.pow(layer.clipPathRadius[0] - layer.clipPathCenter[0], 2) + Math.pow(layer.clipPathRadius[1] - layer.clipPathCenter[1], 2));
+                var radiusSize = Math.sqrt(Math.pow(layer.clipPathRadius[0] - layer.clipPathCenter[0], 2) + Math.pow(layer.clipPathRadius[1] - layer.clipPathCenter[1], 2)) / Math.sqrt(2);
 
-                var dist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+                var dist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / Math.sqrt(2);
                 var radiusPercent = Math.floor(radiusSize / dist * 100) + '%';
 
                 return "circle(" + radiusPercent + " at " + placeCenter.join(' ') + ")";
@@ -13245,13 +13232,11 @@ var ColorPickerLayer = function (_UIElement) {
         value: function changeColor(color) {
             var _this3 = this;
 
-            console.log(color);
             var item = this.read('/item/current');
 
             if (!item) return;
 
             if (this.read('/item/is/mode', 'layer')) {
-                console.log(color);
                 item.style['background-color'] = color;
                 this.dispatch('/item/set', item);
             } else if (this.read('/item/is/mode', 'image')) {
@@ -14782,7 +14767,7 @@ var ClipPath = function (_BasePropertyItem) {
     createClass(ClipPath, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'title\' ref="$title">Clip Image</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Type</label>\n                        <div >\n                            <select ref="$clipType">\n                                <option value="none">none</option>\n                                <option value="circle">circle</option>\n                            </select>\n                        </div>\n                    </div>                                \n                    <div>\n                        <label>Fit Size</label>\n                        <div >\n                            <input type="checkbox" ref="$fit" /> fit to layer\n                        </div>\n                    </div>                \n                    <div>\n                        <label>Clip</label>\n                        <div style=\'cursor:pointer;width: 50px;height:50px;\' ref="$clippath" title="Click me!!">\n\n                        </div>\n                    </div>\n                    \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item background-color show\'>\n                <div class=\'title\' ref="$title">Clip Image</div>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Type</label>\n                        <div >\n                            <select ref="$clipType">\n                                <option value="">none</option>\n                                <!-- <option value="circle">circle</option>-->\n                                <!-- <option value="inset">inset</option> -->\n                                <!-- <option value="polygon">polygon</option> -->\n                                <option value="svg">svg</option>\n                            </select>\n                        </div>\n                    </div>                                \n                    <div>\n                        <label>Fit Size</label>\n                        <div >\n                            <label><input type="checkbox" ref="$fit" /> fit to layer</label>\n                        </div>\n                    </div>                \n                    <div>\n                        <label>Clip</label>\n                        <div style=\'cursor:pointer;width: 50px;height:50px;\' ref="$clipPath" title="Click me!!">\n\n                        </div>\n                    </div>\n                    \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -14796,15 +14781,16 @@ var ClipPath = function (_BasePropertyItem) {
 
             this.read('/item/current/layer', function (layer) {
                 if (layer.clipPathSvg) {
-                    _this2.refs.$clippath.html(layer.clipPathSvg);
+                    _this2.refs.$clipPath.html(layer.clipPathSvg);
                 }
 
                 _this2.refs.$fit.el.checked = !!layer.fitClipPathSize;
+                _this2.refs.$clipType.val(layer.clipPathType);
             });
         }
     }, {
-        key: 'click $clippath',
-        value: function click$clippath() {
+        key: 'click $clipPath',
+        value: function click$clipPath() {
             this.emit('toggleClipPathImageResource');
         }
     }, {
