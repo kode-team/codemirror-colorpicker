@@ -3,7 +3,7 @@ import BasePropertyItem from "./BasePropertyItem";
 export default class ClipPath extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item background-color show'>
+            <div class='property-item clip-path show'>
                 <div class='title' ref="$title">Clip Image</div>
                 <div class='items'>            
                     <div>
@@ -26,7 +26,7 @@ export default class ClipPath extends BasePropertyItem {
                     </div>                
                     <div>
                         <label>Clip</label>
-                        <div style='cursor:pointer;width: 50px;height:50px;' ref="$clipPath" title="Click me!!">
+                        <div class='clip-path-container' ref="$clipPath" title="Click me!!">
 
                         </div>
                     </div>
