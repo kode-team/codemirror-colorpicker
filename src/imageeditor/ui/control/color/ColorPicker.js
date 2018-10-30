@@ -27,13 +27,11 @@ export default class ColorPickerLayer extends UIElement {
     }
 
     changeColor (color) {
-        console.log(color);
         var item = this.read('/item/current')
 
         if (!item) return; 
 
         if (this.read('/item/is/mode', 'layer')) {
-            console.log(color);
             item.style['background-color'] = color; 
             this.dispatch('/item/set', item)
         } else if (this.read('/item/is/mode', 'image')) {

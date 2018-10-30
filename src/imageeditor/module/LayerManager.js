@@ -64,8 +64,6 @@ export default class LayerManager extends BaseModule {
 
         if (layer.clipPathType == 'circle') {
 
-            console.log(layer);
-
             if (!layer.clipPathCenter) return ;
             if (!layer.clipPathRadius) return ;
 

@@ -10105,8 +10105,6 @@ var LayerManager = function (_BaseModule) {
 
             if (layer.clipPathType == 'circle') {
 
-                console.log(layer);
-
                 if (!layer.clipPathCenter) return;
                 if (!layer.clipPathRadius) return;
 
@@ -13378,13 +13376,11 @@ var ColorPickerLayer = function (_UIElement) {
         value: function changeColor(color) {
             var _this3 = this;
 
-            console.log(color);
             var item = this.read('/item/current');
 
             if (!item) return;
 
             if (this.read('/item/is/mode', 'layer')) {
-                console.log(color);
                 item.style['background-color'] = color;
                 this.dispatch('/item/set', item);
             } else if (this.read('/item/is/mode', 'image')) {

@@ -22,8 +22,6 @@ export default class PageManager extends BaseModule {
             realCSS[key] = css[key]
         })
 
-        console.log(realCSS);
-
         return realCSS; 
     }
 

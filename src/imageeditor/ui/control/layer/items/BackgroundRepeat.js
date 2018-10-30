@@ -27,7 +27,6 @@ export default class BackgroundRepeat extends BasePropertyItem {
     'change $repeat' () {
         this.read('/item/current/image', (image) => {
             image.backgroundRepeat = this.refs.$repeat.val()
-            console.log(image);
             this.dispatch('/item/set', image);
         })
     }
