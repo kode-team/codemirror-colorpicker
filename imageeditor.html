@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="./addon/codemirror-colorpicker.css" />
     <script type="text/javascript" src="./addon/codemirror-colorpicker.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>    
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <style type="text/css">
     html, body {
@@ -35,11 +36,18 @@
     picker.loadStart(true);
 
 
-    var icons = Object.keys(feather.icons).map(key => {
-        return { key: key, svg: feather.icons[key].toSvg() }        
+    var icon_url = "https://cdn.jsdelivr.net/npm/material-design-icons-svg@2.0.0/paths.json";
+
+    axios.get(icon_url).then(function (response) {
+        var icons = Object.keys(response.data).map(key => {
+            return { key: key, svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="' + response.data[key] + '" /></svg>' }            
+        })
+
+        picker.dispatch('/svg/list/load', icons);
+
     });
 
-    picker.dispatch('/svg/list/load', icons);
+    
 
 </script>
 
