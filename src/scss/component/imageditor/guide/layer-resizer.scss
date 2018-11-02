@@ -49,7 +49,19 @@
             box-sizing: border-box;
             width: $editor-resizer-width;
             height: $editor-resizer-width;
-            border-radius: 50%;             
+            border-radius: 50%;     
+            
+
+            &.active {
+                &:after {
+                    position: absolute;
+                    bottom: -20px;
+                    display: inline-block;
+                    content: attr(data-position);
+                    transform: translateX(-50%);
+                }
+    
+            }
 
             /* linear */
             &[data-value='to top'] {

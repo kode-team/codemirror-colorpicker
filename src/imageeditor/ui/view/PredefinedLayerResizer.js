@@ -32,7 +32,7 @@ export default class PredefinedLayerResizer extends UIElement {
                     <button type="button" data-value="to top right"></button>
                     <button type="button" data-value="to bottom right"></button>
                     <button type="button" data-value="to bottom left"></button>
-                    <button type="button" data-value="to top left"></button>
+                    <button type="button" data-value="to top left" data-position="aaa"></button>
                 </div>
 
                 <Radius></Radius>
@@ -200,8 +200,38 @@ export default class PredefinedLayerResizer extends UIElement {
 
         item = this.caculateSnap(item)
 
+        this.caculateActiveButtonPosition(item);
+
         this.dispatch('/item/set', item);
         this.setPosition();
+    }
+
+    caculateActiveButtonPosition (item) {
+
+        var value = this.activeButton.attr('data-value')
+        var position = [] 
+        var x = parseParamNumber(item.style.x), y = parseParamNumber(item.style.y);
+        var width = parseParamNumber(item.style.width), height = parseParamNumber(item.style.height);
+
+        if (value == 'to right') {
+            position = [x + width, y + Math.floor(height/2)]
+        } else if (value == 'to bottom') {
+            position = [x + Math.floor(width/2), y + height]
+        } else if (value == 'to top') {
+            position = [x + Math.floor(width/2), y]
+        } else if (value == 'to left') {
+            position = [x, y + Math.floor(height/2)]
+        } else if (value == 'to top left') {
+            position = [x, y]
+        } else if (value == 'to top right') {
+            position = [x + width, y]
+        } else if (value == 'to bottom left') {
+            position = [x, y + height]
+        } else if (value == 'to bottom right') {
+            position = [x + width, y + height]
+        }
+
+        this.activeButton.attr('data-position', position.join(','))
     }
 
 
@@ -290,6 +320,8 @@ export default class PredefinedLayerResizer extends UIElement {
         var layer = this.read('/item/current/layer')
         if (!layer) return; 
 
+        this.activeButton = e.$delegateTarget;
+        this.activeButton.addClass('active');
         var type = e.$delegateTarget.attr('data-value');
         this.currentType = type; 
         this.xy = e.xy;
@@ -312,6 +344,9 @@ export default class PredefinedLayerResizer extends UIElement {
     }
 
     'pointerend document' (e) {
+        if (this.activeButton) {
+            this.activeButton.removeClass('active')
+        }
         this.currentType = null; 
         this.xy = null 
         this.moveX = null;

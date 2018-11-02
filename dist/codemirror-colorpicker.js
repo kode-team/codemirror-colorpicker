@@ -15799,7 +15799,7 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div> \n        ';
+            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left" data-position="aaa"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div> \n        ';
         }
     }, {
         key: 'refresh',
@@ -15983,8 +15983,41 @@ var PredefinedLayerResizer = function (_UIElement) {
 
             item = this.caculateSnap(item);
 
+            this.caculateActiveButtonPosition(item);
+
             this.dispatch('/item/set', item);
             this.setPosition();
+        }
+    }, {
+        key: 'caculateActiveButtonPosition',
+        value: function caculateActiveButtonPosition(item) {
+
+            var value = this.activeButton.attr('data-value');
+            var position = [];
+            var x = parseParamNumber$1(item.style.x),
+                y = parseParamNumber$1(item.style.y);
+            var width = parseParamNumber$1(item.style.width),
+                height = parseParamNumber$1(item.style.height);
+
+            if (value == 'to right') {
+                position = [x + width, y + Math.floor(height / 2)];
+            } else if (value == 'to bottom') {
+                position = [x + Math.floor(width / 2), y + height];
+            } else if (value == 'to top') {
+                position = [x + Math.floor(width / 2), y];
+            } else if (value == 'to left') {
+                position = [x, y + Math.floor(height / 2)];
+            } else if (value == 'to top left') {
+                position = [x, y];
+            } else if (value == 'to top right') {
+                position = [x + width, y];
+            } else if (value == 'to bottom left') {
+                position = [x, y + height];
+            } else if (value == 'to bottom right') {
+                position = [x + width, y + height];
+            }
+
+            this.activeButton.attr('data-position', position.join(','));
         }
     }, {
         key: 'toRight',
@@ -16078,6 +16111,8 @@ var PredefinedLayerResizer = function (_UIElement) {
             var layer = this.read('/item/current/layer');
             if (!layer) return;
 
+            this.activeButton = e.$delegateTarget;
+            this.activeButton.addClass('active');
             var type = e.$delegateTarget.attr('data-value');
             this.currentType = type;
             this.xy = e.xy;
@@ -16100,6 +16135,9 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'pointerend document',
         value: function pointerendDocument(e) {
+            if (this.activeButton) {
+                this.activeButton.removeClass('active');
+            }
             this.currentType = null;
             this.xy = null;
             this.moveX = null;

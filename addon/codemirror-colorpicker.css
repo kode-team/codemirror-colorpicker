@@ -2668,6 +2668,13 @@
         height: 10px;
         border-radius: 50%;
         /* linear */ }
+        .imageeditor .page-view .predefined-layer-resizer button.active:after {
+          position: absolute;
+          bottom: -20px;
+          display: inline-block;
+          content: attr(data-position);
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%); }
         .imageeditor .page-view .predefined-layer-resizer button[data-value='to top'] {
           top: -6px;
           left: 50%;
