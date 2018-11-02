@@ -29,6 +29,30 @@
                 }
 
             }
+
+            &.small-mode {
+                .small {
+                    background: white;
+                    border: 1px solid #333;
+                }
+
+                .large {
+                    border-left: 0px;
+                }
+
+            }
+
+            &.large-mode {
+                .large {
+                    background: white;
+                    border: 1px solid #333;
+                }
+
+                .small {
+                    border-right: 0px;
+                }
+
+            }            
         }
         
     }

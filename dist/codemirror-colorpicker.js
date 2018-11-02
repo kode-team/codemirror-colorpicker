@@ -15056,8 +15056,58 @@ var ClipPathImageResource = function (_BasePropertyItem) {
     return ClipPathImageResource;
 }(BasePropertyItem);
 
+var PanelLayout = function (_UIElement) {
+    inherits(PanelLayout, _UIElement);
+
+    function PanelLayout() {
+        classCallCheck(this, PanelLayout);
+        return possibleConstructorReturn(this, (PanelLayout.__proto__ || Object.getPrototypeOf(PanelLayout)).apply(this, arguments));
+    }
+
+    createClass(PanelLayout, [{
+        key: 'template',
+        value: function template() {
+            return '\n            <div class=\'property-item layout\'>\n                <div class=\'items\'>\n                    <div>\n                        <div class=\'layout-buttons\' ref="$buttons">\n                            <button type="button" class=\'small\' ref="$small">S</button>\n                            <button type="button" class=\'large\' ref="$large">L</button>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.refs.$buttons.removeClass('small-mode').removeClass('large-mode');
+
+            var mode = this.read('/storage/get', 'panel') || 'large';
+            this.refs.$buttons.addClass(mode + '-mode');
+        }
+    }, {
+        key: '@changeEditor',
+        value: function changeEditor() {
+            this.refresh();
+        }
+    }, {
+        key: '@changeStorage',
+        value: function changeStorage() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $small',
+        value: function click$small(e) {
+            this.emit('updatePanelLayout', 'small');
+            this.dispatch('/storage/set', 'panel', 'small');
+            this.refresh();
+        }
+    }, {
+        key: 'click $large',
+        value: function click$large(e) {
+            this.emit('updatePanelLayout', 'large');
+            this.dispatch('/storage/set', 'panel', 'large');
+            this.refresh();
+        }
+    }]);
+    return PanelLayout;
+}(UIElement);
+
 // import BackgroundRepeat from "./BackgroundRepeat";
 var items = {
+    // PanelLayout,
     ClipPath: ClipPath,
     ClipPathImageResource: ClipPathImageResource,
     ImageListView: ImageListView,
@@ -17389,7 +17439,7 @@ var PropertyView = function (_UIElement) {
     createClass(PropertyView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view inline'>\n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n                <PageExport></PageExport>\n                <PageLayout></PageLayout>\n            </div>\n        ";
+            return "\n            <div class='property-view inline'>\n                <PanelLayout></PanelLayout>            \n                <PageName></PageName>\n                <PageSize></PageSize>\n                <clip></clip>\n                <PageExport></PageExport>\n                <PageLayout></PageLayout>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -17694,6 +17744,7 @@ bezierList.forEach(function (arr) {
 });
 
 var screenModes = ['expertor', 'beginner'];
+var panelModes = ['small', 'large'];
 
 var XDImageEditor = function (_BaseImageEditor) {
     inherits(XDImageEditor, _BaseImageEditor);
@@ -17793,6 +17844,19 @@ var XDImageEditor = function (_BaseImageEditor) {
                 return key != layout;
             }).forEach(function (key) {
                 _this3.refs.$layoutMain.removeClass(key + '-mode');
+            });
+
+            this.refs.$layoutMain.addClass(layout + '-mode');
+        }
+    }, {
+        key: '@updatePanelLayout',
+        value: function updatePanelLayout(layout) {
+            var _this4 = this;
+
+            panelModes.filter(function (key) {
+                return key != layout;
+            }).forEach(function (key) {
+                _this4.refs.$layoutMain.removeClass(key + '-mode');
             });
 
             this.refs.$layoutMain.addClass(layout + '-mode');

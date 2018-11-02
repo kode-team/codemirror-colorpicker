@@ -27,8 +27,10 @@ import PageLayout from "./PageLayout";
 import ImageListView from "./ImageListView";
 import ClipPath from "./ClipPath";
 import ClipPathImageResource from "./ClipPathImageResource";
+import PanelLayout from "./PanelLayout";
 
 export default {
+    // PanelLayout,
     ClipPath,
     ClipPathImageResource,    
     ImageListView,

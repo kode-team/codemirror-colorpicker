@@ -5,6 +5,7 @@ $pointer-color: rgba(#ececec, 0.8);
 $gutter: 8px;
 $tool-size: 40px;
 $left-size: 250px;
+$toggle-left-size: 80px;
 $right-size: 250px;
 $timeline-header-size: 30px;
 $timeline-size: 300px;
@@ -35,9 +36,12 @@ $show-timeline-animation: all 0.15s linear;
 
     &.expertor-mode {
         .layout-left {
+            top: 60px;            
+            width: $left-size - 50px;
             border-right: 1px solid $border-color;
         }
         .layout-right {
+            top: 0px;
             right: 0px;
             width: $right-size;
             left: auto;
@@ -45,10 +49,28 @@ $show-timeline-animation: all 0.15s linear;
         } 
         
         .layout-body {
-            left: $left-size;
+            top: 60px;
+            left: $left-size - 50px; 
             right: $right-size;
         }
+
+        .layout-top {
+            right: $right-size;
+            height: 30px;
+            top: 30px;
+        }
+
+        .layout-header {
+            height: 30px;
+            right: $right-size;
+
+            .header-title {
+                font-size: 20px;
+            }
+        }
     }
+
+
 
     .layout-top {
         position: absolute;
@@ -67,7 +89,7 @@ $show-timeline-animation: all 0.15s linear;
         left: $left-size;
         width: $left-size;
         top: $tool-size * 2;
-        bottom: $timeline-header-size;
+        bottom: 0px;
         overflow: auto;
         box-sizing: border-box;
         border-right: 1px solid $border-color;
@@ -80,7 +102,7 @@ $show-timeline-animation: all 0.15s linear;
         left: 0px;
         width: $left-size;
         top: $tool-size * 2;
-        bottom: $timeline-header-size;
+        bottom: 0px;
         box-sizing: border-box;
         transition: $show-timeline-animation;
     }    
@@ -90,7 +112,7 @@ $show-timeline-animation: all 0.15s linear;
         left: $left-size * 2;
         right: 0px;
         top: $tool-size * 2;  
-        bottom: $timeline-header-size;
+        bottom: 0px;
         transition: $show-timeline-animation;        
     }
 
@@ -139,7 +161,7 @@ $show-timeline-animation: all 0.15s linear;
         position: absolute;
         left: 0px;
         right: 0px;
-        height: $timeline-header-size;
+        height: 0px;
         bottom: 0px;
         z-index: 0; 
         overflow: hidden; 

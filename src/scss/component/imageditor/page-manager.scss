@@ -98,3 +98,14 @@ $layer-item-padding: 4px;
     }
 
 }
+
+.layout-main.expertor-mode {
+    .pages {
+        .page-list {
+            .tree-item {
+                padding: 4px 10px;
+            }
+        }
+    }
+
+}

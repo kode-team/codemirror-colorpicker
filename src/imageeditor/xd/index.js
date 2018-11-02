@@ -14,6 +14,7 @@ import VerticalColorStep from '../ui/control/VerticalColorStep';
 import Animation from '../../util/animation/Animation';
 
 const screenModes = ['expertor', 'beginner']
+const panelModes = ['small', 'large']
 
 export default class XDImageEditor extends BaseImageEditor {
 
@@ -131,6 +132,14 @@ export default class XDImageEditor extends BaseImageEditor {
 
         this.refs.$layoutMain.addClass(`${layout}-mode`)
     }
+
+    '@updatePanelLayout' (layout) {
+        panelModes.filter(key => key != layout).forEach(key => {
+            this.refs.$layoutMain.removeClass(`${key}-mode`)
+        })
+
+        this.refs.$layoutMain.addClass(`${layout}-mode`) 
+    }    
 
 
 }

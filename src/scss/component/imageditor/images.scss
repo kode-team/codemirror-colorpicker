@@ -4,7 +4,7 @@ $image-item-width: 70px;
 .images {
     box-sizing: border-box;
     position: absolute;
-    top: 240px;
+    top: 400px;
     left: 0px;
     right: 0px;
     bottom:0px;
@@ -165,4 +165,19 @@ $image-item-width: 70px;
 
     }        
 
+}
+
+.layout-main.expertor-mode {
+    .image-tools {
+        .menu-buttons {
+            
+            .gradient-type {
+                .gradient-item {
+                    width: 22px;
+                    height: 22px;
+                    border-width: 1px !important;
+                }
+            }
+        }
+    }
 }

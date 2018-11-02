@@ -930,15 +930,28 @@
     .imageeditor .layout-main.show-timeline .layout-footer {
       height: 300px; }
     .imageeditor .layout-main.expertor-mode .layout-left {
+      top: 60px;
+      width: 200px;
       border-right: 1px solid #c7c7c7; }
     .imageeditor .layout-main.expertor-mode .layout-right {
+      top: 0px;
       right: 0px;
       width: 250px;
       left: auto;
       border-right: 0px; }
     .imageeditor .layout-main.expertor-mode .layout-body {
-      left: 250px;
+      top: 60px;
+      left: 200px;
       right: 250px; }
+    .imageeditor .layout-main.expertor-mode .layout-top {
+      right: 250px;
+      height: 30px;
+      top: 30px; }
+    .imageeditor .layout-main.expertor-mode .layout-header {
+      height: 30px;
+      right: 250px; }
+      .imageeditor .layout-main.expertor-mode .layout-header .header-title {
+        font-size: 20px; }
     .imageeditor .layout-main .layout-top {
       position: absolute;
       left: 0px;
@@ -954,7 +967,7 @@
       left: 250px;
       width: 250px;
       top: 80px;
-      bottom: 30px;
+      bottom: 0px;
       overflow: auto;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
@@ -967,7 +980,7 @@
       left: 0px;
       width: 250px;
       top: 80px;
-      bottom: 30px;
+      bottom: 0px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       -webkit-transition: all 0.15s linear;
@@ -977,7 +990,7 @@
       left: 500px;
       right: 0px;
       top: 80px;
-      bottom: 30px;
+      bottom: 0px;
       -webkit-transition: all 0.15s linear;
       transition: all 0.15s linear; }
     .imageeditor .layout-main .layout-header {
@@ -1027,7 +1040,7 @@
       position: absolute;
       left: 0px;
       right: 0px;
-      height: 30px;
+      height: 0px;
       bottom: 0px;
       z-index: 0;
       overflow: hidden;
@@ -1385,6 +1398,8 @@
           display: inline-block;
           font-size: 12px;
           pointer-events: none; }
+  .imageeditor .layout-main.expertor-mode .pages .page-list .tree-item {
+    padding: 4px 10px; }
   .imageeditor .layers {
     border-bottom: 1px solid #c7c7c7;
     -webkit-box-sizing: border-box;
@@ -1393,7 +1408,7 @@
     left: 0px;
     top: 0px;
     right: 0px;
-    height: 240px; }
+    height: 400px; }
     .imageeditor .layers button {
       -webkit-appearance: none;
          -moz-appearance: none;
@@ -1514,11 +1529,14 @@
               top: 50%;
               -webkit-transform: translateY(-50%);
                       transform: translateY(-50%); }
+  .imageeditor .layout-main.small-mode .layer-list .tree-item {
+    height: 40px;
+    overflow: auto; }
   .imageeditor .images {
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     position: absolute;
-    top: 240px;
+    top: 400px;
     left: 0px;
     right: 0px;
     bottom: 0px; }
@@ -1646,6 +1664,10 @@
     .imageeditor .images .add-tools {
       padding: 5px;
       height: 80px; }
+  .imageeditor .layout-main.expertor-mode .image-tools .menu-buttons .gradient-type .gradient-item {
+    width: 22px;
+    height: 22px;
+    border-width: 1px !important; }
   .imageeditor .feature-control {
     position: absolute;
     -webkit-box-sizing: border-box;
@@ -3415,6 +3437,16 @@
         border: 1px solid #333; }
       .imageeditor .property-view .property-item.layout .items .layout-buttons.expertor-mode .beginner {
         border-right: 0px; }
+      .imageeditor .property-view .property-item.layout .items .layout-buttons.small-mode .small {
+        background: white;
+        border: 1px solid #333; }
+      .imageeditor .property-view .property-item.layout .items .layout-buttons.small-mode .large {
+        border-left: 0px; }
+      .imageeditor .property-view .property-item.layout .items .layout-buttons.large-mode .large {
+        background: white;
+        border: 1px solid #333; }
+      .imageeditor .property-view .property-item.layout .items .layout-buttons.large-mode .small {
+        border-right: 0px; }
       .imageeditor .property-view .property-item.clip-path .clip-path-container {
         cursor: pointer;
         width: 50px;
@@ -3424,6 +3456,8 @@
     .imageeditor .property-view .gradient-view {
       height: 230px;
       width: 100%; }
+  .imageeditor .layout-main.expertor-mode .layout-top .property-view .property-item {
+    padding: 0px; }
   .imageeditor .filter-list {
     display: block !important; }
     .imageeditor .filter-list .filter-item {
