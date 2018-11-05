@@ -35,6 +35,7 @@ export default class PageLayout extends UIElement {
         this.emit('updateLayout', 'beginner')
         this.dispatch('/storage/set', 'layout', 'beginner')        
         this.refresh();        
+
         this.emit('changeEditor')        
     }
 

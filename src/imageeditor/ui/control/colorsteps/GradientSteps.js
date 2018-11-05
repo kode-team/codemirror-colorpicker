@@ -40,7 +40,8 @@ export default class GradientSteps extends UIElement {
                     color="${step.color}" 
                     style="left: ${this.getStepPosition(step.percent)}px; border-color: ${step.color};background-color: ${step.color};"
                 >
-                    <div class='guide-line' style="background-color: ${step.color};"></div>
+                    <div class='guide-line' 
+                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ${step.color} 10%) ;"></div>
                 </div>
             `
         })
@@ -92,8 +93,8 @@ export default class GradientSteps extends UIElement {
 
     /* slide 영역 min,max 구하기  */
     getMinMax() {
-        var min = this.state.get('$steps.offsetLeft'); 
-        var width = this.state.get('$steps.width');
+        var min = this.refs.$steps.offsetLeft(); 
+        var width = this.refs.$steps.width();
         var max = min + width;
 
         return {min, max, width}
@@ -122,7 +123,7 @@ export default class GradientSteps extends UIElement {
 
         if (this.currentStep) {
             var posX = Math.max(min, current)
-            this.currentStep.px('left', posX - this.state.get('$steps.offsetLeft'))
+            this.currentStep.px('left', posX - this.refs.$steps.offsetLeft())
 
             var percent = Math.floor((current - min) / (max - min) * 100)
 

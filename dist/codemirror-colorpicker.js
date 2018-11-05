@@ -12871,7 +12871,7 @@ var GradientSteps = function (_UIElement) {
 
             return this.read('/item/map/children', item.id, function (step) {
 
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' style="background-color: ' + step.color + ';"></div>\n                </div>\n            ';
+                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                </div>\n            ';
             });
         }
     }, {
@@ -12923,8 +12923,8 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'getMinMax',
         value: function getMinMax() {
-            var min = this.state.get('$steps.offsetLeft');
-            var width = this.state.get('$steps.width');
+            var min = this.refs.$steps.offsetLeft();
+            var width = this.refs.$steps.width();
             var max = min + width;
 
             return { min: min, max: max, width: width };
@@ -12964,7 +12964,7 @@ var GradientSteps = function (_UIElement) {
 
             if (this.currentStep) {
                 var posX = Math.max(min, current);
-                this.currentStep.px('left', posX - this.state.get('$steps.offsetLeft'));
+                this.currentStep.px('left', posX - this.refs.$steps.offsetLeft());
 
                 var percent = Math.floor((current - min) / (max - min) * 100);
 
@@ -14732,6 +14732,7 @@ var PageLayout = function (_UIElement) {
             this.emit('updateLayout', 'beginner');
             this.dispatch('/storage/set', 'layout', 'beginner');
             this.refresh();
+
             this.emit('changeEditor');
         }
     }, {
