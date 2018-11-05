@@ -14599,6 +14599,7 @@ var PageLayout = function (_UIElement) {
             this.emit('updateLayout', 'beginner');
             this.dispatch('/storage/set', 'layout', 'beginner');
             this.refresh();
+            this.emit('changeEditor');
         }
     }, {
         key: 'click $expertor',
@@ -14606,6 +14607,7 @@ var PageLayout = function (_UIElement) {
             this.emit('updateLayout', 'expertor');
             this.dispatch('/storage/set', 'layout', 'expertor');
             this.refresh();
+            this.emit('changeEditor');
         }
     }]);
     return PageLayout;

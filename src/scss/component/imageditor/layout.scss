@@ -94,7 +94,7 @@ $show-timeline-animation: all 0.15s linear;
         box-sizing: border-box;
         border-right: 1px solid $border-color;
         border-left: 1px solid $border-color;
-        transition: $show-timeline-animation;
+        // transition: $show-timeline-animation;
     }
 
     .layout-left {
@@ -104,7 +104,7 @@ $show-timeline-animation: all 0.15s linear;
         top: $tool-size * 2;
         bottom: 0px;
         box-sizing: border-box;
-        transition: $show-timeline-animation;
+        // transition: $show-timeline-animation;
     }    
 
     .layout-body {
@@ -113,7 +113,7 @@ $show-timeline-animation: all 0.15s linear;
         right: 0px;
         top: $tool-size * 2;  
         bottom: 0px;
-        transition: $show-timeline-animation;        
+        // transition: $show-timeline-animation;        
     }
 
     .layout-header {

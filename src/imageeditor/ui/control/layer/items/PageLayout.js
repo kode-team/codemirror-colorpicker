@@ -33,14 +33,16 @@ export default class PageLayout extends UIElement {
 
     'click $beginner' (e) {
         this.emit('updateLayout', 'beginner')
-        this.dispatch('/storage/set', 'layout', 'beginner')
+        this.dispatch('/storage/set', 'layout', 'beginner')        
         this.refresh();        
+        this.emit('changeEditor')        
     }
 
     'click $expertor' (e) {
         this.emit('updateLayout', 'expertor')
         this.dispatch('/storage/set', 'layout', 'expertor')
         this.refresh();
+        this.emit('changeEditor')        
     }
 
 }

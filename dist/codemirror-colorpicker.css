@@ -972,9 +972,7 @@
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border-right: 1px solid #c7c7c7;
-      border-left: 1px solid #c7c7c7;
-      -webkit-transition: all 0.15s linear;
-      transition: all 0.15s linear; }
+      border-left: 1px solid #c7c7c7; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
@@ -982,17 +980,13 @@
       top: 80px;
       bottom: 0px;
       -webkit-box-sizing: border-box;
-              box-sizing: border-box;
-      -webkit-transition: all 0.15s linear;
-      transition: all 0.15s linear; }
+              box-sizing: border-box; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
       left: 500px;
       right: 0px;
       top: 80px;
-      bottom: 0px;
-      -webkit-transition: all 0.15s linear;
-      transition: all 0.15s linear; }
+      bottom: 0px; }
     .imageeditor .layout-main .layout-header {
       position: absolute;
       left: 0px;
