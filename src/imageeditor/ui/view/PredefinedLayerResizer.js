@@ -6,6 +6,7 @@ import BottomRightRadius from './item/BottomRightRadius';
 import LayerRotate from './item/LayerRotate';
 import Radius from './item/Radius';
 import { parseParamNumber } from '../../../util/filter/functions';
+import LayerRadius from './item/LayerRadius';
 
 export default class PredefinedLayerResizer extends UIElement {
 
@@ -18,7 +19,7 @@ export default class PredefinedLayerResizer extends UIElement {
     }
 
     components () {
-        return { TopLeftRadius, TopRightRadius, BottomLeftRadius, BottomRightRadius, LayerRotate, Radius }
+        return { TopLeftRadius, LayerRadius, TopRightRadius, BottomLeftRadius, BottomRightRadius, LayerRotate, Radius }
     }
 
     template () { 
@@ -40,7 +41,7 @@ export default class PredefinedLayerResizer extends UIElement {
                 <TopRightRadius></TopRightRadius>
                 <BottomLeftRadius></BottomLeftRadius>
                 <BottomRightRadius></BottomRightRadius>
-
+                <LayerRadius></LayerRadius>
                 <LayerRotate></LayerRotate>
 
                 <div class="guide-horizontal"></div>

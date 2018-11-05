@@ -267,6 +267,24 @@ export default class LayerManager extends BaseModule {
         return items.length ? items[0] : null;
     }
 
+    '*/layer/get/border-radius' ($store, layer) {
+        var css = {};
+        if (layer.fixedRadius) {
+            css['border-radius'] = layer.style['border-radius']
+            css['border-top-left-radius'] = ''
+            css['border-top-right-radius'] = ''
+            css['border-bottom-left-radius'] = ''
+            css['border-bottom-right-radius'] = ''  
+        } else {
+            css['border-top-left-radius'] = layer.style['border-top-left-radius']
+            css['border-top-right-radius'] = layer.style['border-top-right-radius']
+            css['border-bottom-left-radius'] = layer.style['border-bottom-left-radius']
+            css['border-bottom-right-radius'] = layer.style['border-bottom-right-radius']  
+        }
+
+        return css;
+    }
+
     '*/layer/toCSS' ($store, layer = null, withStyle = true, image = null, isExport = false) {
         var css = Object.assign({}, withStyle ? (layer.style || {}) : {});
 
@@ -288,15 +306,7 @@ export default class LayerManager extends BaseModule {
             css['mix-blend-mode'] = layer.style['mix-blend-mode'] || ""
         }
 
-        if (layer.fixedRadius) {
-            css['border-radius'] = layer.style['border-radius']
-            css['border-top-left-radius'] = ''
-            css['border-top-right-radius'] = ''
-            css['border-bottom-left-radius'] = ''
-            css['border-bottom-right-radius'] = ''  
-        } else {
-
-        }
+        Object.assign(css, $store.read('/layer/get/border-radius', layer));
 
         css['transform'] = $store.read('/layer/make/transform', layer)
         css['filter'] = $store.read('/layer/make/filter', layer.filters);

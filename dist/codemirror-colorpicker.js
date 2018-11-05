@@ -10302,6 +10302,25 @@ var LayerManager = function (_BaseModule) {
             return items.length ? items[0] : null;
         }
     }, {
+        key: '*/layer/get/border-radius',
+        value: function layerGetBorderRadius($store, layer) {
+            var css = {};
+            if (layer.fixedRadius) {
+                css['border-radius'] = layer.style['border-radius'];
+                css['border-top-left-radius'] = '';
+                css['border-top-right-radius'] = '';
+                css['border-bottom-left-radius'] = '';
+                css['border-bottom-right-radius'] = '';
+            } else {
+                css['border-top-left-radius'] = layer.style['border-top-left-radius'];
+                css['border-top-right-radius'] = layer.style['border-top-right-radius'];
+                css['border-bottom-left-radius'] = layer.style['border-bottom-left-radius'];
+                css['border-bottom-right-radius'] = layer.style['border-bottom-right-radius'];
+            }
+
+            return css;
+        }
+    }, {
         key: '*/layer/toCSS',
         value: function layerToCSS($store) {
             var layer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -10328,13 +10347,7 @@ var LayerManager = function (_BaseModule) {
                 css['mix-blend-mode'] = layer.style['mix-blend-mode'] || "";
             }
 
-            if (layer.fixedRadius) {
-                css['border-radius'] = layer.style['border-radius'];
-                css['border-top-left-radius'] = '';
-                css['border-top-right-radius'] = '';
-                css['border-bottom-left-radius'] = '';
-                css['border-bottom-right-radius'] = '';
-            } else {}
+            Object.assign(css, $store.read('/layer/get/border-radius', layer));
 
             css['transform'] = $store.read('/layer/make/transform', layer);
             css['filter'] = $store.read('/layer/make/filter', layer.filters);
@@ -15566,6 +15579,8 @@ var TopLeftRadius = function (_UIElement) {
 
             this.layerWidth = +this.layer.style.width.replace('px', '');
             this.layerHeight = +this.layer.style.height.replace('px', '');
+
+            this.emit('startRadius');
         }
     }, {
         key: 'pointermove document',
@@ -15574,6 +15589,7 @@ var TopLeftRadius = function (_UIElement) {
                 this.targetXY = e.xy;
 
                 this.resize();
+                this.emit('changeRadius');
             }
         }
     }, {
@@ -15582,6 +15598,8 @@ var TopLeftRadius = function (_UIElement) {
             this.xy = null;
             this.moveX = null;
             this.moveY = null;
+
+            this.emit('endRadius');
         }
     }]);
     return TopLeftRadius;
@@ -15775,6 +15793,56 @@ var Radius$2 = function (_TopLeftRadius) {
     return Radius;
 }(TopLeftRadius);
 
+var LayerRadius = function (_UIElement) {
+    inherits(LayerRadius, _UIElement);
+
+    function LayerRadius() {
+        classCallCheck(this, LayerRadius);
+        return possibleConstructorReturn(this, (LayerRadius.__proto__ || Object.getPrototypeOf(LayerRadius)).apply(this, arguments));
+    }
+
+    createClass(LayerRadius, [{
+        key: 'template',
+        value: function template() {
+            return '<div ></div>';
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            var _this2 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                var radius = _this2.read('/layer/get/border-radius', layer);
+                _this2.$el.css(radius);
+            });
+        }
+    }, {
+        key: '@startRadius',
+        value: function startRadius() {
+            this.$el.css({
+                'background-color': 'rgba(0, 0, 0, 0.1)',
+                position: 'absolute',
+                left: '0px',
+                top: '0px',
+                right: '0px',
+                bottom: '0px',
+                border: '1px solid rgba(0, 0, 0, 0.3)'
+            }).show();
+        }
+    }, {
+        key: '@changeRadius',
+        value: function changeRadius() {
+            this.refresh();
+        }
+    }, {
+        key: '@endRadius',
+        value: function endRadius() {
+            this.$el.hide();
+        }
+    }]);
+    return LayerRadius;
+}(UIElement);
+
 var PredefinedLayerResizer = function (_UIElement) {
     inherits(PredefinedLayerResizer, _UIElement);
 
@@ -15794,12 +15862,12 @@ var PredefinedLayerResizer = function (_UIElement) {
     }, {
         key: 'components',
         value: function components() {
-            return { TopLeftRadius: TopLeftRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate, Radius: Radius$2 };
+            return { TopLeftRadius: TopLeftRadius, LayerRadius: LayerRadius, TopRightRadius: TopRightRadius, BottomLeftRadius: BottomLeftRadius, BottomRightRadius: BottomRightRadius, LayerRotate: LayerRotate, Radius: Radius$2 };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left" data-position="aaa"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div> \n        ';
+            return '\n            <div class="predefined-layer-resizer">\n                <div class=\'button-group\' ref=\'$buttonGroup\'>\n                    <button type="button" data-value="to right"></button>\n                    <button type="button" data-value="to left"></button>\n                    <button type="button" data-value="to top"></button>\n                    <button type="button" data-value="to bottom"></button>\n                    <button type="button" data-value="to top right"></button>\n                    <button type="button" data-value="to bottom right"></button>\n                    <button type="button" data-value="to bottom left"></button>\n                    <button type="button" data-value="to top left" data-position="aaa"></button>\n                </div>\n\n                <Radius></Radius>\n                <TopLeftRadius></TopLeftRadius>\n                <TopRightRadius></TopRightRadius>\n                <BottomLeftRadius></BottomLeftRadius>\n                <BottomRightRadius></BottomRightRadius>\n                <LayerRadius></LayerRadius>\n                <LayerRotate></LayerRotate>\n\n                <div class="guide-horizontal"></div>\n                <div class="guide-vertical"></div>\n            </div> \n        ';
         }
     }, {
         key: 'refresh',

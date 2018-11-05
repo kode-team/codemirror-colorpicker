@@ -86,6 +86,8 @@ export default class TopLeftRadius extends UIElement {
         
         this.layerWidth = +this.layer.style.width.replace('px', '') 
         this.layerHeight = +this.layer.style.height.replace('px', '') 
+
+        this.emit('startRadius')                    
     }
 
     'pointermove document' (e) {
@@ -93,6 +95,7 @@ export default class TopLeftRadius extends UIElement {
             this.targetXY = e.xy; 
 
             this.resize();
+            this.emit('changeRadius')            
         }
 
     }
@@ -101,5 +104,7 @@ export default class TopLeftRadius extends UIElement {
         this.xy = null 
         this.moveX = null;
         this.moveY = null; 
+
+        this.emit('endRadius')
     }
 }
