@@ -12870,7 +12870,7 @@ var Name = function (_UIElement) {
     createClass(Name, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item name show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item name show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                    <div>\n                        <label>ID</label>\n                        <div>\n                            <input type=\'text\' ref="$id" class=\'full\'> \n                        </div>\n                    </div>                                        \n                    <div>\n                        <label>Class</label>\n                        <div>\n                            <input type=\'text\' ref="$class" class=\'full\'> \n                        </div>\n                    </div>                    \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -12896,6 +12896,26 @@ var Name = function (_UIElement) {
 
             if (item) {
                 item.name = this.refs.$name.val();
+                this.dispatch('/item/set', item);
+            }
+        }
+    }, {
+        key: 'input $class',
+        value: function input$class() {
+            var item = this.read('/item/current');
+
+            if (item) {
+                item.className = this.refs.$class.val();
+                this.dispatch('/item/set', item);
+            }
+        }
+    }, {
+        key: 'input $id',
+        value: function input$id() {
+            var item = this.read('/item/current');
+
+            if (item) {
+                item.idString = this.refs.$id.val();
                 this.dispatch('/item/set', item);
             }
         }
@@ -17694,7 +17714,7 @@ var ExportView = function (_UIElement) {
     createClass(ExportView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview-container\">\n\n                        <div class=\"title\">Code</div>\n                        <div class=\"codeview\">\n                            <textarea ref=\"$code\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"preview-container\">\n                        <div class=\"title\">Preview</div>\n                        <div class='preview' ref=\"$preview\"></div>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview-container\">\n                        <div class=\"title\">Code</div>\n                        <div class=\"codeview\">\n                            <textarea ref=\"$code\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"preview-container\">\n                        <div class=\"title\">Preview</div>\n                        <div class='preview' ref=\"$preview\"></div>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "afterRender",
@@ -17730,7 +17750,11 @@ var ExportView = function (_UIElement) {
             var pageStyle = this.makePageCSS(page);
 
             var html = "<div id=\"page-1\" style=\"" + pageStyle + "\">\n" + this.read('/item/map/children', page.id, function (item, index) {
-                return "\t<div id=\"layer-" + (index + 1) + "\" style=\"" + _this2.read('/layer/toExport', item, true) + "\">\t\t\n" + _this2.read('/layer/toStringClipPath', item) + "</div>";
+
+                var idString = item.idString || 'layer-' + (index + 1);
+                var className = item.className;
+
+                return "\t<div id=\"" + idString + "\"  " + (className ? "class=\"" + className + "\"" : '') + " style=\"" + _this2.read('/layer/toExport', item, true) + "\">\t\t\n" + _this2.read('/layer/toStringClipPath', item) + "</div>";
             }).join('\n') + "\n</div>";
 
             if (this.cm) {
