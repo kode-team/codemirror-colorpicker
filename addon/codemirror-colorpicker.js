@@ -12768,11 +12768,17 @@ var Name = function (_UIElement) {
             var item = this.read('/item/current');
 
             var name = '';
+            var idString = '';
+            var className = '';
             if (item) {
                 name = item.name;
+                idString = item.idString || '';
+                className = item.className || '';
             }
 
             this.refs.$name.val(name);
+            this.refs.$id.val(idString);
+            this.refs.$class.val(className);
         }
     }, {
         key: 'input $name',
