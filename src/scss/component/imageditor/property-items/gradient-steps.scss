@@ -80,12 +80,17 @@
                     transition: all 0.3s ease-out;
                 }
 
+
                 &.selected {
                     z-index:1;
                     top: 30px;
                     .guide-line {
                         height: 17px;
                     }                
+
+                    .guide-change {
+                        opacity: 1;
+                    }
                 }
             }                    
         }

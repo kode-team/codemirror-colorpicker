@@ -1,4 +1,5 @@
 import UIElement from '../../../../colorpicker/UIElement';
+import Dom from '../../../../util/Dom';
 
 export default class GradientSteps extends UIElement {
 
@@ -33,6 +34,8 @@ export default class GradientSteps extends UIElement {
 
         return this.read('/item/map/children', item.id, (step) => {
 
+            var cut = step.cut ? 'cut' : ''; 
+
             return `
                 <div 
                     class='drag-bar step ${step.selected ? 'selected' : ''}' 
@@ -42,6 +45,7 @@ export default class GradientSteps extends UIElement {
                 >
                     <div class='guide-line' 
                         style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ${step.color} 10%) ;"></div>
+                    <div class="guide-change ${cut}" data-colorstep-id="${step.id}"></div>
                 </div>
             `
         })
@@ -238,6 +242,18 @@ export default class GradientSteps extends UIElement {
         this.selectStep(e)
     }
 
+    'click $steps .step .guide-change' (e) {
+        var id = e.$delegateTarget.attr('data-colorstep-id');
+        var item = this.read('/item/get', id);
+
+        if (item.id) {
+            item.cut = !item.cut;
+            this.dispatch('/item/set', item);
+            this.refresh();
+        }
+
+    }
+
 
     // Event Bindings 
     'pointerend document' (e) { 
@@ -248,9 +264,14 @@ export default class GradientSteps extends UIElement {
         this.onDragMove(e);
     }
 
+    isStepElement (e) {
+        return new Dom(e.target).hasClass('step');
+    }
+
     'pointerstart $steps .step' (e) {
+
         e.preventDefault();
-        if (!this.isDown) {
+        if (this.isStepElement(e) && !this.isDown) {
             this.onDragStart(e);
         }
     }

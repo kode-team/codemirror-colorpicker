@@ -228,8 +228,17 @@ export default class ImageManager extends BaseModule {
             if (a.percent == b.percent) return 0;
             return a.percent > b.percent ? 1 : -1;
         })
+
+        var newColors = []
+        colors.forEach( (c, index) => {
+            if (c.cut && index > 0) {
+                newColors.push(Object.assign({}, c, { percent : colors[index-1].percent} ));
+            }
+
+            newColors.push(c);
+        })        
         
-        colors = colors.map(f => {
+        colors = newColors.map(f => {
             return `${f.color} ${f.percent}%`
         }).join(',')
 
@@ -259,8 +268,18 @@ export default class ImageManager extends BaseModule {
             }
             return a.percent > b.percent ? 1 : -1;
         })
+
+
+        var newColors = []
+        colors.forEach( (c, index) => {
+            if (c.cut && index > 0) {
+                newColors.push(Object.assign({}, c, { percent : colors[index-1].percent} ));
+            }
+
+            newColors.push(c);
+        })      
         
-        colors = colors.map(f => {
+        colors = newColors.map(f => {
             var deg = Math.floor(f.percent * 3.6);
             return `${f.color} ${deg}deg`
         }).join(',')

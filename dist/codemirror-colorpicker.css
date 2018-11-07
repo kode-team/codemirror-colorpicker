@@ -2266,11 +2266,43 @@
                     transform: translateX(-1px);
             -webkit-transition: all 0.3s ease-out;
             transition: all 0.3s ease-out; }
+          .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-change {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            top: 50%;
+            right: -15px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%);
+            opacity: 0;
+            -webkit-transition: all 0.3s ease-out;
+            transition: all 0.3s ease-out;
+            border: 1px solid #c7c7c7; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-change:before {
+              content: "";
+              position: absolute;
+              top: 0px;
+              bottom: 0px;
+              left: 3px;
+              right: 3px;
+              background-color: black; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-change.cut:before {
+              content: "";
+              position: absolute;
+              top: 3px;
+              bottom: 3px;
+              left: 0px;
+              right: 0px;
+              background-color: black; }
           .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected {
             z-index: 1;
             top: 30px; }
             .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-line {
               height: 24px; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-change {
+              opacity: 1; }
   .imageeditor .page-view {
     position: absolute;
     left: 0px;
@@ -3212,6 +3244,8 @@
                 top: 30px; }
                 .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected .guide-line {
                   height: 17px; }
+                .imageeditor .property-view .property-item.gradient-steps .gradient-steps .hue .drag-bar.selected .guide-change {
+                  opacity: 1; }
         .imageeditor .property-view .property-item.gradient-steps .gradient-list-layout {
           position: absolute;
           top: 50px !important;
