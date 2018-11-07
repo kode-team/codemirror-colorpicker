@@ -29,7 +29,10 @@ export default class PredefinedLinearGradientAngle extends UIElement {
 
         if (!image) { return false; }
 
-        return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isLinear', image.type);
+        var isLinear = this.read('/image/type/isLinear', image.type);
+        var isConic = this.read('/image/type/isConic', image.type);
+
+        return this.read('/tool/get', 'guide.angle') && (isLinear || isConic);
     }
 
     'click.self $el button' (e) {

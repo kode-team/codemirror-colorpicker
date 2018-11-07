@@ -8,15 +8,23 @@ export default class ImageList extends UIElement {
                 <div class='image-tools'>   
                     <div class='menu-buttons'>
                         <div class='gradient-type' ref="$gradientType">
-                            <div class="gradient-item static" data-type="static" title="Static Color"></div>
-                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
-                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
-                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
-                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>
-                            <div class="gradient-item image" data-type="image" title="Background Image">
-                                <div class="m1"></div>
-                                <div class="m2"></div>
-                                <div class="m3"></div>
+                            <div>
+                                <label>Simple</label>
+                                <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>
+                                <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>
+                                <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            
+                                <div class="gradient-item static" data-type="static" title="Static Color"></div>                                
+                                <div class="gradient-item image" data-type="image" title="Background Image">
+                                    <div class="m1"></div>
+                                    <div class="m2"></div>
+                                    <div class="m3"></div>
+                                </div>                            
+                            </div>
+                            <div>
+                                <label>Repeat</label>                            
+                                <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>
+                                <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>
+                                <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            
                             </div>
                         </div>
                     </div>

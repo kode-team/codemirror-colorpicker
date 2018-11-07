@@ -1637,7 +1637,7 @@
                 top: 1px;
                 right: 1px; }
       .imageeditor .images .image-tools .menu-buttons {
-        height: 35px;
+        height: 70px;
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
@@ -1904,7 +1904,7 @@
           position: absolute;
           bottom: auto;
           top: 0%;
-          height: 20px;
+          height: 24px;
           width: auto;
           display: inline-block;
           left: 50%;
@@ -1937,6 +1937,10 @@
                 margin-right: 10px; }
                 .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type {
                   padding: 0px; }
+                  .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type > div {
+                    display: inline-block; }
+                    .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type > div label {
+                      display: none; }
                   .imageeditor .sub-feature-control > .feature > .property-view.image-list .images .image-tools .menu-buttons .gradient-type .gradient-item {
                     border: 0px;
                     width: 20px;
@@ -1985,16 +1989,23 @@
   .imageeditor .gradient-type {
     display: inline-block;
     vertical-align: top; }
+    .imageeditor .gradient-type label {
+      font-size: 12px;
+      vertical-align: middle;
+      display: inline-block;
+      min-width: 60px; }
     .imageeditor .gradient-type .gradient-item {
       display: inline-block;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
-      border: 3px solid #ececec;
+      border: 1px solid #ececec;
       cursor: pointer;
       position: relative;
-      pointer-events: all; }
+      pointer-events: all;
+      vertical-align: middle;
+      margin-bottom: 2px; }
       .imageeditor .gradient-type .gradient-item:first-child {
         margin-right: 1px; }
       .imageeditor .gradient-type .gradient-item.selected {
@@ -2007,10 +2018,14 @@
         background-image: linear-gradient(to right, black, gray); }
       .imageeditor .gradient-type .gradient-item.radial {
         background-image: radial-gradient(closest-side, black, #ebf8e1, gray); }
+      .imageeditor .gradient-type .gradient-item.conic {
+        background-image: conic-gradient(black, #ebf8e1); }
       .imageeditor .gradient-type .gradient-item.repeating-linear {
         background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
       .imageeditor .gradient-type .gradient-item.repeating-radial {
         background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%); }
+      .imageeditor .gradient-type .gradient-item.repeating-conic {
+        background-image: repeating-conic-gradient(#3f87a6, #ebf8e1 5%, #f69d3c 10%); }
       .imageeditor .gradient-type .gradient-item.image {
         overflow: hidden; }
         .imageeditor .gradient-type .gradient-item.image .m1 {
@@ -3451,7 +3466,10 @@
       .imageeditor .property-view .property-item.clip-path .clip-path-container {
         cursor: pointer;
         width: 50px;
-        height: 50px; }
+        height: 50px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        border: 1px solid #c7c7c7; }
         .imageeditor .property-view .property-item.clip-path .clip-path-container svg {
           width: 100%; }
     .imageeditor .property-view .gradient-view {

@@ -5,7 +5,7 @@ import { parseParamNumber } from "../../../../../util/filter/functions";
 export default class ClipPathImageResource extends BasePropertyItem {
     template () {
         return `
-            <div class='property-item image-resource show'>
+            <div class='property-item image-resource'>
                 <div class='items' ref="$imageList">
 
                 </div>
@@ -32,8 +32,13 @@ export default class ClipPathImageResource extends BasePropertyItem {
         this.refresh()
     }
 
-    '@toggleClipPathImageResource' () {
-        this.$el.toggleClass('show')
+    '@toggleClipPathImageResource' (isShow) {
+        if (typeof isShow == 'undefined') {
+            this.$el.toggleClass('show')
+        } else {
+            this.$el.toggleClass('show', isShow)
+        }
+        
     }
 
     setClipPathSvg (layer, svg, callback) {

@@ -68,7 +68,10 @@ export default class SubFeatureControl extends UIElement {
 
         if (!item) return false; 
 
-        if (!this.read('/image/type/isLinear', item.type)) {
+        var isLinear = this.read('/image/type/isLinear', item.type)
+        var isConic = this.read('/image/type/isConic', item.type)
+
+        if (isLinear == false && isConic == false) {
             return false; 
         }
 
@@ -81,7 +84,10 @@ export default class SubFeatureControl extends UIElement {
         var item = this.read('/item/current/image')
         if (!item) return false; 
 
-        if (!this.read('/image/type/isRadial', item.type)) {
+        var isRadial = this.read('/image/type/isRadial', item.type)
+        var isConic = this.read('/image/type/isConic', item.type)
+
+        if (isRadial == false && isConic == false) {
             return false; 
         }
 

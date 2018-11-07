@@ -32,7 +32,10 @@ export default class GradientAngle extends UIElement {
 
         if (!item) return false; 
 
-        if (!this.read('/image/type/isLinear', item.type)) {
+        var isLinear = this.read('/image/type/isLinear', item.type)
+        var isConic = this.read('/image/type/isConic', item.type)
+
+        if (isLinear == false && isConic == false) {
             return false; 
         }
 

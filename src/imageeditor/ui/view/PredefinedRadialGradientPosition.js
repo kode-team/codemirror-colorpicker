@@ -34,7 +34,10 @@ export default class PredefinedRadialGradientPosition extends UIElement {
 
         if (!image) { return false; }
 
-        return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isRadial', image.type);
+        var isRadial = this.read('/image/type/isRadial', image.type);
+        var isConic = this.read('/image/type/isConic', image.type);
+
+        return this.read('/tool/get', 'guide.angle') && (isRadial || isConic);
     }
 
     '@changeEditor' () {

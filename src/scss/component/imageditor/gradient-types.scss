@@ -1,19 +1,28 @@
-$typetool-size: 30px;
+$typetool-size: 28px;
 
 .gradient-type {
 
     display: inline-block;
     vertical-align: top;
 
+    label {
+        font-size: 12px;
+        vertical-align: middle;
+        display: inline-block;
+        min-width: 60px;
+    }
+
     .gradient-item {
         display: inline-block;
         width: $typetool-size;
         height: $typetool-size;
         box-sizing: border-box;
-        border: 3px solid #ececec;
+        border: 1px solid #ececec;
         cursor: pointer;
         position: relative;
         pointer-events: all;
+        vertical-align: middle;
+        margin-bottom: 2px;
 
         &:first-child {
             margin-right: 1px; 
@@ -35,13 +44,21 @@ $typetool-size: 30px;
             background-image: radial-gradient(closest-side, black, #ebf8e1, gray);
         }
 
+        &.conic {
+            background-image: conic-gradient(black, #ebf8e1);
+        }        
+
         &.repeating-linear {
             background-image: repeating-linear-gradient(45deg, #3f87a6, #ebf8e1 15%, #f69d3c 20%);
         }
 
         &.repeating-radial {
             background-image: repeating-radial-gradient(circle, #3f87a6, #ebf8e1 15%, #f69d3c 20%);
-        }        
+        }     
+        
+        &.repeating-conic {
+            background-image: repeating-conic-gradient(#3f87a6, #ebf8e1 5%, #f69d3c 10%);
+        }             
         
         &.image {
             overflow: hidden;

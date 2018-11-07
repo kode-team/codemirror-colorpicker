@@ -1,6 +1,7 @@
 import ImageLoader from '../../util/ImageLoader'
 import BaseModule from "../../colorpicker/BaseModule";
 import { ImageToRGB, palette } from '../../util/functions/image';
+import { get } from '../../util/functions/func';
 
 const DEFINED_ANGLES = {
     'to top': 0,
@@ -106,24 +107,8 @@ export default class ImageManager extends BaseModule {
         });
     }    
 
-    '/image/setAngle' ($store, angle = '') {
-        angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : ( +angle % 360);
-
-        $store.dispatch('/image/change', { angle })
-    }
-
-    '/image/setRadialPosition' ($store, radialPosition = '') {
-        var item = $store.read('/item/current/image')
-
-        if (item) {
-            item.radialPosition = radialPosition;
-            
-            $store.dispatch('/item/set', item);
-        }
-    }  
-
     '*/image/type/isGradient' ($store, type) {
-        return $store.read('/image/type/isLinear', type) || $store.read('/image/type/isRadial', type);
+        return $store.read('/image/type/isLinear', type) || $store.read('/image/type/isRadial', type) || $store.read('/image/type/isConic', type);
     }
 
     '*/image/type/isNotGradient' ($store, type) {
@@ -137,6 +122,10 @@ export default class ImageManager extends BaseModule {
     '*/image/type/isRadial' ($store, type) {
         return ['radial', 'repeating-radial'].includes(type)
     }    
+
+    '*/image/type/isConic' ($store, type) {
+        return ['conic', 'repeating-conic'].includes(type)
+    }        
 
     '*/image/type/isImage' ($store, type) {
         return ['image'].includes(type)
@@ -193,6 +182,8 @@ export default class ImageManager extends BaseModule {
             return $store.read('/image/toLinear', image, isExport)
         } else if (type == 'radial' || type == 'repeating-radial') {
             return $store.read('/image/toRadial', image, isExport)
+        } else if (type == 'conic' || type == 'repeating-conic' ) {
+            return $store.read('/image/toConic', image, isExport)            
         } else if (type == 'image' ) {
             return $store.read('/image/toImage', image, isExport)
         } else if (type == 'static' ) {
@@ -244,6 +235,38 @@ export default class ImageManager extends BaseModule {
 
         return colors; 
     }
+
+
+    '*/image/toConicItemString' ($store, image = undefined ) {
+
+        if (!image) return '';
+
+        var colorsteps =  image.colorsteps || $store.read('/item/map/children', image.id, (step) => step )
+
+        if (!colorsteps) return '';
+
+        var colors = [...colorsteps].map( (it, index) => {
+            it.index = index; 
+            return it;
+        })
+        if (!colors.length) return ''; 
+        
+        colors.sort((a, b) => {
+            if (a.percent == b.percent) {
+                if (a.index > b.index) return 1;
+                if (a.index < b.index) return 0; 
+                return 0;
+            }
+            return a.percent > b.percent ? 1 : -1;
+        })
+        
+        colors = colors.map(f => {
+            var deg = Math.floor(f.percent * 3.6);
+            return `${f.color} ${deg}deg`
+        }).join(',')
+
+        return colors; 
+    }    
 
     '*/image/toLinear' ($store, image = {}) {
         var colors = $store.read('/image/toItemString', image)
@@ -299,6 +322,31 @@ export default class ImageManager extends BaseModule {
 
         return `${gradientType}-gradient(${opt}, ${colors})`
     }
+
+    '*/image/toConic' ($store, image = {}) {
+        var colors = $store.read('/image/toConicItemString', image)
+
+        if (colors == '') return '' 
+        var opt = []
+        var conicAngle = image.angle;
+        var conicPosition = image.radialPosition;
+        var gradientType = image.type
+
+        conicPosition = (DEFINED_POSITIONS[conicPosition]) ? conicPosition : conicPosition.join(' ')
+
+        if (typeof conicAngle != 'undefined') {
+            conicAngle = get(DEFINED_ANGLES, conicAngle, (it) => +it) 
+            opt.push(`from ${conicAngle}deg`)
+        }
+
+        if (conicPosition) {
+            opt.push(`at ${conicPosition}`)
+        };
+
+        var optString = opt.length ? opt.join(' ') + ',' : '';
+
+        return `${gradientType}-gradient(${optString} ${colors})`
+    }    
 
     '*/image/toImage' ($store, image = null, isExport = false) {
         var url = image.backgroundImage

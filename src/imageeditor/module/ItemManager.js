@@ -71,6 +71,10 @@ const COLORSTEP_DEFAULT_OBJECT = {
     color: 'rgba(0, 0, 0, 0)'
 }
 
+const gradientTypeList = ['linear', 'radial', 'conic']
+const repeatingGradientTypeList = ['repeating-linear', 'repeating-radial', 'repeating-conic']
+const conicList = ['conic', 'repeating-conic']
+
 export const EDITOR_MODE_PAGE = 'page';
 export const EDITOR_MODE_LAYER = 'layer-rect';
 export const EDITOR_MODE_LAYER_BORDER = 'layer-border';
@@ -192,16 +196,19 @@ export default class ItemManager extends BaseModule {
  
         } else if (obj.type == 'image') {
 
-        } else if (obj.type == 'linear') {
+        } else if (gradientTypeList.includes(obj.type)) {
+
+            if (conicList.includes(obj.type)) {
+                $store.items[imageId].angle = 0; 
+            }
+
             $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
             $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100});
-        } else if (obj.type == 'radial') {
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100});
-        } else if (obj.type == 'repeating-linear') {
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10});
-        } else if (obj.type == 'repeating-radial') {
+        } else if (repeatingGradientTypeList.includes(obj.type)) {
+            if (conicList.includes(obj.type)) {
+                $store.items[imageId].angle = 0; 
+            }
+
             $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
             $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10});
         }
@@ -339,7 +346,7 @@ export default class ItemManager extends BaseModule {
         return $store.read('/item/list/children', parentId).length;
     }    
 
-    '*/item/map/children' ($store, parentId, callback) {
+    '*/item/map/children' ($store, parentId, callback = ((item) => item)) {
         return $store.read('/item/filter', function (id) {
             return $store.items[id].parentId == parentId
         }).map(function (id, index) { 

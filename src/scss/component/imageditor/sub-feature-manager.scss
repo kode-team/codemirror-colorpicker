@@ -167,7 +167,7 @@ $layer-item-padding: 4px;
                 position: absolute;
                 bottom: auto;
                 top: 0%;
-                height: 20px;
+                height: 24px;
                 width: auto;
                 display: inline-block;
                 left: 50%;
@@ -200,6 +200,14 @@ $layer-item-padding: 4px;
                             
                             .gradient-type {
                                 padding: 0px;
+
+                                > div {
+                                    display: inline-block;
+
+                                    label {
+                                        display: none;
+                                    }
+                                }
                                 .gradient-item {
                                     border:0px;
                                     width: 20px;

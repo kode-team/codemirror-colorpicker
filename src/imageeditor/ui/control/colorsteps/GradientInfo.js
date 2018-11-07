@@ -18,7 +18,7 @@ export default class GradientInfo extends UIElement {
 
         if (!item) return '';
 
-        var colorsteps = this.read('/item/map/children', item.id, (step) => step);
+        var colorsteps = this.read('/item/map/children', item.id);
 
         return `<div class='step-list' ref="$stepList">
                     ${colorsteps.map( step => {
@@ -33,6 +33,9 @@ export default class GradientInfo extends UIElement {
                                 <div class="color-percent">
                                     <input type="number" class="percent" min="0" max="100" step="0.1"  value="${step.percent}"   colorstep-id="${step.id}"  />%
                                 </div>
+                                <div class="color-angle">
+                                    <input type="number" class="angle" min="0" max="360" step="1"  value="${step.angle}"  colorstep-id="${step.id}"  />deg
+                                </div>                                
                                 <div class="tools">
                                     <button type="button" class='remove-step'  colorstep-id="${step.id}" >&times;</button>
                                 </div>
@@ -102,6 +105,21 @@ export default class GradientInfo extends UIElement {
             this.dispatch('/item/set', step)            
         }
     }
+
+    'input $colorsteps input.angle' (e) {
+        var item = this.read('/item/current/image')
+        if (!item) return; 
+
+        var angle = e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('colorstep-id')
+        
+        var step = this.read('/item/get', id)
+
+        if (step) {
+            step.angle = angle == '' ? undefined : angle; 
+            this.dispatch('/item/set', step)            
+        }
+    }    
 
     'click $colorsteps .remove-step' (e) {
         var item = this.read('/item/current/image')

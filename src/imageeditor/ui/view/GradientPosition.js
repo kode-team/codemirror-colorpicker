@@ -34,7 +34,11 @@ export default class GradientPosition extends UIElement {
         var item = this.read('/item/current/image')
         if (!item) return false; 
 
-        if (!this.read('/image/type/isRadial', item.type)) {
+
+        var isRadial = this.read('/image/type/isRadial', item.type);
+        var isConic = this.read('/image/type/isConic', item.type);
+
+        if (isRadial == false && isConic == false) {    // radial , conic 만 보여주기 
             return false; 
         }
 

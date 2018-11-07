@@ -13,6 +13,17 @@ export function debounce (callback, delay) {
     }
 }
 
+export function get(obj, key, callback) {
+    
+    var returnValue = typeof obj[key] == 'undefined' ? key : obj[key];
+
+    if (typeof callback == 'function') {
+        return callback(returnValue);
+    }
+
+    return returnValue; 
+}
+
 export default {
     debounce
 }

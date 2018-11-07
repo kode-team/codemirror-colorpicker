@@ -5573,6 +5573,17 @@ function debounce(callback, delay) {
     };
 }
 
+function get$1(obj, key, callback) {
+
+    var returnValue = typeof obj[key] == 'undefined' ? key : obj[key];
+
+    if (typeof callback == 'function') {
+        return callback(returnValue);
+    }
+
+    return returnValue;
+}
+
 var func = {
     debounce: debounce
 };
@@ -9637,31 +9648,9 @@ var ImageManager = function (_BaseModule) {
             });
         }
     }, {
-        key: '/image/setAngle',
-        value: function imageSetAngle($store) {
-            var angle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-            angle = typeof DEFINED_ANGLES[angle] != 'undefined' ? DEFINED_ANGLES[angle] : +angle % 360;
-
-            $store.dispatch('/image/change', { angle: angle });
-        }
-    }, {
-        key: '/image/setRadialPosition',
-        value: function imageSetRadialPosition($store) {
-            var radialPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-            var item = $store.read('/item/current/image');
-
-            if (item) {
-                item.radialPosition = radialPosition;
-
-                $store.dispatch('/item/set', item);
-            }
-        }
-    }, {
         key: '*/image/type/isGradient',
         value: function imageTypeIsGradient($store, type) {
-            return $store.read('/image/type/isLinear', type) || $store.read('/image/type/isRadial', type);
+            return $store.read('/image/type/isLinear', type) || $store.read('/image/type/isRadial', type) || $store.read('/image/type/isConic', type);
         }
     }, {
         key: '*/image/type/isNotGradient',
@@ -9677,6 +9666,11 @@ var ImageManager = function (_BaseModule) {
         key: '*/image/type/isRadial',
         value: function imageTypeIsRadial($store, type) {
             return ['radial', 'repeating-radial'].includes(type);
+        }
+    }, {
+        key: '*/image/type/isConic',
+        value: function imageTypeIsConic($store, type) {
+            return ['conic', 'repeating-conic'].includes(type);
         }
     }, {
         key: '*/image/type/isImage',
@@ -9751,6 +9745,8 @@ var ImageManager = function (_BaseModule) {
                 return $store.read('/image/toLinear', image$$1, isExport);
             } else if (type == 'radial' || type == 'repeating-radial') {
                 return $store.read('/image/toRadial', image$$1, isExport);
+            } else if (type == 'conic' || type == 'repeating-conic') {
+                return $store.read('/image/toConic', image$$1, isExport);
             } else if (type == 'image') {
                 return $store.read('/image/toImage', image$$1, isExport);
             } else if (type == 'static') {
@@ -9802,6 +9798,42 @@ var ImageManager = function (_BaseModule) {
 
             colors = colors.map(function (f) {
                 return f.color + ' ' + f.percent + '%';
+            }).join(',');
+
+            return colors;
+        }
+    }, {
+        key: '*/image/toConicItemString',
+        value: function imageToConicItemString($store) {
+            var image$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
+
+            if (!image$$1) return '';
+
+            var colorsteps = image$$1.colorsteps || $store.read('/item/map/children', image$$1.id, function (step) {
+                return step;
+            });
+
+            if (!colorsteps) return '';
+
+            var colors = [].concat(toConsumableArray(colorsteps)).map(function (it, index) {
+                it.index = index;
+                return it;
+            });
+            if (!colors.length) return '';
+
+            colors.sort(function (a, b) {
+                if (a.percent == b.percent) {
+                    if (a.index > b.index) return 1;
+                    if (a.index < b.index) return 0;
+                    return 0;
+                }
+                return a.percent > b.percent ? 1 : -1;
+            });
+
+            colors = colors.map(function (f) {
+                var deg = Math.floor(f.percent * 3.6);
+                return f.color + ' ' + deg + 'deg';
             }).join(',');
 
             return colors;
@@ -9867,6 +9899,36 @@ var ImageManager = function (_BaseModule) {
             opt = radialPosition ? radialType + ' at ' + radialPosition : radialType;
 
             return gradientType + '-gradient(' + opt + ', ' + colors + ')';
+        }
+    }, {
+        key: '*/image/toConic',
+        value: function imageToConic($store) {
+            var image$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var colors = $store.read('/image/toConicItemString', image$$1);
+
+            if (colors == '') return '';
+            var opt = [];
+            var conicAngle = image$$1.angle;
+            var conicPosition = image$$1.radialPosition;
+            var gradientType = image$$1.type;
+
+            conicPosition = DEFINED_POSITIONS[conicPosition] ? conicPosition : conicPosition.join(' ');
+
+            if (typeof conicAngle != 'undefined') {
+                conicAngle = get$1(DEFINED_ANGLES, conicAngle, function (it) {
+                    return +it;
+                });
+                opt.push('from ' + conicAngle + 'deg');
+            }
+
+            if (conicPosition) {
+                opt.push('at ' + conicPosition);
+            }
+
+            var optString = opt.length ? opt.join(' ') + ',' : '';
+
+            return gradientType + '-gradient(' + optString + ' ' + colors + ')';
         }
     }, {
         key: '*/image/toImage',
@@ -10596,6 +10658,10 @@ var COLORSTEP_DEFAULT_OBJECT = {
     color: 'rgba(0, 0, 0, 0)'
 };
 
+var gradientTypeList = ['linear', 'radial', 'conic'];
+var repeatingGradientTypeList = ['repeating-linear', 'repeating-radial', 'repeating-conic'];
+var conicList = ['conic', 'repeating-conic'];
+
 var EDITOR_MODE_PAGE = 'page';
 var EDITOR_MODE_LAYER = 'layer-rect';
 var EDITOR_MODE_LAYER_BORDER = 'layer-border';
@@ -10734,16 +10800,19 @@ var ItemManager = function (_BaseModule) {
 
             var imageId = $store.read('/item/create/object', obj, IMAGE_DEFAULT_OBJECT);
 
-            if (obj.type == 'static') {} else if (obj.type == 'image') {} else if (obj.type == 'linear') {
+            if (obj.type == 'static') {} else if (obj.type == 'image') {} else if (gradientTypeList.includes(obj.type)) {
+
+                if (conicList.includes(obj.type)) {
+                    $store.items[imageId].angle = 0;
+                }
+
                 $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
                 $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100 });
-            } else if (obj.type == 'radial') {
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100 });
-            } else if (obj.type == 'repeating-linear') {
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10 });
-            } else if (obj.type == 'repeating-radial') {
+            } else if (repeatingGradientTypeList.includes(obj.type)) {
+                if (conicList.includes(obj.type)) {
+                    $store.items[imageId].angle = 0;
+                }
+
                 $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
                 $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10 });
             }
@@ -10907,7 +10976,11 @@ var ItemManager = function (_BaseModule) {
         }
     }, {
         key: '*/item/map/children',
-        value: function itemMapChildren($store, parentId, callback) {
+        value: function itemMapChildren($store, parentId) {
+            var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (item) {
+                return item;
+            };
+
             return $store.read('/item/filter', function (id) {
                 return $store.items[id].parentId == parentId;
             }).map(function (id, index) {
@@ -13076,12 +13149,10 @@ var GradientInfo = function (_UIElement) {
 
             if (!item) return '';
 
-            var colorsteps = this.read('/item/map/children', item.id, function (step) {
-                return step;
-            });
+            var colorsteps = this.read('/item/map/children', item.id);
 
             return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step) {
-                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" colorstep-id="' + step.id + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
+                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" colorstep-id="' + step.id + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>\n                                <div class="color-angle">\n                                    <input type="number" class="angle" min="0" max="360" step="1"  value="' + step.angle + '"  colorstep-id="' + step.id + '"  />deg\n                                </div>                                \n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
             }).join('') + '\n                </div>';
         }
     }, {
@@ -13148,6 +13219,22 @@ var GradientInfo = function (_UIElement) {
 
             if (step) {
                 step.percent = percent;
+                this.dispatch('/item/set', step);
+            }
+        }
+    }, {
+        key: 'input $colorsteps input.angle',
+        value: function input$colorstepsInputAngle(e) {
+            var item = this.read('/item/current/image');
+            if (!item) return;
+
+            var angle = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            if (step) {
+                step.angle = angle == '' ? undefined : angle;
                 this.dispatch('/item/set', step);
             }
         }
@@ -13349,7 +13436,7 @@ var ImageTypeSelect = function (_BasePropertyItem) {
     createClass(ImageTypeSelect, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class=\'property-item gradient-tools show\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        ';
+            return '\n        <div class=\'property-item gradient-tools show\'>\n            <div class=\'title\' ref="$title">Change Image Types</div>\n            <div class=\'items\' ref="$items">        \n                <div class=\'gradient-type\' ref="$gradientType">\n                    <div ref="$static" class="gradient-item static" data-type="static" title="Static Color"></div>\n                    <div ref="$linear" class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                    <div ref="$radial" class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                    <div ref="$conic" class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                                                \n                    <div ref="$repeatingLinear" class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                    <div ref="$repeatingRadial" class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                    <div ref="$repeatingConic" class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                    \n                    <div ref="$image" class="gradient-item image" data-type="image" title="Background Image">\n                        <div class="m1"></div>\n                        <div class="m2"></div>\n                        <div class="m3"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -13385,12 +13472,26 @@ var ImageTypeSelect = function (_BasePropertyItem) {
                 type = item.type;
             }
 
-            this.refs.$static.toggleClass('selected', type == 'static');
-            this.refs.$linear.toggleClass('selected', type == 'linear');
-            this.refs.$radial.toggleClass('selected', type == 'radial');
-            this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
-            this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
-            this.refs.$image.toggleClass('selected', type == 'image');
+            var selectedItem = this.refs.$gradientType.$('.gradient-item.selected');
+
+            if (selectedItem) {
+                selectedItem.removeClass('selected');
+            }
+
+            var newItem = this.refs.$gradientType.$('.gradient-item[data-type=' + type + ']');
+
+            if (newItem) {
+                newItem.addClass('selected');
+            }
+
+            // this.refs.$static.toggleClass('selected', type == 'static');
+            // this.refs.$linear.toggleClass('selected', type == 'linear');
+            // this.refs.$radial.toggleClass('selected', type == 'radial');
+            // this.refs.$conic.toggleClass('selected', type == 'conic');
+            // this.refs.$repeatingLinear.toggleClass('selected', type == 'repeating-linear');
+            // this.refs.$repeatingRadial.toggleClass('selected', type == 'repeating-radial');
+            // this.refs.$repeatingConic.toggleClass('selected', type == 'repeating-conic');
+            // this.refs.$image.toggleClass('selected', type == 'image');
         }
     }, {
         key: 'click $gradientType .gradient-item',
@@ -14625,7 +14726,7 @@ var ImageList = function (_UIElement) {
     createClass(ImageList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div>\n                                <label>Simple</label>\n                                <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                                <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                                <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            \n                                <div class="gradient-item static" data-type="static" title="Static Color"></div>                                \n                                <div class="gradient-item image" data-type="image" title="Background Image">\n                                    <div class="m1"></div>\n                                    <div class="m2"></div>\n                                    <div class="m3"></div>\n                                </div>                            \n                            </div>\n                            <div>\n                                <label>Repeat</label>                            \n                                <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                                <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                                <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            \n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makeItemNodeImage',
@@ -14844,7 +14945,7 @@ var ClipPathImageResource = function (_BasePropertyItem) {
     createClass(ClipPathImageResource, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item image-resource show'>\n                <div class='items' ref=\"$imageList\">\n\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item image-resource'>\n                <div class='items' ref=\"$imageList\">\n\n                </div>\n            </div>\n        ";
         }
     }, {
         key: 'load $imageList',
@@ -14869,8 +14970,12 @@ var ClipPathImageResource = function (_BasePropertyItem) {
         }
     }, {
         key: '@toggleClipPathImageResource',
-        value: function toggleClipPathImageResource() {
-            this.$el.toggleClass('show');
+        value: function toggleClipPathImageResource(isShow) {
+            if (typeof isShow == 'undefined') {
+                this.$el.toggleClass('show');
+            } else {
+                this.$el.toggleClass('show', isShow);
+            }
         }
     }, {
         key: "setClipPathSvg",
@@ -16192,7 +16297,10 @@ var GradientAngle = function (_UIElement) {
 
             if (!item) return false;
 
-            if (!this.read('/image/type/isLinear', item.type)) {
+            var isLinear = this.read('/image/type/isLinear', item.type);
+            var isConic = this.read('/image/type/isConic', item.type);
+
+            if (isLinear == false && isConic == false) {
                 return false;
             }
 
@@ -16364,7 +16472,11 @@ var GradientPosition = function (_UIElement) {
             var item = this.read('/item/current/image');
             if (!item) return false;
 
-            if (!this.read('/image/type/isRadial', item.type)) {
+            var isRadial = this.read('/image/type/isRadial', item.type);
+            var isConic = this.read('/image/type/isConic', item.type);
+
+            if (isRadial == false && isConic == false) {
+                // radial , conic 만 보여주기 
                 return false;
             }
 
@@ -16560,7 +16672,10 @@ var PredefinedLinearGradientAngle = function (_UIElement) {
                 return false;
             }
 
-            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isLinear', image.type);
+            var isLinear = this.read('/image/type/isLinear', image.type);
+            var isConic = this.read('/image/type/isConic', image.type);
+
+            return this.read('/tool/get', 'guide.angle') && (isLinear || isConic);
         }
     }, {
         key: 'click.self $el button',
@@ -16627,7 +16742,10 @@ var PredefinedRadialGradientPosition = function (_UIElement) {
                 return false;
             }
 
-            return this.read('/tool/get', 'guide.angle') && this.read('/image/type/isRadial', image.type);
+            var isRadial = this.read('/image/type/isRadial', image.type);
+            var isConic = this.read('/image/type/isConic', image.type);
+
+            return this.read('/tool/get', 'guide.angle') && (isRadial || isConic);
         }
     }, {
         key: '@changeEditor',
@@ -16743,7 +16861,10 @@ var SubFeatureControl = function (_UIElement) {
 
             if (!item) return false;
 
-            if (!this.read('/image/type/isLinear', item.type)) {
+            var isLinear = this.read('/image/type/isLinear', item.type);
+            var isConic = this.read('/image/type/isConic', item.type);
+
+            if (isLinear == false && isConic == false) {
                 return false;
             }
 
@@ -16757,7 +16878,10 @@ var SubFeatureControl = function (_UIElement) {
             var item = this.read('/item/current/image');
             if (!item) return false;
 
-            if (!this.read('/image/type/isRadial', item.type)) {
+            var isRadial = this.read('/image/type/isRadial', item.type);
+            var isConic = this.read('/image/type/isConic', item.type);
+
+            if (isRadial == false && isConic == false) {
                 return false;
             }
 
