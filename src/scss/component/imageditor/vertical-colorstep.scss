@@ -123,6 +123,19 @@
 
                 } 
 
+                .guide-step {
+                    position: absolute;
+                    display:inline-block;
+                    box-sizing: border-box;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(10px);
+                    opacity: 0;                  
+                    transition: all 0.3s ease-out;
+                    // background-color: black;
+                    border: 1px solid $border-color;
+                }                 
+
                 &.selected {
                     z-index:1;
                     top: 30px;
@@ -130,11 +143,18 @@
                         height: 24px;
                     }       
                     
-                    .guide-change {
+                    .guide-change, .guide-step {
                         opacity: 1;
                     }
                 }
             }                    
+        }
+
+        .current-percent {
+            position: absolute;
+            display: none;
+            font-size: 12px;
+            transform: translateX(-50%);
         }
     }
 

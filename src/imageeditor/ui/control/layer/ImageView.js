@@ -6,13 +6,13 @@ export default class ImageView extends UIElement {
     template () {
         return `
             <div class='property-view'>
-                <ImageTypeSelect></ImageTypeSelect>                        
+                <!--<ImageTypeSelect></ImageTypeSelect>-->
                 <!-- <ImageListView></ImageListView> -->
                 <SampleList></SampleList>                                   
                 <ColorPickerPanel></ColorPickerPanel>
                 <!--<ColorSteps></ColorSteps>-->
                 <ColorStepsInfo></ColorStepsInfo>
-                <ImageInfo></ImageInfo>
+                <!-- <ImageInfo></ImageInfo> -->
                 <ImageResource></ImageResource>
             </div>  
         `

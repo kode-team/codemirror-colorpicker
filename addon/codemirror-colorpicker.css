@@ -2296,13 +2296,32 @@
               left: 0px;
               right: 0px;
               background-color: black; }
+          .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-step {
+            position: absolute;
+            display: inline-block;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            top: 100%;
+            left: 50%;
+            -webkit-transform: translateX(-50%) translateY(10px);
+                    transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            -webkit-transition: all 0.3s ease-out;
+            transition: all 0.3s ease-out;
+            border: 1px solid #c7c7c7; }
           .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected {
             z-index: 1;
             top: 30px; }
             .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-line {
               height: 24px; }
-            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-change {
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-change, .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-step {
               opacity: 1; }
+      .imageeditor .vertical-colorstep .gradient-steps .current-percent {
+        position: absolute;
+        display: none;
+        font-size: 12px;
+        -webkit-transform: translateX(-50%);
+                transform: translateX(-50%); }
   .imageeditor .page-view {
     position: absolute;
     left: 0px;
@@ -3594,7 +3613,7 @@
         position: absolute;
         left: 0px;
         right: 0px;
-        height: 200px;
+        height: 300px;
         top: 0px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box; }
@@ -3606,9 +3625,24 @@
           height: 22px;
           background-color: #ececec;
           font-size: 12px;
-          padding: 5px;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box; }
+          .imageeditor .export-view .color-view .codeview-container .title .tools {
+            float: right;
+            display: inline-block;
+            height: 100%; }
+            .imageeditor .export-view .color-view .codeview-container .title .tools .tool-item {
+              display: inline-block;
+              min-width: 80px;
+              height: 100%;
+              text-align: center;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              padding: 5px;
+              cursor: pointer; }
+              .imageeditor .export-view .color-view .codeview-container .title .tools .tool-item.selected {
+                background-color: white;
+                color: black; }
         .imageeditor .export-view .color-view .codeview-container .codeview {
           position: absolute;
           left: 0px;
@@ -3619,13 +3653,22 @@
                   box-sizing: border-box; }
           .imageeditor .export-view .color-view .codeview-container .codeview .CodeMirror {
             height: 100%; }
+          .imageeditor .export-view .color-view .codeview-container .codeview .content-item {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            display: none; }
+            .imageeditor .export-view .color-view .codeview-container .codeview .content-item.selected {
+              display: block; }
           .imageeditor .export-view .color-view .codeview-container .codeview textarea {
             position: relative; }
       .imageeditor .export-view .color-view .preview-container {
         position: absolute;
         right: 0px;
         left: 0px;
-        top: 200px;
+        top: 300px;
         bottom: 0px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;

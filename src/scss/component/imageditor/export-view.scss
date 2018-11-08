@@ -35,7 +35,7 @@ $title-height: 22px;
             position: absolute;
             left: 0px;
             right: 0px;
-            height: 200px;
+            height: 300px;
             top: 0px;
             box-sizing: border-box;
 
@@ -47,8 +47,26 @@ $title-height: 22px;
                 height: $title-height;
                 background-color: #ececec;
                 font-size: 12px;
-                padding: 5px;
-                box-sizing: border-box;                                
+                box-sizing: border-box;        
+                
+                .tools {
+                    float:right;
+                    display:inline-block;
+                    height: 100%;
+                    .tool-item {
+                        display:inline-block;
+                        min-width: 80px;
+                        height: 100%;
+                        text-align: center;
+                        box-sizing: border-box;
+                        padding:5px;
+                        cursor: pointer;
+                        &.selected {
+                            background-color: white;
+                            color: black; 
+                        }
+                    }
+                }
             }
             .codeview {
                 position: absolute;
@@ -62,6 +80,20 @@ $title-height: 22px;
                     height: 100%;
                 }
     
+
+                .content-item {
+                    position: absolute;
+                    left: 0px;
+                    top: 0px;
+                    right: 0px;
+                    bottom: 0px;
+                    display: none;
+
+                    &.selected {
+                        display: block; 
+                    }
+
+                }
                 textarea {
                     position: relative;
                 }
@@ -73,7 +105,7 @@ $title-height: 22px;
             position: absolute;
             right: 0px;
             left: 0px;
-            top: 200px;
+            top: 300px;
             bottom: 0px;
             box-sizing: border-box;
             overflow: auto;

@@ -12178,7 +12178,9 @@ var CssManager = function (_BaseModule) {
         value: function cssToString($store, style) {
             var newStyle = $store.read('/css/sorting', style);
 
-            return Object.keys(newStyle).map(function (key) {
+            return Object.keys(newStyle).filter(function (key) {
+                return !!newStyle[key];
+            }).map(function (key) {
                 return key + ": " + newStyle[key];
             }).join(';');
         }
@@ -15342,7 +15344,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <ImageTypeSelect></ImageTypeSelect>                        \n                <!-- <ImageListView></ImageListView> -->\n                <SampleList></SampleList>                                   \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <ImageInfo></ImageInfo>\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <!--<ImageTypeSelect></ImageTypeSelect>-->\n                <!-- <ImageListView></ImageListView> -->\n                <SampleList></SampleList>                                   \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <!-- <ImageInfo></ImageInfo> -->\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -17742,16 +17744,23 @@ var ExportView = function (_UIElement) {
     createClass(ExportView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview-container\">\n                        <div class=\"title\">Code</div>\n                        <div class=\"codeview\">\n                            <textarea ref=\"$code\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"preview-container\">\n                        <div class=\"title\">Preview</div>\n                        <div class='preview' ref=\"$preview\"></div>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='export-view'>\n                <div class=\"color-view\">\n                    <div class=\"close\" ref=\"$close\">&times;</div>        \n                    <div class=\"codeview-container\">\n                        <div class=\"title\">Code\n                            <div class=\"tools\" ref=\"$title\">\n                                <div class=\"tool-item selected\" data-type=\"html\" ref=\"$htmlTitle\">HTML</div>\n                                <div class=\"tool-item\" data-type=\"css\" ref=\"$cssTitle\">CSS</div>\n                            </div>\n                        </div>\n                        <div class=\"codeview\">\n                            <div class=\"content-item selected\" data-type=\"html\" ref=\"$htmlContent\">\n                                <textarea ref=\"$html\"></textarea>\n                            </div>\n                            <div class=\"content-item\" data-type=\"css\" ref=\"$cssContent\">\n                                <textarea ref=\"$css\"></textarea>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"preview-container\">\n                        <div class=\"title\">Preview</div>\n                        <div class='preview' ref=\"$preview\"></div>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "afterRender",
         value: function afterRender() {
-            this.cm = CodeMirror.fromTextArea(this.refs.$code.el, {
+            this.cmHtml = CodeMirror.fromTextArea(this.refs.$html.el, {
                 lineNumbers: true,
                 readOnly: true,
                 lineWrapping: true,
                 mode: "text/html"
+            });
+
+            this.cmCss = CodeMirror.fromTextArea(this.refs.$css.el, {
+                lineNumbers: true,
+                readOnly: true,
+                lineWrapping: true,
+                mode: "text/css"
             });
         }
     }, {
@@ -17765,32 +17774,125 @@ var ExportView = function (_UIElement) {
             return this.read('/css/toString', obj);
         }
     }, {
-        key: "loadCode",
-        value: function loadCode() {
+        key: "getClassName",
+        value: function getClassName(className) {
+            return (className || '').split(' ').map(function (it) {
+                return '.' + it;
+            }).join('');
+        }
+    }, {
+        key: "getPageStyle",
+        value: function getPageStyle(page) {
+            var pageStyle = this.makePageCSS(page).split(';').map(function (it) {
+                return "\t" + it + ';';
+            }).join('\n');
+
+            return pageStyle;
+        }
+    }, {
+        key: "getPageHtml",
+        value: function getPageHtml(page) {
             var _this2 = this;
 
+            var html = "<div id=\"page-1\">\n" + this.read('/item/map/children', page.id, function (item, index) {
+
+                var idString = item.idString || 'layer-' + (index + 1);
+                var className = item.className;
+
+                var selector = [];
+
+                if (className) {
+                    selector.push("class=\"" + className + "\"");
+                }
+
+                if (!selector.length && item.idString) {
+                    selector.push("id=\"" + idString + "\"");
+                } else {
+                    selector.push("id=\"layer-" + (index + 1) + "\"");
+                }
+
+                var clipPath = _this2.read('/layer/toStringClipPath', item);
+
+                if (clipPath) {
+                    clipPath = "\t\t\n" + clipPath;
+                }
+
+                return "\t<div " + selector.join(' ') + ">" + clipPath + "</div>";
+            }).join('\n') + "\n</div>";
+
+            return html;
+        }
+    }, {
+        key: "getLayerStyle",
+        value: function getLayerStyle(page) {
+            var _this3 = this;
+
+            var layerStyle = this.read('/item/map/children', page.id, function (item, index) {
+
+                var idString = item.idString || 'layer-' + (index + 1);
+                var className = item.className;
+
+                var selector = [];
+
+                if (className) {
+                    selector = _this3.getClassName(className);
+                } else {
+                    selector = "#" + idString;
+                }
+
+                var css = _this3.read('/layer/toExport', item, true).split(';').map(function (it) {
+                    return '\t' + it + ';';
+                }).join('\n');
+
+                return selector + " {\n" + css + "\n}";
+            }).join('\n');
+
+            return layerStyle;
+        }
+    }, {
+        key: "generateCode",
+        value: function generateCode() {
             var page = this.read('/item/current/page');
 
             if (!page) {
                 return '';
             }
 
-            var pageStyle = this.makePageCSS(page);
+            var pageStyle = this.getPageStyle(page);
 
-            var html = "<div id=\"page-1\" style=\"" + pageStyle + "\">\n" + this.read('/item/map/children', page.id, function (item, index) {
+            var html = this.getPageHtml(page);
 
-                var idString = item.idString || 'layer-' + (index + 1);
-                var className = item.className;
+            var layerStyle = this.getLayerStyle(page);
 
-                return "\t<div id=\"" + idString + "\"  " + (className ? "class=\"" + className + "\"" : '') + " style=\"" + _this2.read('/layer/toExport', item, true) + "\">\t\t\n" + _this2.read('/layer/toStringClipPath', item) + "</div>";
-            }).join('\n') + "\n</div>";
+            var styleText = "\n#page-1 { \n" + pageStyle + "\n}\n" + layerStyle + "\n\n";
+            var style = "<style type=\"text/css\">" + styleText + "</style>\n";
+            return {
+                html: style + html,
+                css: styleText
+            };
+        }
+    }, {
+        key: "loadCode",
+        value: function loadCode() {
+            var page = this.read('/item/current/page');
 
-            if (this.cm) {
-                this.cm.setValue(html);
-                this.cm.refresh();
+            if (!page) {
+                return '';
             }
 
-            this.refs.$preview.html(html);
+            var generateCode = this.generateCode();
+
+            if (this.cmHtml) {
+                this.cmHtml.setValue(generateCode.html);
+                this.cmHtml.refresh();
+            }
+
+            if (this.cmCss) {
+                this.cmCss.setValue(generateCode.css);
+                this.cmCss.refresh();
+            }
+
+            this.refs.$preview.html(generateCode.html);
         }
     }, {
         key: "refresh",
@@ -17801,6 +17903,30 @@ var ExportView = function (_UIElement) {
         key: 'click $close',
         value: function click$close(e) {
             this.$el.hide();
+        }
+    }, {
+        key: 'click $title .tool-item',
+        value: function click$titleToolItem(e) {
+            var _this4 = this;
+
+            var type = e.$delegateTarget.attr('data-type');
+
+            Object.keys(this.refs).filter(function (it) {
+                return it.includes('Title');
+            }).forEach(function (key) {
+                var obj = _this4.refs[key];
+                obj.toggleClass('selected', "$" + type + "Title" == key);
+            });
+
+            Object.keys(this.refs).filter(function (it) {
+                return it.includes('Content');
+            }).forEach(function (key) {
+                var obj = _this4.refs[key];
+                obj.toggleClass('selected', "$" + type + "Content" == key);
+
+                if (_this4.cmHtml) _this4.cmHtml.refresh();
+                if (_this4.cmHtml) _this4.cmCss.refresh();
+            });
         }
     }, {
         key: '@toggleExport',
