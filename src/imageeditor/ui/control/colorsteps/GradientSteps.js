@@ -6,7 +6,7 @@ export default class GradientSteps extends UIElement {
     template () { 
         return `
             <div class='gradient-steps'>
-                <div class="hue-container"></div>            
+                <div class="hue-container" ref="$back"></div>            
                 <div class="hue" ref="$steps">
                     <div class='step-list' ref="$stepList">
                     </div>
@@ -166,12 +166,12 @@ export default class GradientSteps extends UIElement {
     }
 
     'checkTarget' (e) {
-        return this.refs.$stepList.is(e.target)
+        return this.refs.$back.is(e.target)
     }
 
     // 이미 선언된 메소드를 사용하여 메타 데이타로 쓴다. 
     // checkTarget 이라는 메소드가 true 를 리턴해줘야 아래 이벤트는 실행된다. 
-    'click.checkTarget $steps' (e) {
+    'click $back' (e) {
         this.addStep(e);
     }
 

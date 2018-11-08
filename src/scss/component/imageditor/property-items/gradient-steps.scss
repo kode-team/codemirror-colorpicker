@@ -21,6 +21,7 @@
             z-index: 0;
             // border: 1px solid #ececec;
             box-sizing: border-box;
+            @include transparent-background();             
         }
 
         .hue {
@@ -31,7 +32,7 @@
             box-sizing: border-box;
             cursor: pointer;
             // overflow:hidden;
-            @include transparent-background(); 
+
 
 
             > .step-list {

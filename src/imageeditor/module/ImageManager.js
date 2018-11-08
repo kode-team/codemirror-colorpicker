@@ -147,6 +147,7 @@ export default class ImageManager extends BaseModule {
 
         var results = {} 
         var backgroundImage = $store.read('/image/toImageString', image, isExport)
+        var backgroundPosition = $store.read('/image/toBackgroundPositionString', image, isExport)
         var backgroundSize = $store.read('/image/toBackgroundSizeString', image, isExport)
         var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image, isExport)
 
@@ -157,6 +158,10 @@ export default class ImageManager extends BaseModule {
         if (backgroundSize) {
             results['background-size'] = backgroundSize;
         }
+
+        if (backgroundPosition) {
+            results['background-position'] = backgroundPosition;
+        }        
 
         if (backgroundRepeat) {
             results['background-repeat'] = backgroundRepeat;
@@ -205,7 +210,24 @@ export default class ImageManager extends BaseModule {
         }
 
         return 'auto'
-    }   
+    }  
+    
+
+    '*/image/toBackgroundPositionString' ($store, image) {
+
+        var x = image.backgroundPositionX || 'center';
+        var y = image.backgroundPositionY || 'center';
+
+        if (typeof x == 'number') {
+            x = x + 'px';
+        }
+
+        if (typeof y == 'number') {
+            y = y + 'px';
+        }
+
+        return [x, y].join(' ')
+    }      
     
     '*/image/toBackgroundRepeatString' ($store, image) {
         if (image.backgroundRepeat) {

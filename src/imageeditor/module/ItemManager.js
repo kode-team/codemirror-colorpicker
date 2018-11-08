@@ -58,7 +58,8 @@ const IMAGE_DEFAULT_OBJECT = {
     backgroundSizeWidth: 0,
     backgroundSizeHeight: 0,
     backgroundOrigin: null, 
-    backgroundPosition: null,
+    backgroundPositionX: 0,
+    backgroundPositionY: 0,
     backgroundColor: null,
     backgroundAttachment: null,
     backgroundClip: null

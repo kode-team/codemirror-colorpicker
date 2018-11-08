@@ -9705,6 +9705,7 @@ var ImageManager = function (_BaseModule) {
 
             var results = {};
             var backgroundImage = $store.read('/image/toImageString', image$$1, isExport);
+            var backgroundPosition = $store.read('/image/toBackgroundPositionString', image$$1, isExport);
             var backgroundSize = $store.read('/image/toBackgroundSizeString', image$$1, isExport);
             var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image$$1, isExport);
 
@@ -9714,6 +9715,10 @@ var ImageManager = function (_BaseModule) {
 
             if (backgroundSize) {
                 results['background-size'] = backgroundSize;
+            }
+
+            if (backgroundPosition) {
+                results['background-position'] = backgroundPosition;
             }
 
             if (backgroundRepeat) {
@@ -9766,6 +9771,23 @@ var ImageManager = function (_BaseModule) {
             }
 
             return 'auto';
+        }
+    }, {
+        key: '*/image/toBackgroundPositionString',
+        value: function imageToBackgroundPositionString($store, image$$1) {
+
+            var x = image$$1.backgroundPositionX || 'center';
+            var y = image$$1.backgroundPositionY || 'center';
+
+            if (typeof x == 'number') {
+                x = x + 'px';
+            }
+
+            if (typeof y == 'number') {
+                y = y + 'px';
+            }
+
+            return [x, y].join(' ');
         }
     }, {
         key: '*/image/toBackgroundRepeatString',
@@ -10663,7 +10685,8 @@ var IMAGE_DEFAULT_OBJECT = {
     backgroundSizeWidth: 0,
     backgroundSizeHeight: 0,
     backgroundOrigin: null,
-    backgroundPosition: null,
+    backgroundPositionX: 0,
+    backgroundPositionY: 0,
     backgroundColor: null,
     backgroundAttachment: null,
     backgroundClip: null
@@ -12827,7 +12850,7 @@ var GradientSteps = function (_UIElement) {
     createClass(GradientSteps, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'gradient-steps\'>\n                <div class="hue-container"></div>            \n                <div class="hue" ref="$steps">\n                    <div class=\'step-list\' ref="$stepList">\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'gradient-steps\'>\n                <div class="hue-container" ref="$back"></div>            \n                <div class="hue" ref="$steps">\n                    <div class=\'step-list\' ref="$stepList">\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'getStepPosition',
@@ -12993,15 +13016,15 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'checkTarget',
         value: function checkTarget(e) {
-            return this.refs.$stepList.is(e.target);
+            return this.refs.$back.is(e.target);
         }
 
         // 이미 선언된 메소드를 사용하여 메타 데이타로 쓴다. 
         // checkTarget 이라는 메소드가 true 를 리턴해줘야 아래 이벤트는 실행된다. 
 
     }, {
-        key: 'click.checkTarget $steps',
-        value: function clickCheckTarget$steps(e) {
+        key: 'click $back',
+        value: function click$back(e) {
             this.addStep(e);
         }
     }, {
@@ -13923,7 +13946,7 @@ var BackgroundSize = function (_UIElement) {
     }, {
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item background'>\n                <div class='title' ref=\"$title\">Background</div>            \n                <div class='items'>\n                    <div>\n                        <label>size</label>\n                        <div class='size-list' ref=\"$size\">\n                            <button type=\"button\" value=\"contain\" title=\"contain\" ></button>\n                            <button type=\"button\" value=\"cover\" title=\"cover\"></button>\n                            <button type=\"button\" value=\"auto\" title=\"auto\"></button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <UnitRange \n                            ref=\"$width\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxWidth\"\n                            updateFunction=\"updateWidth\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <UnitRange \n                            ref=\"$height\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxHeight\"\n                            updateFunction=\"updateHeight\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>repeat</label>\n                        <div class='flex repeat-list' ref=\"$repeat\">\n                            <button type=\"button\" value='no-repeat' title=\"no-repeat\">\n                                <span></span>\n                            </button>                        \n                            <button type=\"button\" value='repeat' title=\"repeat\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-x' title=\"repeat-x\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-y' title=\"repeat-y\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='space' title=\"space\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                \n                            </button>\n                            <button type=\"button\" value='round' title=\"round\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                                                \n                            </button>                            \n                            \n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item background'>\n                <!-- <div class='title' ref=\"$title\">Background</div> -->   \n                <div class='items'>\n                    <div>\n                        <label>size</label>\n                        <div class='size-list' ref=\"$size\">\n                            <button type=\"button\" value=\"contain\" title=\"contain\" ></button>\n                            <button type=\"button\" value=\"cover\" title=\"cover\"></button>\n                            <button type=\"button\" value=\"auto\" title=\"auto\"></button>\n                        </div>\n                    </div>\n                    <div>\n                        <label>x</label>\n                        <UnitRange \n                            ref=\"$x\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxX\"\n                            updateFunction=\"updateX\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>y</label>\n                        <UnitRange \n                            ref=\"$y\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxY\"\n                            updateFunction=\"updateY\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>width</label>\n                        <UnitRange \n                            ref=\"$width\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxWidth\"\n                            updateFunction=\"updateWidth\"\n                        ></UnitRange>\n                    </div>\n                    <div>\n                        <label>height</label>\n                        <UnitRange \n                            ref=\"$height\" \n                            min=\"0\" max=\"1000\" step=\"1\" value=\"0\" unit=\"px\" \n                            maxValueFunction=\"getMaxHeight\"\n                            updateFunction=\"updateHeight\"\n                        ></UnitRange>\n                    </div>                    \n                    <div>\n                        <label>repeat</label>\n                        <div class='flex repeat-list' ref=\"$repeat\">\n                            <button type=\"button\" value='no-repeat' title=\"no-repeat\">\n                                <span></span>\n                            </button>                        \n                            <button type=\"button\" value='repeat' title=\"repeat\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-x' title=\"repeat-x\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='repeat-y' title=\"repeat-y\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                            </button>\n                            <button type=\"button\" value='space' title=\"space\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                \n                            </button>\n                            <button type=\"button\" value='round' title=\"round\">\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>\n                                <span></span>                                                                \n                            </button>                            \n                            \n                        </div>\n                 \n                    </div>\n\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "updateWidth",
@@ -13946,6 +13969,26 @@ var BackgroundSize = function (_UIElement) {
             });
         }
     }, {
+        key: "updateX",
+        value: function updateX(value) {
+            var _this4 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundPositionX = value;
+                _this4.dispatch('/item/set', image);
+            });
+        }
+    }, {
+        key: "updateY",
+        value: function updateY(value) {
+            var _this5 = this;
+
+            this.read('/item/current/image', function (image) {
+                image.backgroundPositionY = value;
+                _this5.dispatch('/item/set', image);
+            });
+        }
+    }, {
         key: "getMaxHeight",
         value: function getMaxHeight() {
             var layer = this.read('/item/current/layer');
@@ -13953,6 +13996,15 @@ var BackgroundSize = function (_UIElement) {
             if (!layer) return 0;
 
             return parseParamNumber$1(layer.style.height);
+        }
+    }, {
+        key: "getMaxY",
+        value: function getMaxY() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return 0;
+
+            return parseParamNumber$1(layer.style.height) * 2;
         }
     }, {
         key: "getMaxWidth",
@@ -13964,14 +14016,23 @@ var BackgroundSize = function (_UIElement) {
             return parseParamNumber$1(layer.style.width);
         }
     }, {
+        key: "getMaxX",
+        value: function getMaxX() {
+            var layer = this.read('/item/current/layer');
+
+            if (!layer) return 0;
+
+            return parseParamNumber$1(layer.style.width) * 2;
+        }
+    }, {
         key: 'click $size button',
         value: function click$sizeButton(e) {
-            var _this4 = this;
+            var _this6 = this;
 
             this.read('/item/current/image', function (image) {
                 image.backgroundSize = e.$delegateTarget.val();
-                _this4.selectBackgroundSize(image.backgroundSize);
-                _this4.dispatch('/item/set', image);
+                _this6.selectBackgroundSize(image.backgroundSize);
+                _this6.dispatch('/item/set', image);
             });
         }
     }, {
@@ -14007,12 +14068,12 @@ var BackgroundSize = function (_UIElement) {
     }, {
         key: 'click $repeat button',
         value: function click$repeatButton(e) {
-            var _this5 = this;
+            var _this7 = this;
 
             this.read('/item/current/image', function (image) {
                 image.backgroundRepeat = e.$delegateTarget.val();
-                _this5.selectBackgroundRepeat(image.backgroundRepeat);
-                _this5.dispatch('/item/set', image);
+                _this7.selectBackgroundRepeat(image.backgroundRepeat);
+                _this7.dispatch('/item/set', image);
             });
         }
     }, {
@@ -14023,7 +14084,7 @@ var BackgroundSize = function (_UIElement) {
     }, {
         key: "refresh",
         value: function refresh() {
-            var _this6 = this;
+            var _this8 = this;
 
             var isShow = this.isShow();
 
@@ -14031,10 +14092,12 @@ var BackgroundSize = function (_UIElement) {
 
             if (isShow) {
                 this.read('/item/current/image', function (image) {
-                    _this6.children.$width.refresh(image.backgroundSizeWidth);
-                    _this6.children.$height.refresh(image.backgroundSizeHeight);
-                    _this6.selectBackgroundSize(image.backgroundSize);
-                    _this6.selectBackgroundRepeat(image.backgroundRepeat);
+                    _this8.children.$width.refresh(image.backgroundSizeWidth);
+                    _this8.children.$height.refresh(image.backgroundSizeHeight);
+                    _this8.children.$x.refresh(image.backgroundPositionX);
+                    _this8.children.$y.refresh(image.backgroundPositionY);
+                    _this8.selectBackgroundSize(image.backgroundSize);
+                    _this8.selectBackgroundRepeat(image.backgroundRepeat);
                 });
             }
         }
