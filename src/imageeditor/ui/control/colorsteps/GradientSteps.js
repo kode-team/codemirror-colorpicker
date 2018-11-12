@@ -368,6 +368,82 @@ export default class GradientSteps extends UIElement {
         }        
     }
 
+
+    'input $steps input.percent' (e) {
+        var item = this.read('/item/current/image')
+        if (!item) return; 
+
+        var layer = this.read('/item/current/layer');
+
+        var percent = e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('colorstep-id')
+        
+        var step = this.read('/item/get', id)
+
+        if (step) {
+            step.percent = percent; 
+            step.px = percent2px(percent, this.getMaxValue(layer) );
+            step.em = percent2em(percent, this.getMaxValue(layer) );
+
+            this.currentStepBox.px('left', step.px)                
+            // this.currentUnitPercent.val(item.percent);
+            this.currentUnitPx.val(step.px);
+            this.currentUnitEm.val(step.em);
+
+            this.dispatch('/item/set', step)            
+        }
+    }
+
+    'input $steps input.px' (e) {
+        var item = this.read('/item/current/image')
+        if (!item) return; 
+
+        var layer = this.read('/item/current/layer');
+
+        var px = e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('colorstep-id')
+        
+        var step = this.read('/item/get', id)
+
+        if (step) {
+            step.px = px; 
+            step.percent = px2percent(px, this.getMaxValue(layer));
+            step.em = px2em(px, this.getMaxValue(layer));
+
+            this.currentStepBox.px('left', step.px)                
+            this.currentUnitPercent.val(step.percent);
+            // this.currentUnitPx.val(item.px);
+            this.currentUnitEm.val(step.em);
+
+            this.dispatch('/item/set', step)            
+        }
+    }
+    
+    'input $steps input.em' (e) {
+        var item = this.read('/item/current/image')
+        if (!item) return; 
+
+        var layer = this.read('/item/current/layer');        
+
+        var em = e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('colorstep-id')
+        
+        var step = this.read('/item/get', id)
+
+        if (step) {
+            step.em = em; 
+            step.percent = em2percent(em, this.getMaxValue(layer));
+            step.px = em2px(em, this.getMaxValue(layer));   
+            
+            this.currentStepBox.px('left', step.px)                
+            this.currentUnitPercent.val(step.percent);
+            this.currentUnitPx.val(step.px);
+            // this.currentUnitEm.val(item.em);
+        
+            this.dispatch('/item/set', step)            
+        }
+    }        
+
     // Event Bindings 
     'pointerend document' (e) { 
         this.onDragEnd(e);
