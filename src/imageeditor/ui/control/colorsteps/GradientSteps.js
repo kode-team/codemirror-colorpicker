@@ -375,8 +375,8 @@ export default class GradientSteps extends UIElement {
 
         var layer = this.read('/item/current/layer');
 
-        var percent = e.$delegateTarget.val()
-        var id = e.$delegateTarget.attr('colorstep-id')
+        var percent = +e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('data-colorstep-id')
         
         var step = this.read('/item/get', id)
 
@@ -390,7 +390,8 @@ export default class GradientSteps extends UIElement {
             this.currentUnitPx.val(step.px);
             this.currentUnitEm.val(step.em);
 
-            this.dispatch('/item/set', step)            
+            this.dispatch('/item/set', step)   
+            this.setBackgroundColor();         
         }
     }
 
@@ -400,8 +401,8 @@ export default class GradientSteps extends UIElement {
 
         var layer = this.read('/item/current/layer');
 
-        var px = e.$delegateTarget.val()
-        var id = e.$delegateTarget.attr('colorstep-id')
+        var px = +e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('data-colorstep-id')
         
         var step = this.read('/item/get', id)
 
@@ -415,7 +416,8 @@ export default class GradientSteps extends UIElement {
             // this.currentUnitPx.val(item.px);
             this.currentUnitEm.val(step.em);
 
-            this.dispatch('/item/set', step)            
+            this.dispatch('/item/set', step)    
+            this.setBackgroundColor();                    
         }
     }
     
@@ -425,8 +427,8 @@ export default class GradientSteps extends UIElement {
 
         var layer = this.read('/item/current/layer');        
 
-        var em = e.$delegateTarget.val()
-        var id = e.$delegateTarget.attr('colorstep-id')
+        var em = +e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('data-colorstep-id')
         
         var step = this.read('/item/get', id)
 
@@ -440,7 +442,8 @@ export default class GradientSteps extends UIElement {
             this.currentUnitPx.val(step.px);
             // this.currentUnitEm.val(item.em);
         
-            this.dispatch('/item/set', step)            
+            this.dispatch('/item/set', step)   
+            this.setBackgroundColor();         
         }
     }        
 
