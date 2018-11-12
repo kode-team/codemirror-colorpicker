@@ -3515,7 +3515,8 @@
                       appearance: none;
               border: 0px;
               background-color: transparent;
-              display: inline-block; }
+              display: inline-block;
+              outline: none; }
       .imageeditor .property-view .property-item.gradient-tools {
         display: block;
         width: 100%;
