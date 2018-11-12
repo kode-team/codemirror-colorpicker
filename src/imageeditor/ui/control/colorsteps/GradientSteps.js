@@ -1,5 +1,6 @@
 import UIElement from '../../../../colorpicker/UIElement';
 import Dom from '../../../../util/Dom';
+import { px2em, px2percent } from '../../../../util/filter/functions';
 
 export default class GradientSteps extends UIElement {
 
@@ -15,7 +16,7 @@ export default class GradientSteps extends UIElement {
         ` 
     }
 
-    getStepPosition (percent) {
+    getStepPosition (step) {
         var {min, max} = this.getMinMax() 
         
         var left = this.refs.$steps.offset().left
@@ -23,7 +24,17 @@ export default class GradientSteps extends UIElement {
         min -= left;
         max -= left;
 
-        return min + (max - min) * (percent / 100);
+        if (step.unit == 'px') {
+            return step.px;
+        } 
+
+        return min + (max - min) * (step.percent / 100);
+    }
+
+    '@step/position' (step, callback) {
+        if (typeof callback == 'function') {
+            callback (this.getStepPosition(step));
+        }
     }
 
     // load 후에 이벤트를 재설정 해야한다. 
@@ -41,7 +52,7 @@ export default class GradientSteps extends UIElement {
                     class='drag-bar step ${step.selected ? 'selected' : ''}' 
                     id="${step.id}"
                     color="${step.color}" 
-                    style="left: ${this.getStepPosition(step.percent)}px; border-color: ${step.color};background-color: ${step.color};"
+                    style="left: ${this.getStepPosition(step)}px; border-color: ${step.color};background-color: ${step.color};"
                 >
                     <div class='guide-line' 
                         style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ${step.color} 10%) ;"></div>
@@ -127,15 +138,20 @@ export default class GradientSteps extends UIElement {
 
         if (this.currentStep) {
             var posX = Math.max(min, current)
-            this.currentStep.px('left', posX - this.refs.$steps.offsetLeft())
-
-            var percent = Math.floor((current - min) / (max - min) * 100)
+            var px = posX - this.refs.$steps.offsetLeft();
+            this.currentStep.px('left', px)
+            // var percent = Math.floor((current - min) / (max - min) * 100)
 
             var item = this.read('/item/get', this.currentStep.attr('id'));
 
             if (item) {
-                item.percent = percent;
+
+                item.px = px; 
+                item.percent = Math.floor(px2percent(px, max - min));
+                item.em = px2em(px, max- min);
+
                 this.dispatch('/item/set', item);
+                this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());                
                 this.setBackgroundColor();
             }
         }
@@ -214,6 +230,19 @@ export default class GradientSteps extends UIElement {
         this.dispatch('/colorstep/initColor', color)        
     }
 
+    getSortedStepList () {
+        var list = this.refs.$stepList.$$('.step').map(it => {
+            return {id : it.attr('id'), x: it.cssFloat('left')}
+        })
+
+        list.sort((a, b) => {
+            if (a.x == b.x) return 0; 
+            return a.x > b.x ? 1: -1;
+        })
+
+        return list.map(it => it.id)
+    }
+
     selectStep (e) {
         var item = this.read('/item/get', e.$delegateTarget.attr('id'));
             
@@ -230,7 +259,8 @@ export default class GradientSteps extends UIElement {
             $selected.removeClass('selected');
         }
         this.currentStep.addClass('selected')
-        this.dispatch('/item/set', item); 
+        this.run ('/item/set', item); 
+        this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
         this.setBackgroundColor();
     }
 

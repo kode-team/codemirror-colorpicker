@@ -19,6 +19,7 @@ export default class VerticalColorStep extends UIElement {
 
     refresh () {
         this.$el.toggle(this.isShow())
+        this.$el.px('width', this.$store.step.width);
     }
 
     '@changeEditor' () {

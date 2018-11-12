@@ -3652,6 +3652,8 @@ function percent2em(percent, maxValue) {
     return px2em(percent2px(percent, maxValue), maxValue);
 }
 
+
+
 var filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
 function pack$1(callback) {
     return function (bitmap, done) {
@@ -5709,11 +5711,26 @@ var Dom = function () {
             return null;
         }
     }, {
+        key: 'parent',
+        value: function parent() {
+            return new Dom(this.el.parentNode);
+        }
+    }, {
         key: 'removeClass',
-        value: function removeClass(cls) {
+        value: function removeClass() {
 
             if (this.el.className) {
-                this.el.className = (' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' ').trim();
+                var className = this.el.className;
+
+                for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                    args[_key] = arguments[_key];
+                }
+
+                args.forEach(function (cls) {
+                    className = (' ' + className + ' ').replace(' ' + cls + ' ', ' ').trim();
+                });
+
+                this.el.className = className;
             }
 
             return this;
@@ -9331,6 +9348,15 @@ var ColorStepManager = function (_BaseModule) {
     }
 
     createClass(ColorStepManager, [{
+        key: "initialize",
+        value: function initialize() {
+            get(ColorStepManager.prototype.__proto__ || Object.getPrototypeOf(ColorStepManager.prototype), "initialize", this).call(this);
+
+            this.$store.step = {
+                width: 400
+            };
+        }
+    }, {
         key: '*/colorstep/create',
         value: function colorstepCreate($store, obj) {
             if (obj) {
@@ -9412,64 +9438,6 @@ var ColorStepManager = function (_BaseModule) {
             $store.dispatch('/tool/setColorSource', INIT_COLOR_SOURCE);
             $store.dispatch('/tool/changeColor', color);
         }
-
-        // 이미지 변경하기 
-
-    }, {
-        key: '/colorstep/change',
-        value: function colorstepChange($store, newColorStep, index) {
-            // 현재 image 설정 
-            // 현재 layer 설정 
-            $store.dispatch('/colorstep/set', newColorStep, index);
-        }
-
-        // 이미지 설정하기 , 이벤트 까지 
-
-    }, {
-        key: '/colorstep/set',
-        value: function colorstepSet($store, newColorStep, index) {
-            var current = $store.read('/colorstep/current', index);
-            Object.assign(current, newColorStep);
-
-            var colorsteps = $store.read('/colorstep/list');
-
-            $store.dispatch('/image/change', { colorsteps: colorsteps });
-        }
-    }, {
-        key: '/colorstep/select',
-        value: function colorstepSelect($store, selectedIndex) {
-            var colorsteps = $store.read('/colorstep/list');
-
-            colorsteps.forEach(function (step, index) {
-                step.selected = selectedIndex === index;
-            });
-
-            $store.dispatch('/colorstep/setAll', colorsteps);
-        }
-    }, {
-        key: '/colorstep/setStep',
-        value: function colorstepSetStep($store, color, percent, index) {
-            var current = $store.read('/colorstep/current', index);
-
-            if (typeof color != 'undefined') {
-                current.color = color;
-            }
-
-            if (typeof percent != 'undefined') {
-                current.percent = percent;
-            }
-
-            var colorsteps = $store.read('/colorstep/list');
-
-            $store.dispatch('/colorstep/setStepAll', colorsteps);
-        }
-    }, {
-        key: '/colorstep/setAll',
-        value: function colorstepSetAll($store) {
-            var colorsteps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-            $store.dispatch('/image/change', { colorsteps: colorsteps });
-        }
     }, {
         key: '/colorstep/add',
         value: function colorstepAdd($store, item, percent) {
@@ -9478,8 +9446,8 @@ var ColorStepManager = function (_BaseModule) {
 
             if (!list.length) {
 
-                $store.read('/item/create/colorstep', { parentId: item.id, color: 'rgba(0, 0, 0, 0)', percent: percent });
-                $store.read('/item/create/colorstep', { parentId: item.id, color: 'rgba(0, 0, 0, 1)', percent: 100 });
+                $store.read('/item/create/colorstep', { parentId: item.id, color: 'rgba(0, 0, 0, 0)', percent: percent, index: 0 });
+                $store.read('/item/create/colorstep', { parentId: item.id, color: 'rgba(0, 0, 0, 1)', percent: 100, index: 100 });
 
                 $store.dispatch('/item/set', item);
                 return;
@@ -9491,16 +9459,19 @@ var ColorStepManager = function (_BaseModule) {
 
             if (percent < colorsteps[0].percent) {
 
-                $store.read('/item/create/colorstep', { parentId: item.id, color: colorsteps[0].color, percent: percent });
+                colorsteps[0].index = 1;
+
+                $store.read('/item/create/colorstep', { parentId: item.id, index: 0, color: colorsteps[0].color, percent: percent });
+                $store.run('/item/set', colorsteps[0]);
                 $store.dispatch('/item/set', item);
                 return;
             }
 
             if (colorsteps[colorsteps.length - 1].percent < percent) {
                 var color = colorsteps[colorsteps.length - 1].color;
+                var index = colorsteps[colorsteps.length - 1].index;
 
-                $store.read('/item/create/colorstep', { parentId: item.id, color: color, percent: percent });
-
+                $store.read('/item/create/colorstep', { parentId: item.id, index: index + 1, color: color, percent: percent });
                 $store.dispatch('/item/set', item);
                 return;
             }
@@ -9512,8 +9483,7 @@ var ColorStepManager = function (_BaseModule) {
                 if (step.percent <= percent && percent <= nextStep.percent) {
                     var color = Color$1.mix(step.color, nextStep.color, (percent - step.percent) / (nextStep.percent - step.percent), 'rgb');
 
-                    $store.read('/item/create/colorstep', { parentId: item.id, color: color, percent: percent });
-
+                    $store.read('/item/create/colorstep', { parentId: item.id, index: step.index + 1, color: color, percent: percent });
                     $store.dispatch('/item/set', item);
                     return;
                 }
@@ -9529,6 +9499,31 @@ var ColorStepManager = function (_BaseModule) {
             $store.dispatch('/item/remove', id);
 
             $store.dispatch('/item/set', image);
+        }
+    }, {
+        key: '/colorstep/sort',
+        value: function colorstepSort($store, id, sortedList) {
+
+            sortedList.forEach(function (stepId, index) {
+                var item = $store.read('/item/get', stepId);
+                item.index = index * 100;
+
+                $store.run('/item/set', item);
+            });
+
+            $store.run('/item/sort', id);
+        }
+    }, {
+        key: '*/colorstep/sort/list',
+        value: function colorstepSortList($store, parentId) {
+            var colorsteps = $store.read('/item/map/children', parentId);
+
+            colorsteps.sort(function (a, b) {
+                if (a.index == b.index) return 0;
+                return a.index > b.index ? 1 : -1;
+            });
+
+            return colorsteps;
         }
     }]);
     return ColorStepManager;
@@ -9797,6 +9792,28 @@ var ImageManager = function (_BaseModule) {
             }
         }
     }, {
+        key: '*/image/get/unitValue',
+        value: function imageGetUnitValue($store, step) {
+            if (step.unit == 'px') {
+                return step.px + 'px';
+            } else if (step.unit == 'em') {
+                return step.em + 'em';
+            }
+
+            return step.percent + '%';
+        }
+    }, {
+        key: '*/image/get/stepValue',
+        value: function imageGetStepValue($store, step) {
+            if (step.unit == 'px') {
+                return step.px;
+            } else if (step.unit == 'em') {
+                return step.em;
+            }
+
+            return step.percent;
+        }
+    }, {
         key: '*/image/toItemString',
         value: function imageToItemString($store) {
             var image$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
@@ -9814,21 +9831,29 @@ var ImageManager = function (_BaseModule) {
             if (!colors.length) return '';
 
             colors.sort(function (a, b) {
-                if (a.percent == b.percent) return 0;
-                return a.percent > b.percent ? 1 : -1;
+                if (a.index == b.index) return 0;
+                return a.index > b.index ? 1 : -1;
             });
 
             var newColors = [];
             colors.forEach(function (c, index) {
                 if (c.cut && index > 0) {
-                    newColors.push(Object.assign({}, c, { percent: colors[index - 1].percent }));
+                    newColors.push(Object.assign({}, c, {
+                        unit: colors[index - 1].unit,
+                        percent: colors[index - 1].percent,
+                        px: colors[index - 1].px,
+                        em: colors[index - 1].em
+                    }));
                 }
 
                 newColors.push(c);
             });
 
             colors = newColors.map(function (f) {
-                return f.color + ' ' + f.percent + '%';
+
+                var value = $store.read('/image/get/unitValue', f);
+
+                return f.color + ' ' + value;
             }).join(',');
 
             return colors;
@@ -10601,8 +10626,32 @@ var GradientManager = function (_BaseModule) {
                 image = Object.assign({}, image, obj);
 
                 if (image.colorsteps) {
-                    image.colorsteps.forEach(function (step) {
+
+                    if (typeof image.colorsteps[0].index == 'undefined') {
+                        image.colorsteps.sort(function (a, b) {
+
+                            var aValue = $store.read('/image/get/stepValue', a);
+                            var bValue = $store.read('/image/get/stepValue', b);
+
+                            if (aValue == bValue) return 0;
+
+                            return aValue > bValue ? 1 : -1;
+                        });
+                    } else {
+                        image.colorsteps.sort(function (a, b) {
+
+                            var aValue = a.index;
+                            var bValue = b.index;
+
+                            if (aValue == bValue) return 0;
+
+                            return aValue > bValue ? 1 : -1;
+                        });
+                    }
+
+                    image.colorsteps.forEach(function (step, index) {
                         step.parentId = image.id;
+                        step.index = index * 100;
                         $store.read('/item/create/colorstep', step);
                     });
                     // 기존 데이타를 변경 후에 colorsteps 는 지운다. 
@@ -10847,15 +10896,15 @@ var ItemManager = function (_BaseModule) {
                     $store.items[imageId].angle = 0;
                 }
 
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100 });
+                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0, index: 0 });
+                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100, index: 100 });
             } else if (repeatingGradientTypeList.includes(obj.type)) {
                 if (conicList.includes(obj.type)) {
                     $store.items[imageId].angle = 0;
                 }
 
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0 });
-                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10 });
+                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0, index: 0 });
+                $store.read('/item/create/colorstep', { parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10, index: 100 });
             }
 
             return imageId;
@@ -12854,7 +12903,7 @@ var GradientSteps = function (_UIElement) {
         }
     }, {
         key: 'getStepPosition',
-        value: function getStepPosition(percent) {
+        value: function getStepPosition(step) {
             var _getMinMax = this.getMinMax(),
                 min = _getMinMax.min,
                 max = _getMinMax.max;
@@ -12864,7 +12913,18 @@ var GradientSteps = function (_UIElement) {
             min -= left;
             max -= left;
 
-            return min + (max - min) * (percent / 100);
+            if (step.unit == 'px') {
+                return step.px;
+            }
+
+            return min + (max - min) * (step.percent / 100);
+        }
+    }, {
+        key: '@step/position',
+        value: function stepPosition(step, callback) {
+            if (typeof callback == 'function') {
+                callback(this.getStepPosition(step));
+            }
         }
 
         // load 후에 이벤트를 재설정 해야한다. 
@@ -12882,7 +12942,7 @@ var GradientSteps = function (_UIElement) {
 
                 var cut = step.cut ? 'cut' : '';
 
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step.percent) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                </div>\n            ';
+                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                </div>\n            ';
             });
         }
     }, {
@@ -12975,15 +13035,20 @@ var GradientSteps = function (_UIElement) {
 
             if (this.currentStep) {
                 var posX = Math.max(min, current);
-                this.currentStep.px('left', posX - this.refs.$steps.offsetLeft());
-
-                var percent = Math.floor((current - min) / (max - min) * 100);
+                var px = posX - this.refs.$steps.offsetLeft();
+                this.currentStep.px('left', px);
+                // var percent = Math.floor((current - min) / (max - min) * 100)
 
                 var item = this.read('/item/get', this.currentStep.attr('id'));
 
                 if (item) {
-                    item.percent = percent;
+
+                    item.px = px;
+                    item.percent = Math.floor(px2percent(px, max - min));
+                    item.em = px2em(px, max - min);
+
                     this.dispatch('/item/set', item);
+                    this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
                     this.setBackgroundColor();
                 }
             }
@@ -13073,6 +13138,22 @@ var GradientSteps = function (_UIElement) {
             this.dispatch('/colorstep/initColor', color);
         }
     }, {
+        key: 'getSortedStepList',
+        value: function getSortedStepList() {
+            var list = this.refs.$stepList.$$('.step').map(function (it) {
+                return { id: it.attr('id'), x: it.cssFloat('left') };
+            });
+
+            list.sort(function (a, b) {
+                if (a.x == b.x) return 0;
+                return a.x > b.x ? 1 : -1;
+            });
+
+            return list.map(function (it) {
+                return it.id;
+            });
+        }
+    }, {
         key: 'selectStep',
         value: function selectStep(e) {
             var item = this.read('/item/get', e.$delegateTarget.attr('id'));
@@ -13090,7 +13171,8 @@ var GradientSteps = function (_UIElement) {
                 $selected.removeClass('selected');
             }
             this.currentStep.addClass('selected');
-            this.dispatch('/item/set', item);
+            this.run('/item/set', item);
+            this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
             this.setBackgroundColor();
         }
     }, {
@@ -13226,26 +13308,76 @@ var GradientInfo = function (_UIElement) {
     }
 
     createClass(GradientInfo, [{
-        key: 'template',
+        key: "template",
         value: function template() {
-            return ' \n            <div class=\'gradient-info\'>\n                <div class="form-item" ref="$colorsteps">\n\n                </div>\n            </div>\n        ';
+            return " \n            <div class='gradient-info'>\n                <div class=\"form-item\" ref=\"$colorsteps\">\n\n                </div>\n            </div>\n        ";
+        }
+    }, {
+        key: "getUnitName",
+        value: function getUnitName(step) {
+            var unit = step.unit || '%';
+
+            if (['px', 'em'].includes(unit)) {
+                return unit;
+            }
+
+            return 'percent';
+        }
+    }, {
+        key: "getUnitSelect",
+        value: function getUnitSelect(step) {
+
+            var unit = step.unit || '%';
+
+            if (['px', 'em'].includes(unit) == false) {
+                unit = '%';
+            }
+
+            return "\n        <select class='unit' colorstep-id=\"" + step.id + "\">\n            <option value='%' " + (unit == '%' ? 'selected' : '') + ">%</option>\n            <option value='px' " + (unit == 'px' ? 'selected' : '') + ">px</option>\n            <option value='em' " + (unit == 'em' ? 'selected' : '') + ">em</option>\n        </select>\n        ";
+        }
+    }, {
+        key: "getUnitValue",
+        value: function getUnitValue(step) {
+
+            if (step.unit == 'px') {
+                return {
+                    px: step.px,
+                    percent: px2percent(step.px, this.getMaxValue()),
+                    em: px2em(step.px, this.getMaxValue())
+                };
+            } else if (step.unit == 'em') {
+                return {
+                    em: step.em,
+                    percent: em2percent(step.em, this.getMaxValue()),
+                    px: em2px(step.em, this.getMaxValue())
+                };
+            }
+
+            return {
+                percent: step.percent,
+                px: percent2px(step.percent, this.getMaxValue()),
+                em: percent2em(step.percent, this.getMaxValue())
+            };
         }
     }, {
         key: 'load $colorsteps',
         value: function load$colorsteps() {
+            var _this2 = this;
 
             var item = this.read('/item/current/image');
 
             if (!item) return '';
 
-            var colorsteps = this.read('/item/map/children', item.id);
+            var colorsteps = this.read('/colorstep/sort/list', item.id);
 
-            return '<div class=\'step-list\' ref="$stepList">\n                    ' + colorsteps.map(function (step) {
-                return '\n                            <div class=\'color-step ' + (step.selected ? 'selected' : '') + '\' style="background-color: ' + (step.selected ? step.color : '') + '" colorstep-id="' + step.id + '" >\n                                <div class="color-view">\n                                    <div class="color-view-item" style="background-color: ' + step.color + '" colorstep-id="' + step.id + '" ></div>\n                                </div>\n                                <div class="color-code">\n                                    <input type="text" class="code" value=\'' + step.color + '\'  colorstep-id="' + step.id + '"  />\n                                </div>\n                                <div class="color-percent">\n                                    <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + step.percent + '"   colorstep-id="' + step.id + '"  />%\n                                </div>                       \n                                <div class="tools">\n                                    <button type="button" class=\'remove-step\'  colorstep-id="' + step.id + '" >&times;</button>\n                                </div>\n                            </div>\n                        ';
-            }).join('') + '\n                </div>';
+            return "<div class='step-list' ref=\"$stepList\">\n                    " + colorsteps.map(function (step) {
+                var cut = step.cut ? 'cut' : '';
+                var unitValue = _this2.getUnitValue(step);
+                return "\n                            <div class='color-step " + (step.selected ? 'selected' : '') + "' colorstep-id=\"" + step.id + "\" >\n                                <div class=\"color-cut\">\n                                    <div class=\"guide-change " + cut + "\" colorstep-id=\"" + step.id + "\"></div>\n                                </div>                                \n                                <div class=\"color-view\">\n                                    <div class=\"color-view-item\" style=\"background-color: " + step.color + "\" colorstep-id=\"" + step.id + "\" ></div>\n                                </div>                            \n                                <div class=\"color-code\">\n                                    <input type=\"text\" class=\"code\" value='" + step.color + "' colorstep-id=\"" + step.id + "\"  />\n                                </div>\n                                <div class=\"color-unit " + _this2.getUnitName(step) + "\">\n                                    <input type=\"number\" class=\"percent\" min=\"0\" max=\"100\" step=\"0.1\"  value=\"" + unitValue.percent + "\" colorstep-id=\"" + step.id + "\"  />\n                                    <input type=\"number\" class=\"px\" min=\"0\" max=\"1000\" step=\"1\"  value=\"" + unitValue.px + "\" colorstep-id=\"" + step.id + "\"  />\n                                    <input type=\"number\" class=\"em\" min=\"0\" max=\"500\" step=\"0.1\"  value=\"" + unitValue.em + "\" colorstep-id=\"" + step.id + "\"  />\n                                    " + _this2.getUnitSelect(step) + "\n                                </div>                       \n                                <div class=\"tools\">\n                                    <button type=\"button\" class='remove-step' colorstep-id=\"" + step.id + "\" >&times;</button>\n                                </div>\n                            </div>\n                        ";
+            }).join('') + "\n                </div>";
         }
     }, {
-        key: 'refresh',
+        key: "refresh",
         value: function refresh() {
             this.load();
         }
@@ -13255,12 +13387,12 @@ var GradientInfo = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'initColor',
+        key: "initColor",
         value: function initColor(color) {
             this.dispatch('/colorstep/initColor', color);
         }
     }, {
-        key: 'selectStep',
+        key: "selectStep",
         value: function selectStep(e) {
             var item = this.read('/item/get', e.$delegateTarget.attr('colorstep-id'));
 
@@ -13296,10 +13428,37 @@ var GradientInfo = function (_UIElement) {
             }
         }
     }, {
+        key: "getMaxValue",
+        value: function getMaxValue(layer) {
+            return this.$store.step.width;
+        }
+    }, {
+        key: 'change $colorsteps select.unit',
+        value: function change$colorstepsSelectUnit(e) {
+
+            var unit = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            console.log(id);
+
+            if (step) {
+                step.unit = unit;
+                this.dispatch('/item/set', step);
+
+                console.log(e.$delegateTarget);
+                var $parent = e.$delegateTarget.parent();
+                $parent.removeClass('percent', 'px', 'em').addClass(unit);
+            }
+        }
+    }, {
         key: 'input $colorsteps input.percent',
         value: function input$colorstepsInputPercent(e) {
             var item = this.read('/item/current/image');
             if (!item) return;
+
+            var layer = this.read('/item/current/layer');
 
             var percent = e.$delegateTarget.val();
             var id = e.$delegateTarget.attr('colorstep-id');
@@ -13308,6 +13467,48 @@ var GradientInfo = function (_UIElement) {
 
             if (step) {
                 step.percent = percent;
+                step.px = percent2px(percent, this.getMaxValue(layer));
+                step.em = percent2em(percent, this.getMaxValue(layer));
+                this.dispatch('/item/set', step);
+            }
+        }
+    }, {
+        key: 'input $colorsteps input.px',
+        value: function input$colorstepsInputPx(e) {
+            var item = this.read('/item/current/image');
+            if (!item) return;
+
+            var layer = this.read('/item/current/layer');
+
+            var px = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            if (step) {
+                step.px = px;
+                step.percent = px2percent(px, this.getMaxValue(layer));
+                step.em = px2em(px, this.getMaxValue(layer));
+                this.dispatch('/item/set', step);
+            }
+        }
+    }, {
+        key: 'input $colorsteps input.em',
+        value: function input$colorstepsInputEm(e) {
+            var item = this.read('/item/current/image');
+            if (!item) return;
+
+            var layer = this.read('/item/current/layer');
+
+            var em = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            if (step) {
+                step.em = em;
+                step.percent = em2percent(em, this.getMaxValue(layer));
+                step.px = em2px(em, this.getMaxValue(layer));
                 this.dispatch('/item/set', step);
             }
         }
@@ -13321,6 +13522,18 @@ var GradientInfo = function (_UIElement) {
 
             this.dispatch('/colorstep/remove', id);
             this.refresh();
+        }
+    }, {
+        key: 'click $colorsteps .guide-change',
+        value: function click$colorstepsGuideChange(e) {
+            var id = e.$delegateTarget.attr('colorstep-id');
+            var item = this.read('/item/get', id);
+
+            if (item.id) {
+                item.cut = !item.cut;
+                this.dispatch('/item/set', item);
+                this.refresh();
+            }
         }
     }]);
     return GradientInfo;
@@ -14839,7 +15052,7 @@ var ImageList = function (_UIElement) {
     createClass(ImageList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'images\'>\n                <div class=\'image-tools\'>   \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div>\n                                <label>Simple</label>\n                                <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                                <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                                <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            \n                                <div class="gradient-item static" data-type="static" title="Static Color"></div>                                \n                                <div class="gradient-item image" data-type="image" title="Background Image">\n                                    <div class="m1"></div>\n                                    <div class="m2"></div>\n                                    <div class="m3"></div>\n                                </div>                            \n                            </div>\n                            <div>\n                                <label>Repeat</label>                            \n                                <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                                <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                                <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            \n                            </div>\n                        </div>\n                    </div>\n                    <div class="image-list" ref="$imageList">\n\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'images\'>\n                <div class="title">Gradients</div>\n                <div class=\'image-tools\'>   \n                    <div class="image-list" ref="$imageList"> </div>                                       \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            \n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            \n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>                                \n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>                                                  \n                        </div>\n                    </div> \n\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makeItemNodeImage',
@@ -16936,7 +17149,7 @@ var SubFeatureControl = function (_UIElement) {
     createClass(SubFeatureControl, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <div class=\"property-view image-list\" ref=\"$imageList\">\n                        <ImageList></ImageList>\n                    </div>\n                    <div class=\"property-view\" ref=\"$background\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
+            return "\n            <div class='sub-feature-control'>         \n                <div class='feature'>\n                    <!--<div class=\"property-view image-list\" ref=\"$imageList\">\n                        <ImageList></ImageList>\n                    </div>-->\n                    <div class=\"property-view\" ref=\"$background\">\n                        <BackgroundSize></BackgroundSize>\n                    </div>\n                    <div class=\"property-view\" ref=\"$linear\">\n                        <PredefinedLinearGradientAngle></PredefinedLinearGradientAngle>\n                        <GradientAngle></GradientAngle>                            \n                    </div>\n                    <div class=\"property-view\" ref=\"$radial\">\n                        <PredefinedRadialGradientAngle></PredefinedRadialGradientAngle>                    \n                        <PredefinedRadialGradientPosition></PredefinedRadialGradientPosition>\n                        <GradientPosition></GradientPosition>\n                    </div>\n                </div>\n            </div>\n        ";
         }
     }, {
         key: "components",
@@ -16955,7 +17168,7 @@ var SubFeatureControl = function (_UIElement) {
         value: function refresh() {
             this.$el.toggle(this.isShow());
             this.refs.$background.toggleClass('hide', !this.isBackgroundShow());
-            this.refs.$imageList.toggleClass('hide', !this.isImageListShow());
+            // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
             this.refs.$linear.toggleClass('hide', !this.isLinearShow());
             this.refs.$radial.toggleClass('hide', !this.isRadialShow());
         }
@@ -18021,6 +18234,7 @@ var VerticalColorStep = function (_UIElement) {
         key: "refresh",
         value: function refresh() {
             this.$el.toggle(this.isShow());
+            this.$el.px('width', this.$store.step.width);
         }
     }, {
         key: '@changeEditor',

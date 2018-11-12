@@ -21,21 +21,11 @@
                 color: #333; 
 
                 &.selected {
-                    // background-color: #ececec;
 
                     .color-view {
-                        border:0px;
+                        border: 1px solid black;
                     }
 
-                    .color-percent {
-                        color: rgba(#ececec, 0.5);
-                    }
-
-                    .tools {
-                        button {
-                            color: rgba(#ececec, 0.5);
-                        }
-                    }
                 }
 
                 > * {
@@ -73,14 +63,18 @@
                 }
 
                 .color-view {
-                    width: 20px;
+                    width: 16px;
                     flex: none;
-                    height: 20px;
+                    height: 16px;
+                    margin-top: 2px;
+                    margin-right: 2px;
                     box-sizing: border-box;
                     position: relative;
                     @include transparent-background();
                     border: 1px solid #ececec;
-
+                    vertical-align: middle;
+                    border-radius: 3px;
+                    overflow: hidden;
                     .color-view-item {
                         position: absolute; 
                         left: 0px;
@@ -90,6 +84,71 @@
                         cursor: pointer;
                     }
                 }
+
+                .color-cut {
+                    width: 16px;
+                    flex: none;
+                    height: 20px;
+                    margin-right: 2px;
+                    box-sizing: border-box;
+                    position: relative;
+                    vertical-align: middle;
+
+                    .guide-change {
+                        position: absolute;
+                        width: 16px;
+                        height: 16px;
+                        box-sizing: border-box;
+                        top: 50%;
+                        left: 0px;
+                        transform: translateY(-50%);
+                        border: 1px solid $border-color;
+                        cursor: pointer;
+    
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            top: 0px;
+                            bottom: 0px;
+                            left: 5px;
+                            right: 5px;
+                            background-color: black; 
+                        }
+    
+                        &.cut {
+                            &:before {
+                                content: "";
+                                position: absolute;
+                                top: 5px;
+                                bottom: 5px;
+                                left: 0px;
+                                right: 0px;
+                                background-color: black; 
+                            }
+                        }
+    
+                    } 
+                }
+
+                .color-unit {
+                    > input[type=number] {
+                        display:none;
+                        outline: none;
+                    }
+                    &.percent > .percent { display: inline-block; }
+                    &.px > .px { display: inline-block; }
+                    &.em > .em { display: inline-block; }
+
+                    select {
+                        appearance: none;
+                        border:0px;
+                        background-color: transparent;
+                        display: inline-block;
+                        outline: none;
+                    }
+                }
+
+
             }
         }
     }

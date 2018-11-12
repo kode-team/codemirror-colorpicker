@@ -67,11 +67,21 @@ export default class Dom {
     
         return null;
     }
+
+    parent () {
+        return new Dom(this.el.parentNode);
+    }
     
-    removeClass (cls) {
+    removeClass (...args) {
 
         if (this.el.className) {
-            this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
+            var className = this.el.className;
+
+            args.forEach(cls => {
+                className = ((` ${className} `).replace(` ${cls} `, ' ')).trim();    
+            })
+
+            this.el.className = className;
         }
 
         return this; 

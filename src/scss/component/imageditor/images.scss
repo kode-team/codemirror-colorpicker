@@ -4,18 +4,33 @@ $image-item-width: 70px;
 .images {
     box-sizing: border-box;
     position: absolute;
-    top: 400px;
-    left: 0px;
-    right: 0px;
+    top: 0px;
+    right: -91px;
+    // right: 0px;
     bottom:0px;
-    // border-top: 1px solid $border-color;
+    width: $image-item-width + 20px;
+    border-right: 1px solid $border-color;
+    background-color: white;
+
+    > .title {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        height: 32px;
+        border-bottom: 1px solid $border-color;
+        box-sizing: border-box;
+        font-size: 12px;
+        padding: 5px 10px;
+        font-weight: bold;
+    }
 
     .image-tools {
         position: absolute;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        top: 0px;
+        top: 32px;
         display: flex; 
         flex-direction: column;
 
@@ -38,14 +53,18 @@ $image-item-width: 70px;
         > .tools {
             flex: none; 
             width: $image-item-width + 10;            
+            height: 100px;
         }
 
 
         .image-list {
             box-sizing: border-box;
             overflow: auto;
-            flex: 1 1 auto;
-            border-top: 1px solid $border-color;
+            flex: none;
+            max-height: 400px;
+
+            // border-top: 1px solid $border-color;
+            text-align: center;
             
             .tree-item {
                 display: inline-block;
@@ -54,7 +73,8 @@ $image-item-width: 70px;
                 overflow: hidden;
                 border: 3px solid #dedede;  
                 vertical-align: middle;
-                margin: 2px;
+                margin: 5px 2px;
+
     
                 &.selected {
                     border: 3px solid #333;
@@ -135,24 +155,27 @@ $image-item-width: 70px;
         }
 
         .menu-buttons {
-            height: 70px;
+            height: 100px;
             flex: none;
-            padding: 0px;
+            padding: 5px;
             box-sizing: border-box;
+            border-top: 1px solid $border-color;
 
             .gradient-type {
-                padding: 2px;
+                // padding: 2px;
                 display: block;
                 box-sizing: border-box;
 
                 > button {
                     height: auto; 
-                    margin: 5px 0px;
+                    // margin: 5px 0px;
                 }
 
                 .gradient-item {
-                    width: 30px;
-                    height: 30px;
+                    width: 22px;
+                    height: 22px;
+                    display: inline-block;
+                    vertical-align: middle;
                 }
             }
         }

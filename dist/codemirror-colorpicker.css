@@ -941,7 +941,7 @@
       border-right: 0px; }
     .imageeditor .layout-main.expertor-mode .layout-body {
       top: 60px;
-      left: 200px;
+      left: 290px;
       right: 250px; }
     .imageeditor .layout-main.expertor-mode .layout-top {
       right: 250px;
@@ -964,7 +964,7 @@
               box-sizing: border-box; }
     .imageeditor .layout-main .layout-right {
       position: absolute;
-      left: 250px;
+      right: 0px;
       width: 250px;
       top: 80px;
       bottom: 0px;
@@ -972,7 +972,10 @@
       -webkit-box-sizing: border-box;
               box-sizing: border-box;
       border-right: 1px solid #c7c7c7;
-      border-left: 1px solid #c7c7c7; }
+      border-left: 1px solid #c7c7c7;
+      background-color: white;
+      border-left: 1px solid #c7c7c7;
+      z-index: 100; }
     .imageeditor .layout-main .layout-left {
       position: absolute;
       left: 0px;
@@ -980,11 +983,13 @@
       top: 80px;
       bottom: 0px;
       -webkit-box-sizing: border-box;
-              box-sizing: border-box; }
+              box-sizing: border-box;
+      border-right: 1px solid #c7c7c7;
+      z-index: 100; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 500px;
-      right: 0px;
+      left: 340px;
+      right: 250px;
       top: 80px;
       bottom: 0px; }
     .imageeditor .layout-main .layout-header {
@@ -1395,14 +1400,13 @@
   .imageeditor .layout-main.expertor-mode .pages .page-list .tree-item {
     padding: 4px 10px; }
   .imageeditor .layers {
-    border-bottom: 1px solid #c7c7c7;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     position: absolute;
     left: 0px;
     top: 0px;
     right: 0px;
-    height: 400px; }
+    bottom: 0px; }
     .imageeditor .layers button {
       -webkit-appearance: none;
          -moz-appearance: none;
@@ -1530,16 +1534,30 @@
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     position: absolute;
-    top: 400px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px; }
+    top: 0px;
+    right: -91px;
+    bottom: 0px;
+    width: 90px;
+    border-right: 1px solid #c7c7c7;
+    background-color: white; }
+    .imageeditor .images > .title {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      height: 32px;
+      border-bottom: 1px solid #c7c7c7;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      font-size: 12px;
+      padding: 5px 10px;
+      font-weight: bold; }
     .imageeditor .images .image-tools {
       position: absolute;
       left: 0px;
       right: 0px;
       bottom: 0px;
-      top: 0px;
+      top: 32px;
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
@@ -1567,15 +1585,17 @@
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
-        width: 80px; }
+        width: 80px;
+        height: 100px; }
       .imageeditor .images .image-tools .image-list {
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         overflow: auto;
-        -webkit-box-flex: 1;
-            -ms-flex: 1 1 auto;
-                flex: 1 1 auto;
-        border-top: 1px solid #c7c7c7; }
+        -webkit-box-flex: 0;
+            -ms-flex: none;
+                flex: none;
+        max-height: 400px;
+        text-align: center; }
         .imageeditor .images .image-tools .image-list .tree-item {
           display: inline-block;
           cursor: pointer;
@@ -1583,7 +1603,7 @@
           overflow: hidden;
           border: 3px solid #dedede;
           vertical-align: middle;
-          margin: 2px; }
+          margin: 5px 2px; }
           .imageeditor .images .image-tools .image-list .tree-item.selected {
             border: 3px solid #333; }
           .imageeditor .images .image-tools .image-list .tree-item:hover .item-tools {
@@ -1637,24 +1657,25 @@
                 top: 1px;
                 right: 1px; }
       .imageeditor .images .image-tools .menu-buttons {
-        height: 70px;
+        height: 100px;
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
-        padding: 0px;
+        padding: 5px;
         -webkit-box-sizing: border-box;
-                box-sizing: border-box; }
+                box-sizing: border-box;
+        border-top: 1px solid #c7c7c7; }
         .imageeditor .images .image-tools .menu-buttons .gradient-type {
-          padding: 2px;
           display: block;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box; }
           .imageeditor .images .image-tools .menu-buttons .gradient-type > button {
-            height: auto;
-            margin: 5px 0px; }
+            height: auto; }
           .imageeditor .images .image-tools .menu-buttons .gradient-type .gradient-item {
-            width: 30px;
-            height: 30px; }
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            vertical-align: middle; }
     .imageeditor .images .add-tools {
       padding: 5px;
       height: 80px; }
@@ -3386,11 +3407,7 @@
             padding: 1px;
             color: #333; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .color-view {
-              border: 0px; }
-            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .color-percent {
-              color: rgba(236, 236, 236, 0.5); }
-            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step.selected .tools button {
-              color: rgba(236, 236, 236, 0.5); }
+              border: 1px solid black; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step > * {
               -webkit-box-flex: 1;
                   -ms-flex: 1 1 auto;
@@ -3422,16 +3439,21 @@
                       appearance: none;
               border: 1px solid #ececec; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-view {
-              width: 20px;
+              width: 16px;
               -webkit-box-flex: 0;
                   -ms-flex: none;
                       flex: none;
-              height: 20px;
+              height: 16px;
+              margin-top: 2px;
+              margin-right: 2px;
               -webkit-box-sizing: border-box;
                       box-sizing: border-box;
               position: relative;
               background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat;
-              border: 1px solid #ececec; }
+              border: 1px solid #ececec;
+              vertical-align: middle;
+              border-radius: 3px;
+              overflow: hidden; }
               .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-view .color-view-item {
                 position: absolute;
                 left: 0px;
@@ -3439,6 +3461,62 @@
                 bottom: 0px;
                 top: 0px;
                 cursor: pointer; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-cut {
+              width: 16px;
+              -webkit-box-flex: 0;
+                  -ms-flex: none;
+                      flex: none;
+              height: 20px;
+              margin-right: 2px;
+              -webkit-box-sizing: border-box;
+                      box-sizing: border-box;
+              position: relative;
+              vertical-align: middle; }
+              .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-cut .guide-change {
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+                top: 50%;
+                left: 0px;
+                -webkit-transform: translateY(-50%);
+                        transform: translateY(-50%);
+                border: 1px solid #c7c7c7;
+                cursor: pointer; }
+                .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-cut .guide-change:before {
+                  content: "";
+                  position: absolute;
+                  top: 0px;
+                  bottom: 0px;
+                  left: 5px;
+                  right: 5px;
+                  background-color: black; }
+                .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-cut .guide-change.cut:before {
+                  content: "";
+                  position: absolute;
+                  top: 5px;
+                  bottom: 5px;
+                  left: 0px;
+                  right: 0px;
+                  background-color: black; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit > input[type=number] {
+              display: none;
+              outline: none; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit.percent > .percent {
+              display: inline-block; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit.px > .px {
+              display: inline-block; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit.em > .em {
+              display: inline-block; }
+            .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit select {
+              -webkit-appearance: none;
+                 -moz-appearance: none;
+                      appearance: none;
+              border: 0px;
+              background-color: transparent;
+              display: inline-block;
+              outline: none; }
       .imageeditor .property-view .property-item.gradient-tools {
         display: block;
         width: 100%;

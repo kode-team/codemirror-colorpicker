@@ -14,9 +14,9 @@ export default class SubFeatureControl extends UIElement {
         return `
             <div class='sub-feature-control'>         
                 <div class='feature'>
-                    <div class="property-view image-list" ref="$imageList">
+                    <!--<div class="property-view image-list" ref="$imageList">
                         <ImageList></ImageList>
-                    </div>
+                    </div>-->
                     <div class="property-view" ref="$background">
                         <BackgroundSize></BackgroundSize>
                     </div>
@@ -50,7 +50,7 @@ export default class SubFeatureControl extends UIElement {
     refresh () {
         this.$el.toggle(this.isShow())
         this.refs.$background.toggleClass('hide', !this.isBackgroundShow())
-        this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
+        // this.refs.$imageList.toggleClass('hide', !this.isImageListShow())
         this.refs.$linear.toggleClass('hide', !this.isLinearShow())
         this.refs.$radial.toggleClass('hide', !this.isRadialShow())
     }

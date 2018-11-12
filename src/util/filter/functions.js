@@ -324,6 +324,10 @@ export function percent2em (percent, maxValue) {
     return px2em(percent2px(percent, maxValue), maxValue);
 }
 
+export function getGradientLength (W, H, A) {
+    return Math.abs(W * Math.sin(A)) + Math.abs(H * Math.cos(A))
+}
+
 const filter_regexp = /(([\w_\-]+)(\(([^\)]*)\))?)+/gi;
 const filter_split = ' '
 

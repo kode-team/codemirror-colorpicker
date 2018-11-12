@@ -235,6 +235,26 @@ export default class ImageManager extends BaseModule {
         }
     }       
 
+    '*/image/get/unitValue' ($store, step) {
+        if (step.unit == 'px') {
+            return step.px + 'px';
+        } else if (step.unit == 'em') {
+            return step.em + 'em';
+        }
+
+        return step.percent + '%'
+    }
+
+    '*/image/get/stepValue' ($store, step) {
+        if (step.unit == 'px') {
+            return step.px;
+        } else if (step.unit == 'em') {
+            return step.em;
+        }
+
+        return step.percent
+    }    
+
     '*/image/toItemString' ($store, image = undefined ) {
 
         if (!image) return '';
@@ -247,21 +267,29 @@ export default class ImageManager extends BaseModule {
         if (!colors.length) return ''; 
         
         colors.sort((a, b) => {
-            if (a.percent == b.percent) return 0;
-            return a.percent > b.percent ? 1 : -1;
+            if (a.index == b.index) return 0;
+            return a.index > b.index ? 1 : -1;
         })
 
         var newColors = []
         colors.forEach( (c, index) => {
             if (c.cut && index > 0) {
-                newColors.push(Object.assign({}, c, { percent : colors[index-1].percent} ));
+                newColors.push(Object.assign({}, c, { 
+                    unit : colors[index-1].unit,
+                    percent : colors[index-1].percent,
+                    px : colors[index-1].px,
+                    em : colors[index-1].em
+                } ));
             }
 
             newColors.push(c);
         })        
         
         colors = newColors.map(f => {
-            return `${f.color} ${f.percent}%`
+
+            var value = $store.read('/image/get/unitValue', f);
+
+            return `${f.color} ${value}`
         }).join(',')
 
         return colors; 

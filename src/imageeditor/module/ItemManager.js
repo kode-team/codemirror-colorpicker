@@ -203,15 +203,15 @@ export default class ItemManager extends BaseModule {
                 $store.items[imageId].angle = 0; 
             }
 
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0, index: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 100, index: 100});
         } else if (repeatingGradientTypeList.includes(obj.type)) {
             if (conicList.includes(obj.type)) {
                 $store.items[imageId].angle = 0; 
             }
 
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0});
-            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 0)', percent: 0, index: 0});
+            $store.read('/item/create/colorstep', {parentId: imageId, color: 'rgba(0, 0, 0, 1)', percent: 10, index: 100});
         }
 
         return imageId; 

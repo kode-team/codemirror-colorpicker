@@ -41,8 +41,32 @@ export default class GradientManager extends BaseModule {
             image = Object.assign({}, image, obj);
 
             if (image.colorsteps) {
-                image.colorsteps.forEach(step => {
+
+                if (typeof image.colorsteps[0].index == 'undefined') {
+                    image.colorsteps.sort((a, b) => {
+
+                        var aValue  = $store.read('/image/get/stepValue', a);
+                        var bValue  = $store.read('/image/get/stepValue', b);
+
+                        if (aValue == bValue) return 0; 
+
+                        return aValue > bValue ? 1 : -1; 
+                    })
+                } else {
+                    image.colorsteps.sort((a, b) => {
+
+                        var aValue  = a.index;
+                        var bValue  = b.index;
+
+                        if (aValue == bValue) return 0; 
+
+                        return aValue > bValue ? 1 : -1; 
+                    })
+                }
+
+                image.colorsteps.forEach( (step, index) => {
                     step.parentId = image.id; 
+                    step.index = index * 100; 
                     $store.read('/item/create/colorstep', step);
                 })
                 // 기존 데이타를 변경 후에 colorsteps 는 지운다. 

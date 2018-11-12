@@ -5,13 +5,13 @@ $button-size: 24px;
 $layer-item-padding: 4px;
 
 .layers {
-    border-bottom: 1px solid $border-color;
+    // border-bottom: 1px solid $border-color;
     box-sizing: border-box;
     position: absolute;
     left: 0px;
     top: 0px;
     right: 0px;
-    height: 400px;
+    bottom: 0px;
 
 
     button {
