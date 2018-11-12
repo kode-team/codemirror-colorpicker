@@ -134,6 +134,7 @@
                     > input[type=number] {
                         display:none;
                         outline: none;
+                        width: 50px;
                     }
                     &.percent > .percent { display: inline-block; }
                     &.px > .px { display: inline-block; }

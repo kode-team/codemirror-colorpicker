@@ -2255,13 +2255,6 @@
           .imageeditor .vertical-colorstep .gradient-steps .hue > .step-list.mode-drag {
             cursor: pointer; }
         .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar {
-          border: 0px;
-          background-color: transparent;
-          border: 2px solid white;
-          -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
-                  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
-          width: 10px;
-          height: 10px;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box;
           -webkit-transform: none;
@@ -2269,13 +2262,11 @@
           border-radius: 50%;
           display: inline-block;
           left: 0px;
-          top: 17px;
+          top: 11px;
           -webkit-transform: translateX(-50%);
                   transform: translateX(-50%);
           position: absolute;
-          background-color: rgba(255, 255, 255, 0.8);
           cursor: pointer;
-          z-index: 0;
           -webkit-transition: top 0.3s ease-out;
           transition: top 0.3s ease-out;
           pointer-events: all; }
@@ -2287,9 +2278,7 @@
             -webkit-box-sizing: border-box;
                     box-sizing: border-box;
             bottom: 8px;
-            left: 3px;
-            -webkit-transform: translateX(-1px);
-                    transform: translateX(-1px);
+            left: 4px;
             -webkit-transition: all 0.3s ease-out;
             transition: all 0.3s ease-out; }
           .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-change {
@@ -2299,7 +2288,7 @@
             -webkit-box-sizing: border-box;
                     box-sizing: border-box;
             top: 50%;
-            right: -15px;
+            left: -15px;
             -webkit-transform: translateY(-50%);
                     transform: translateY(-50%);
             opacity: 0;
@@ -2323,24 +2312,72 @@
               right: 0px;
               background-color: black; }
           .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-step {
-            position: absolute;
-            display: inline-block;
+            background-color: transparent;
+            border: 2px solid white;
+            -webkit-box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+                    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+            width: 10px;
+            height: 10px;
             -webkit-box-sizing: border-box;
                     box-sizing: border-box;
-            top: 100%;
-            left: 50%;
-            -webkit-transform: translateX(-50%) translateY(10px);
-                    transform: translateX(-50%) translateY(10px);
+            -webkit-transform: none;
+                    transform: none;
+            border-radius: 50%;
+            display: inline-block;
+            top: 0px;
+            -webkit-transform: translateX(-0.5px);
+                    transform: translateX(-0.5px);
+            cursor: pointer;
+            -webkit-transition: top 0.3s ease-out;
+            transition: top 0.3s ease-out;
+            pointer-events: all; }
+          .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit {
+            position: absolute;
+            width: 80px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            top: 50%;
+            left: 15px;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%);
             opacity: 0;
             -webkit-transition: all 0.3s ease-out;
-            transition: all 0.3s ease-out;
-            border: 1px solid #c7c7c7; }
+            transition: all 0.3s ease-out; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit > input[type=number] {
+              display: none;
+              outline: none;
+              -webkit-box-flex: 3;
+                  -ms-flex: 3;
+                      flex: 3;
+              width: 40px;
+              -webkit-appearance: none;
+                 -moz-appearance: none;
+                      appearance: none;
+              border: 1px solid #c7c7c7;
+              background-color: white; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit.percent > .percent {
+              display: inline-block; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit.px > .px {
+              display: inline-block; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit.em > .em {
+              display: inline-block; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar .guide-unit select {
+              -webkit-box-flex: 1;
+                  -ms-flex: 1;
+                      flex: 1;
+              -webkit-appearance: none;
+                 -moz-appearance: none;
+                      appearance: none;
+              border: 0px;
+              background-color: transparent;
+              display: inline-block;
+              outline: none; }
           .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected {
             z-index: 1;
-            top: 30px; }
+            top: 24px; }
             .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-line {
-              height: 24px; }
-            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-change, .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-step {
+              height: 28px; }
+            .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-change, .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-step, .imageeditor .vertical-colorstep .gradient-steps .hue .drag-bar.selected .guide-unit {
               opacity: 1; }
       .imageeditor .vertical-colorstep .gradient-steps .current-percent {
         position: absolute;
@@ -3502,7 +3539,8 @@
                   background-color: black; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit > input[type=number] {
               display: none;
-              outline: none; }
+              outline: none;
+              width: 50px; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit.percent > .percent {
               display: inline-block; }
             .imageeditor .property-view .property-item.gradient-steps-info .gradient-info .form-item .color-step .color-unit.px > .px {

@@ -1,6 +1,6 @@
 import UIElement from '../../../../colorpicker/UIElement';
 import Dom from '../../../../util/Dom';
-import { px2em, px2percent } from '../../../../util/filter/functions';
+import { px2em, px2percent, percent2px, percent2em, em2percent, em2px } from '../../../../util/filter/functions';
 
 export default class GradientSteps extends UIElement {
 
@@ -37,6 +37,68 @@ export default class GradientSteps extends UIElement {
         }
     }
 
+
+    getUnitName (step) {
+        var unit = step.unit || 'percent'
+
+        if (['px', 'em'].includes(unit)) {
+            return unit; 
+        }
+
+        return 'percent'
+    }
+
+    getUnitSelect (step) {
+
+        var unit = step.unit || '%'
+
+        if (['px', 'em'].includes(unit) == false) {
+            unit = '%';
+        }
+
+        return `
+        <select class='unit' data-colorstep-id="${step.id}">
+            <option value='%' ${unit == '%' ? 'selected' : ''}>%</option>
+            <option value='px' ${unit == 'px' ? 'selected' : ''}>px</option>
+            <option value='em' ${unit == 'em' ? 'selected' : ''}>em</option>
+        </select>
+        `
+    }
+
+    getMaxValue () {
+        return this.$store.step.width;
+    }
+
+    getUnitValue (step) {
+
+        if (step.unit == 'px') {
+            if (typeof step.px == 'undefined') {
+                step.px = percent2px(step.percent, this.getMaxValue())
+            }
+
+            return {
+                px:  step.px,
+                percent: px2percent(step.px, this.getMaxValue()),
+                em: px2em(step.px, this.getMaxValue())
+            }
+        } else if (step.unit == 'em') {
+            if (typeof step.em == 'undefined') {
+                step.em = percent2em(step.percent, this.getMaxValue())
+            }            
+            return {
+                em: step.em,
+                percent: em2percent(step.em, this.getMaxValue()),
+                px: em2px(step.em, this.getMaxValue())
+            }
+        }
+
+        return {
+            percent: step.percent,
+            px: percent2px(step.percent, this.getMaxValue()),
+            em: percent2em(step.percent, this.getMaxValue())
+        }
+    }    
+
     // load 후에 이벤트를 재설정 해야한다. 
     'load $stepList' () {
         var item = this.read('/item/current/image')
@@ -46,17 +108,23 @@ export default class GradientSteps extends UIElement {
         return this.read('/item/map/children', item.id, (step) => {
 
             var cut = step.cut ? 'cut' : ''; 
-
+            var unitValue = this.getUnitValue(step);
             return `
                 <div 
-                    class='drag-bar step ${step.selected ? 'selected' : ''}' 
+                    class='drag-bar ${step.selected ? 'selected' : ''}' 
                     id="${step.id}"
-                    color="${step.color}" 
-                    style="left: ${this.getStepPosition(step)}px; border-color: ${step.color};background-color: ${step.color};"
-                >
+                    style="left: ${this.getStepPosition(step)}px;"
+                >   
+                    <div class="guide-step step" style=" border-color: ${step.color};background-color: ${step.color};"></div>
                     <div class='guide-line' 
                         style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ${step.color} 10%) ;"></div>
                     <div class="guide-change ${cut}" data-colorstep-id="${step.id}"></div>
+                    <div class="guide-unit ${this.getUnitName(step)}">
+                        <input type="number" class="percent" min="0" max="100" step="0.1"  value="${unitValue.percent}" data-colorstep-id="${step.id}"  />
+                        <input type="number" class="px" min="0" max="1000" step="1"  value="${unitValue.px}" data-colorstep-id="${step.id}"  />
+                        <input type="number" class="em" min="0" max="500" step="0.1"  value="${unitValue.em}" data-colorstep-id="${step.id}"  />
+                        ${this.getUnitSelect(step)}
+                    </div>       
                 </div>
             `
         })
@@ -139,16 +207,24 @@ export default class GradientSteps extends UIElement {
         if (this.currentStep) {
             var posX = Math.max(min, current)
             var px = posX - this.refs.$steps.offsetLeft();
-            this.currentStep.px('left', px)
+
+            if (e.ctrlKey) {
+                px = Math.floor(px);    // control + drag is floor number 
+            }
+            this.currentStepBox.px('left', px)
             // var percent = Math.floor((current - min) / (max - min) * 100)
 
-            var item = this.read('/item/get', this.currentStep.attr('id'));
+            var item = this.read('/item/get', this.currentStepBox.attr('id'));
 
             if (item) {
 
                 item.px = px; 
                 item.percent = Math.floor(px2percent(px, max - min));
                 item.em = px2em(px, max- min);
+
+                this.currentUnitPercent.val(item.percent);
+                this.currentUnitPx.val(item.px);
+                this.currentUnitEm.val(item.em);
 
                 this.dispatch('/item/set', item);
                 this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());                
@@ -214,24 +290,12 @@ export default class GradientSteps extends UIElement {
         this.refresh()
     }
 
-    updateSelectedStep (e) {
-
-        var selectedUI = this.refs.$steps.$('.selected')
-
-        if (selectedUI) {
-            selectedUI.removeClass('selected')
-        }
-
-        this.currentStep = e.$delegateTarget
-        this.currentStep.addClass('selected')
-    }
-
     initColor (color) {
         this.dispatch('/colorstep/initColor', color)        
     }
 
     getSortedStepList () {
-        var list = this.refs.$stepList.$$('.step').map(it => {
+        var list = this.refs.$stepList.$$('.drag-bar').map(it => {
             return {id : it.attr('id'), x: it.cssFloat('left')}
         })
 
@@ -244,7 +308,7 @@ export default class GradientSteps extends UIElement {
     }
 
     selectStep (e) {
-        var item = this.read('/item/get', e.$delegateTarget.attr('id'));
+        var item = this.read('/item/get', e.$delegateTarget.parent().attr('id'));
             
         this.read('/item/each/children', item.parentId, (step) => {
             if (step.selected) step.selected = false; 
@@ -255,10 +319,10 @@ export default class GradientSteps extends UIElement {
         this.initColor(item.color)     
 
         var $selected = this.refs.$stepList.$('.selected');
-        if ($selected && !$selected.is(this.currentStep)) {
+        if ($selected && !$selected.is(this.currentStepBox)) {
             $selected.removeClass('selected');
         }
-        this.currentStep.addClass('selected')
+        this.currentStepBox.addClass('selected')
         this.run ('/item/set', item); 
         this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
         this.setBackgroundColor();
@@ -272,7 +336,7 @@ export default class GradientSteps extends UIElement {
         this.selectStep(e)
     }
 
-    'click $steps .step .guide-change' (e) {
+    'click $steps .guide-change' (e) {
         var id = e.$delegateTarget.attr('data-colorstep-id');
         var item = this.read('/item/get', id);
 
@@ -284,6 +348,25 @@ export default class GradientSteps extends UIElement {
 
     }
 
+    'change $steps .guide-unit select.unit' (e) {
+
+        var unit = e.$delegateTarget.val()
+        var id = e.$delegateTarget.attr('data-colorstep-id')
+        
+        var step = this.read('/item/get', id)
+
+        if (step) {
+            step.unit = unit;
+
+            var unitValue = this.getUnitValue(step);
+            Object.assign(step, unitValue);
+
+            this.dispatch('/item/set', step)            
+
+            var $parent = e.$delegateTarget.parent();
+            $parent.removeClass('percent', 'px', 'em').addClass(this.getUnitName(step));
+        }        
+    }
 
     // Event Bindings 
     'pointerend document' (e) { 
@@ -310,6 +393,11 @@ export default class GradientSteps extends UIElement {
 
         this.isDown = true; 
         this.currentStep = e.$delegateTarget;
+        this.currentStepBox = this.currentStep.parent();
+        this.currentUnit = this.currentStepBox.$(".guide-unit")
+        this.currentUnitPercent = this.currentUnit.$(".percent")
+        this.currentUnitPx = this.currentUnit.$(".px")
+        this.currentUnitEm = this.currentUnit.$(".em")
 
         if (this.currentStep) {
             this.selectStep(e)

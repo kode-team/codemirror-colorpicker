@@ -160,7 +160,7 @@ export default class GradientInfo extends UIElement {
         var step = this.read('/item/get', id)
 
         if (step) {
-            step.unit = unit; 
+            step.unit = unit;
             this.dispatch('/item/set', step)            
 
             var $parent = e.$delegateTarget.parent();

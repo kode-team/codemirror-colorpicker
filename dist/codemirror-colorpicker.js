@@ -13059,6 +13059,65 @@ var GradientSteps = function (_UIElement) {
                 callback(this.getStepPosition(step));
             }
         }
+    }, {
+        key: 'getUnitName',
+        value: function getUnitName(step) {
+            var unit = step.unit || 'percent';
+
+            if (['px', 'em'].includes(unit)) {
+                return unit;
+            }
+
+            return 'percent';
+        }
+    }, {
+        key: 'getUnitSelect',
+        value: function getUnitSelect(step) {
+
+            var unit = step.unit || '%';
+
+            if (['px', 'em'].includes(unit) == false) {
+                unit = '%';
+            }
+
+            return '\n        <select class=\'unit\' data-colorstep-id="' + step.id + '">\n            <option value=\'%\' ' + (unit == '%' ? 'selected' : '') + '>%</option>\n            <option value=\'px\' ' + (unit == 'px' ? 'selected' : '') + '>px</option>\n            <option value=\'em\' ' + (unit == 'em' ? 'selected' : '') + '>em</option>\n        </select>\n        ';
+        }
+    }, {
+        key: 'getMaxValue',
+        value: function getMaxValue() {
+            return this.$store.step.width;
+        }
+    }, {
+        key: 'getUnitValue',
+        value: function getUnitValue(step) {
+
+            if (step.unit == 'px') {
+                if (typeof step.px == 'undefined') {
+                    step.px = percent2px(step.percent, this.getMaxValue());
+                }
+
+                return {
+                    px: step.px,
+                    percent: px2percent(step.px, this.getMaxValue()),
+                    em: px2em(step.px, this.getMaxValue())
+                };
+            } else if (step.unit == 'em') {
+                if (typeof step.em == 'undefined') {
+                    step.em = percent2em(step.percent, this.getMaxValue());
+                }
+                return {
+                    em: step.em,
+                    percent: em2percent(step.em, this.getMaxValue()),
+                    px: em2px(step.em, this.getMaxValue())
+                };
+            }
+
+            return {
+                percent: step.percent,
+                px: percent2px(step.percent, this.getMaxValue()),
+                em: percent2em(step.percent, this.getMaxValue())
+            };
+        }
 
         // load 후에 이벤트를 재설정 해야한다. 
 
@@ -13074,8 +13133,8 @@ var GradientSteps = function (_UIElement) {
             return this.read('/item/map/children', item.id, function (step) {
 
                 var cut = step.cut ? 'cut' : '';
-
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                </div>\n            ';
+                var unitValue = _this2.getUnitValue(step);
+                return '\n                <div \n                    class=\'drag-bar ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    style="left: ' + _this2.getStepPosition(step) + 'px;"\n                >   \n                    <div class="guide-step step" style=" border-color: ' + step.color + ';background-color: ' + step.color + ';"></div>\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                    <div class="guide-unit ' + _this2.getUnitName(step) + '">\n                        <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + unitValue.percent + '" data-colorstep-id="' + step.id + '"  />\n                        <input type="number" class="px" min="0" max="1000" step="1"  value="' + unitValue.px + '" data-colorstep-id="' + step.id + '"  />\n                        <input type="number" class="em" min="0" max="500" step="0.1"  value="' + unitValue.em + '" data-colorstep-id="' + step.id + '"  />\n                        ' + _this2.getUnitSelect(step) + '\n                    </div>       \n                </div>\n            ';
             });
         }
     }, {
@@ -13169,16 +13228,24 @@ var GradientSteps = function (_UIElement) {
             if (this.currentStep) {
                 var posX = Math.max(min, current);
                 var px = posX - this.refs.$steps.offsetLeft();
-                this.currentStep.px('left', px);
+
+                if (e.ctrlKey) {
+                    px = Math.floor(px); // control + drag is floor number 
+                }
+                this.currentStepBox.px('left', px);
                 // var percent = Math.floor((current - min) / (max - min) * 100)
 
-                var item = this.read('/item/get', this.currentStep.attr('id'));
+                var item = this.read('/item/get', this.currentStepBox.attr('id'));
 
                 if (item) {
 
                     item.px = px;
                     item.percent = Math.floor(px2percent(px, max - min));
                     item.em = px2em(px, max - min);
+
+                    this.currentUnitPercent.val(item.percent);
+                    this.currentUnitPx.val(item.px);
+                    this.currentUnitEm.val(item.em);
 
                     this.dispatch('/item/set', item);
                     this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
@@ -13253,19 +13320,6 @@ var GradientSteps = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'updateSelectedStep',
-        value: function updateSelectedStep(e) {
-
-            var selectedUI = this.refs.$steps.$('.selected');
-
-            if (selectedUI) {
-                selectedUI.removeClass('selected');
-            }
-
-            this.currentStep = e.$delegateTarget;
-            this.currentStep.addClass('selected');
-        }
-    }, {
         key: 'initColor',
         value: function initColor(color) {
             this.dispatch('/colorstep/initColor', color);
@@ -13273,7 +13327,7 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'getSortedStepList',
         value: function getSortedStepList() {
-            var list = this.refs.$stepList.$$('.step').map(function (it) {
+            var list = this.refs.$stepList.$$('.drag-bar').map(function (it) {
                 return { id: it.attr('id'), x: it.cssFloat('left') };
             });
 
@@ -13289,7 +13343,7 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'selectStep',
         value: function selectStep(e) {
-            var item = this.read('/item/get', e.$delegateTarget.attr('id'));
+            var item = this.read('/item/get', e.$delegateTarget.parent().attr('id'));
 
             this.read('/item/each/children', item.parentId, function (step) {
                 if (step.selected) step.selected = false;
@@ -13300,10 +13354,10 @@ var GradientSteps = function (_UIElement) {
             this.initColor(item.color);
 
             var $selected = this.refs.$stepList.$('.selected');
-            if ($selected && !$selected.is(this.currentStep)) {
+            if ($selected && !$selected.is(this.currentStepBox)) {
                 $selected.removeClass('selected');
             }
-            this.currentStep.addClass('selected');
+            this.currentStepBox.addClass('selected');
             this.run('/item/set', item);
             this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
             this.setBackgroundColor();
@@ -13319,8 +13373,8 @@ var GradientSteps = function (_UIElement) {
             this.selectStep(e);
         }
     }, {
-        key: 'click $steps .step .guide-change',
-        value: function click$stepsStepGuideChange(e) {
+        key: 'click $steps .guide-change',
+        value: function click$stepsGuideChange(e) {
             var id = e.$delegateTarget.attr('data-colorstep-id');
             var item = this.read('/item/get', id);
 
@@ -13328,6 +13382,27 @@ var GradientSteps = function (_UIElement) {
                 item.cut = !item.cut;
                 this.dispatch('/item/set', item);
                 this.refresh();
+            }
+        }
+    }, {
+        key: 'change $steps .guide-unit select.unit',
+        value: function change$stepsGuideUnitSelectUnit(e) {
+
+            var unit = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('data-colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            if (step) {
+                step.unit = unit;
+
+                var unitValue = this.getUnitValue(step);
+                Object.assign(step, unitValue);
+
+                this.dispatch('/item/set', step);
+
+                var $parent = e.$delegateTarget.parent();
+                $parent.removeClass('percent', 'px', 'em').addClass(this.getUnitName(step));
             }
         }
 
@@ -13363,6 +13438,11 @@ var GradientSteps = function (_UIElement) {
 
             this.isDown = true;
             this.currentStep = e.$delegateTarget;
+            this.currentStepBox = this.currentStep.parent();
+            this.currentUnit = this.currentStepBox.$(".guide-unit");
+            this.currentUnitPercent = this.currentUnit.$(".percent");
+            this.currentUnitPx = this.currentUnit.$(".px");
+            this.currentUnitEm = this.currentUnit.$(".em");
 
             if (this.currentStep) {
                 this.selectStep(e);

@@ -200,18 +200,6 @@ var math = {
     cubicBezier: cubicBezier
 };
 
-/**
- * @method RGBtoHSV
- *
- * convert rgb to hsv
- *
- * 		color.RGBtoHSV(0, 0, 255) === { h : 240, s : 1, v : 1 } === '#FFFF00'
- *
- * @param {Number} R  red color value
- * @param {Number} G  green color value
- * @param {Number} B  blue color value
- * @return {Object}  hsv color code
- */
 function RGBtoHSV(r, g, b) {
 
     if (arguments.length == 1) {
@@ -523,18 +511,6 @@ var fromLAB = {
     LABtoXYZ: LABtoXYZ
 };
 
-/**
- * @method HSVtoRGB
- *
- * convert hsv to rgb
- *
- * 		color.HSVtoRGB(0,0,1) === #FFFFF === { r : 255, g : 0, b : 0 }
- *
- * @param {Number} H  hue color number  (min : 0, max : 360)
- * @param {Number} S  Saturation number  (min : 0, max : 1)
- * @param {Number} V  Value number 		(min : 0, max : 1 )
- * @returns {Object}
- */
 function HSVtoRGB(h, s, v) {
 
     if (arguments.length == 1) {
@@ -1168,15 +1144,6 @@ var parser = {
     color_split: color_split
 };
 
-/**
- * @deprecated 
- * 
- * instead of this,  use blend function 
- *  
- * @param {*} startColor 
- * @param {*} endColor 
- * @param {*} t 
- */
 function interpolateRGB(startColor, endColor) {
     var t = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var exportFormat = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'hex';
@@ -2016,7 +1983,6 @@ function crop() {
     };
 }
 
-// Image manupulate 
 function resize(dstWidth, dstHeight) {
     return function (bitmap, done) {
         var c = Canvas.drawPixels(bitmap);
@@ -2242,9 +2208,6 @@ function bitonal(darkColor, lightColor) {
     });
 }
 
-/*
- * @param {Number} amount  -100..100  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2272,10 +2235,6 @@ function brownie() {
     });
 }
 
-/**
- * 
- * @param {Number} amount from 0 to 100 
- */
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2290,10 +2249,6 @@ function clip() {
     }, { $C: $C });
 }
 
-/**
- * 
- * @param {*} amount   min = -128, max = 128 
- */
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -2318,10 +2273,6 @@ function gamma() {
     }, { $C: $C });
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$1() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -2393,9 +2344,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -2479,10 +2427,6 @@ function matrix() {
     });
 }
 
-/**
- * 
- * @param {Number} amount 1..100
- */
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2526,9 +2470,6 @@ function polaroid() {
     });
 }
 
-/*
- * @param {Number} amount  -100..100 
- */
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
@@ -2548,9 +2489,6 @@ function saturation() {
     });
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -2603,12 +2541,6 @@ function shift() {
     });
 }
 
-/**
- * change the relative darkness of (a part of an image) by overexposure to light.
- * @param {*} r 
- * @param {*} g 
- * @param {*} b 
- */
 function solarize(redValue, greenValue, blueValue) {
     var $redValue = parseParamNumber$1(redValue);
     var $greenValue = parseParamNumber$1(greenValue);
@@ -2668,9 +2600,6 @@ function thresholdColor() {
     });
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -2732,11 +2661,6 @@ function blur () {
     return convolution(createBlurMatrix(amount));
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4349,11 +4273,6 @@ function normal () {
     return convolution$1([0, 0, 0, 0, 1, 0, 0, 0, 0]);
 }
 
-/*
- * carve, mold, or stamp a design on (a surface) so that it stands out in relief.
- * 
- * @param {Number} amount   0.0 .. 4.0 
- */
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
@@ -4361,10 +4280,6 @@ function emboss$1() {
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4481,9 +4396,6 @@ function bitonal$1(darkColor, lightColor) {
     return shader('\n        if ((pixelColor.r + pixelColor.g + pixelColor.b) > ' + checkVlue + ') {\n            outColor = vec4(' + lightColorString + '.rgb, pixelColor.a);\n        } else {\n            outColor = vec4(' + darkColorString + '.rgb, pixelColor.a);\n        }\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4521,9 +4433,6 @@ function brownie$1() {
     return matrix$3(0.5997023498159715, 0.34553243048391263, -0.2708298674538042, 0, -0.037703249837783157, 0.8609577587992641, 0.15059552388459913, 0, 0.24113635128153335, -0.07441037908422492, 0.44972182064877153, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount 0..1
- */
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4540,9 +4449,6 @@ function chaos() {
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..1
- */
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4551,9 +4457,6 @@ function contrast$2() {
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
 
-/*
- * @param {Number} amount  -1..1  ,  value < 0  is darken, value > 0 is brighten 
- */
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4562,10 +4465,6 @@ function gamma$1() {
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
 
-/**
- * F.gradient('red', 'blue', 'yellow', 'white', 10)
- * F.gradient('red, blue, yellow, white, 10')
- */
 function gradient$2() {
     // 전체 매개변수 기준으로 파싱 
     // 색이 아닌 것 기준으로 scale 변수로 인식 
@@ -4613,10 +4512,6 @@ function gradient$2() {
     return shader('\n        float rate = (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722); \n\n        ' + temp.join('\n') + '        \n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4628,9 +4523,6 @@ function grayscale$1() {
 }
 
 //http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-/*
- * @param {Number} amount  0..1  ,  (real value 0..360)
- */
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4652,10 +4544,6 @@ function kodachrome$1() {
     return matrix$3(1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 0, 0, 0, 1);
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4666,10 +4554,6 @@ function noise$1() {
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
 }
 
-/**
- * 
- * @param {Number} amount 0..1
- */
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4683,9 +4567,6 @@ function polaroid$1() {
     return matrix$3(1.438, -0.062, -0.062, 0, -0.122, 1.378, -0.122, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 1);
 }
 
-/*
- * @param {Number} amount  0..1 
- */
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -4694,9 +4575,6 @@ function saturation$1() {
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
@@ -4744,9 +4622,6 @@ function thresholdColor$1() {
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
 
-/*
- * @param {Number} amount  0..100 
- */
 function threshold$1() {
   var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
   var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
@@ -4754,12 +4629,6 @@ function threshold$1() {
   return thresholdColor$1(scale, amount, false);
 }
 
-/**
- * 
- * @param {*} redTint  0..1
- * @param {*} greenTint 0..1
- * @param {*} blueTint 0..1
- */
 function tint$1 () {
     var redTint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -13057,6 +12926,65 @@ var GradientSteps = function (_UIElement) {
                 callback(this.getStepPosition(step));
             }
         }
+    }, {
+        key: 'getUnitName',
+        value: function getUnitName(step) {
+            var unit = step.unit || 'percent';
+
+            if (['px', 'em'].includes(unit)) {
+                return unit;
+            }
+
+            return 'percent';
+        }
+    }, {
+        key: 'getUnitSelect',
+        value: function getUnitSelect(step) {
+
+            var unit = step.unit || '%';
+
+            if (['px', 'em'].includes(unit) == false) {
+                unit = '%';
+            }
+
+            return '\n        <select class=\'unit\' data-colorstep-id="' + step.id + '">\n            <option value=\'%\' ' + (unit == '%' ? 'selected' : '') + '>%</option>\n            <option value=\'px\' ' + (unit == 'px' ? 'selected' : '') + '>px</option>\n            <option value=\'em\' ' + (unit == 'em' ? 'selected' : '') + '>em</option>\n        </select>\n        ';
+        }
+    }, {
+        key: 'getMaxValue',
+        value: function getMaxValue() {
+            return this.$store.step.width;
+        }
+    }, {
+        key: 'getUnitValue',
+        value: function getUnitValue(step) {
+
+            if (step.unit == 'px') {
+                if (typeof step.px == 'undefined') {
+                    step.px = percent2px(step.percent, this.getMaxValue());
+                }
+
+                return {
+                    px: step.px,
+                    percent: px2percent(step.px, this.getMaxValue()),
+                    em: px2em(step.px, this.getMaxValue())
+                };
+            } else if (step.unit == 'em') {
+                if (typeof step.em == 'undefined') {
+                    step.em = percent2em(step.percent, this.getMaxValue());
+                }
+                return {
+                    em: step.em,
+                    percent: em2percent(step.em, this.getMaxValue()),
+                    px: em2px(step.em, this.getMaxValue())
+                };
+            }
+
+            return {
+                percent: step.percent,
+                px: percent2px(step.percent, this.getMaxValue()),
+                em: percent2em(step.percent, this.getMaxValue())
+            };
+        }
 
         // load 후에 이벤트를 재설정 해야한다. 
 
@@ -13072,8 +13000,8 @@ var GradientSteps = function (_UIElement) {
             return this.read('/item/map/children', item.id, function (step) {
 
                 var cut = step.cut ? 'cut' : '';
-
-                return '\n                <div \n                    class=\'drag-bar step ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    color="' + step.color + '" \n                    style="left: ' + _this2.getStepPosition(step) + 'px; border-color: ' + step.color + ';background-color: ' + step.color + ';"\n                >\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                </div>\n            ';
+                var unitValue = _this2.getUnitValue(step);
+                return '\n                <div \n                    class=\'drag-bar ' + (step.selected ? 'selected' : '') + '\' \n                    id="' + step.id + '"\n                    style="left: ' + _this2.getStepPosition(step) + 'px;"\n                >   \n                    <div class="guide-step step" style=" border-color: ' + step.color + ';background-color: ' + step.color + ';"></div>\n                    <div class=\'guide-line\' \n                        style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ' + step.color + ' 10%) ;"></div>\n                    <div class="guide-change ' + cut + '" data-colorstep-id="' + step.id + '"></div>\n                    <div class="guide-unit ' + _this2.getUnitName(step) + '">\n                        <input type="number" class="percent" min="0" max="100" step="0.1"  value="' + unitValue.percent + '" data-colorstep-id="' + step.id + '"  />\n                        <input type="number" class="px" min="0" max="1000" step="1"  value="' + unitValue.px + '" data-colorstep-id="' + step.id + '"  />\n                        <input type="number" class="em" min="0" max="500" step="0.1"  value="' + unitValue.em + '" data-colorstep-id="' + step.id + '"  />\n                        ' + _this2.getUnitSelect(step) + '\n                    </div>       \n                </div>\n            ';
             });
         }
     }, {
@@ -13167,16 +13095,24 @@ var GradientSteps = function (_UIElement) {
             if (this.currentStep) {
                 var posX = Math.max(min, current);
                 var px = posX - this.refs.$steps.offsetLeft();
-                this.currentStep.px('left', px);
+
+                if (e.ctrlKey) {
+                    px = Math.floor(px); // control + drag is floor number 
+                }
+                this.currentStepBox.px('left', px);
                 // var percent = Math.floor((current - min) / (max - min) * 100)
 
-                var item = this.read('/item/get', this.currentStep.attr('id'));
+                var item = this.read('/item/get', this.currentStepBox.attr('id'));
 
                 if (item) {
 
                     item.px = px;
                     item.percent = Math.floor(px2percent(px, max - min));
                     item.em = px2em(px, max - min);
+
+                    this.currentUnitPercent.val(item.percent);
+                    this.currentUnitPx.val(item.px);
+                    this.currentUnitEm.val(item.em);
 
                     this.dispatch('/item/set', item);
                     this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
@@ -13251,19 +13187,6 @@ var GradientSteps = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'updateSelectedStep',
-        value: function updateSelectedStep(e) {
-
-            var selectedUI = this.refs.$steps.$('.selected');
-
-            if (selectedUI) {
-                selectedUI.removeClass('selected');
-            }
-
-            this.currentStep = e.$delegateTarget;
-            this.currentStep.addClass('selected');
-        }
-    }, {
         key: 'initColor',
         value: function initColor(color) {
             this.dispatch('/colorstep/initColor', color);
@@ -13271,7 +13194,7 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'getSortedStepList',
         value: function getSortedStepList() {
-            var list = this.refs.$stepList.$$('.step').map(function (it) {
+            var list = this.refs.$stepList.$$('.drag-bar').map(function (it) {
                 return { id: it.attr('id'), x: it.cssFloat('left') };
             });
 
@@ -13287,7 +13210,7 @@ var GradientSteps = function (_UIElement) {
     }, {
         key: 'selectStep',
         value: function selectStep(e) {
-            var item = this.read('/item/get', e.$delegateTarget.attr('id'));
+            var item = this.read('/item/get', e.$delegateTarget.parent().attr('id'));
 
             this.read('/item/each/children', item.parentId, function (step) {
                 if (step.selected) step.selected = false;
@@ -13298,10 +13221,10 @@ var GradientSteps = function (_UIElement) {
             this.initColor(item.color);
 
             var $selected = this.refs.$stepList.$('.selected');
-            if ($selected && !$selected.is(this.currentStep)) {
+            if ($selected && !$selected.is(this.currentStepBox)) {
                 $selected.removeClass('selected');
             }
-            this.currentStep.addClass('selected');
+            this.currentStepBox.addClass('selected');
             this.run('/item/set', item);
             this.dispatch('/colorstep/sort', item.id, this.getSortedStepList());
             this.setBackgroundColor();
@@ -13317,8 +13240,8 @@ var GradientSteps = function (_UIElement) {
             this.selectStep(e);
         }
     }, {
-        key: 'click $steps .step .guide-change',
-        value: function click$stepsStepGuideChange(e) {
+        key: 'click $steps .guide-change',
+        value: function click$stepsGuideChange(e) {
             var id = e.$delegateTarget.attr('data-colorstep-id');
             var item = this.read('/item/get', id);
 
@@ -13326,6 +13249,27 @@ var GradientSteps = function (_UIElement) {
                 item.cut = !item.cut;
                 this.dispatch('/item/set', item);
                 this.refresh();
+            }
+        }
+    }, {
+        key: 'change $steps .guide-unit select.unit',
+        value: function change$stepsGuideUnitSelectUnit(e) {
+
+            var unit = e.$delegateTarget.val();
+            var id = e.$delegateTarget.attr('data-colorstep-id');
+
+            var step = this.read('/item/get', id);
+
+            if (step) {
+                step.unit = unit;
+
+                var unitValue = this.getUnitValue(step);
+                Object.assign(step, unitValue);
+
+                this.dispatch('/item/set', step);
+
+                var $parent = e.$delegateTarget.parent();
+                $parent.removeClass('percent', 'px', 'em').addClass(this.getUnitName(step));
             }
         }
 
@@ -13361,6 +13305,11 @@ var GradientSteps = function (_UIElement) {
 
             this.isDown = true;
             this.currentStep = e.$delegateTarget;
+            this.currentStepBox = this.currentStep.parent();
+            this.currentUnit = this.currentStepBox.$(".guide-unit");
+            this.currentUnitPercent = this.currentUnit.$(".percent");
+            this.currentUnitPx = this.currentUnit.$(".px");
+            this.currentUnitEm = this.currentUnit.$(".em");
 
             if (this.currentStep) {
                 this.selectStep(e);
@@ -15547,7 +15496,6 @@ var PanelLayout = function (_UIElement) {
     return PanelLayout;
 }(UIElement);
 
-// import BackgroundRepeat from "./BackgroundRepeat";
 var items = {
     // PanelLayout,
     ClipPath: ClipPath,

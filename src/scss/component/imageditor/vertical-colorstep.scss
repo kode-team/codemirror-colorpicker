@@ -55,24 +55,17 @@
             }
 
             .drag-bar {
-                border:0px;
-                background-color: transparent;
-                border: 2px solid white;
-                box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);            
-                width: 10px;
-                height: 10px;                    
                 box-sizing: border-box;
                 transform: none;
                 // overflow: hidden;
                 border-radius: 50%;
                 display: inline-block;
                 left: 0px;
-                top: 17px;
+                top: 11px;
                 transform: translateX(-50%);
                 position: absolute;
-                background-color: rgba(white, 0.8);
+                // background-color: rgba(white, 0.8);
                 cursor: pointer;
-                z-index: 0;
                 transition: top 0.3s ease-out;
                 pointer-events: all;
 
@@ -84,8 +77,8 @@
                     height: 0px;
                     box-sizing: border-box;
                     bottom: 8px;
-                    left: 3px;
-                    transform: translateX(-1px);                    
+                    left: 4px;
+                    // transform: translateX(-1px);                    
                     transition: all 0.3s ease-out;
                 }
 
@@ -95,7 +88,7 @@
                     height: 10px;
                     box-sizing: border-box;
                     top: 50%;
-                    right: -15px;
+                    left: -15px;
                     transform: translateY(-50%);
                     opacity: 0;                  
                     transition: all 0.3s ease-out;
@@ -127,26 +120,70 @@
                 } 
 
                 .guide-step {
-                    position: absolute;
-                    display:inline-block;
+                    background-color: transparent;
+                    border: 2px solid white;
+                    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);            
+                    width: 10px;
+                    height: 10px;                    
                     box-sizing: border-box;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%) translateY(10px);
+                    transform: none;
+                    // overflow: hidden;
+                    border-radius: 50%;
+                    display: inline-block;
+                    // left: 50%;
+                    top: 0px;
+                    transform: translateX(-0.5px);
+                    cursor: pointer;
+                    transition: top 0.3s ease-out;
+                    pointer-events: all;
+                }      
+                
+
+                .guide-unit {
+                    position: absolute;
+                    width: 80px;
+                    box-sizing: border-box;
+                    top: 50%;
+                    left: 15px;
+                    transform: translateY(-50%);
+                    // transform: translateX(50%) translateY(50%);
                     opacity: 0;                  
                     transition: all 0.3s ease-out;
                     // background-color: black;
-                    border: 1px solid $border-color;
-                }                 
+                    // border: 1px solid $border-color;
+
+                    > input[type=number] {
+                        display:none;
+                        outline: none;
+                        flex: 3; 
+                        width: 40px;
+                        appearance: none;
+                        border: 1px solid $border-color;
+                        background-color: white;                        
+                    }
+                    &.percent > .percent { display: inline-block; }
+                    &.px > .px { display: inline-block; }
+                    &.em > .em { display: inline-block; }
+
+                    select {
+                        flex: 1; 
+                        appearance: none;
+                        border:0px;
+                        background-color: transparent;
+                        display: inline-block;
+                        outline: none;
+                    }
+                }
+                
 
                 &.selected {
                     z-index:1;
-                    top: 30px;
+                    top: 24px;
                     .guide-line {
-                        height: 24px;
+                        height: 28px;
                     }       
                     
-                    .guide-change, .guide-step {
+                    .guide-change, .guide-step, .guide-unit {
                         opacity: 1;
                     }
                 }
