@@ -19,7 +19,7 @@ export default class ExternalResourceManager extends BaseModule {
         if (dataList.length) {
             $store.read('/image/get/url', dataList, (url) => {
 
-                $store.run('/item/add/image/url', url, true, layerId);
+                $store.run('/item/prepend/image/url', url, true, layerId);
             })
         }
 
@@ -27,7 +27,7 @@ export default class ExternalResourceManager extends BaseModule {
         if (files.length) {
 
             $store.read('/image/get/file', files, (img) => {
-                $store.dispatch('/item/add/image/file', img, true, layerId);
+                $store.dispatch('/item/prepend/image/file', img, true, layerId);
             })
         }
     }

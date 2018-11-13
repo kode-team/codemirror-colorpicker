@@ -1658,15 +1658,57 @@
                 top: 1px;
                 right: 1px; }
       .imageeditor .images .image-tools .menu-buttons {
-        height: 100px;
+        height: 120px;
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
         padding: 5px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
-        border-top: 1px solid #c7c7c7; }
+        border-top: 1px solid #c7c7c7;
+        position: relative; }
+        .imageeditor .images .image-tools .menu-buttons .gradient-sample-list {
+          position: absolute;
+          bottom: 0px;
+          left: 0px;
+          right: 0px;
+          height: 30px;
+          display: block;
+          border-top: 1px solid #c7c7c7;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          text-align: center; }
+          .imageeditor .images .image-tools .menu-buttons .gradient-sample-list .arrow {
+            display: inline-block;
+            width: 30px;
+            height: 100%;
+            position: relative;
+            cursor: pointer; }
+            .imageeditor .images .image-tools .menu-buttons .gradient-sample-list .arrow:before {
+              content: "";
+              position: absolute;
+              height: 1px;
+              width: 100%;
+              top: 10px;
+              left: 0px;
+              pointer-events: none;
+              background-color: black; }
+            .imageeditor .images .image-tools .menu-buttons .gradient-sample-list .arrow:after {
+              content: "";
+              position: absolute;
+              height: 1px;
+              width: 100%;
+              top: 15px;
+              left: 0px;
+              pointer-events: none;
+              background-color: black; }
         .imageeditor .images .image-tools .menu-buttons .gradient-type {
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          top: 0px;
+          bottom: 30px;
+          padding: 5px;
           display: block;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box; }
@@ -2388,6 +2430,100 @@
         font-size: 12px;
         -webkit-transform: translateX(-50%);
                 transform: translateX(-50%); }
+  .imageeditor .gradient-sample-view {
+    position: absolute;
+    left: 350px;
+    right: 250px;
+    top: 80px;
+    bottom: 0px;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 100000;
+    display: none; }
+    .imageeditor .gradient-sample-view .close {
+      font-size: 30px;
+      position: absolute;
+      right: 10px;
+      top: 0px;
+      display: inline-block;
+      font-weight: 500; }
+    .imageeditor .gradient-sample-view .gradient-sample-list {
+      position: absolute;
+      top: 40px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      text-align: center;
+      overflow: auto; }
+      .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        border: 1px solid #c7c7c7;
+        vertical-align: top;
+        background-color: white;
+        font-size: 50px;
+        line-height: 0px;
+        font-weight: 100; }
+      .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty {
+        width: 160px;
+        height: 120px;
+        display: inline-block;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        position: relative; }
+        .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty .item-tools {
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          right: 0px;
+          bottom: 0px;
+          display: none;
+          background-color: rgba(0, 0, 0, 0.5);
+          text-align: center;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          padding: 40px 20px; }
+          .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item .item-tools button, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item .item-tools button, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image .item-tools button, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty .item-tools button {
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 20px;
+            width: 30px;
+            height: 30px;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+            border-radius: 50%;
+            padding: 5px;
+            text-align: center;
+            line-height: 0;
+            cursor: pointer; }
+            .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item .item-tools button.add-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item .item-tools button.add-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image .item-tools button.add-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty .item-tools button.add-item {
+              -webkit-transform: rotate(45deg);
+                      transform: rotate(45deg); }
+            .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item .item-tools button.change-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item .item-tools button.change-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image .item-tools button.change-item, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty .item-tools button.change-item {
+              position: relative; }
+              .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item .item-tools button.change-item:before, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item .item-tools button.change-item:before, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image .item-tools button.change-item:before, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty .item-tools button.change-item:before {
+                content: "";
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 10px;
+                height: 10px;
+                border: 2px solid white;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+                -webkit-transform: translateX(-50%) translateY(-50%);
+                        transform: translateX(-50%) translateY(-50%); }
+        .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-sample-item:hover .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .gradient-cached-item:hover .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .add-current-image:hover .item-tools, .imageeditor .gradient-sample-view .gradient-sample-list .cached-list .empty:hover .item-tools {
+          display: inline-block; }
+  .imageeditor .layout-main.expertor-mode .gradient-sample-view {
+    top: 60px;
+    left: 300px;
+    right: 250px; }
   .imageeditor .page-view {
     position: absolute;
     left: 0px;
@@ -3653,7 +3789,10 @@
       height: 230px;
       width: 100%; }
   .imageeditor .layout-main.expertor-mode .layout-top .property-view .property-item {
-    padding: 0px; }
+    padding: 0px;
+    margin-bottom: 0px; }
+    .imageeditor .layout-main.expertor-mode .layout-top .property-view .property-item .items {
+      padding: 2px 5px !important; }
   .imageeditor .filter-list {
     display: block !important; }
     .imageeditor .filter-list .filter-item {

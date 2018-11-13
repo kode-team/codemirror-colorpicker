@@ -12,6 +12,8 @@ import Timeline from '../ui/control/Timeline';
 import DropView from '../ui/control/DropView';
 import VerticalColorStep from '../ui/control/VerticalColorStep';
 import Animation from '../../util/animation/Animation';
+import GradientSampleView from '../ui/control/GradientSampleView';
+
 
 const screenModes = ['expertor', 'beginner']
 const panelModes = ['small', 'large']
@@ -55,12 +57,14 @@ export default class XDImageEditor extends BaseImageEditor {
                 </div>
                 <ExportView></ExportView>
                 <DropView></DropView>
+                <GradientSampleView></GradientSampleView>
             </div>
         `
     }
 
     components() { 
         return { 
+            GradientSampleView,
             VerticalColorStep, 
             DropView,
             ExportView,

@@ -20,8 +20,12 @@ export default class ImageList extends UIElement {
                             <div class="gradient-item image" data-type="image" title="Background Image">
                                 <div class="m1"></div>
                                 <div class="m2"></div>
-                                <div class="m3"></div>
+                                <div class="m3"></div> 
                             </div>                                                  
+                        </div>
+                        <div class="gradient-sample-list">
+                            <div class="arrow">
+                            </div>
                         </div>
                     </div> 
 
@@ -89,12 +93,10 @@ export default class ImageList extends UIElement {
 
             var type = e.$delegateTarget.attr('data-type')
 
-            this.dispatch('/item/add/image', type, true, item.id)
+            this.dispatch('/item/prepend/image', type, true, item.id)
             this.refresh()
         }); 
     }       
-
-
 
     'dragstart $imageList .tree-item' (e) {
         this.draggedImage = e.$delegateTarget;
@@ -146,4 +148,8 @@ export default class ImageList extends UIElement {
         this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
         this.refresh()
     }   
+
+    'click $el .gradient-sample-list' (e) {
+        this.emit('toggleGradientSampleView');
+    }
 }

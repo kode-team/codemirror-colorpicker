@@ -10667,12 +10667,76 @@ var GradientManager = function (_BaseModule) {
             }
         }
     }, {
+        key: '/gradient/image/add',
+        value: function gradientImageAdd($store, obj) {
+            var image = $store.read('/item/current/image');
+
+            if (image) {
+
+                // $store.run('/item/remove/children', image.id);
+
+                var newImageId = $store.read('/item/create/object', Object.assign({}, image, obj));
+                var newImage = $store.read('/item/get', newImageId);
+                newImage.index -= 1;
+
+                if (newImage.colorsteps) {
+
+                    if (typeof newImage.colorsteps[0].index == 'undefined') {
+                        newImage.colorsteps.sort(function (a, b) {
+
+                            var aValue = $store.read('/image/get/stepValue', a);
+                            var bValue = $store.read('/image/get/stepValue', b);
+
+                            if (aValue == bValue) return 0;
+
+                            return aValue > bValue ? 1 : -1;
+                        });
+                    } else {
+                        newImage.colorsteps.sort(function (a, b) {
+
+                            var aValue = a.index;
+                            var bValue = b.index;
+
+                            if (aValue == bValue) return 0;
+
+                            return aValue > bValue ? 1 : -1;
+                        });
+                    }
+
+                    newImage.colorsteps.forEach(function (step, index) {
+                        step.parentId = newImage.id;
+                        step.index = index * 100;
+                        $store.read('/item/create/colorstep', step);
+                    });
+                    // 기존 데이타를 변경 후에 colorsteps 는 지운다. 
+                    delete newImage.colorsteps;
+                }
+
+                $store.run('/item/move/in', image.id, newImage.id);
+            } else {
+                // $store.read('/item/current/layer', (layer) => {
+                //     layer.style['background-color'] = obj.color;
+                //     $store.run('/item/set', layer);
+                // })
+
+            }
+        }
+    }, {
         key: '/gradient/select',
         value: function gradientSelect($store, type, index) {
             var obj = $store.read('/gradient/list/sample', type)[index];
 
             if (obj) {
                 $store.run('/gradient/image/select', obj);
+            }
+        }
+    }, {
+        key: '/gradient/add',
+        value: function gradientAdd($store, type, index) {
+            var obj = $store.read('/gradient/list/sample', type)[index];
+
+            if (obj) {
+                $store.run('/gradient/image/add', obj);
             }
         }
     }]);
@@ -11387,31 +11451,49 @@ var ItemManager = function (_BaseModule) {
             $store.run('/item/sort', item.id);
         }
     }, {
+        key: '/item/prepend/image',
+        value: function itemPrependImage($store, imageType) {
+            var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
+            $store.run('/item/add/image', imageType, isSelected, parentId, -1);
+        }
+    }, {
         key: '/item/add/image',
         value: function itemAddImage($store, imageType) {
             var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
             var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+            var index = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : Number.MAX_SAFE_INTEGER;
 
             var id = $store.read('/item/create/image', { type: imageType });
             var item = $store.read('/item/get', id);
             item.type = imageType;
             item.parentId = parentId;
-            item.index = Number.MAX_SAFE_INTEGER;
+            item.index = index;
 
             $store.run('/item/set', item, isSelected);
             $store.run('/item/sort', id);
+        }
+    }, {
+        key: '/item/prepend/image/file',
+        value: function itemPrependImageFile($store, img) {
+            var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
+            $store.run('/item/add/image/file', img, isSelected, parentId, -1);
         }
     }, {
         key: '/item/add/image/file',
         value: function itemAddImageFile($store, img) {
             var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
             var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+            var index = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : Number.MAX_SAFE_INTEGER;
 
             var id = $store.read('/item/create/image');
             var item = $store.read('/item/get', id);
             item.type = 'image';
             item.parentId = parentId;
-            item.index = Number.MAX_SAFE_INTEGER;
+            item.index = index;
             item.colors = img.colors;
             item.fileType = img.fileType;
             item.backgroundImage = img.url;
@@ -11437,16 +11519,25 @@ var ItemManager = function (_BaseModule) {
             $store.run('/item/set', item);
         }
     }, {
+        key: '/item/prepend/image/url',
+        value: function itemPrependImageUrl($store, img) {
+            var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
+            $store.run('/item/add/image/url', img, isSelected, parentId, -1);
+        }
+    }, {
         key: '/item/add/image/url',
         value: function itemAddImageUrl($store, img) {
             var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
             var parentId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+            var index = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : Number.MAX_SAFE_INTEGER;
 
             var id = $store.read('/item/create/image');
             var item = $store.read('/item/get', id);
             item.type = 'image';
             item.parentId = parentId;
-            item.index = Number.MAX_SAFE_INTEGER;
+            item.index = index;
             item.colors = img.colors;
             item.fileType = img.fileType;
             item.backgroundImage = img.url;
@@ -12155,7 +12246,7 @@ var ExternalResourceManager = function (_BaseModule) {
             if (dataList.length) {
                 $store.read('/image/get/url', dataList, function (url) {
 
-                    $store.run('/item/add/image/url', url, true, layerId);
+                    $store.run('/item/prepend/image/url', url, true, layerId);
                 });
             }
 
@@ -12163,7 +12254,7 @@ var ExternalResourceManager = function (_BaseModule) {
             if (files.length) {
 
                 $store.read('/image/get/file', files, function (img) {
-                    $store.dispatch('/item/add/image/file', img, true, layerId);
+                    $store.dispatch('/item/prepend/image/file', img, true, layerId);
                 });
             }
         }
@@ -12738,21 +12829,34 @@ var GradientSampleList = function (_UIElement) {
     }, {
         key: 'template',
         value: function template() {
-            var _this2 = this;
 
-            return '\n        <div class="gradient-sample-list">\n            ' + this.list.map(function (item, index) {
-                return '<div class=\'gradient-sample-item\' style=\'' + _this2.read('/image/toString', item) + '\' data-index="' + index + '"></div>';
-            }).join('') + '\n            <div class=\'cached-list\' ref="$cachedList"></div>\n            <div class=\'tools\'>\n                <button type="button" class="add-current-image" title="Cache a image">+</button>\n            </div>\n        </div>\n        ';
+            return '\n        <div class="gradient-sample-list">\n            <div class=\'cached-list\' ref="$cachedList"></div>\n\n        </div>\n        ';
         }
     }, {
         key: 'load $cachedList',
         value: function load$cachedList() {
-            var _this3 = this;
+            var _this2 = this;
 
-            return this.read('/storage/images').map(function (item, index) {
-                var newImage = Object.assign({}, item.image, { colorsteps: item.colorsteps });
-                return '<div class=\'gradient-cached-item\' style=\'' + _this3.read('/image/toString', newImage) + '\' data-index="' + index + '"></div>';
+            var list = this.list.map(function (item, index) {
+                return '\n            <div class=\'gradient-sample-item\' style=\'' + _this2.read('/image/toString', item) + '\' data-index="' + index + '">\n                <div class=\'item-tools\'>\n                    <button type="button" class=\'add-item\'  data-index="' + index + '" title="Addd">&times;</button>                \n                    <button type="button" class=\'change-item\'  data-index="' + index + '" title="Change"></button>\n                </div>          \n            </div>';
             });
+
+            var storageList = this.read('/storage/images').map(function (item, index) {
+                var newImage = Object.assign({}, item.image, { colorsteps: item.colorsteps });
+                return '\n                <div class=\'gradient-cached-item\' style=\'' + _this2.read('/image/toString', newImage) + '\' data-index="' + index + '">\n                    <div class=\'item-tools\'>\n                        <button type="button" class=\'add-item\'  data-index="' + index + '" title="Addd">&times;</button>                \n                        <button type="button" class=\'change-item\'  data-index="' + index + '" title="Change"></button>\n                    </div>          \n                </div>\n            ';
+            });
+
+            var results = [].concat(toConsumableArray(list), toConsumableArray(storageList), ['<button type="button" class="add-current-image" title="Cache a image">+</button>']);
+
+            var emptyCount = 5 - results.length % 5;
+
+            var arr = [].concat(toConsumableArray(Array(emptyCount)));
+
+            arr.forEach(function (it) {
+                results.push('<div class=\'empty\'></div>');
+            });
+
+            return results;
         }
     }, {
         key: 'refresh',
@@ -12765,15 +12869,31 @@ var GradientSampleList = function (_UIElement) {
             this.refresh();
         }
     }, {
-        key: 'click $el .gradient-sample-item',
-        value: function click$elGradientSampleItem(e) {
+        key: 'click $el .gradient-sample-item .change-item',
+        value: function click$elGradientSampleItemChangeItem(e) {
             var index = +e.$delegateTarget.attr('data-index');
 
             this.dispatch('/gradient/select', this.props.type, index);
         }
     }, {
-        key: 'click $el .gradient-cached-item',
-        value: function click$elGradientCachedItem(e) {
+        key: 'click $el .gradient-sample-item .add-item',
+        value: function click$elGradientSampleItemAddItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+
+            this.dispatch('/gradient/add', this.props.type, index);
+        }
+    }, {
+        key: 'click $el .gradient-cached-item .add-item',
+        value: function click$elGradientCachedItemAddItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+            var image = this.read('/storage/images', index);
+            var newImage = Object.assign({}, image.image, { colorsteps: image.colorsteps });
+
+            this.dispatch('/gradient/image/add', newImage);
+        }
+    }, {
+        key: 'click $el .gradient-cached-item .change-item',
+        value: function click$elGradientCachedItemChangeItem(e) {
             var index = +e.$delegateTarget.attr('data-index');
             var image = this.read('/storage/images', index);
             var newImage = Object.assign({}, image.image, { colorsteps: image.colorsteps });
@@ -12783,13 +12903,13 @@ var GradientSampleList = function (_UIElement) {
     }, {
         key: 'click $el .add-current-image',
         value: function click$elAddCurrentImage(e) {
-            var _this4 = this;
+            var _this3 = this;
 
             this.read('/item/current/image', function (image) {
-                var newImage = _this4.read('/item/collect/image/one', image.id);
+                var newImage = _this3.read('/item/collect/image/one', image.id);
 
-                _this4.dispatch('/storage/add/image', newImage);
-                _this4.refresh();
+                _this3.dispatch('/storage/add/image', newImage);
+                _this3.refresh();
             });
         }
     }]);
@@ -15210,7 +15330,7 @@ var ImageList = function (_UIElement) {
     createClass(ImageList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'images\'>\n                <div class="title">Gradients</div>\n                <div class=\'image-tools\'>   \n                    <div class="image-list" ref="$imageList"> </div>                                       \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            \n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            \n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>                                \n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div>\n                            </div>                                                  \n                        </div>\n                    </div> \n\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'images\'>\n                <div class="title">Gradients</div>\n                <div class=\'image-tools\'>   \n                    <div class="image-list" ref="$imageList"> </div>                                       \n                    <div class=\'menu-buttons\'>\n                        <div class=\'gradient-type\' ref="$gradientType">\n                            <div class="gradient-item linear" data-type="linear" title="Linear Gradient"></div>\n                            <div class="gradient-item radial" data-type="radial" title="Radial Gradient"></div>\n                            <div class="gradient-item conic" data-type="conic" title="Conic Gradient"></div>                            \n                            <div class="gradient-item repeating-linear" data-type="repeating-linear" title="repeating Linear Gradient"></div>\n                            <div class="gradient-item repeating-radial" data-type="repeating-radial" title="repeating Radial Gradient"></div>\n                            <div class="gradient-item repeating-conic" data-type="repeating-conic" title="repeating Conic Gradient"></div>                            \n                            <div class="gradient-item static" data-type="static" title="Static Color"></div>                                \n                            <div class="gradient-item image" data-type="image" title="Background Image">\n                                <div class="m1"></div>\n                                <div class="m2"></div>\n                                <div class="m3"></div> \n                            </div>                                                  \n                        </div>\n                        <div class="gradient-sample-list">\n                            <div class="arrow">\n                            </div>\n                        </div>\n                    </div> \n\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makeItemNodeImage',
@@ -15270,7 +15390,7 @@ var ImageList = function (_UIElement) {
 
                 var type = e.$delegateTarget.attr('data-type');
 
-                _this3.dispatch('/item/add/image', type, true, item.id);
+                _this3.dispatch('/item/prepend/image', type, true, item.id);
                 _this3.refresh();
             });
         }
@@ -15330,6 +15450,11 @@ var ImageList = function (_UIElement) {
         value: function click$imageListDeleteItem(e) {
             this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
             this.refresh();
+        }
+    }, {
+        key: 'click $el .gradient-sample-list',
+        value: function click$elGradientSampleList(e) {
+            this.emit('toggleGradientSampleView');
         }
     }]);
     return ImageList;
@@ -15644,7 +15769,7 @@ var ImageView = function (_UIElement) {
     createClass(ImageView, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-view'>\n                <!--<ImageTypeSelect></ImageTypeSelect>-->\n                <!-- <ImageListView></ImageListView> -->\n                <SampleList></SampleList>                                   \n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <!-- <ImageInfo></ImageInfo> -->\n                <ImageResource></ImageResource>\n            </div>  \n        ";
+            return "\n            <div class='property-view'>\n                <!--<ImageTypeSelect></ImageTypeSelect>-->\n                <!-- <ImageListView></ImageListView> -->\n                <!-- <SampleList></SampleList> -->\n                <ColorPickerPanel></ColorPickerPanel>\n                <!--<ColorSteps></ColorSteps>-->\n                <ColorStepsInfo></ColorStepsInfo>\n                <!-- <ImageInfo></ImageInfo> -->\n                <ImageResource></ImageResource>\n            </div>  \n        ";
         }
     }, {
         key: "components",
@@ -15930,6 +16055,11 @@ var PredefinedPageResizer = function (_UIElement) {
         value: function pointerendDocument(e) {
             this.currentType = null;
             this.xy = null;
+        }
+    }, {
+        key: 'resize.debounce(300) window',
+        value: function resizeDebounce300Window(e) {
+            this.refresh();
         }
     }]);
     return PredefinedPageResizer;
@@ -18316,7 +18446,7 @@ var DropView = function (_UIElement) {
             if (dataList.length) {
                 this.read('/item/current/layer', function (layer) {
                     _this2.read('/image/get/url', dataList, function (img) {
-                        _this2.dispatch('/item/add/image/url', img, true, layer.id);
+                        _this2.dispatch('/item/prepend/image/url', img, true, layer.id);
                     });
                 });
             }
@@ -18325,7 +18455,7 @@ var DropView = function (_UIElement) {
             if (files.length) {
                 this.read('/item/current/layer', function (layer) {
                     _this2.read('/image/get/file', files, function (img) {
-                        _this2.dispatch('/item/add/image/file', img, true, layer.id);
+                        _this2.dispatch('/item/prepend/image/file', img, true, layer.id);
                     });
                 });
             }
@@ -18349,7 +18479,7 @@ var DropView = function (_UIElement) {
             if (dataList.length) {
                 this.read('/item/current/layer', function (layer) {
                     _this3.read('/image/get/url', dataList, function (url) {
-                        _this3.dispatch('/item/add/image/url', url, true, layer.id);
+                        _this3.dispatch('/item/prepend/image/url', url, true, layer.id);
                     });
                 });
             }
@@ -18358,7 +18488,7 @@ var DropView = function (_UIElement) {
             if (files.length) {
                 this.read('/item/current/layer', function (layer) {
                     _this3.read('/image/get/file', files, function (img) {
-                        _this3.dispatch('/item/add/image/file', img, true, layer.id);
+                        _this3.dispatch('/item/prepend/image/file', img, true, layer.id);
                         _this3.refresh();
                     });
                 });
@@ -18456,6 +18586,40 @@ bezierList.forEach(function (arr) {
     Timing[arr[4]] = cubicBezier(arr[0], arr[1], arr[2], arr[3]);
 });
 
+var GradientSampleView = function (_UIElement) {
+    inherits(GradientSampleView, _UIElement);
+
+    function GradientSampleView() {
+        classCallCheck(this, GradientSampleView);
+        return possibleConstructorReturn(this, (GradientSampleView.__proto__ || Object.getPrototypeOf(GradientSampleView)).apply(this, arguments));
+    }
+
+    createClass(GradientSampleView, [{
+        key: "components",
+        value: function components() {
+            return {
+                GradientSampleList: GradientSampleList
+            };
+        }
+    }, {
+        key: "template",
+        value: function template() {
+            return "\n            <div class='gradient-sample-view'>\n                <div class=\"close\">&times;</div>\n                <GradientSampleList></GradientSampleList>\n            </div>\n        ";
+        }
+    }, {
+        key: 'click $el .close',
+        value: function click$elClose(e) {
+            this.$el.toggle();
+        }
+    }, {
+        key: '@toggleGradientSampleView',
+        value: function toggleGradientSampleView() {
+            this.$el.toggle();
+        }
+    }]);
+    return GradientSampleView;
+}(UIElement);
+
 var screenModes = ['expertor', 'beginner'];
 var panelModes = ['small', 'large'];
 
@@ -18477,12 +18641,13 @@ var XDImageEditor = function (_BaseImageEditor) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n                <GradientSampleView></GradientSampleView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
         value: function components() {
             return {
+                GradientSampleView: GradientSampleView,
                 VerticalColorStep: VerticalColorStep,
                 DropView: DropView,
                 ExportView: ExportView,

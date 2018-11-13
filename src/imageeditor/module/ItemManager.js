@@ -631,23 +631,31 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/sort', item.id)
     }
 
-    '/item/add/image' ($store, imageType, isSelected = false, parentId = '') {
+    '/item/prepend/image' ($store, imageType, isSelected = false, parentId = '') {
+        $store.run('/item/add/image', imageType, isSelected, parentId, -1);
+    }        
+
+    '/item/add/image' ($store, imageType, isSelected = false, parentId = '', index = Number.MAX_SAFE_INTEGER) {
         var id = $store.read('/item/create/image', { type : imageType });
         var item = $store.read('/item/get', id);
         item.type = imageType; 
         item.parentId = parentId; 
-        item.index = Number.MAX_SAFE_INTEGER; 
+        item.index = index; 
 
         $store.run('/item/set', item, isSelected);
         $store.run('/item/sort', id); 
     }    
 
-    '/item/add/image/file' ($store, img, isSelected = false, parentId = '') {
+    '/item/prepend/image/file' ($store, img, isSelected = false, parentId = '') {
+        $store.run('/item/add/image/file', img, isSelected, parentId, -1);
+    }     
+
+    '/item/add/image/file' ($store, img, isSelected = false, parentId = '', index = Number.MAX_SAFE_INTEGER) {
         var id = $store.read('/item/create/image');
         var item = $store.read('/item/get', id);
         item.type = 'image'; 
         item.parentId = parentId; 
-        item.index = Number.MAX_SAFE_INTEGER;
+        item.index = index;
         item.colors = img.colors;         
         item.fileType = img.fileType;
         item.backgroundImage = img.url;
@@ -671,13 +679,17 @@ export default class ItemManager extends BaseModule {
 
         $store.run('/item/set', item);
     }         
-    
-    '/item/add/image/url' ($store, img, isSelected = false, parentId = '') {
+
+    '/item/prepend/image/url' ($store, img, isSelected = false, parentId = '') {
+        $store.run('/item/add/image/url', img, isSelected, parentId, -1);
+    }         
+
+    '/item/add/image/url' ($store, img, isSelected = false, parentId = '', index = Number.MAX_SAFE_INTEGER) {
         var id = $store.read('/item/create/image');
         var item = $store.read('/item/get', id);
         item.type = 'image'; 
         item.parentId = parentId; 
-        item.index = Number.MAX_SAFE_INTEGER;
+        item.index = index;
         item.colors = img.colors;         
         item.fileType = img.fileType;
         item.backgroundImage = img.url;

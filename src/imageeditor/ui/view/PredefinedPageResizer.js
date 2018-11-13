@@ -172,4 +172,9 @@ export default class PredefinedPageResizer extends UIElement {
         this.currentType = null; 
         this.xy = null 
     }
+
+    'resize.debounce(300) window' (e) {
+        this.refresh();
+    }
+        
 }
