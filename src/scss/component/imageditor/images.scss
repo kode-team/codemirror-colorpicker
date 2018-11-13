@@ -1,14 +1,14 @@
-$image-item-height: 70px;
-$image-item-width: 70px;
+$image-item-height: 64px;
+$image-item-width: 64px;
 
 .images {
     box-sizing: border-box;
     position: absolute;
     top: 0px;
-    right: -91px;
+    right: -1 * ($gradient-box-size + 1px);
     // right: 0px;
     bottom:0px;
-    width: $image-item-width + 20px;
+    width: $gradient-box-size;
     border-right: 1px solid $border-color;
     background-color: white;
 
@@ -60,9 +60,10 @@ $image-item-width: 70px;
         .image-list {
             box-sizing: border-box;
             overflow: auto;
-            flex: none;
-            max-height: 400px;
-
+            flex: 1 1 auto;
+            // max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
             // border-top: 1px solid $border-color;
             text-align: center;
             

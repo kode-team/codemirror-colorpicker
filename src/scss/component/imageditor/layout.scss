@@ -10,6 +10,7 @@ $right-size: 250px;
 $timeline-header-size: 30px;
 $timeline-size: 300px;
 $show-timeline-animation: all 0.15s linear; 
+$gradient-box-size: 100px;
 
 .layout-main {
     position: absolute;
@@ -50,7 +51,7 @@ $show-timeline-animation: all 0.15s linear;
         
         .layout-body {
             top: 60px;
-            left: $left-size - 50px + 90px; 
+            left: $left-size - 50px + $gradient-box-size; 
             right: $right-size;
         }
 
@@ -114,7 +115,7 @@ $show-timeline-animation: all 0.15s linear;
 
     .layout-body {
         position: absolute;
-        left: $left-size + 90px;
+        left: $left-size + $gradient-box-size;
         right: $left-size;
         top: $tool-size * 2;  
         bottom: 0px;

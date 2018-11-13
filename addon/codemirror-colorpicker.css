@@ -941,7 +941,7 @@
       border-right: 0px; }
     .imageeditor .layout-main.expertor-mode .layout-body {
       top: 60px;
-      left: 290px;
+      left: 300px;
       right: 250px; }
     .imageeditor .layout-main.expertor-mode .layout-top {
       right: 250px;
@@ -988,7 +988,7 @@
       z-index: 100; }
     .imageeditor .layout-main .layout-body {
       position: absolute;
-      left: 340px;
+      left: 350px;
       right: 250px;
       top: 80px;
       bottom: 0px; }
@@ -1535,9 +1535,9 @@
             box-sizing: border-box;
     position: absolute;
     top: 0px;
-    right: -91px;
+    right: -101px;
     bottom: 0px;
-    width: 90px;
+    width: 100px;
     border-right: 1px solid #c7c7c7;
     background-color: white; }
     .imageeditor .images > .title {
@@ -1570,8 +1570,8 @@
         -webkit-appearance: none;
            -moz-appearance: none;
                 appearance: none;
-        width: 70px;
-        height: 70px;
+        width: 64px;
+        height: 64px;
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         border: 1px solid #dedede;
@@ -1585,16 +1585,17 @@
         -webkit-box-flex: 0;
             -ms-flex: none;
                 flex: none;
-        width: 80px;
+        width: 74px;
         height: 100px; }
       .imageeditor .images .image-tools .image-list {
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
         overflow: auto;
-        -webkit-box-flex: 0;
-            -ms-flex: none;
-                flex: none;
-        max-height: 400px;
+        -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         text-align: center; }
         .imageeditor .images .image-tools .image-list .tree-item {
           display: inline-block;
@@ -1615,8 +1616,8 @@
             vertical-align: middle;
             -webkit-box-sizing: border-box;
                     box-sizing: border-box;
-            height: 70px;
-            width: 70px; }
+            height: 64px;
+            width: 64px; }
             .imageeditor .images .image-tools .image-list .tree-item .item-view-container .item-view {
               position: absolute;
               top: 0px;
@@ -1678,7 +1679,7 @@
             vertical-align: middle; }
     .imageeditor .images .add-tools {
       padding: 5px;
-      height: 80px; }
+      height: 74px; }
   .imageeditor .layout-main.expertor-mode .image-tools .menu-buttons .gradient-type .gradient-item {
     width: 22px;
     height: 22px;
