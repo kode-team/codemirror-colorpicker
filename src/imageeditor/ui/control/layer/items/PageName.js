@@ -4,7 +4,7 @@ export default class PageName extends UIElement {
     template () {
         return `
             <div class='property-item name'>
-                <div class='items'>            
+                <div class='items no-padding'>            
                     <div>
                         <label>page name</label>
                         <div>

@@ -12938,8 +12938,8 @@ var SampleList = function (_BasePropertyItem) {
     return SampleList;
 }(BasePropertyItem);
 
-var Name = function (_UIElement) {
-    inherits(Name, _UIElement);
+var Name = function (_BasePropertyItem) {
+    inherits(Name, _BasePropertyItem);
 
     function Name() {
         classCallCheck(this, Name);
@@ -12949,7 +12949,7 @@ var Name = function (_UIElement) {
     createClass(Name, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item name show\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                    <div>\n                        <label>ID</label>\n                        <div>\n                            <input type=\'text\' ref="$id" class=\'full\'> \n                        </div>\n                    </div>                                        \n                    <div>\n                        <label>Class</label>\n                        <div>\n                            <input type=\'text\' ref="$class" class=\'full\'> \n                        </div>\n                    </div>                    \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item name show\'>\n                <div class=\'title\' ref="$title">Information</div>            \n                <div class=\'items\'>            \n                    <div>\n                        <label>Name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                    <div>\n                        <label>ID</label>\n                        <div>\n                            <input type=\'text\' ref="$id" class=\'full\'> \n                        </div>\n                    </div>                                        \n                    <div>\n                        <label>Class</label>\n                        <div>\n                            <input type=\'text\' ref="$class" class=\'full\'> \n                        </div>\n                    </div>                    \n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -13006,7 +13006,7 @@ var Name = function (_UIElement) {
         }
     }]);
     return Name;
-}(UIElement);
+}(BasePropertyItem);
 
 var GradientSteps = function (_UIElement) {
     inherits(GradientSteps, _UIElement);
@@ -14613,7 +14613,7 @@ var PageSize = function (_UIElement) {
     createClass(PageSize, [{
         key: "template",
         value: function template() {
-            return "\n            <div class='property-item size'>\n                <div class='title'>page size\n                    <span>\n                        <button type=\"button\" ref=\"$rect\">rect</button>\n                    </span>\n                </div>\n                <div class='items'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type='number' ref=\"$width\"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type='number' ref=\"$height\"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ";
+            return "\n            <div class='property-item size'>\n                <div class='title'>page size\n                    <span>\n                        <button type=\"button\" ref=\"$rect\">rect</button>\n                    </span>\n                </div>\n                <div class='items no-padding'>\n                    <div>\n                        <label>Width</label>\n                        <div>\n                            <input type='number' ref=\"$width\"> <span>px</span>\n                        </div>\n                        <label>Height</label>\n                        <div>\n                            <input type='number' ref=\"$height\"> <span>px</span>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ";
         }
     }, {
         key: '@changeEditor',
@@ -14681,7 +14681,7 @@ var PageName = function (_UIElement) {
     createClass(PageName, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item name\'>\n                <div class=\'items\'>            \n                    <div>\n                        <label>page name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item name\'>\n                <div class=\'items no-padding\'>            \n                    <div>\n                        <label>page name</label>\n                        <div>\n                            <input type=\'text\' ref="$name" class=\'full\'> \n                        </div>\n                    </div>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: '@changeEditor',
@@ -14727,7 +14727,7 @@ var PageExport = function (_UIElement) {
     createClass(PageExport, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item export\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>Export</label>\n                        <button type="button" ref="$export">view</button>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item export\'>\n                <div class=\'items no-padding\'>\n                    <div>\n                        <label>Export</label>\n                        <button type="button" ref="$export">view</button>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'click $export',
@@ -15280,7 +15280,7 @@ var PageLayout = function (_UIElement) {
     createClass(PageLayout, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'property-item layout\'>\n                <div class=\'items\'>\n                    <div>\n                        <label>Layout</label>\n                        <div class=\'layout-buttons\' ref="$buttons">\n                            <button type="button" class=\'beginner\' ref="$beginner">B</button>\n                            <button type="button" class=\'expertor\' ref="$expertor">E</button>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'property-item layout\'>\n                <div class=\'items no-padding\'>\n                    <div>\n                        <label>Layout</label>\n                        <div class=\'layout-buttons\' ref="$buttons">\n                            <button type="button" class=\'beginner\' ref="$beginner">B</button>\n                            <button type="button" class=\'expertor\' ref="$expertor">E</button>\n                        </div>\n                    </div>   \n                                 \n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'refresh',

@@ -8,6 +8,7 @@
     overflow: auto;
 
     &.inline {
+        overflow: hidden;
         .property-item {
             display: inline-block;
             vertical-align: middle;
@@ -144,7 +145,7 @@
 
         > .items {
             display: none; 
-            padding: 4px 5px !important; 
+            padding: 4px 5px; 
             padding-top: 0px;
 
             &.no-padding {
@@ -174,7 +175,7 @@
                 line-height: 1.6;
                 margin-left: 4px;
                 text-align: right;
-                padding-right: 10px;
+                padding-right: 5px;
                 box-sizing: border-box;
 
                 &.left {
@@ -195,6 +196,7 @@
 
                     &.full {
                         width: 160px;
+                        height: 20px;
                     }
                 }
 
@@ -266,7 +268,7 @@
                 margin-bottom: 0px;
 
                 .items {
-                    padding: 2px 5px !important;
+                    padding: 2px 5px;
                 }
             }
         }

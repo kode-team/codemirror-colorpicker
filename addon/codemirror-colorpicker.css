@@ -930,7 +930,7 @@
     .imageeditor .layout-main.show-timeline .layout-footer {
       height: 300px; }
     .imageeditor .layout-main.expertor-mode .layout-left {
-      top: 60px;
+      top: 70px;
       width: 200px;
       border-right: 1px solid #c7c7c7; }
     .imageeditor .layout-main.expertor-mode .layout-right {
@@ -940,12 +940,12 @@
       left: auto;
       border-right: 0px; }
     .imageeditor .layout-main.expertor-mode .layout-body {
-      top: 60px;
+      top: 70px;
       left: 300px;
       right: 250px; }
     .imageeditor .layout-main.expertor-mode .layout-top {
       right: 250px;
-      height: 30px;
+      height: 40px;
       top: 30px; }
     .imageeditor .layout-main.expertor-mode .layout-header {
       height: 30px;
@@ -3231,36 +3231,38 @@
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     overflow: auto; }
-    .imageeditor .property-view.inline .property-item {
-      display: inline-block;
-      vertical-align: middle;
-      border: 0px;
-      padding: 2px 4px; }
-      .imageeditor .property-view.inline .property-item > .title {
-        background-image: none;
-        border-bottom: 0px; }
-        .imageeditor .property-view.inline .property-item > .title > span button {
-          -webkit-appearance: none;
-             -moz-appearance: none;
-                  appearance: none;
-          background-color: transparent;
-          border: 1px solid #c7c7c7;
-          vertical-align: middle;
-          display: inline-block;
-          height: auto; }
-      .imageeditor .property-view.inline .property-item > .items {
-        display: inline-block; }
-      .imageeditor .property-view.inline .property-item > * {
+    .imageeditor .property-view.inline {
+      overflow: hidden; }
+      .imageeditor .property-view.inline .property-item {
         display: inline-block;
-        vertical-align: middle; }
-        .imageeditor .property-view.inline .property-item > * button {
-          -webkit-appearance: none;
-             -moz-appearance: none;
-                  appearance: none;
-          background-color: transparent;
-          border: 1px solid #c7c7c7;
-          vertical-align: middle;
+        vertical-align: middle;
+        border: 0px;
+        padding: 2px 4px; }
+        .imageeditor .property-view.inline .property-item > .title {
+          background-image: none;
+          border-bottom: 0px; }
+          .imageeditor .property-view.inline .property-item > .title > span button {
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            background-color: transparent;
+            border: 1px solid #c7c7c7;
+            vertical-align: middle;
+            display: inline-block;
+            height: auto; }
+        .imageeditor .property-view.inline .property-item > .items {
           display: inline-block; }
+        .imageeditor .property-view.inline .property-item > * {
+          display: inline-block;
+          vertical-align: middle; }
+          .imageeditor .property-view.inline .property-item > * button {
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            background-color: transparent;
+            border: 1px solid #c7c7c7;
+            vertical-align: middle;
+            display: inline-block; }
     .imageeditor .property-view.accordian {
       display: -webkit-box;
       display: -ms-flexbox;
@@ -3329,7 +3331,7 @@
           height: 100%; }
       .imageeditor .property-view .property-item > .items {
         display: none;
-        padding: 4px 5px !important;
+        padding: 4px 5px;
         padding-top: 0px; }
         .imageeditor .property-view .property-item > .items.no-padding {
           padding: 0px !important; }
@@ -3349,7 +3351,7 @@
           line-height: 1.6;
           margin-left: 4px;
           text-align: right;
-          padding-right: 10px;
+          padding-right: 5px;
           -webkit-box-sizing: border-box;
                   box-sizing: border-box; }
           .imageeditor .property-view .property-item > .items > div > label.left {
@@ -3364,7 +3366,8 @@
             width: 40px;
             vertical-align: middle; }
             .imageeditor .property-view .property-item > .items > div > div input[type=number].full, .imageeditor .property-view .property-item > .items > div > div input[type=text].full {
-              width: 160px; }
+              width: 160px;
+              height: 20px; }
           .imageeditor .property-view .property-item > .items > div > div .input input[type=number], .imageeditor .property-view .property-item > .items > div > div .input input[type=text] {
             width: 30px; }
           .imageeditor .property-view .property-item > .items > div > div .input-field.hex input[type=number], .imageeditor .property-view .property-item > .items > div > div .input-field.hex input[type=text] {
@@ -3792,7 +3795,7 @@
     padding: 0px;
     margin-bottom: 0px; }
     .imageeditor .layout-main.expertor-mode .layout-top .property-view .property-item .items {
-      padding: 2px 5px !important; }
+      padding: 2px 5px; }
   .imageeditor .filter-list {
     display: block !important; }
     .imageeditor .filter-list .filter-item {

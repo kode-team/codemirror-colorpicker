@@ -37,7 +37,7 @@ $gradient-box-size: 100px;
 
     &.expertor-mode {
         .layout-left {
-            top: 60px;            
+            top: 70px;            
             width: $left-size - 50px;
             border-right: 1px solid $border-color;
         }
@@ -50,14 +50,14 @@ $gradient-box-size: 100px;
         } 
         
         .layout-body {
-            top: 60px;
+            top: 70px;
             left: $left-size - 50px + $gradient-box-size; 
             right: $right-size;
         }
 
         .layout-top {
             right: $right-size;
-            height: 30px;
+            height: 40px;
             top: 30px;
         }
 

@@ -10,7 +10,7 @@ export default class PageSize extends UIElement {
                         <button type="button" ref="$rect">rect</button>
                     </span>
                 </div>
-                <div class='items'>
+                <div class='items no-padding'>
                     <div>
                         <label>Width</label>
                         <div>

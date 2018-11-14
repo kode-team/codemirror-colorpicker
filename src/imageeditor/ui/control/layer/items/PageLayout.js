@@ -4,7 +4,7 @@ export default class PageLayout extends UIElement {
     template () {
         return `
             <div class='property-item layout'>
-                <div class='items'>
+                <div class='items no-padding'>
                     <div>
                         <label>Layout</label>
                         <div class='layout-buttons' ref="$buttons">
