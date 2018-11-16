@@ -14,6 +14,7 @@ import VerticalColorStep from '../ui/control/VerticalColorStep';
 import Animation from '../../util/animation/Animation';
 import GradientSampleView from '../ui/control/GradientSampleView';
 import LayerSampleView from '../ui/control/LayerSampleView';
+import PageSampleView from '../ui/control/PageSampleView';
 
 
 
@@ -61,6 +62,7 @@ export default class XDImageEditor extends BaseImageEditor {
                 <DropView></DropView>
                 <GradientSampleView></GradientSampleView>
                 <LayerSampleView></LayerSampleView>
+                <PageSampleView></PageSampleView>
             </div>
         `
     }
@@ -79,7 +81,8 @@ export default class XDImageEditor extends BaseImageEditor {
             SubFeatureControl, 
             ImageList,
             Timeline,
-            LayerSampleView 
+            LayerSampleView,
+            PageSampleView
         }
     } 
 

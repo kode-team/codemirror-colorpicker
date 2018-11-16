@@ -704,6 +704,25 @@ export default class ItemManager extends BaseModule {
 
         return newLayerId;
     }
+ 
+    '*/item/recover/page' ($store, page) {
+        var newPageId = $store.read('/item/create/object', page.page);
+        page.layers.forEach(layer => {
+
+            var newLayerId = $store.read('/item/create/object', Object.assign({parentId: newPageId}, layer.layer));
+            layer.images.forEach(image => {
+                var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, {parentId: newLayerId}));
+                
+                image.colorsteps.forEach(step => {
+                    $store.read('/item/create/object', Object.assign({}, step, {parentId: newImageId}))
+                })
+    
+            })
+
+        })
+
+        return newPageId;
+    }    
 
     '/item/addCopy/layer' ($store, sourceId) {
 
@@ -721,6 +740,15 @@ export default class ItemManager extends BaseModule {
             $store.read('/item/recover/layer', layer, currentLayer.parentId)
         );        
     }    
+
+    '/item/addCache/page' ($store, page) {
+        var currentPage = $store.read('/item/current/page');
+        
+        $store.run('/item/move/to', 
+            currentPage.id, 
+            $store.read('/item/recover/page', page)
+        );        
+    }        
 
     '/item/addCopy/image' ($store, sourceId) {
         var currentImage = $store.read('/item/get', sourceId);

@@ -28,9 +28,15 @@ export default class StorageManager extends BaseModule {
         localStorage.setItem(`${SAVE_ID}-${key}`, JSON.stringify(value))
     }
 
-    '*/storage/pages' ($store, index = undefined) {
-        if (typeof index !== 'undefined' ) {
-            return $store.cachedPages[index];
+    '*/storage/pages' ($store, id = undefined) {
+        if (typeof id !== 'undefined' ) {
+            var results = $store.cachedPages.filter(item => (item.id == id) );
+
+            if (!results.length) {
+                return {}
+            }
+
+            return results[0];
         }
         return $store.cachedPages;
     }
@@ -80,6 +86,15 @@ export default class StorageManager extends BaseModule {
         $store.run('/storage/save/layer');
     }        
 
+    '/storage/remove/page' ($store, id) {
+
+        $store.cachedLayers = $store.cachedPages.filter(item => {
+            return item.id != id; 
+        });
+
+        $store.run('/storage/save/page');
+    }            
+
     '/storage/unshift/page' ($store, page) {
         var item = $store.read('/clone', page);
         item.id = uuid()
@@ -121,22 +136,6 @@ export default class StorageManager extends BaseModule {
 
         $store.run('/storage/save/image');
     }        
-
-    '/storage/add/current/layer' ($store) {
-        $store.read('/item/current/layer', (layer) => {
-            $store.dispatch('/storage/add/layer', [
-                $store.read('/clone', layer),
-                ...$store.read('/item/map/children', layer.id, (item) => $store.read('/clone', item) )
-            ])  
-        })
-    }
-
-    '/storage/add/current/image' ($store) {
-        $store.read('/item/current/image', (image) => {
-            $store.dispatch('/storage/add/image', image)  
-        })
-    }
-
 
     '/storage/save' ($store) {
         localStorage.setItem(SAVE_ID, JSON.stringify({

@@ -25,4 +25,27 @@ export default class PageManager extends BaseModule {
         return realCSS; 
     }
 
+    '*/page/cache/toCSS' ($store, page = {}) {
+        var css = page.style || {} 
+
+        var realCSS = {}
+        Object.keys(css).filter(key => {
+            return !!css[key]
+        }).forEach(key => {
+            realCSS[key] = css[key]
+        })
+ 
+        return realCSS; 
+    }    
+
+    '*/page/cache/toString' ($store, page) {
+        var obj = $store.read('/page/cache/toCSS', page) || {};
+
+        return {
+            css: $store.read('/css/toString', obj),
+            obj
+        }
+    }    
+
+
 }

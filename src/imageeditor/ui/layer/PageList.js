@@ -9,6 +9,9 @@ export default class PageList extends UIElement {
                 
                 </div>
                 <div class='project-tools'>
+                    <button type="button" class='view-sample' ref="$viewSample">
+                        <div class="arrow"></div>
+                    </button>                
                     <button type="button" ref="$saveButton">Save</button>
                 </div>
             </div>
@@ -78,5 +81,9 @@ export default class PageList extends UIElement {
     'click $saveButton' (e) {
         this.run('/storage/save');
     }
+
+    'click $viewSample' (e) {
+        this.emit('togglePageSampleView');
+    }    
 
 } 

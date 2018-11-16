@@ -52,7 +52,7 @@ export default class CollectManager extends BaseModule {
         })
     }
 
-    '*/collect/page' ($store, pageId) {
+    '*/collect/page/one' ($store, pageId) {
         var results = {} 
 
         if (!$store.items[pageId]) {

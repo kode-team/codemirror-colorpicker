@@ -11,9 +11,11 @@ import CssManager from "./CssManager";
 import ExternalResourceManager from "./ExternalResourceManager";
 import SVGManager from "./SVGManager";
 import CollectManager from "./CollectManager";
+import PageManager from "./PageManager";
 
 
 export default [
+    PageManager,
     CollectManager,
     SVGManager, 
     ExternalResourceManager,

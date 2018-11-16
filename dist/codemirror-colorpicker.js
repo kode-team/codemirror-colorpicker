@@ -11801,6 +11801,24 @@ var ItemManager = function (_BaseModule) {
             return newLayerId;
         }
     }, {
+        key: '*/item/recover/page',
+        value: function itemRecoverPage($store, page) {
+            var newPageId = $store.read('/item/create/object', page.page);
+            page.layers.forEach(function (layer) {
+
+                var newLayerId = $store.read('/item/create/object', Object.assign({ parentId: newPageId }, layer.layer));
+                layer.images.forEach(function (image) {
+                    var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, { parentId: newLayerId }));
+
+                    image.colorsteps.forEach(function (step) {
+                        $store.read('/item/create/object', Object.assign({}, step, { parentId: newImageId }));
+                    });
+                });
+            });
+
+            return newPageId;
+        }
+    }, {
         key: '/item/addCopy/layer',
         value: function itemAddCopyLayer($store, sourceId) {
 
@@ -11815,6 +11833,13 @@ var ItemManager = function (_BaseModule) {
             var currentLayer = $store.read('/item/current/layer');
 
             $store.run('/item/move/to', currentLayer.id, $store.read('/item/recover/layer', layer, currentLayer.parentId));
+        }
+    }, {
+        key: '/item/addCache/page',
+        value: function itemAddCachePage($store, page) {
+            var currentPage = $store.read('/item/current/page');
+
+            $store.run('/item/move/to', currentPage.id, $store.read('/item/recover/page', page));
         }
     }, {
         key: '/item/addCopy/image',
@@ -12203,10 +12228,18 @@ var StorageManager = function (_BaseModule) {
     }, {
         key: '*/storage/pages',
         value: function storagePages($store) {
-            var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+            var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
-            if (typeof index !== 'undefined') {
-                return $store.cachedPages[index];
+            if (typeof id !== 'undefined') {
+                var results = $store.cachedPages.filter(function (item) {
+                    return item.id == id;
+                });
+
+                if (!results.length) {
+                    return {};
+                }
+
+                return results[0];
             }
             return $store.cachedPages;
         }
@@ -12267,6 +12300,16 @@ var StorageManager = function (_BaseModule) {
             $store.run('/storage/save/layer');
         }
     }, {
+        key: '/storage/remove/page',
+        value: function storageRemovePage($store, id) {
+
+            $store.cachedLayers = $store.cachedPages.filter(function (item) {
+                return item.id != id;
+            });
+
+            $store.run('/storage/save/page');
+        }
+    }, {
         key: '/storage/unshift/page',
         value: function storageUnshiftPage($store, page) {
             var item = $store.read('/clone', page);
@@ -12312,22 +12355,6 @@ var StorageManager = function (_BaseModule) {
             $store.cachedImages.push(item);
 
             $store.run('/storage/save/image');
-        }
-    }, {
-        key: '/storage/add/current/layer',
-        value: function storageAddCurrentLayer($store) {
-            $store.read('/item/current/layer', function (layer) {
-                $store.dispatch('/storage/add/layer', [$store.read('/clone', layer)].concat(toConsumableArray($store.read('/item/map/children', layer.id, function (item) {
-                    return $store.read('/clone', item);
-                }))));
-            });
-        }
-    }, {
-        key: '/storage/add/current/image',
-        value: function storageAddCurrentImage($store) {
-            $store.read('/item/current/image', function (image) {
-                $store.dispatch('/storage/add/image', image);
-            });
         }
     }, {
         key: '/storage/save',
@@ -12704,8 +12731,8 @@ var CollectManager = function (_BaseModule) {
             });
         }
     }, {
-        key: '*/collect/page',
-        value: function collectPage($store, pageId) {
+        key: '*/collect/page/one',
+        value: function collectPageOne($store, pageId) {
             var results = {};
 
             if (!$store.items[pageId]) {
@@ -12725,7 +12752,72 @@ var CollectManager = function (_BaseModule) {
     return CollectManager;
 }(BaseModule);
 
-var ModuleList = [CollectManager, SVGManager, ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var PageManager = function (_BaseModule) {
+    inherits(PageManager, _BaseModule);
+
+    function PageManager() {
+        classCallCheck(this, PageManager);
+        return possibleConstructorReturn(this, (PageManager.__proto__ || Object.getPrototypeOf(PageManager)).apply(this, arguments));
+    }
+
+    createClass(PageManager, [{
+        key: '*/page/toString',
+        value: function pageToString($store, id) {
+
+            var page = $store.read('/item/get', id);
+            var obj = $store.read('/page/toCSS', page) || {};
+
+            return Object.keys(obj).map(function (key) {
+                return key + ': ' + obj[key] + ';';
+            }).join(' ');
+        }
+    }, {
+        key: '*/page/toCSS',
+        value: function pageToCSS($store) {
+            var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var css = page.style || {};
+
+            var realCSS = {};
+            Object.keys(css).filter(function (key) {
+                return !!css[key];
+            }).forEach(function (key) {
+                realCSS[key] = css[key];
+            });
+
+            return realCSS;
+        }
+    }, {
+        key: '*/page/cache/toCSS',
+        value: function pageCacheToCSS($store) {
+            var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var css = page.style || {};
+
+            var realCSS = {};
+            Object.keys(css).filter(function (key) {
+                return !!css[key];
+            }).forEach(function (key) {
+                realCSS[key] = css[key];
+            });
+
+            return realCSS;
+        }
+    }, {
+        key: '*/page/cache/toString',
+        value: function pageCacheToString($store, page) {
+            var obj = $store.read('/page/cache/toCSS', page) || {};
+
+            return {
+                css: $store.read('/css/toString', obj),
+                obj: obj
+            };
+        }
+    }]);
+    return PageManager;
+}(BaseModule);
+
+var ModuleList = [PageManager, CollectManager, SVGManager, ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -12782,7 +12874,7 @@ var PageList = function (_UIElement) {
     createClass(PageList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'pages\'>         \n                <div class="page-list" ref="$pageList">\n                \n                </div>\n                <div class=\'project-tools\'>\n                    <button type="button" ref="$saveButton">Save</button>\n                </div>\n            </div>\n        ';
+            return '\n            <div class=\'pages\'>         \n                <div class="page-list" ref="$pageList">\n                \n                </div>\n                <div class=\'project-tools\'>\n                    <button type="button" class=\'view-sample\' ref="$viewSample">\n                        <div class="arrow"></div>\n                    </button>                \n                    <button type="button" ref="$saveButton">Save</button>\n                </div>\n            </div>\n        ';
         }
     }, {
         key: 'makeItemNode',
@@ -12849,6 +12941,11 @@ var PageList = function (_UIElement) {
         key: 'click $saveButton',
         value: function click$saveButton(e) {
             this.run('/storage/save');
+        }
+    }, {
+        key: 'click $viewSample',
+        value: function click$viewSample(e) {
+            this.emit('togglePageSampleView');
         }
     }]);
     return PageList;
@@ -19144,6 +19241,159 @@ var LayerSampleView = function (_UIElement) {
     return LayerSampleView;
 }(UIElement);
 
+var PageSampleList = function (_UIElement) {
+    inherits(PageSampleList, _UIElement);
+
+    function PageSampleList() {
+        classCallCheck(this, PageSampleList);
+        return possibleConstructorReturn(this, (PageSampleList.__proto__ || Object.getPrototypeOf(PageSampleList)).apply(this, arguments));
+    }
+
+    createClass(PageSampleList, [{
+        key: "initialize",
+        value: function initialize() {
+            get(PageSampleList.prototype.__proto__ || Object.getPrototypeOf(PageSampleList.prototype), "initialize", this).call(this);
+
+            // this.list = this.read('/page/list/sample', this.props.type); 
+            this.list = [];
+            this.dispatch('/storage/load/page');
+        }
+    }, {
+        key: "template",
+        value: function template() {
+
+            return "\n        <div class=\"page-sample-list\">\n            <div class='cached-list' ref=\"$cachedList\"></div>\n\n        </div>\n        ";
+        }
+    }, {
+        key: 'load $cachedList',
+        value: function load$cachedList() {
+            var _this2 = this;
+
+            var list = this.list.map(function (page, index) {
+                var data = _this2.read('/page/cache/toString', page);
+
+                var rateX = 160 / parseParamNumber$1(data.obj.width);
+                var rateY = 120 / parseParamNumber$1(data.obj.height);
+
+                var transform = "transform: scale(" + rateX + " " + rateY + ")";
+
+                return "\n            <div class='page-sample-item'  data-sample-id=\"" + page.id + "\">\n                <div class=\"page-view\" style=\"" + data.css + "; " + transform + "\">\n                " + page.layers.map(function (layer) {
+                    var data = _this2.read('/layer/cache/toString', layer);
+                    return "\n                        <div class=\"layer-view\" style=\"" + data.css + "\"></div>\n                    ";
+                }).join('') + "\n                </div>\n\n                <div class='item-tools'>\n                    <button type=\"button\" class='add-item'  data-index=\"" + index + "\" title=\"Addd\">&times;</button>\n                </div>          \n            </div>";
+            });
+
+            var storageList = this.read('/storage/pages').map(function (page) {
+                var data = _this2.read('/page/cache/toString', page);
+
+                var rateX = 160 / parseParamNumber$1(data.obj.width || 400);
+                var rateY = 240 / parseParamNumber$1(data.obj.height || 300) * rateX;
+
+                var transform = "transform-origin: left top;transform: scale(" + rateX + ", " + rateY + ")";
+
+                return "\n                <div class='page-cached-item' data-sample-id=\"" + page.id + "\">\n                    <div class=\"page-view\" style=\"" + data.css + "; " + transform + "\">\n                    " + page.layers.map(function (layer) {
+                    var data = _this2.read('/layer/cache/toString', layer);
+                    return "\n                            <div class=\"layer-view\" style=\"position:absolute;" + data.css + "\"></div>\n                        ";
+                }).join('') + "\n                    </div>\n                    <div class='item-tools'>\n                        <button type=\"button\" class='add-item'  data-sample-id=\"" + page.id + "\" title=\"Add\">&times;</button>                \n                        <button type=\"button\" class='delete-item'  data-sample-id=\"" + page.id + "\" title=\"Delete\">&times;</button>\n                    </div>          \n                </div>\n            ";
+            });
+
+            var results = [].concat(toConsumableArray(list), toConsumableArray(storageList), ["<button type=\"button\" class=\"add-current-page\" title=\"Cache a page\">+</button>"]);
+
+            var emptyCount = 5 - results.length % 5;
+
+            var arr = [].concat(toConsumableArray(Array(emptyCount)));
+
+            arr.forEach(function (it) {
+                results.push("<div class='empty'></div>");
+            });
+
+            return results;
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeStorage',
+        value: function changeStorage() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $el .page-sample-item .add-item',
+        value: function click$elPageSampleItemAddItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+
+            var newPage = this.list[index];
+
+            if (newPage) {
+                this.dispatch('/item/addCache/page', newPage);
+            }
+        }
+    }, {
+        key: 'click $el .page-cached-item .add-item',
+        value: function click$elPageCachedItemAddItem(e) {
+            var newPage = this.read('/storage/pages', e.$delegateTarget.attr('data-sample-id'));
+            if (newPage) {
+                this.dispatch('/item/addCache/page', newPage);
+            }
+        }
+    }, {
+        key: 'click $el .page-cached-item .delete-item',
+        value: function click$elPageCachedItemDeleteItem(e) {
+            this.dispatch('/storage/remove/page', e.$delegateTarget.attr('data-sample-id'));
+            this.refresh();
+        }
+    }, {
+        key: 'click $el .add-current-page',
+        value: function click$elAddCurrentPage(e) {
+            var _this3 = this;
+
+            this.read('/item/current/page', function (page) {
+                var newPage = _this3.read('/collect/page/one', page.id);
+
+                _this3.dispatch('/storage/add/page', newPage);
+                _this3.refresh();
+            });
+        }
+    }]);
+    return PageSampleList;
+}(UIElement);
+
+var PageSampleView = function (_UIElement) {
+    inherits(PageSampleView, _UIElement);
+
+    function PageSampleView() {
+        classCallCheck(this, PageSampleView);
+        return possibleConstructorReturn(this, (PageSampleView.__proto__ || Object.getPrototypeOf(PageSampleView)).apply(this, arguments));
+    }
+
+    createClass(PageSampleView, [{
+        key: "components",
+        value: function components() {
+            return {
+                PageSampleList: PageSampleList
+            };
+        }
+    }, {
+        key: "template",
+        value: function template() {
+            return "\n            <div class='page-sample-view'>\n                <div class=\"close\">&times;</div>\n                <PageSampleList></PageSampleList>\n            </div>\n        ";
+        }
+    }, {
+        key: 'click $el .close',
+        value: function click$elClose(e) {
+            this.$el.toggle();
+        }
+    }, {
+        key: '@togglePageSampleView',
+        value: function togglePageSampleView() {
+            this.$el.toggle();
+        }
+    }]);
+    return PageSampleView;
+}(UIElement);
+
 var screenModes = ['expertor', 'beginner'];
 var panelModes = ['small', 'large'];
 
@@ -19165,7 +19415,7 @@ var XDImageEditor = function (_BaseImageEditor) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n                <GradientSampleView></GradientSampleView>\n                <LayerSampleView></LayerSampleView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n                <GradientSampleView></GradientSampleView>\n                <LayerSampleView></LayerSampleView>\n                <PageSampleView></PageSampleView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -19183,7 +19433,8 @@ var XDImageEditor = function (_BaseImageEditor) {
                 SubFeatureControl: SubFeatureControl,
                 ImageList: ImageList,
                 Timeline: Timeline,
-                LayerSampleView: LayerSampleView
+                LayerSampleView: LayerSampleView,
+                PageSampleView: PageSampleView
             };
         }
     }, {
