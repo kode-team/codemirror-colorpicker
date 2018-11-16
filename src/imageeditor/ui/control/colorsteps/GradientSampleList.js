@@ -15,7 +15,6 @@ export default class GradientSampleList extends UIElement  {
         return `
         <div class="gradient-sample-list">
             <div class='cached-list' ref="$cachedList"></div>
-
         </div>
         `  
     }
@@ -100,7 +99,7 @@ export default class GradientSampleList extends UIElement  {
 
     'click $el .add-current-image' (e) {
         this.read('/item/current/image', (image) => {
-            var newImage = this.read('/item/collect/image/one', image.id)
+            var newImage = this.read('/collect/image/one', image.id)
 
             this.dispatch('/storage/add/image', newImage);
             this.refresh();

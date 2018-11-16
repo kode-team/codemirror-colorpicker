@@ -13,6 +13,8 @@ import DropView from '../ui/control/DropView';
 import VerticalColorStep from '../ui/control/VerticalColorStep';
 import Animation from '../../util/animation/Animation';
 import GradientSampleView from '../ui/control/GradientSampleView';
+import LayerSampleView from '../ui/control/LayerSampleView';
+
 
 
 const screenModes = ['expertor', 'beginner']
@@ -58,6 +60,7 @@ export default class XDImageEditor extends BaseImageEditor {
                 <ExportView></ExportView>
                 <DropView></DropView>
                 <GradientSampleView></GradientSampleView>
+                <LayerSampleView></LayerSampleView>
             </div>
         `
     }
@@ -75,7 +78,8 @@ export default class XDImageEditor extends BaseImageEditor {
             LayerList, 
             SubFeatureControl, 
             ImageList,
-            Timeline
+            Timeline,
+            LayerSampleView 
         }
     } 
 

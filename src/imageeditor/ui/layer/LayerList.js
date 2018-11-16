@@ -9,6 +9,9 @@ export default class LayerList extends UIElement {
                     <h1>Layers</h1>
                     <div class="tools">
                         <button type="button" class='add-layer' ref="$addLayer">+</button>
+                        <button type="button" class='view-sample' ref="$viewSample">
+                            <div class="arrow"></div>
+                        </button>
                     </div>
                 </div>             
                 <div class="layer-list" ref="$layerList"></div>
@@ -135,5 +138,9 @@ export default class LayerList extends UIElement {
     'click $layerList .delete-item' (e) {
         this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'))
         this.refresh()
+    }
+
+    'click $viewSample' (e) {
+        this.emit('toggleLayerSampleView');
     }
 }

@@ -10,9 +10,11 @@ import StorageManager from "./StorageManager";
 import CssManager from "./CssManager";
 import ExternalResourceManager from "./ExternalResourceManager";
 import SVGManager from "./SVGManager";
+import CollectManager from "./CollectManager";
 
 
 export default [
+    CollectManager,
     SVGManager, 
     ExternalResourceManager,
     CssManager,

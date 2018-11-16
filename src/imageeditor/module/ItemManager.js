@@ -104,74 +104,6 @@ export default class ItemManager extends BaseModule {
         this.$store.emit('changeEditor')
     }
 
-    '*/item/collect/colorsteps' ($store, imageId) {
-        return $store.read('/item/map/children', imageId, (colorstep) => {
-            var colorstep = $store.read('/clone', $store.items[colorstep.id]);
-            delete colorstep.id;
-            delete colorstep.parentId;
-    
-            return colorstep
-        })
-    }
-
-    '*/item/collect/image/one' ($store, imageId) {
-        var image = $store.read('/clone', $store.items[imageId]);
-        delete image.id;
-        delete image.parentId;
-
-        return {
-            image,
-            colorsteps: $store.read('/item/collect/colorsteps', imageId)
-        }
-    }
-
-    '*/item/collect/images' ($store, layerId) {
-        return $store.read('/item/map/children', layerId, (image) => {
-            return $store.read('/item/collect/image/one', image.id)
-        })
-    }
-
-    '*/item/collect/layer/one' ($store, layerId) {
-        var results = {} 
-
-        if (!$store.items[layerId]) {
-            return results; 
-        }
-
-        var layer = $store.read('/clone', $store.items[layerId]);
-        delete layer.id;
-        delete layer.parentId;
-
-        return {
-            layer,
-            images: $store.read('/item/collect/images', layerId)
-        }
-    }
-
-    '*/item/collect/layers' ($store, pageId) {
-        return $store.read('/item/map/children', pageId, (layer) => {
-            return $store.read('/item/collect/layer/one', layer.id)
-        })
-    }
-
-    '*/item/collect/page' ($store, pageId) {
-        var results = {} 
-
-        if (!$store.items[pageId]) {
-            return results; 
-        }
-
-        var page = $store.read('/clone', $store.items[pageId]);
-        delete page.id;
-        delete page.parentId;
-
-        return {
-            page,
-            layers: $store.read('/item/collect/layers', pageId)
-        }
-
-    }
-
     '*/item/create/object' ($store, obj, defaultObj = {}) {
         obj = Object.assign({}, $store.read('/clone', defaultObj), obj);         
         obj.id = Date.now() + '-' + uuid();
@@ -438,10 +370,10 @@ export default class ItemManager extends BaseModule {
     }    
 
     '*/item/dom' ($store, id) {
-        var dom = document.querySelector('[item-layer-id="' + id + '"]');
+        var element = document.querySelector('[item-layer-id="' + id + '"]');
 
-        if (dom) {
-            return new Dom(dom)
+        if (element) {
+            return new Dom(element)
         }
     }
 
@@ -740,7 +672,7 @@ export default class ItemManager extends BaseModule {
     }    
 
     '/item/addCopy/page' ($store, sourceId) {
-        var page = $store.read('/item/collect/page', sourceId);
+        var page = $store.read('/collect/page', sourceId);
         var newPageId = $store.read('/item/create/object', page.page);
 
         page.layers.forEach( layer => {
@@ -759,10 +691,8 @@ export default class ItemManager extends BaseModule {
         $store.run('/item/move/to', sourceId, newPageId);
     }
 
-    '/item/addCopy/layer' ($store, sourceId) {
-        var currentLayer = $store.read('/item/get', sourceId);
-        var layer = $store.read('/item/collect/layer/one', sourceId);
-        var newLayerId = $store.read('/item/create/object', Object.assign({parentId: currentLayer.parentId}, layer.layer));
+    '*/item/recover/layer' ($store, layer, parentId) {
+        var newLayerId = $store.read('/item/create/object', Object.assign({parentId}, layer.layer));
         layer.images.forEach(image => {
             var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, {parentId: newLayerId}));
             
@@ -772,13 +702,29 @@ export default class ItemManager extends BaseModule {
 
         })
 
-        $store.run('/item/move/to', sourceId, newLayerId);        
-
+        return newLayerId;
     }
+
+    '/item/addCopy/layer' ($store, sourceId) {
+
+        var layer = $store.read('collect/layer/one', sourceId);
+        var newLayerId = $store.run('/item/recover/layer', layer, layer.parentId);
+        
+        $store.run('/item/move/to', sourceId, newLayerId);        
+    }
+
+    '/item/addCache/layer' ($store, layer) {
+        var currentLayer = $store.read('/item/current/layer');
+        
+        $store.run('/item/move/to', 
+            currentLayer.id, 
+            $store.read('/item/recover/layer', layer, currentLayer.parentId)
+        );        
+    }    
 
     '/item/addCopy/image' ($store, sourceId) {
         var currentImage = $store.read('/item/get', sourceId);
-        var image = $store.read('/item/collect/image/one', sourceId);
+        var image = $store.read('/collect/image/one', sourceId);
         var newImageId = $store.read('/item/create/object', Object.assign({parentId: currentImage.parentId}, image.image));
         image.colorsteps.forEach(step => {
             $store.read('/item/create/object', Object.assign({}, step, {parentId: newImageId}))

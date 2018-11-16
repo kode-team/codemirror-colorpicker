@@ -170,6 +170,34 @@ export default class ImageManager extends BaseModule {
         return results
     }
 
+    '*/image/cache/toCSS' ($store, item = {}) {
+        var image = Object.assign({}, item.image, {colorsteps: item.colorsteps}); 
+
+        var results = {} 
+        var backgroundImage = $store.read('/image/toImageString', image)
+        var backgroundPosition = $store.read('/image/toBackgroundPositionString', image)
+        var backgroundSize = $store.read('/image/toBackgroundSizeString', image)
+        var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image)
+
+        if (backgroundImage) {
+            results['background-image'] = backgroundImage;  // size, position, origin, attachment and etc 
+        }
+
+        if (backgroundSize) {
+            results['background-size'] = backgroundSize;
+        }
+
+        if (backgroundPosition) {
+            results['background-position'] = backgroundPosition;
+        }        
+
+        if (backgroundRepeat) {
+            results['background-repeat'] = backgroundRepeat;
+        }        
+
+        return results
+    }
+
     '*/image/toString' ($store, image = null) {
 
         var obj = $store.read('/image/toCSS', image)

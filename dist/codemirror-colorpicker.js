@@ -9856,6 +9856,37 @@ var ImageManager = function (_BaseModule) {
             return results;
         }
     }, {
+        key: '*/image/cache/toCSS',
+        value: function imageCacheToCSS($store) {
+            var item = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var image$$1 = Object.assign({}, item.image, { colorsteps: item.colorsteps });
+
+            var results = {};
+            var backgroundImage = $store.read('/image/toImageString', image$$1);
+            var backgroundPosition = $store.read('/image/toBackgroundPositionString', image$$1);
+            var backgroundSize = $store.read('/image/toBackgroundSizeString', image$$1);
+            var backgroundRepeat = $store.read('/image/toBackgroundRepeatString', image$$1);
+
+            if (backgroundImage) {
+                results['background-image'] = backgroundImage; // size, position, origin, attachment and etc 
+            }
+
+            if (backgroundSize) {
+                results['background-size'] = backgroundSize;
+            }
+
+            if (backgroundPosition) {
+                results['background-position'] = backgroundPosition;
+            }
+
+            if (backgroundRepeat) {
+                results['background-repeat'] = backgroundRepeat;
+            }
+
+            return results;
+        }
+    }, {
         key: '*/image/toString',
         value: function imageToString($store) {
             var image$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -10148,6 +10179,10 @@ var ImageManager = function (_BaseModule) {
     return ImageManager;
 }(BaseModule);
 
+var layerList = [
+    // sample
+];
+
 var filterInfo = {
 
     'blur': { title: 'Blur', type: 'range', min: 0, max: 100, step: 1, unit: 'px', defaultValue: 0 },
@@ -10175,6 +10210,17 @@ var LayerManager = function (_BaseModule) {
     }
 
     createClass(LayerManager, [{
+        key: '*/layer/list/sample',
+        value: function layerListSample($store) {
+            var results = [];
+
+            results = layerList.map(function (it) {
+                return Object.assign({}, it);
+            });
+
+            return results;
+        }
+    }, {
         key: '*/layer/filter/list',
         value: function layerFilterList($store) {
             return filterInfo;
@@ -10200,9 +10246,17 @@ var LayerManager = function (_BaseModule) {
                 delete obj['filter'];
             }
 
-            return Object.keys(obj).map(function (key) {
-                return key + ": " + obj[key] + ";";
-            }).join(' ');
+            return $store.read('/css/toString', obj);
+        }
+    }, {
+        key: '*/layer/cache/toString',
+        value: function layerCacheToString($store, layer) {
+            var obj = $store.read('/layer/cache/toCSS', layer) || {};
+
+            return {
+                css: $store.read('/css/toString', obj),
+                obj: obj
+            };
         }
     }, {
         key: '*/layer/toExport',
@@ -10306,6 +10360,32 @@ var LayerManager = function (_BaseModule) {
             var results = {};
             $store.read('/item/each/children', layer.id, function (item) {
                 var css = $store.read('/image/toCSS', item, isExport);
+
+                Object.keys(css).forEach(function (key) {
+                    if (!results[key]) {
+                        results[key] = [];
+                    }
+
+                    results[key].push(css[key]);
+                });
+            });
+
+            Object.keys(results).forEach(function (key) {
+                if (Array.isArray(results[key])) {
+                    results[key] = results[key].join(', ');
+                }
+            });
+
+            return results;
+        }
+    }, {
+        key: '*/layer/cache/toImageCSS',
+        value: function layerCacheToImageCSS($store, images) {
+            var results = {};
+
+            images.forEach(function (item) {
+                var image = Object.assign({}, item.image, { colorsteps: item.colorsteps });
+                var css = $store.read('/image/toCSS', image);
 
                 Object.keys(css).forEach(function (key) {
                     if (!results[key]) {
@@ -10481,6 +10561,43 @@ var LayerManager = function (_BaseModule) {
             css['clip-path'] = $store.read('/layer/make/clip-path', layer);
 
             var results = Object.assign(css, image ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport));
+
+            var realCSS = {};
+            Object.keys(results).filter(function (key) {
+                return !!results[key];
+            }).forEach(function (key) {
+                realCSS[key] = results[key];
+            });
+
+            return realCSS;
+        }
+    }, {
+        key: '*/layer/cache/toCSS',
+        value: function layerCacheToCSS($store) {
+            var item = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            var layer = Object.assign({}, item.layer, { images: item.images });
+            var css = Object.assign({}, layer.style);
+
+            if (layer.style['background-color']) {
+                css['background-color'] = layer.style['background-color'];
+            }
+
+            if (layer.style['background-blend-mode']) {
+                css['background-blend-mode'] = layer.style['background-blend-mode'] || "";
+            }
+
+            if (layer.style['mix-blend-mode']) {
+                css['mix-blend-mode'] = layer.style['mix-blend-mode'] || "";
+            }
+
+            Object.assign(css, $store.read('/layer/get/border-radius', layer));
+
+            css['transform'] = $store.read('/layer/make/transform', layer);
+            css['filter'] = $store.read('/layer/make/filter', layer.filters);
+            css['clip-path'] = $store.read('/layer/make/clip-path', layer);
+
+            var results = Object.assign(css, $store.read('/layer/cache/toImageCSS', layer.images));
 
             var realCSS = {};
             Object.keys(results).filter(function (key) {
@@ -10981,79 +11098,6 @@ var ItemManager = function (_BaseModule) {
             this.$store.emit('changeEditor');
         }
     }, {
-        key: '*/item/collect/colorsteps',
-        value: function itemCollectColorsteps($store, imageId) {
-            return $store.read('/item/map/children', imageId, function (colorstep) {
-                var colorstep = $store.read('/clone', $store.items[colorstep.id]);
-                delete colorstep.id;
-                delete colorstep.parentId;
-
-                return colorstep;
-            });
-        }
-    }, {
-        key: '*/item/collect/image/one',
-        value: function itemCollectImageOne($store, imageId) {
-            var image = $store.read('/clone', $store.items[imageId]);
-            delete image.id;
-            delete image.parentId;
-
-            return {
-                image: image,
-                colorsteps: $store.read('/item/collect/colorsteps', imageId)
-            };
-        }
-    }, {
-        key: '*/item/collect/images',
-        value: function itemCollectImages($store, layerId) {
-            return $store.read('/item/map/children', layerId, function (image) {
-                return $store.read('/item/collect/image/one', image.id);
-            });
-        }
-    }, {
-        key: '*/item/collect/layer/one',
-        value: function itemCollectLayerOne($store, layerId) {
-            var results = {};
-
-            if (!$store.items[layerId]) {
-                return results;
-            }
-
-            var layer = $store.read('/clone', $store.items[layerId]);
-            delete layer.id;
-            delete layer.parentId;
-
-            return {
-                layer: layer,
-                images: $store.read('/item/collect/images', layerId)
-            };
-        }
-    }, {
-        key: '*/item/collect/layers',
-        value: function itemCollectLayers($store, pageId) {
-            return $store.read('/item/map/children', pageId, function (layer) {
-                return $store.read('/item/collect/layer/one', layer.id);
-            });
-        }
-    }, {
-        key: '*/item/collect/page',
-        value: function itemCollectPage($store, pageId) {
-            var results = {};
-
-            if (!$store.items[pageId]) {
-                return results;
-            }
-
-            var page = $store.read('/clone', $store.items[pageId]);
-            delete page.id;
-            delete page.parentId;
-
-            return {
-                page: page,
-                layers: $store.read('/item/collect/layers', pageId)
-            };
-        }
-    }, {
         key: '*/item/create/object',
         value: function itemCreateObject($store, obj) {
             var defaultObj = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -11370,10 +11414,10 @@ var ItemManager = function (_BaseModule) {
     }, {
         key: '*/item/dom',
         value: function itemDom($store, id) {
-            var dom = document.querySelector('[item-layer-id="' + id + '"]');
+            var element = document.querySelector('[item-layer-id="' + id + '"]');
 
-            if (dom) {
-                return new Dom(dom);
+            if (element) {
+                return new Dom(element);
             }
         }
     }, {
@@ -11726,7 +11770,7 @@ var ItemManager = function (_BaseModule) {
     }, {
         key: '/item/addCopy/page',
         value: function itemAddCopyPage($store, sourceId) {
-            var page = $store.read('/item/collect/page', sourceId);
+            var page = $store.read('/collect/page', sourceId);
             var newPageId = $store.read('/item/create/object', page.page);
 
             page.layers.forEach(function (layer) {
@@ -11743,11 +11787,9 @@ var ItemManager = function (_BaseModule) {
             $store.run('/item/move/to', sourceId, newPageId);
         }
     }, {
-        key: '/item/addCopy/layer',
-        value: function itemAddCopyLayer($store, sourceId) {
-            var currentLayer = $store.read('/item/get', sourceId);
-            var layer = $store.read('/item/collect/layer/one', sourceId);
-            var newLayerId = $store.read('/item/create/object', Object.assign({ parentId: currentLayer.parentId }, layer.layer));
+        key: '*/item/recover/layer',
+        value: function itemRecoverLayer($store, layer, parentId) {
+            var newLayerId = $store.read('/item/create/object', Object.assign({ parentId: parentId }, layer.layer));
             layer.images.forEach(function (image) {
                 var newImageId = $store.read('/item/create/object', Object.assign({}, image.image, { parentId: newLayerId }));
 
@@ -11756,13 +11798,29 @@ var ItemManager = function (_BaseModule) {
                 });
             });
 
+            return newLayerId;
+        }
+    }, {
+        key: '/item/addCopy/layer',
+        value: function itemAddCopyLayer($store, sourceId) {
+
+            var layer = $store.read('collect/layer/one', sourceId);
+            var newLayerId = $store.run('/item/recover/layer', layer, layer.parentId);
+
             $store.run('/item/move/to', sourceId, newLayerId);
+        }
+    }, {
+        key: '/item/addCache/layer',
+        value: function itemAddCacheLayer($store, layer) {
+            var currentLayer = $store.read('/item/current/layer');
+
+            $store.run('/item/move/to', currentLayer.id, $store.read('/item/recover/layer', layer, currentLayer.parentId));
         }
     }, {
         key: '/item/addCopy/image',
         value: function itemAddCopyImage($store, sourceId) {
             var currentImage = $store.read('/item/get', sourceId);
-            var image = $store.read('/item/collect/image/one', sourceId);
+            var image = $store.read('/collect/image/one', sourceId);
             var newImageId = $store.read('/item/create/object', Object.assign({ parentId: currentImage.parentId }, image.image));
             image.colorsteps.forEach(function (step) {
                 $store.read('/item/create/object', Object.assign({}, step, { parentId: newImageId }));
@@ -12106,6 +12164,7 @@ var GuideManager = function (_BaseModule) {
 }(BaseModule);
 
 var SAVE_ID = 'css-imageeditor';
+var CACHED_PAGE_SAVE_ID = 'css-imageeditor-cached-pages';
 var CACHED_LAYER_SAVE_ID = 'css-imageeditor-cached-layers';
 var CACHED_IMAGE_SAVE_ID = 'css-imageeditor-cached-images';
 
@@ -12118,35 +12177,54 @@ var StorageManager = function (_BaseModule) {
     }
 
     createClass(StorageManager, [{
-        key: 'initialize',
+        key: "initialize",
         value: function initialize() {
-            get(StorageManager.prototype.__proto__ || Object.getPrototypeOf(StorageManager.prototype), 'initialize', this).call(this);
+            get(StorageManager.prototype.__proto__ || Object.getPrototypeOf(StorageManager.prototype), "initialize", this).call(this);
 
+            this.$store.cachedPages = [];
             this.$store.cachedLayers = [];
             this.$store.cachedImages = [];
         }
     }, {
-        key: 'afterDispatch',
+        key: "afterDispatch",
         value: function afterDispatch() {
             this.$store.emit('changeStorage');
         }
     }, {
         key: '*/storage/get',
         value: function storageGet($store, key) {
-            return JSON.parse(localStorage.getItem(SAVE_ID + '-' + key));
+            return JSON.parse(localStorage.getItem(SAVE_ID + "-" + key));
         }
     }, {
         key: '/storage/set',
         value: function storageSet($store, key, value) {
-            localStorage.setItem(SAVE_ID + '-' + key, JSON.stringify(value));
+            localStorage.setItem(SAVE_ID + "-" + key, JSON.stringify(value));
+        }
+    }, {
+        key: '*/storage/pages',
+        value: function storagePages($store) {
+            var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
+            if (typeof index !== 'undefined') {
+                return $store.cachedPages[index];
+            }
+            return $store.cachedPages;
         }
     }, {
         key: '*/storage/layers',
         value: function storageLayers($store) {
-            var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+            var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
-            if (typeof index !== 'undefined') {
-                return $store.cachedLayers[index];
+            if (typeof id !== 'undefined') {
+                var results = $store.cachedLayers.filter(function (item) {
+                    return item.id == id;
+                });
+
+                if (!results.length) {
+                    return {};
+                }
+
+                return results[0];
             }
             return $store.cachedLayers;
         }
@@ -12164,6 +12242,7 @@ var StorageManager = function (_BaseModule) {
         key: '/storage/unshift/layer',
         value: function storageUnshiftLayer($store, layer) {
             var item = $store.read('/clone', layer);
+            item.id = uuid();
             $store.cachedLayers.unshift(item);
 
             $store.run('/storage/save/layer');
@@ -12172,14 +12251,64 @@ var StorageManager = function (_BaseModule) {
         key: '/storage/add/layer',
         value: function storageAddLayer($store, layer) {
             var item = $store.read('/clone', layer);
+            item.id = uuid();
             $store.cachedLayers.push(item);
 
             $store.run('/storage/save/layer');
         }
     }, {
+        key: '/storage/remove/layer',
+        value: function storageRemoveLayer($store, id) {
+
+            $store.cachedLayers = $store.cachedLayers.filter(function (item) {
+                return item.id != id;
+            });
+
+            $store.run('/storage/save/layer');
+        }
+    }, {
+        key: '/storage/unshift/page',
+        value: function storageUnshiftPage($store, page) {
+            var item = $store.read('/clone', page);
+            item.id = uuid();
+            $store.cachedPages.unshift(item);
+
+            $store.run('/storage/save/page');
+        }
+    }, {
+        key: '/storage/add/page',
+        value: function storageAddPage($store, page) {
+            var item = $store.read('/clone', page);
+            item.id = uuid();
+            $store.cachedPages.push(item);
+
+            $store.run('/storage/save/page');
+        }
+    }, {
+        key: '/storage/delete/page',
+        value: function storageDeletePage($store, id) {
+
+            $store.cachedPages = $store.cachedPages.filter(function (item) {
+                return item.id != id;
+            });
+
+            $store.run('/storage/save/page');
+        }
+    }, {
+        key: '/storage/delete/image',
+        value: function storageDeleteImage($store, id) {
+
+            $store.cachedImages = $store.cachedImages.filter(function (item) {
+                return item.id != id;
+            });
+
+            $store.run('/storage/save/image');
+        }
+    }, {
         key: '/storage/add/image',
         value: function storageAddImage($store, image) {
             var item = $store.read('/clone', image);
+            item.id = uuid();
             $store.cachedImages.push(item);
 
             $store.run('/storage/save/image');
@@ -12215,6 +12344,11 @@ var StorageManager = function (_BaseModule) {
             localStorage.setItem(CACHED_LAYER_SAVE_ID, JSON.stringify($store.cachedLayers));
         }
     }, {
+        key: '/storage/save/page',
+        value: function storageSavePage($store) {
+            localStorage.setItem(CACHED_PAGE_SAVE_ID, JSON.stringify($store.cachedPages));
+        }
+    }, {
         key: '/storage/save/image',
         value: function storageSaveImage($store) {
             localStorage.setItem(CACHED_IMAGE_SAVE_ID, JSON.stringify($store.cachedImages));
@@ -12223,11 +12357,31 @@ var StorageManager = function (_BaseModule) {
         key: '/storage/load/layer',
         value: function storageLoadLayer($store) {
             $store.cachedLayers = JSON.parse(localStorage.getItem(CACHED_LAYER_SAVE_ID) || "[]");
+
+            $store.cachedLayers = $store.cachedLayers.map(function (item) {
+                if (!item.id) item.id = uuid();
+                return item;
+            });
+        }
+    }, {
+        key: '/storage/load/page',
+        value: function storageLoadPage($store) {
+            $store.cachedPages = JSON.parse(localStorage.getItem(CACHED_PAGE_SAVE_ID) || "[]");
+
+            $store.cachedPages = $store.cachedPages.map(function (item) {
+                if (!item.id) item.id = uuid();
+                return item;
+            });
         }
     }, {
         key: '/storage/load/image',
         value: function storageLoadImage($store) {
             $store.cachedImages = JSON.parse(localStorage.getItem(CACHED_IMAGE_SAVE_ID) || "[]");
+
+            $store.cachedLayers = $store.cachedLayers.map(function (item) {
+                if (!item.id) item.id = uuid();
+                return item;
+            });
         }
     }, {
         key: '/storage/load',
@@ -12486,7 +12640,92 @@ var SVGManager = function (_BaseModule) {
     return SVGManager;
 }(BaseModule);
 
-var ModuleList = [SVGManager, ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
+var CollectManager = function (_BaseModule) {
+    inherits(CollectManager, _BaseModule);
+
+    function CollectManager() {
+        classCallCheck(this, CollectManager);
+        return possibleConstructorReturn(this, (CollectManager.__proto__ || Object.getPrototypeOf(CollectManager)).apply(this, arguments));
+    }
+
+    createClass(CollectManager, [{
+        key: '*/collect/colorsteps',
+        value: function collectColorsteps($store, imageId) {
+            return $store.read('/item/map/children', imageId, function (colorstep) {
+                var colorstep = $store.read('/clone', $store.items[colorstep.id]);
+                delete colorstep.id;
+                delete colorstep.parentId;
+
+                return colorstep;
+            });
+        }
+    }, {
+        key: '*/collect/image/one',
+        value: function collectImageOne($store, imageId) {
+            var image = $store.read('/clone', $store.items[imageId]);
+            delete image.id;
+            delete image.parentId;
+
+            return {
+                image: image,
+                colorsteps: $store.read('/collect/colorsteps', imageId)
+            };
+        }
+    }, {
+        key: '*/collect/images',
+        value: function collectImages($store, layerId) {
+            return $store.read('/item/map/children', layerId, function (image) {
+                return $store.read('/collect/image/one', image.id);
+            });
+        }
+    }, {
+        key: '*/collect/layer/one',
+        value: function collectLayerOne($store, layerId) {
+            var results = {};
+
+            if (!$store.items[layerId]) {
+                return results;
+            }
+
+            var layer = $store.read('/clone', $store.items[layerId]);
+            delete layer.id;
+            delete layer.parentId;
+
+            return {
+                layer: layer,
+                images: $store.read('/collect/images', layerId)
+            };
+        }
+    }, {
+        key: '*/collect/layers',
+        value: function collectLayers($store, pageId) {
+            return $store.read('/item/map/children', pageId, function (layer) {
+                return $store.read('/collect/layer/one', layer.id);
+            });
+        }
+    }, {
+        key: '*/collect/page',
+        value: function collectPage($store, pageId) {
+            var results = {};
+
+            if (!$store.items[pageId]) {
+                return results;
+            }
+
+            var page = $store.read('/clone', $store.items[pageId]);
+            delete page.id;
+            delete page.parentId;
+
+            return {
+                page: page,
+                layers: $store.read('/collect/layers', pageId)
+            };
+        }
+    }]);
+    return CollectManager;
+}(BaseModule);
+
+var ModuleList = [CollectManager, SVGManager, ExternalResourceManager, CssManager, StorageManager, ItemManager, ColorStepManager, ImageManager, LayerManager, ToolManager, BlendManager, GradientManager, GuideManager];
 
 var BaseImageEditor = function (_UIElement) {
     inherits(BaseImageEditor, _UIElement);
@@ -12963,7 +13202,7 @@ var GradientSampleList = function (_UIElement) {
         key: 'template',
         value: function template() {
 
-            return '\n        <div class="gradient-sample-list">\n            <div class=\'cached-list\' ref="$cachedList"></div>\n\n        </div>\n        ';
+            return '\n        <div class="gradient-sample-list">\n            <div class=\'cached-list\' ref="$cachedList"></div>\n        </div>\n        ';
         }
     }, {
         key: 'load $cachedList',
@@ -13039,7 +13278,7 @@ var GradientSampleList = function (_UIElement) {
             var _this3 = this;
 
             this.read('/item/current/image', function (image) {
-                var newImage = _this3.read('/item/collect/image/one', image.id);
+                var newImage = _this3.read('/collect/image/one', image.id);
 
                 _this3.dispatch('/storage/add/image', newImage);
                 _this3.refresh();
@@ -18144,7 +18383,7 @@ var LayerList = function (_UIElement) {
     createClass(LayerList, [{
         key: 'template',
         value: function template() {
-            return '\n            <div class=\'layers\'>\n                <div class=\'title\'> \n                    <h1>Layers</h1>\n                    <div class="tools">\n                        <button type="button" class=\'add-layer\' ref="$addLayer">+</button>\n                    </div>\n                </div>             \n                <div class="layer-list" ref="$layerList"></div>\n            </div>\n        ';
+            return '\n            <div class=\'layers\'>\n                <div class=\'title\'> \n                    <h1>Layers</h1>\n                    <div class="tools">\n                        <button type="button" class=\'add-layer\' ref="$addLayer">+</button>\n                        <button type="button" class=\'view-sample\' ref="$viewSample">\n                            <div class="arrow"></div>\n                        </button>\n                    </div>\n                </div>             \n                <div class="layer-list" ref="$layerList"></div>\n            </div>\n        ';
         }
     }, {
         key: 'makeItemNode',
@@ -18270,6 +18509,11 @@ var LayerList = function (_UIElement) {
         value: function click$layerListDeleteItem(e) {
             this.dispatch('/item/remove', e.$delegateTarget.attr('item-id'));
             this.refresh();
+        }
+    }, {
+        key: 'click $viewSample',
+        value: function click$viewSample(e) {
+            this.emit('toggleLayerSampleView');
         }
     }]);
     return LayerList;
@@ -18753,6 +18997,153 @@ var GradientSampleView = function (_UIElement) {
     return GradientSampleView;
 }(UIElement);
 
+var LayerSampleList = function (_UIElement) {
+    inherits(LayerSampleList, _UIElement);
+
+    function LayerSampleList() {
+        classCallCheck(this, LayerSampleList);
+        return possibleConstructorReturn(this, (LayerSampleList.__proto__ || Object.getPrototypeOf(LayerSampleList)).apply(this, arguments));
+    }
+
+    createClass(LayerSampleList, [{
+        key: "initialize",
+        value: function initialize() {
+            get(LayerSampleList.prototype.__proto__ || Object.getPrototypeOf(LayerSampleList.prototype), "initialize", this).call(this);
+
+            this.list = this.read('/layer/list/sample', this.props.type);
+            this.dispatch('/storage/load/layer');
+        }
+    }, {
+        key: "template",
+        value: function template() {
+
+            return "\n        <div class=\"layer-sample-list\">\n            <div class='cached-list' ref=\"$cachedList\"></div>\n\n        </div>\n        ";
+        }
+    }, {
+        key: 'load $cachedList',
+        value: function load$cachedList() {
+            var _this2 = this;
+
+            var list = this.list.map(function (item, index) {
+                var data = _this2.read('/layer/cache/toString', item);
+
+                var rateX = 160 / parseParamNumber$1(data.obj.width);
+                var rateY = 120 / parseParamNumber$1(data.obj.height);
+
+                var transform = "transform: scale(" + rateX + " " + rateY + ")";
+
+                return "\n            <div class='layer-sample-item'  data-sample-id=\"" + item.id + "\">\n                <div class=\"layer-view\" style=\"" + data.css + "; " + transform + "\"></div>\n\n                <div class='item-tools'>\n                    <button type=\"button\" class='add-item'  data-index=\"" + index + "\" title=\"Addd\">&times;</button>\n                </div>          \n            </div>";
+            });
+
+            var storageList = this.read('/storage/layers').map(function (item) {
+                var data = _this2.read('/layer/cache/toString', item);
+
+                var rateX = 160 / parseParamNumber$1(data.obj.width);
+                var rateY = 120 / parseParamNumber$1(data.obj.height);
+
+                var transform = "transform-origin: left top;transform: scale(" + rateX + ", " + rateY + ")";
+
+                return "\n                <div class='layer-cached-item' data-sample-id=\"" + item.id + "\">\n                    <div class=\"layer-view\" style=\"" + data.css + "; " + transform + "\"></div>\n                    <div class='item-tools'>\n                        <button type=\"button\" class='add-item'  data-sample-id=\"" + item.id + "\" title=\"Add\">&times;</button>                \n                        <button type=\"button\" class='delete-item'  data-sample-id=\"" + item.id + "\" title=\"Delete\">&times;</button>\n                    </div>          \n                </div>\n            ";
+            });
+
+            var results = [].concat(toConsumableArray(list), toConsumableArray(storageList), ["<button type=\"button\" class=\"add-current-layer\" title=\"Cache a layer\">+</button>"]);
+
+            var emptyCount = 5 - results.length % 5;
+
+            var arr = [].concat(toConsumableArray(Array(emptyCount)));
+
+            arr.forEach(function (it) {
+                results.push("<div class='empty'></div>");
+            });
+
+            return results;
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            this.load();
+        }
+    }, {
+        key: '@changeStorage',
+        value: function changeStorage() {
+            this.refresh();
+        }
+    }, {
+        key: 'click $el .layer-sample-item .add-item',
+        value: function click$elLayerSampleItemAddItem(e) {
+            var index = +e.$delegateTarget.attr('data-index');
+
+            var newLayer = this.list[index];
+
+            if (newLayer) {
+                this.dispatch('/item/addCache/layer', newLayer);
+            }
+        }
+    }, {
+        key: 'click $el .layer-cached-item .add-item',
+        value: function click$elLayerCachedItemAddItem(e) {
+            var newLayer = this.read('/storage/layers', e.$delegateTarget.attr('data-sample-id'));
+
+            if (newLayer) {
+                this.dispatch('/item/addCache/layer', newLayer);
+            }
+        }
+    }, {
+        key: 'click $el .layer-cached-item .delete-item',
+        value: function click$elLayerCachedItemDeleteItem(e) {
+            this.dispatch('/storage/remove/layer', e.$delegateTarget.attr('data-sample-id'));
+            this.refresh();
+        }
+    }, {
+        key: 'click $el .add-current-layer',
+        value: function click$elAddCurrentLayer(e) {
+            var _this3 = this;
+
+            this.read('/item/current/layer', function (layer) {
+                var newLayer = _this3.read('/collect/layer/one', layer.id);
+
+                _this3.dispatch('/storage/add/layer', newLayer);
+                _this3.refresh();
+            });
+        }
+    }]);
+    return LayerSampleList;
+}(UIElement);
+
+var LayerSampleView = function (_UIElement) {
+    inherits(LayerSampleView, _UIElement);
+
+    function LayerSampleView() {
+        classCallCheck(this, LayerSampleView);
+        return possibleConstructorReturn(this, (LayerSampleView.__proto__ || Object.getPrototypeOf(LayerSampleView)).apply(this, arguments));
+    }
+
+    createClass(LayerSampleView, [{
+        key: "components",
+        value: function components() {
+            return {
+                LayerSampleList: LayerSampleList
+            };
+        }
+    }, {
+        key: "template",
+        value: function template() {
+            return "\n            <div class='layer-sample-view'>\n                <div class=\"close\">&times;</div>\n                <LayerSampleList></LayerSampleList>\n            </div>\n        ";
+        }
+    }, {
+        key: 'click $el .close',
+        value: function click$elClose(e) {
+            this.$el.toggle();
+        }
+    }, {
+        key: '@toggleLayerSampleView',
+        value: function toggleLayerSampleView() {
+            this.$el.toggle();
+        }
+    }]);
+    return LayerSampleView;
+}(UIElement);
+
 var screenModes = ['expertor', 'beginner'];
 var panelModes = ['small', 'large'];
 
@@ -18774,7 +19165,7 @@ var XDImageEditor = function (_BaseImageEditor) {
     }, {
         key: 'template',
         value: function template() {
-            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n                <GradientSampleView></GradientSampleView>\n            </div>\n        ';
+            return '\n\n            <div class="layout-main" ref="$layoutMain">\n                <div class="layout-header">\n                    <h1 class="header-title">EASYLOGIC</h1>\n                    <div class="page-tab-menu">\n                        <PageList></PageList>\n                    </div>\n                </div>\n                <div class="layout-top">\n                    <PropertyView></PropertyView>\n                </div>\n                <div class="layout-left">      \n                    <LayerList></LayerList>\n                    <ImageList></ImageList>\n                </div>\n                <div class="layout-body">\n                    <VerticalColorStep></VerticalColorStep>\n                    <GradientView></GradientView>                      \n                </div>                \n                <div class="layout-right">\n                    <FeatureControl></FeatureControl>\n                </div>\n                <div class="layout-footer">\n                    <Timeline></Timeline>\n                </div>\n                <ExportView></ExportView>\n                <DropView></DropView>\n                <GradientSampleView></GradientSampleView>\n                <LayerSampleView></LayerSampleView>\n            </div>\n        ';
         }
     }, {
         key: 'components',
@@ -18791,7 +19182,8 @@ var XDImageEditor = function (_BaseImageEditor) {
                 LayerList: LayerList,
                 SubFeatureControl: SubFeatureControl,
                 ImageList: ImageList,
-                Timeline: Timeline
+                Timeline: Timeline,
+                LayerSampleView: LayerSampleView
             };
         }
     }, {

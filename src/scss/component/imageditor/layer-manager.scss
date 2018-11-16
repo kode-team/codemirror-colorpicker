@@ -56,6 +56,39 @@ $layer-item-padding: 4px;
                 border-bottom: 0px;
                 border-right: 0px;
                 padding: 0px 10px;
+
+                &.view-sample {
+                    position: relative;
+                    .arrow {
+                        display: inline-block;
+                        width: 10px;
+                        height: 100%;
+                        position: relative;
+                        cursor: pointer;
+    
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            height: 1px;
+                            width: 100%;
+                            top: 13px;
+                            left:0px;
+                            pointer-events: none;                        
+                            background-color: black;
+                        }
+    
+                        &:after {
+                            content: "";
+                            position: absolute;
+                            height: 1px;
+                            width: 100%;
+                            top: 18px;
+                            left:0px;
+                            pointer-events: none;
+                            background-color: black;
+                        }                    
+                    }
+                }
             }
         }
     }    

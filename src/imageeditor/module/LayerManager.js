@@ -1,7 +1,7 @@
 import BaseModule from "../../colorpicker/BaseModule";
 import { parseParamNumber } from "../../util/filter/functions";
 import Dom from "../../util/Dom";
-
+import layerList from './layers/index';
 const filterInfo = {
 
     'blur': { title: 'Blur', type: 'range', min: 0, max: 100, step: 1, unit: 'px', defaultValue: 0 },
@@ -28,6 +28,16 @@ const filterInfo = {
 
 export default class LayerManager extends BaseModule {
    
+
+    '*/layer/list/sample' ($store, type = 'all') {
+ 
+        var results = [] 
+
+        results = layerList.map(it => Object.assign({}, it))
+
+        return results;
+    }
+
     '*/layer/filter/list' ($store) {
         return filterInfo;
     }
@@ -47,10 +57,17 @@ export default class LayerManager extends BaseModule {
             delete obj['filter'];
         }
 
-        return Object.keys(obj).map(key => {
-            return `${key}: ${obj[key]};`
-        }).join(' ')
+        return $store.read('/css/toString', obj);
     }
+
+    '*/layer/cache/toString' ($store, layer, opt = {}) {
+        var obj = $store.read('/layer/cache/toCSS', layer) || {};
+
+        return {
+            css: $store.read('/css/toString', obj),
+            obj
+        }
+    }    
 
     '*/layer/toExport' ($store, layer, withStyle = true) {
 
@@ -165,6 +182,32 @@ export default class LayerManager extends BaseModule {
 
         return results; 
     }
+
+
+    '*/layer/cache/toImageCSS' ($store, images) {    
+        var results = {}
+
+        images.forEach(item => {
+            var image = Object.assign({}, item.image, {colorsteps: item.colorsteps})
+            var css = $store.read('/image/toCSS', image);
+
+            Object.keys(css).forEach(key => {
+                if (!results[key]) {
+                    results[key] = [] 
+                }
+
+                results[key].push(css[key]);
+            })
+        })
+
+        Object.keys(results).forEach(key => {
+            if (Array.isArray(results[key])) {
+                results[key] = results[key].join(', ')
+            }
+        })
+
+        return results; 
+    }    
 
     '*/layer/image/toImageCSS' ($store, image) {    
         var results = {}
@@ -315,6 +358,41 @@ export default class LayerManager extends BaseModule {
         var results = Object.assign(css, 
              (image) ? $store.read('/layer/image/toImageCSS', image) : $store.read('/layer/toImageCSS', layer, isExport)
         )
+
+        var realCSS = {}
+        Object.keys(results).filter(key => {
+            return !!results[key]
+        }).forEach(key => {
+            realCSS[key] = results[key]
+        })
+
+        return realCSS; 
+    }
+
+
+    '*/layer/cache/toCSS' ($store, item = null) {
+        var layer = Object.assign({}, item.layer, { images: item.images });
+        var css = Object.assign({}, layer.style);
+
+        if (layer.style['background-color']) {
+            css['background-color'] = layer.style['background-color']
+        }         
+
+        if (layer.style['background-blend-mode']) {
+            css['background-blend-mode'] = layer.style['background-blend-mode'] || ""
+        } 
+        
+        if (layer.style['mix-blend-mode']) {
+            css['mix-blend-mode'] = layer.style['mix-blend-mode'] || ""
+        }
+
+        Object.assign(css, $store.read('/layer/get/border-radius', layer));
+
+        css['transform'] = $store.read('/layer/make/transform', layer)
+        css['filter'] = $store.read('/layer/make/filter', layer.filters);
+        css['clip-path'] = $store.read('/layer/make/clip-path', layer);
+
+        var results = Object.assign(css, $store.read('/layer/cache/toImageCSS', layer.images))
 
         var realCSS = {}
         Object.keys(results).filter(key => {
