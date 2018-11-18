@@ -10252,7 +10252,7 @@ var LayerManager = function (_BaseModule) {
         key: '*/layer/cache/toString',
         value: function layerCacheToString($store, layer) {
             var obj = $store.read('/layer/cache/toCSS', layer) || {};
-
+            obj.position = 'absolute';
             return {
                 css: $store.read('/css/toString', obj),
                 obj: obj
@@ -10578,6 +10578,9 @@ var LayerManager = function (_BaseModule) {
 
             var layer = Object.assign({}, item.layer, { images: item.images });
             var css = Object.assign({}, layer.style);
+
+            css.left = css.x;
+            css.top = css.y;
 
             if (layer.style['background-color']) {
                 css['background-color'] = layer.style['background-color'];
@@ -11952,10 +11955,10 @@ var GuideManager = function (_BaseModule) {
     createClass(GuideManager, [{
         key: '*/guide/rect',
         value: function guideRect($store, obj) {
-            var x = +(obj.x || '0px').replace('px', '');
-            var y = +(obj.y || '0px').replace('px', '');
-            var width = +(obj.width || '0px').replace('px', '');
-            var height = +(obj.height || '0px').replace('px', '');
+            var x = parseParamNumber$1(obj.x);
+            var y = parseParamNumber$1(obj.y);
+            var width = parseParamNumber$1(obj.width);
+            var height = parseParamNumber$1(obj.height);
 
             var x2 = x + width;
             var y2 = y + height;
@@ -11974,8 +11977,8 @@ var GuideManager = function (_BaseModule) {
             var x, y;
             if (list.length) {
 
-                var height = +(layer.style.height || '0px').replace('px', '');
-                var width = +(layer.style.width || '0px').replace('px', '');
+                var height = parseParamNumber$1(layer.style.height);
+                var width = parseParamNumber$1(layer.style.width);
                 var topY = Math.min.apply(Math, toConsumableArray(list.filter(function (it) {
                     return it.align == 'top';
                 }).map(function (it) {
@@ -14175,6 +14178,10 @@ var GradientInfo = function (_UIElement) {
             if (step) {
                 step.color = color;
                 this.dispatch('/item/set', step);
+
+                this.refs.$stepList.$(".color-view-item[colorstep-id=\"" + step.id + "\"]").css({
+                    'background-color': color
+                });
             }
         }
     }, {
@@ -19138,7 +19145,9 @@ var LayerSampleList = function (_UIElement) {
                 var rateX = 160 / parseParamNumber$1(data.obj.width);
                 var rateY = 120 / parseParamNumber$1(data.obj.height);
 
-                var transform = "transform-origin: left top;transform: scale(" + rateX + ", " + rateY + ")";
+                var minRate = Math.min(rateY, rateX);
+
+                var transform = "transform-origin: left top;transform: scale(" + minRate + ")";
 
                 return "\n                <div class='layer-cached-item' data-sample-id=\"" + item.id + "\">\n                    <div class=\"layer-view\" style=\"" + data.css + "; " + transform + "\"></div>\n                    <div class='item-tools'>\n                        <button type=\"button\" class='add-item'  data-sample-id=\"" + item.id + "\" title=\"Add\">&times;</button>                \n                        <button type=\"button\" class='delete-item'  data-sample-id=\"" + item.id + "\" title=\"Delete\">&times;</button>\n                    </div>          \n                </div>\n            ";
             });
@@ -19284,16 +19293,17 @@ var PageSampleList = function (_UIElement) {
             });
 
             var storageList = this.read('/storage/pages').map(function (page) {
-                var data = _this2.read('/page/cache/toString', page);
-
+                var data = _this2.read('/page/cache/toString', page.page);
                 var rateX = 160 / parseParamNumber$1(data.obj.width || 400);
-                var rateY = 240 / parseParamNumber$1(data.obj.height || 300) * rateX;
+                var rateY = 160 / parseParamNumber$1(data.obj.height || 300);
 
-                var transform = "transform-origin: left top;transform: scale(" + rateX + ", " + rateY + ")";
+                var minRate = Math.min(rateY, rateX);
+
+                var transform = "left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%) scale(" + minRate + ")";
 
                 return "\n                <div class='page-cached-item' data-sample-id=\"" + page.id + "\">\n                    <div class=\"page-view\" style=\"" + data.css + "; " + transform + "\">\n                    " + page.layers.map(function (layer) {
                     var data = _this2.read('/layer/cache/toString', layer);
-                    return "\n                            <div class=\"layer-view\" style=\"position:absolute;" + data.css + "\"></div>\n                        ";
+                    return "\n                            <div class=\"layer-view\" style=\"" + data.css + "\"></div>\n                        ";
                 }).join('') + "\n                    </div>\n                    <div class='item-tools'>\n                        <button type=\"button\" class='add-item'  data-sample-id=\"" + page.id + "\" title=\"Add\">&times;</button>                \n                        <button type=\"button\" class='delete-item'  data-sample-id=\"" + page.id + "\" title=\"Delete\">&times;</button>\n                    </div>          \n                </div>\n            ";
             });
 

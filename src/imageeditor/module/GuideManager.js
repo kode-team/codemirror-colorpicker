@@ -1,4 +1,5 @@
 import BaseModule from "../../colorpicker/BaseModule";
+import { parseParamNumber } from "../../util/filter/functions";
 
 var list = new Array(1000);
 var lastIndex = -1;
@@ -14,10 +15,10 @@ var MAX_DIST = 1;
 export default class GuideManager extends BaseModule {
 
     '*/guide/rect' ($store, obj) {
-        var x = +((obj.x || '0px').replace('px', ''))
-        var y = +((obj.y || '0px').replace('px', ''))
-        var width = +((obj.width || '0px').replace('px', ''))
-        var height = +((obj.height || '0px').replace('px', ''))
+        var x = parseParamNumber(obj.x);
+        var y = parseParamNumber(obj.y);
+        var width = parseParamNumber(obj.width)
+        var height = parseParamNumber(obj.height)
 
         var x2 = x + width; 
         var y2 = y + height;
@@ -33,8 +34,8 @@ export default class GuideManager extends BaseModule {
         var x, y;
         if (list.length) {
 
-            var height = +((layer.style.height || '0px') .replace('px', ''))
-            var width = +((layer.style.width || '0px').replace('px', ''))
+            var height = parseParamNumber(layer.style.height)
+            var width = parseParamNumber(layer.style.width)
             var topY = Math.min(...list.filter(it => it.align == 'top').map(it => it.y))
             var middleY = Math.min(...list.filter(it => it.align == 'middle').map(it => it.y))
             var bottomY = Math.min(...list.filter(it => it.align == 'bottom').map(it => it.y))

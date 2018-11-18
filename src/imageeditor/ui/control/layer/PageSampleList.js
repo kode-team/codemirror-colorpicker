@@ -51,12 +51,13 @@ export default class PageSampleList extends UIElement {
         })
 
         var storageList = this.read('/storage/pages').map( page => {
-            var data = this.read('/page/cache/toString', page)
-
+            var data = this.read('/page/cache/toString', page.page)
             var rateX = 160 / parseParamNumber(data.obj.width || 400);
-            var rateY = 240 / parseParamNumber(data.obj.height || 300) * rateX;
+            var rateY = 160 / parseParamNumber(data.obj.height || 300);
 
-            var transform = `transform-origin: left top;transform: scale(${rateX}, ${rateY})`
+            var minRate = Math.min(rateY, rateX);
+
+            var transform = `left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%) scale(${minRate})`
 
             return `
                 <div class='page-cached-item' data-sample-id="${page.id}">
@@ -64,7 +65,7 @@ export default class PageSampleList extends UIElement {
                     ${page.layers.map(layer => {
                         var data = this.read('/layer/cache/toString', layer)
                         return `
-                            <div class="layer-view" style="position:absolute;${data.css}"></div>
+                            <div class="layer-view" style="${data.css}"></div>
                         `
                     }).join('')}
                     </div>

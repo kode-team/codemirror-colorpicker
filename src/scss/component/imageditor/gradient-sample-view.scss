@@ -1,7 +1,7 @@
 .gradient-sample-view {
     position: absolute;
     left: $left-size + $gradient-box-size;
-    right: $left-size;
+    right: 0px;
     top: $tool-size * 2;  
     bottom: 0px;
     // transition: $show-timeline-animation;     
@@ -37,6 +37,7 @@
                 font-size: 50px;
                 line-height: 0px;
                 font-weight: 100;
+                cursor: pointer;
             }
             .gradient-sample-item, .gradient-cached-item, .add-current-image, .empty {
                 width: 160px;
@@ -46,6 +47,10 @@
                 margin-right: 5px;
                 margin-bottom: 5px;
                 position: relative;
+
+                &:not(.empty) {
+                    border: 1px solid $border-color;
+                }
 
                 .item-tools {
                     position: absolute;
@@ -113,9 +118,8 @@
 .layout-main {
     &.expertor-mode {
         .gradient-sample-view {
-            top: 60px;
+            top: 70px;
             left: $left-size - 50px + $gradient-box-size; 
-            right: $right-size;
         }
     }
 }

@@ -42,7 +42,7 @@ $gradient-box-size: 100px;
             border-right: 1px solid $border-color;
         }
         .layout-right {
-            top: 0px;
+            top: 70px; 
             right: 0px;
             width: $right-size;
             left: auto;
@@ -56,14 +56,12 @@ $gradient-box-size: 100px;
         }
 
         .layout-top {
-            right: $right-size;
             height: 40px;
             top: 30px;
         }
 
         .layout-header {
             height: 30px;
-            right: $right-size;
 
             .header-title {
                 font-size: 20px;

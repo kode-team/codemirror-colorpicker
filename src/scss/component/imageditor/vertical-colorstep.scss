@@ -117,6 +117,16 @@
                         }
                     }
 
+                    &.easing {
+
+                        background-repeat: no-repeat;
+                        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB3SURBVChTY9iefGyO+gasCCjFgCaEhrBLf33x/f6uZ0AGuvRc7Y37i8/8////3JQbQC5CekPwgRsrH/z48Aso9+bah8VmW6HSQBaQDxQFygFVANXB9YCkgeYA5YBmAk2GS0AQSBroCqBbkEXhCN1paAhvsCQfAwDynahhkocJpQAAAABJRU5ErkJggg==);
+                        border:0px;
+                        &:before {
+                            display: none;
+                        }
+                    }
+
                 } 
 
                 .guide-step {
@@ -180,9 +190,9 @@
 
                 &.selected {
                     z-index:1;
-                    top: 24px;
+                    top: 30px;
                     .guide-line {
-                        height: 28px;
+                        height: 32px;
                     }       
                     
                     .guide-change, .guide-step, .guide-unit {

@@ -39,12 +39,9 @@
                 font-weight: 100;
             }
 
-            .page-sample-item, .page-cached-item {
-                @include transparent-background();
-            }
             .page-sample-item, .page-cached-item, .add-current-page, .empty {
                 width: 160px;
-                height: 240px;
+                height: 160px;
                 display:inline-block;
                 box-sizing: border-box;
                 margin-right: 5px;
@@ -52,7 +49,8 @@
                 position: relative;
 
                 &:not(.empty) {
-                    border: 1px solid $border-color, 0.5;
+                    border: 1px solid $border-color;
+                    background-color: white;
                 }
 
 

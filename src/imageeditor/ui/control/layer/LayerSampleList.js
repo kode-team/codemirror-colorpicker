@@ -48,7 +48,9 @@ export default class LayerSampleList extends UIElement {
             var rateX = 160 / parseParamNumber(data.obj.width);
             var rateY = 120 / parseParamNumber(data.obj.height);
 
-            var transform = `transform-origin: left top;transform: scale(${rateX}, ${rateY})`
+            var minRate = Math.min(rateY, rateX);            
+
+            var transform = `transform-origin: left top;transform: scale(${minRate})`
 
 
             return `

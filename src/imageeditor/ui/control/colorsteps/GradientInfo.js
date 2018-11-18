@@ -143,7 +143,11 @@ export default class GradientInfo extends UIElement {
 
         if (step) {
             step.color = color; 
-            this.dispatch('/item/set', step)            
+            this.dispatch('/item/set', step)       
+
+            this.refs.$stepList.$(`.color-view-item[colorstep-id="${step.id}"]`).css({
+                'background-color': color 
+            })
         }
 
     }

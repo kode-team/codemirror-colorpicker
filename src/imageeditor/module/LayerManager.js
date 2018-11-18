@@ -62,7 +62,7 @@ export default class LayerManager extends BaseModule {
 
     '*/layer/cache/toString' ($store, layer, opt = {}) {
         var obj = $store.read('/layer/cache/toCSS', layer) || {};
-
+        obj.position = 'absolute';
         return {
             css: $store.read('/css/toString', obj),
             obj
@@ -373,6 +373,9 @@ export default class LayerManager extends BaseModule {
     '*/layer/cache/toCSS' ($store, item = null) {
         var layer = Object.assign({}, item.layer, { images: item.images });
         var css = Object.assign({}, layer.style);
+
+        css.left = css.x 
+        css.top = css.y
 
         if (layer.style['background-color']) {
             css['background-color'] = layer.style['background-color']
