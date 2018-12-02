@@ -1,6 +1,6 @@
 import Color from '../../Color'
 import {
-    clamp,
+    // clamp,
     pixel
 } from '../functions'
 /**

@@ -2057,7 +2057,7 @@ function rotateDegree(angle) {
 function rotate() {
     var degree = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    degree = parseParamNumber$1(degree);
+    degree = parseParamNumber(degree);
     degree = degree % 360;
     return function (bitmap, done) {
         var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2173,7 +2173,7 @@ function bitonal(darkColor, lightColor) {
 function brightness$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var $C = Math.floor(255 * (amount / 100));
 
     return pixel(function () {
@@ -2204,7 +2204,7 @@ function brownie() {
 function clip() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var $C = Math.abs(amount) * 2.55;
 
     return pixel(function () {
@@ -2222,7 +2222,7 @@ function clip() {
 function contrast$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var $C = Math.max((128 + amount) / 128, 0);
 
     return pixel(function () {
@@ -2235,7 +2235,7 @@ function contrast$1() {
 function gamma() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var $C = parseParamNumber$1(amount);
+    var $C = parseParamNumber(amount);
     return pixel(function () {
         $r = Math.pow($r / 255, $C) * 255;
         $g = Math.pow($g / 255, $C) * 255;
@@ -2289,19 +2289,19 @@ function gradient$1() {
     });
 
     return pixel(function () {
-        var colorIndex = clamp$1(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
-        var newColorIndex = clamp$1(Math.floor(colorIndex * ($scale / 256)));
+        var colorIndex = clamp(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722));
+        var newColorIndex = clamp(Math.floor(colorIndex * ($scale / 256)));
         var color = $colors[newColorIndex];
 
         $r = color.r;
         $g = color.g;
         $b = color.b;
-        $a = clamp$1(Math.floor(color.a * 256));
+        $a = clamp(Math.floor(color.a * 256));
     }, {}, { $colors: $colors, $scale: $scale });
 }
 
 function grayscale(amount) {
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var C = amount / 100;
 
     if (C > 1) C = 1;
@@ -2324,7 +2324,7 @@ function grayscale(amount) {
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
-    var $C = parseParamNumber$1(amount);
+    var $C = parseParamNumber(amount);
     return pixel(function () {
         var hsv = Color.RGBtoHSV($r, $g, $b);
 
@@ -2347,7 +2347,7 @@ function hue() {
 function invert() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var $C = amount / 100;
 
     return pixel(function () {
@@ -2411,7 +2411,7 @@ function matrix() {
 function noise() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var $C = parseParamNumber$1(amount);
+    var $C = parseParamNumber(amount);
     return pixel(function () {
         var C = Math.abs($C) * 5;
         var min = -C;
@@ -2429,7 +2429,7 @@ function noise() {
 function opacity() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var $C = amount / 100;
 
     return pixel(function () {
@@ -2457,7 +2457,7 @@ function polaroid() {
 function saturation() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var C = amount / 100;
     var L = 1 - Math.abs(C);
 
@@ -2479,7 +2479,7 @@ function saturation() {
 function sepia() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = parseParamNumber$1(amount);
+    var C = parseParamNumber(amount);
     if (C > 1) C = 1;
 
     var $matrix = [0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1];
@@ -2499,9 +2499,9 @@ function shade() {
     var greenValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var blueValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    var $redValue = parseParamNumber$1(redValue);
-    var $greenValue = parseParamNumber$1(greenValue);
-    var $blueValue = parseParamNumber$1(blueValue);
+    var $redValue = parseParamNumber(redValue);
+    var $greenValue = parseParamNumber(greenValue);
+    var $blueValue = parseParamNumber(blueValue);
 
     return pixel(function () {
         $r *= $redValue;
@@ -2535,9 +2535,9 @@ function shift() {
  * @param {*} b 
  */
 function solarize(redValue, greenValue, blueValue) {
-    var $redValue = parseParamNumber$1(redValue);
-    var $greenValue = parseParamNumber$1(greenValue);
-    var $blueValue = parseParamNumber$1(blueValue);
+    var $redValue = parseParamNumber(redValue);
+    var $greenValue = parseParamNumber(greenValue);
+    var $blueValue = parseParamNumber(blueValue);
     return pixel(function () {
         $r = $r < $redValue ? 255 - $r : $r;
         $g = $g < $greenValue ? 255 - $g : $g;
@@ -2566,8 +2566,8 @@ function thresholdColor() {
     var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
     var hasColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
-    var $scale = parseParamNumber$1(scale);
-    amount = parseParamNumber$1(amount);
+    var $scale = parseParamNumber(scale);
+    amount = parseParamNumber(amount);
     var $C = amount / 100;
     var $hasColor = hasColor;
 
@@ -2652,7 +2652,7 @@ var pixel$1 = {
 
 function blur () {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
 
     return convolution(createBlurMatrix(amount));
 }
@@ -2665,14 +2665,14 @@ function blur () {
 function emboss() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
 function gaussianBlur() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var C = amount / 100;
 
     return convolution(weight([1, 2, 1, 2, 4, 2, 1, 2, 1], 1 / 16 * C));
@@ -2681,7 +2681,7 @@ function gaussianBlur() {
 function gaussianBlur5x() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     var C = amount / 100;
     return convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, 36, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], 1 / 256 * C));
 }
@@ -2689,7 +2689,7 @@ function gaussianBlur5x() {
 function grayscale2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([0.3, 0.3, 0.3, 0, 0, 0.59, 0.59, 0.59, 0, 0, 0.11, 0.11, 0.11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 }
 
@@ -2700,28 +2700,28 @@ function identity() {
 function kirschHorizontal() {
     var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    count = parseParamNumber$1(count);
+    count = parseParamNumber(count);
     return convolution([5, 5, 5, -3, 0, -3, -3, -3, -3]);
 }
 
 function kirschVertical() {
     var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    count = parseParamNumber$1(count);
+    count = parseParamNumber(count);
     return convolution([5, -3, -3, 5, 0, -3, 5, -3, -3]);
 }
 
 function laplacian() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([-1, -1, -1, -1, 8, -1, -1, -1, -1], amount / 100));
 }
 
 function laplacian5x() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 24, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], amount / 100));
 }
 
@@ -2740,21 +2740,21 @@ function motionBlur3() {
 function negative() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1], amount / 100));
 }
 
 function sepia2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([0.393, 0.349, 0.272, 0, 0, 0.769, 0.686, 0.534, 0, 0, 0.189, 0.168, 0.131, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], amount / 100));
 }
 
 function sharpen() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([0, -1, 0, -1, 5, -1, 0, -1, 0], amount / 100));
 }
 
@@ -3239,7 +3239,7 @@ function stackBlur () {
     var radius = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
     var hasAlphaChannel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-    radius = parseParamNumber$1(radius);
+    radius = parseParamNumber(radius);
 
     return function (bitmap, done) {
         var newBitmap = stackBlurImage(bitmap, radius, hasAlphaChannel);
@@ -3251,14 +3251,14 @@ function stackBlur () {
 function transparency() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0, 0, 1], amount / 100));
 }
 
 function unsharpMasking() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 256;
 
-    amount = parseParamNumber$1(amount);
+    amount = parseParamNumber(amount);
     return convolution(weight([1, 4, 6, 4, 1, 4, 16, 24, 16, 4, 6, 24, -476, 24, 6, 4, 16, 24, 16, 4, 1, 4, 6, 4, 1], -1 / amount));
 }
 
@@ -3342,7 +3342,7 @@ var functions$1 = (_functions = {
     putBitmap: putBitmap,
     radian: radian,
     convolution: convolution,
-    parseParamNumber: parseParamNumber$1,
+    parseParamNumber: parseParamNumber,
     filter: filter$1,
     clamp: clamp$1,
     fillColor: fillColor,
@@ -3609,7 +3609,7 @@ function putBitmap(bitmap, subBitmap, area) {
     return Canvas.putBitmap(bitmap, subBitmap, area);
 }
 
-function parseParamNumber$1(param) {
+function parseParamNumber(param) {
     if (typeof param === 'string') {
         param = param.replace(/deg/, '');
         param = param.replace(/px/, '');
@@ -4124,7 +4124,7 @@ function partial(area) {
     };
 }
 
-function parseParamNumber$2(param) {
+function parseParamNumber$1(param) {
     if (typeof param === 'string') {
         param = param.replace(/deg/, '');
         param = param.replace(/px/, '');
@@ -4242,7 +4242,7 @@ function normal () {
 function emboss$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
 
-    amount = parseParamNumber$2(amount);
+    amount = parseParamNumber$1(amount);
     return convolution$1([amount * -2.0, -amount, 0.0, -amount, 1.0, amount, 0.0, amount, amount * 2.0]);
 }
 
@@ -4253,7 +4253,7 @@ function emboss$1() {
 function gaussianBlur$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = parseParamNumber$2(amount) * (1 / 16);
+    var C = parseParamNumber$1(amount) * (1 / 16);
 
     return convolution$1(weight$1([1, 2, 1, 2, 4, 2, 1, 2, 1], C));
 }
@@ -4372,7 +4372,7 @@ function bitonal$1(darkColor, lightColor) {
 function brightness$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = pixelColor + (' + C + ');\n    ');
 }
@@ -4412,7 +4412,7 @@ function brownie$1() {
 function clip$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = vec4(\n            (pixelColor.r > 1.0 - ' + C + ') ? 1.0 : 0.0,\n            (pixelColor.g > 1.0 - ' + C + ') ? 1.0 : 0.0,\n            (pixelColor.b > 1.0 - ' + C + ') ? 1.0 : 0.0,\n            pixelColor.a \n        );\n    ');
 }
@@ -4420,7 +4420,7 @@ function clip$1() {
 function chaos() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        vec2 st = pixelColor.st;\n        st *= ' + C + ';\n        \n        vec2 ipos = floor(st);  // get the integer coords\n\n        vec3 color = vec3(random( ipos ));\n\n        outColor = vec4(color, pixelColor.a);\n    ');
 }
@@ -4431,7 +4431,7 @@ function chaos() {
 function contrast$2() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = pixelColor * ' + C + ';\n    ');
 }
@@ -4442,7 +4442,7 @@ function contrast$2() {
 function gamma$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = vec4(pow(pixelColor.r, ' + C + '), pow(pixelColor.g, ' + C + '), pow(pixelColor.b, ' + C + '), pixelColor.a );\n    ');
 }
@@ -4505,7 +4505,7 @@ function gradient$2() {
 function grayscale$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = parseParamNumber$2(amount);
+    var C = parseParamNumber$1(amount);
 
     if (C > 1) C = 1;
 
@@ -4519,7 +4519,7 @@ function grayscale$1() {
 function hue$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        vec3 hsv = rgb2hsv(pixelColor.rgb);\n        hsv.x += ' + C + ';\n        outColor = vec4(hsv2rgb(hsv).rgb, pixelColor.a);\n    ');
 }
@@ -4527,7 +4527,7 @@ function hue$1() {
 function invert$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = vec4(\n            (1.0 - pixelColor.r) * ' + C + ',\n            (1.0 - pixelColor.g) * ' + C + ',\n            (1.0 - pixelColor.b) * ' + C + ',\n            pixelColor.a\n        );\n    ');
 }
@@ -4545,7 +4545,7 @@ function noise$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
 
-    var C = Math.abs(parseParamNumber$2(amount));
+    var C = Math.abs(parseParamNumber$1(amount));
     var min = toFloatString(-C);
     var max = toFloatString(C);
     return shader('\n        float rnd = ' + min + ' + random( pixelColor.st ) * (' + max + ' - ' + min + ');\n\n        outColor = vec4(pixelColor.rgb + rnd, 1.0);\n    ');
@@ -4558,7 +4558,7 @@ function noise$1() {
 function opacity$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = toFloatString(parseParamNumber$2(amount));
+    var C = toFloatString(parseParamNumber$1(amount));
 
     return shader('\n        outColor = vec4(pixelColor.rgb, pixelColor.a * ' + C + ');\n    ');
 }
@@ -4574,7 +4574,7 @@ function polaroid$1() {
 function saturation$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    var L = 1 - Math.abs(parseParamNumber$2(amount));
+    var L = 1 - Math.abs(parseParamNumber$1(amount));
 
     return matrix$3(L, 0, 0, 0, 0, L, 0, 0, 0, 0, L, 0, 0, 0, 0, L);
 }
@@ -4585,7 +4585,7 @@ function saturation$1() {
 function sepia$1() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    var C = parseParamNumber$2(amount);
+    var C = parseParamNumber$1(amount);
     if (C > 1) C = 1;
 
     return matrix$3(0.393 + 0.607 * (1 - C), 0.769 - 0.769 * (1 - C), 0.189 - 0.189 * (1 - C), 0, 0.349 - 0.349 * (1 - C), 0.686 + 0.314 * (1 - C), 0.168 - 0.168 * (1 - C), 0, 0.272 - 0.272 * (1 - C), 0.534 - 0.534 * (1 - C), 0.131 + 0.869 * (1 - C), 0, 0, 0, 0, 1);
@@ -4596,9 +4596,9 @@ function shade$1() {
     var greenValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
     var blueValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    var r = toFloatString(parseParamNumber$2(redValue) / 255);
-    var g = toFloatString(parseParamNumber$2(greenValue) / 255);
-    var b = toFloatString(parseParamNumber$2(blueValue) / 255);
+    var r = toFloatString(parseParamNumber$1(redValue) / 255);
+    var g = toFloatString(parseParamNumber$1(greenValue) / 255);
+    var b = toFloatString(parseParamNumber$1(blueValue) / 255);
 
     return shader('\n        outColor = vec4(\n            pixelColor.r * ' + r + ',\n            pixelColor.g * ' + g + ',\n            pixelColor.b * ' + b + ',\n            pixelColor.a\n        );\n    ');
 }
@@ -4609,9 +4609,9 @@ function shift$1() {
 }
 
 function solarize$1(redValue, greenValue, blueValue) {
-    var r = toFloatString(parseParamNumber$2(redValue));
-    var g = toFloatString(parseParamNumber$2(greenValue));
-    var b = toFloatString(parseParamNumber$2(blueValue));
+    var r = toFloatString(parseParamNumber$1(redValue));
+    var g = toFloatString(parseParamNumber$1(greenValue));
+    var b = toFloatString(parseParamNumber$1(blueValue));
 
     return shader('\n        outColor = vec4(\n            (pixelColor.r < ' + r + ') ? 1.0 - pixelColor.r: pixelColor.r,\n            (pixelColor.g < ' + g + ') ? 1.0 - pixelColor.g: pixelColor.g,\n            (pixelColor.b < ' + b + ') ? 1.0 - pixelColor.b: pixelColor.b,\n            pixelColor.a\n        );\n    ');
 }
@@ -4624,7 +4624,7 @@ function technicolor$1() {
 function thresholdColor$1() {
     var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
-    scale = toFloatString(parseParamNumber$2(scale));
+    scale = toFloatString(parseParamNumber$1(scale));
 
     return shader('\n        float c = ( (pixelColor.r * 0.2126 + pixelColor.g * 0.7152 + pixelColor.b * 0.0722) ) >= ' + scale + ' ? 1.0 : 0.0;\n\n        outColor = vec4(c, c, c, pixelColor.a);\n    ');
 }
@@ -4650,9 +4650,9 @@ function tint$1 () {
     var greenTint = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var blueTint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-    var r = parseParamNumber$2(redTint);
-    var g = parseParamNumber$2(greenTint);
-    var b = parseParamNumber$2(blueTint);
+    var r = parseParamNumber$1(redTint);
+    var g = parseParamNumber$1(greenTint);
+    var b = parseParamNumber$1(blueTint);
 
     return shader('\n        outColor = vec4(\n            pixelColor.r += (1 - pixelColor.r) * ' + r + ',\n            pixelColor.g += (1 - pixelColor.g) * ' + g + ',\n            pixelColor.b += (1 - pixelColor.b) * ' + b + ',\n            pixelColor.a\n        );\n    ');
 }

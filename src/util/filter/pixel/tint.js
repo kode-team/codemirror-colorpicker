@@ -1,4 +1,4 @@
-import { pixel } from "../functions";
+import { pixel, parseParamNumber } from "../functions";
 
 
 export default function (redTint = 1, greenTint = 1, blueTint = 1) {
