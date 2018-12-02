@@ -13,7 +13,7 @@ export default function hue (amount = 360) {
 
         // 0 ~ 360 
         var h = hsv.h;
-        h += Math.abs($amount)
+        h += Math.abs($C)
         h = h % 360
         hsv.h = h
 
