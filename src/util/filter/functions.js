@@ -78,6 +78,7 @@ export function makeFilter(filter) {
         filter = [filter];
     }
 
+    filter = filter.slice(0);
     const filterName = filter.shift();
 
     if (typeof filterName == 'function') {

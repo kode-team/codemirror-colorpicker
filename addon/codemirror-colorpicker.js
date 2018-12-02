@@ -3308,6 +3308,7 @@ function makeFilter$1(filter) {
         filter = [filter];
     }
 
+    filter = filter.slice(0);
     var filterName = filter.shift();
 
     if (typeof filterName == 'function') {
