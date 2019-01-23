@@ -2267,9 +2267,6 @@ function grayscale(amount) {
     });
 }
 
-/*
- * @param {Number} amount   0..360  
- */
 function hue() {
     var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 360;
 
@@ -9256,7 +9253,7 @@ var ColorPicker = {
 var colorpicker_class = 'codemirror-colorview';
 var colorpicker_background_class = 'codemirror-colorview-background';
 // Excluded tokens do not show color views..
-var excluded_token = ['comment'];
+var excluded_token = ['comment', 'builtin'];
 
 function onChange(cm, evt) {
     if (evt.origin == 'setValue') {
@@ -9645,7 +9642,14 @@ var ColorView = function () {
     }, {
         key: 'is_excluded_token',
         value: function is_excluded_token(line, ch) {
-            var type = this.cm.getTokenTypeAt({ line: line, ch: ch });
+            var token = this.cm.getTokenAt({ line: line, ch: ch }, true);
+            var type = token.type;
+            var state = token.state.state;
+
+            if (type == null && state == 'block') return true;
+            if (type == null && state == 'top') return true;
+            // if (type == null && state == 'prop')  return true;
+
             var count = 0;
             for (var i = 0, len = this.excluded_token.length; i < len; i++) {
                 if (type === this.excluded_token[i]) {
