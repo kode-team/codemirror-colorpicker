@@ -5,7 +5,7 @@ import serve from 'rollup-plugin-serve'
 import livereload from 'rollup-plugin-livereload'
 import autoprefixer from 'autoprefixer'
 import glslify from 'rollup-plugin-glslify';
-
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
 // rollup.config.js
 export default {
@@ -20,6 +20,7 @@ export default {
   },
   name: 'CodeMirrorColorPicker',  
   plugins : [
+    peerDepsExternal(),
     serve(),
     livereload({watch: 'addon'}),
     glslify({ basedir: 'src/util/glsl/source' }),
