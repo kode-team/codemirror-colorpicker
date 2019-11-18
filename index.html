@@ -1154,10 +1154,13 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
             outputFormat: 'hex',    
             hideDelay: 0,
             onHide: function (c) {
-                console.log('hide', c)
+                // console.log('hide', c)
             },
             onChange : function (c) {
                 console.log('change', c);
+            },
+            onLastUpdate : function (c) { 
+                console.log('last update', c);
             }
         });
 /*

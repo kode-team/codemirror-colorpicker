@@ -68,7 +68,7 @@ export default class BaseBox extends UIElement {
         this.refreshColorUI(e);
     }
 
-    onDragMove (e) {
+    onDragMove (e) {      
         if (this.isDown) {
             this.refreshColorUI(e);
         }
@@ -76,7 +76,11 @@ export default class BaseBox extends UIElement {
 
     /* called when mouse is ended move  */
     onDragEnd (e) {
-        this.isDown = false 
+        if (this.isDown) {
+            this.$store.emit('lastUpdateColor');            
+            this.isDown = false 
+        }
+
     }
 
 

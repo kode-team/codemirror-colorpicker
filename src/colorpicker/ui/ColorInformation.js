@@ -95,18 +95,29 @@ export default class ColorInformation extends UIElement {
         this.format = next_format;
 
         this.$store.dispatch('/changeFormat', this.format);
+        this.$store.emit('lastUpdateColor')
     }
     
     getFormat () {
         return this.format || 'hex';   
     }
 
+    
     checkNumberKey(e) {
-        return Event.checkNumberKey(e);
-    }    
+        var code = e.which,
+            isExcept = false;
+
+        if(code == 37 || code == 39 || code == 8 || code == 46 || code == 9)
+            isExcept = true;
+
+        if(!isExcept && (code < 48 || code > 57))
+            return false;
+
+        return true;
+    }
 
     checkNotNumberKey(e) {
-        return !Event.checkNumberKey(e);
+        return !this.checkNumberKey(e);
     }        
 
     changeRgbColor () {
@@ -118,6 +129,7 @@ export default class ColorInformation extends UIElement {
             a : this.refs.$rgb_a.float(),
             source
         })
+        this.$store.emit('lastUpdateColor')
     }
 
     changeHslColor () {
@@ -128,7 +140,8 @@ export default class ColorInformation extends UIElement {
             l : this.refs.$hsl_l.int(),
             a : this.refs.$hsl_a.float(),
             source
-        })        
+        })       
+        this.$store.emit('lastUpdateColor')         
     }    
 
     '@changeColor' (sourceType) {
@@ -160,6 +173,7 @@ export default class ColorInformation extends UIElement {
     
         if(code.charAt(0) == '#' && code.length == 7) {
             this.$store.dispatch('/changeColor', code, source)
+            this.$store.emit('lastUpdateColor')            
         }
     }
     

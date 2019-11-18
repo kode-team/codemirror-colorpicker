@@ -208,7 +208,10 @@ export default class ColorWheel extends UIElement {
 
     // Event Bindings 
     'mouseup document' (e) {
-        this.isDown = false ;
+        if (this.isDown) {
+            this.isDown = false ;
+            this.$store.emit('lastUpdateColor');              
+        }
     }
 
     'mousemove document' (e) {
@@ -228,7 +231,10 @@ export default class ColorWheel extends UIElement {
     }    
 
     'touchend document' (e) {
-        this.isDown = false ;
+        if (this.isDown) {
+            this.isDown = false ;
+            this.$store.emit('lastUpdateColor');              
+        }
     }
 
     'touchmove document' (e) {

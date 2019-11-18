@@ -6995,8 +6995,13 @@ var BaseColorPicker = function (_UIElement) {
                 _this2.callbackColorValue();
             };
 
+            this.callbackLastUpdate = function () {
+                _this2.callbackLastUpdateColorValue();
+            };
+
             this.colorpickerShowCallback = function () {};
             this.colorpickerHideCallback = function () {};
+            this.colorpickerLastUpdateCallback = function () {};
 
             this.$body = new Dom(this.getContainer());
             this.$root = new Dom('div', 'codemirror-colorpicker');
@@ -7057,7 +7062,7 @@ var BaseColorPicker = function (_UIElement) {
 
     }, {
         key: 'show',
-        value: function show(opt, color, showCallback, hideCallback) {
+        value: function show(opt, color, showCallback, hideCallback, lastUpdateCallback) {
 
             // 매번 이벤트를 지우고 다시 생성할 필요가 없어서 초기화 코드는 지움. 
             // this.destroy();
@@ -7065,6 +7070,7 @@ var BaseColorPicker = function (_UIElement) {
             // define colorpicker callback
             this.colorpickerShowCallback = showCallback;
             this.colorpickerHideCallback = hideCallback;
+            this.colorpickerLastUpdateCallback = lastUpdateCallback;
             this.$root.css(this.getInitalizePosition()).show();
 
             this.isColorPickerShow = true;
@@ -7322,6 +7328,19 @@ var BaseColorPicker = function (_UIElement) {
             }
         }
     }, {
+        key: 'callbackLastUpdateColorValue',
+        value: function callbackLastUpdateColorValue(color) {
+            color = color || this.getCurrentColor();
+
+            if (typeof this.opt.onLastUpdate == 'function') {
+                this.opt.onLastUpdate.call(this, color);
+            }
+
+            if (typeof this.colorpickerLastUpdateCallback == 'function') {
+                this.colorpickerLastUpdateCallback(color);
+            }
+        }
+    }, {
         key: 'callbackHideColorValue',
         value: function callbackHideColorValue(color) {
             color = color || this.getCurrentColor();
@@ -7361,6 +7380,7 @@ var BaseColorPicker = function (_UIElement) {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'initializeStoreEvent', this).call(this);
 
             this.$store.on('changeColor', this.callbackChange);
+            this.$store.on('lastUpdateColor', this.callbackLastUpdate);
             this.$store.on('changeFormat', this.callbackChange);
         }
     }, {
@@ -7369,9 +7389,11 @@ var BaseColorPicker = function (_UIElement) {
             get(BaseColorPicker.prototype.__proto__ || Object.getPrototypeOf(BaseColorPicker.prototype), 'destroy', this).call(this);
 
             this.$store.off('changeColor', this.callbackChange);
+            this.$store.off('lastUpdateColor', this.callbackLastUpdate);
             this.$store.off('changeFormat', this.callbackChange);
 
             this.callbackChange = undefined;
+            this.callbackLastUpdate = undefined;
 
             // remove color picker callback
             this.colorpickerShowCallback = undefined;
@@ -7474,7 +7496,10 @@ var BaseBox = function (_UIElement) {
     }, {
         key: 'onDragEnd',
         value: function onDragEnd(e) {
-            this.isDown = false;
+            if (this.isDown) {
+                this.$store.emit('lastUpdateColor');
+                this.isDown = false;
+            }
         }
     }, {
         key: '@changeColor',
@@ -8015,7 +8040,10 @@ var ColorWheel = function (_UIElement) {
     }, {
         key: 'mouseup document',
         value: function mouseupDocument(e) {
-            this.isDown = false;
+            if (this.isDown) {
+                this.isDown = false;
+                this.$store.emit('lastUpdateColor');
+            }
         }
     }, {
         key: 'mousemove document',
@@ -8039,7 +8067,10 @@ var ColorWheel = function (_UIElement) {
     }, {
         key: 'touchend document',
         value: function touchendDocument(e) {
-            this.isDown = false;
+            if (this.isDown) {
+                this.isDown = false;
+                this.$store.emit('lastUpdateColor');
+            }
         }
     }, {
         key: 'touchmove document',
@@ -8120,6 +8151,7 @@ var ColorInformation = function (_UIElement) {
             this.format = next_format;
 
             this.$store.dispatch('/changeFormat', this.format);
+            this.$store.emit('lastUpdateColor');
         }
     }, {
         key: 'getFormat',
@@ -8129,12 +8161,19 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'checkNumberKey',
         value: function checkNumberKey(e) {
-            return Event.checkNumberKey(e);
+            var code = e.which,
+                isExcept = false;
+
+            if (code == 37 || code == 39 || code == 8 || code == 46 || code == 9) isExcept = true;
+
+            if (!isExcept && (code < 48 || code > 57)) return false;
+
+            return true;
         }
     }, {
         key: 'checkNotNumberKey',
         value: function checkNotNumberKey(e) {
-            return !Event.checkNumberKey(e);
+            return !this.checkNumberKey(e);
         }
     }, {
         key: 'changeRgbColor',
@@ -8147,6 +8186,7 @@ var ColorInformation = function (_UIElement) {
                 a: this.refs.$rgb_a.float(),
                 source: source$2
             });
+            this.$store.emit('lastUpdateColor');
         }
     }, {
         key: 'changeHslColor',
@@ -8159,6 +8199,7 @@ var ColorInformation = function (_UIElement) {
                 a: this.refs.$hsl_a.float(),
                 source: source$2
             });
+            this.$store.emit('lastUpdateColor');
         }
     }, {
         key: '@changeColor',
@@ -8226,6 +8267,7 @@ var ColorInformation = function (_UIElement) {
 
             if (code.charAt(0) == '#' && code.length == 7) {
                 this.$store.dispatch('/changeColor', code, source$2);
+                this.$store.emit('lastUpdateColor');
             }
         }
     }, {
@@ -8433,6 +8475,7 @@ var CurrentColorSets = function (_UIElement) {
         key: 'click $colorSetsColorList .color-item',
         value: function click$colorSetsColorListColorItem(e) {
             this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
+            this.$store.emit('lastUpdateColor');
         }
     }]);
     return CurrentColorSets;
@@ -8726,7 +8769,10 @@ var ColorPalette = function (_UIElement) {
     }, {
         key: 'mouseup document',
         value: function mouseupDocument(e) {
-            this.isDown = false;
+            if (this.isDown) {
+                this.isDown = false;
+                this.$store.emit('lastUpdateColor');
+            }
         }
     }, {
         key: 'mousemove document',
@@ -8742,14 +8788,12 @@ var ColorPalette = function (_UIElement) {
             this.setMainColor(e);
         }
     }, {
-        key: 'mouseup',
-        value: function mouseup(e) {
-            this.isDown = false;
-        }
-    }, {
         key: 'touchend document',
         value: function touchendDocument(e) {
-            this.isDown = false;
+            if (this.isDown) {
+                this.isDown = false;
+                this.$store.emit('lastUpdateColor');
+            }
         }
     }, {
         key: 'touchmove document',
@@ -8764,11 +8808,6 @@ var ColorPalette = function (_UIElement) {
             e.preventDefault();
             this.isDown = true;
             this.setMainColor(e);
-        }
-    }, {
-        key: 'touchend',
-        value: function touchend(e) {
-            this.isDown = false;
         }
     }]);
     return ColorPalette;

@@ -91,7 +91,10 @@ export default class ColorPalette extends UIElement {
     '@initColor' () { this.refresh() }    
 
     'mouseup document' (e) {
-        this.isDown = false; 
+        if (this.isDown) {
+            this.isDown = false; 
+            this.$store.emit('lastUpdateColor');            
+        }
     }    
 
     'mousemove document' (e) {
@@ -104,14 +107,13 @@ export default class ColorPalette extends UIElement {
         this.isDown = true; 
         this.setMainColor(e);
     }
-    
-    mouseup (e) {
-        this.isDown = false; 
-    }
 
 
     'touchend document' (e) {
-        this.isDown = false; 
+        if (this.isDown) {
+            this.isDown = false; 
+            this.$store.emit('lastUpdateColor');            
+        }
     }    
 
     'touchmove document' (e) {
@@ -124,10 +126,6 @@ export default class ColorPalette extends UIElement {
         e.preventDefault()
         this.isDown = true; 
         this.setMainColor(e);
-    }
-    
-    touchend (e) {
-        this.isDown = false; 
-    }    
+    } 
 
 }

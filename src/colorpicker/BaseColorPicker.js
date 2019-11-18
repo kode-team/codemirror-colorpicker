@@ -34,8 +34,13 @@ export default class BaseColorPicker extends UIElement {
             this.callbackColorValue()
         }
 
+        this.callbackLastUpdate = () => {
+            this.callbackLastUpdateColorValue()
+        }        
+
         this.colorpickerShowCallback = function () { };
-        this.colorpickerHideCallback = function () { };           
+        this.colorpickerHideCallback = function () { };   
+        this.colorpickerLastUpdateCallback = function () { };           
 
 
         this.$body = new Dom(this.getContainer());
@@ -93,14 +98,15 @@ export default class BaseColorPicker extends UIElement {
      * @param {Function} showCallback  it is called when colorpicker is shown
      * @param {Function} hideCallback  it is called once when colorpicker is hidden
      */
-    show(opt, color, showCallback, hideCallback) {
+    show(opt, color, showCallback, hideCallback, lastUpdateCallback) {
 
         // 매번 이벤트를 지우고 다시 생성할 필요가 없어서 초기화 코드는 지움. 
         // this.destroy();
         // this.initializeEvent();
         // define colorpicker callback
         this.colorpickerShowCallback = showCallback;
-        this.colorpickerHideCallback = hideCallback;        
+        this.colorpickerHideCallback = hideCallback;    
+        this.colorpickerLastUpdateCallback = lastUpdateCallback;        
         this.$root.css(this.getInitalizePosition()).show();
 
 
@@ -321,6 +327,19 @@ export default class BaseColorPicker extends UIElement {
         }        
     }
 
+    callbackLastUpdateColorValue(color) {
+        color = color || this.getCurrentColor();
+
+        if (typeof this.opt.onLastUpdate == 'function') {
+            this.opt.onLastUpdate.call(this, color);
+        }
+
+        if (typeof this.colorpickerLastUpdateCallback == 'function') {
+            this.colorpickerLastUpdateCallback(color);
+        }                
+    }
+
+
     callbackHideColorValue(color) {
         color = color || this.getCurrentColor();
         if (typeof this.opt.onHide == 'function') {
@@ -356,6 +375,7 @@ export default class BaseColorPicker extends UIElement {
         super.initializeStoreEvent()
 
         this.$store.on('changeColor', this.callbackChange)
+        this.$store.on('lastUpdateColor', this.callbackLastUpdate)
         this.$store.on('changeFormat', this.callbackChange)        
     }
  
@@ -363,9 +383,11 @@ export default class BaseColorPicker extends UIElement {
         super.destroy();
 
         this.$store.off('changeColor', this.callbackChange);
+        this.$store.off('lastUpdateColor', this.callbackLastUpdate)
         this.$store.off('changeFormat', this.callbackChange);
 
         this.callbackChange = undefined; 
+        this.callbackLastUpdate = undefined;
 
         // remove color picker callback
         this.colorpickerShowCallback = undefined;
