@@ -67,6 +67,10 @@ export default class Dom {
     
         return null;
     }
+
+    checked() {
+        return this.el.checked;
+    }
     
     removeClass (cls) {
         this.el.className = ((` ${this.el.className} `).replace(` ${cls} `, ' ')).trim();
@@ -102,11 +106,15 @@ export default class Dom {
     }
     
     html (html) {
-
-        if (typeof html == 'string') {
-            this.el.innerHTML = html;
-        } else {
-            this.empty().append(html);
+        try {
+            if (typeof html == 'string') {
+                this.el.innerHTML = html;
+            } else {
+                this.empty().append(html);
+            }
+    
+        } catch (e) {
+            console.log(html);
         }
 
         return this;
@@ -116,9 +124,17 @@ export default class Dom {
         return this.el.querySelector(selector)
     } 
 
+    $ (selector) {
+        return new Dom(this.find(selector))
+    }
+
     findAll (selector) { 
         return this.el.querySelectorAll(selector)
     } 
+
+    $$ (selector) {
+        return [...this.findAll(selector)].map(el => new Dom(el))
+    }
 
     
     empty () {
@@ -190,6 +206,10 @@ export default class Dom {
             top: rect.top + Dom.getScrollTop(),
             left: rect.left + Dom.getScrollLeft()
         };
+    }
+
+    rect () {
+        return this.el.getBoundingClientRect()
     }
     
     position () {

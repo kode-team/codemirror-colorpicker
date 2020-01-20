@@ -2,8 +2,9 @@ import ColorNames from '../ColorNames'
 
 import { RGBtoHSL } from './fromRGB'
 import { HSLtoRGB } from './fromHSL'
+import { round } from './math';
 
-const color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
+const color_regexp = /(#(?:[\da-f]{3}){1,2}|#(?:[\da-f]{8})|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
 const color_split = ','
 
 
@@ -163,18 +164,25 @@ export function parse(str) {
             str = str.replace("#", "");
 
             var arr = [];
+            var a = 1; 
             if (str.length == 3) {
                 for (var i = 0, len = str.length; i < len; i++) {
                     var char = str.substr(i, 1);
                     arr.push(parseInt(char + char, 16));
                 }
+            } else if (str.length === 8) {
+                for (var i = 0, len = str.length; i < len; i += 2) {
+                    arr.push(parseInt(str.substr(i, 2), 16));
+                }
+
+                a = arr.pop() / 255
             } else {
                 for (var i = 0, len = str.length; i < len; i += 2) {
                     arr.push(parseInt(str.substr(i, 2), 16));
                 }
             }
 
-            var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+            var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a };
 
             obj = Object.assign(obj, RGBtoHSL(obj));
 

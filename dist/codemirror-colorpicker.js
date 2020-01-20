@@ -10,7 +10,7 @@
  * convert color to format string
  *
  *     // hex
- *     color.format({ r : 255, g : 255, b : 255 }, 'hex')  // #FFFFFF
+ *     color.format({ r : 255, g : 255, b : 255, a: 1 }, 'hex')  // #FFFFFFFF
  *
  *     // rgb
  *     color.format({ r : 255, g : 255, b : 255 }, 'rgb') // rgba(255, 255, 255, 0.5);
@@ -55,7 +55,14 @@ function hex(obj) {
     var b = obj.b.toString(16);
     if (obj.b < 16) b = "0" + b;
 
-    return '#' + r + g + b;
+    var alphaValue = '';
+    if (obj.a < 1) {
+        var alpha = Math.floor(obj.a * 255);
+        var alphaValue = alpha.toString(16);
+        if (alpha < 16) alphaValue = "0" + alphaValue;
+    }
+
+    return '#' + r + g + b + alphaValue;
 }
 
 function rgb(obj) {
@@ -158,6 +165,545 @@ var math = {
     getXInCircle: getXInCircle,
     getYInCircle: getYInCircle,
     caculateAngle: caculateAngle
+};
+
+var color_names = { aliceblue: "rgb(240, 248, 255)", antiquewhite: "rgb(250, 235, 215)", aqua: "rgb(0, 255, 255)", aquamarine: "rgb(127, 255, 212)", azure: "rgb(240, 255, 255)", beige: "rgb(245, 245, 220)", bisque: "rgb(255, 228, 196)", black: "rgb(0, 0, 0)", blanchedalmond: "rgb(255, 235, 205)", blue: "rgb(0, 0, 255)", blueviolet: "rgb(138, 43, 226)", brown: "rgb(165, 42, 42)", burlywood: "rgb(222, 184, 135)", cadetblue: "rgb(95, 158, 160)", chartreuse: "rgb(127, 255, 0)", chocolate: "rgb(210, 105, 30)", coral: "rgb(255, 127, 80)", cornflowerblue: "rgb(100, 149, 237)", cornsilk: "rgb(255, 248, 220)", crimson: "rgb(237, 20, 61)", cyan: "rgb(0, 255, 255)", darkblue: "rgb(0, 0, 139)", darkcyan: "rgb(0, 139, 139)", darkgoldenrod: "rgb(184, 134, 11)", darkgray: "rgb(169, 169, 169)", darkgrey: "rgb(169, 169, 169)", darkgreen: "rgb(0, 100, 0)", darkkhaki: "rgb(189, 183, 107)", darkmagenta: "rgb(139, 0, 139)", darkolivegreen: "rgb(85, 107, 47)", darkorange: "rgb(255, 140, 0)", darkorchid: "rgb(153, 50, 204)", darkred: "rgb(139, 0, 0)", darksalmon: "rgb(233, 150, 122)", darkseagreen: "rgb(143, 188, 143)", darkslateblue: "rgb(72, 61, 139)", darkslategray: "rgb(47, 79, 79)", darkslategrey: "rgb(47, 79, 79)", darkturquoise: "rgb(0, 206, 209)", darkviolet: "rgb(148, 0, 211)", deeppink: "rgb(255, 20, 147)", deepskyblue: "rgb(0, 191, 255)", dimgray: "rgb(105, 105, 105)", dimgrey: "rgb(105, 105, 105)", dodgerblue: "rgb(30, 144, 255)", firebrick: "rgb(178, 34, 34)", floralwhite: "rgb(255, 250, 240)", forestgreen: "rgb(34, 139, 34)", fuchsia: "rgb(255, 0, 255)", gainsboro: "rgb(220, 220, 220)", ghostwhite: "rgb(248, 248, 255)", gold: "rgb(255, 215, 0)", goldenrod: "rgb(218, 165, 32)", gray: "rgb(128, 128, 128)", grey: "rgb(128, 128, 128)", green: "rgb(0, 128, 0)", greenyellow: "rgb(173, 255, 47)", honeydew: "rgb(240, 255, 240)", hotpink: "rgb(255, 105, 180)", indianred: "rgb(205, 92, 92)", indigo: "rgb(75, 0, 130)", ivory: "rgb(255, 255, 240)", khaki: "rgb(240, 230, 140)", lavender: "rgb(230, 230, 250)", lavenderblush: "rgb(255, 240, 245)", lawngreen: "rgb(124, 252, 0)", lemonchiffon: "rgb(255, 250, 205)", lightblue: "rgb(173, 216, 230)", lightcoral: "rgb(240, 128, 128)", lightcyan: "rgb(224, 255, 255)", lightgoldenrodyellow: "rgb(250, 250, 210)", lightgreen: "rgb(144, 238, 144)", lightgray: "rgb(211, 211, 211)", lightgrey: "rgb(211, 211, 211)", lightpink: "rgb(255, 182, 193)", lightsalmon: "rgb(255, 160, 122)", lightseagreen: "rgb(32, 178, 170)", lightskyblue: "rgb(135, 206, 250)", lightslategray: "rgb(119, 136, 153)", lightslategrey: "rgb(119, 136, 153)", lightsteelblue: "rgb(176, 196, 222)", lightyellow: "rgb(255, 255, 224)", lime: "rgb(0, 255, 0)", limegreen: "rgb(50, 205, 50)", linen: "rgb(250, 240, 230)", magenta: "rgb(255, 0, 255)", maroon: "rgb(128, 0, 0)", mediumaquamarine: "rgb(102, 205, 170)", mediumblue: "rgb(0, 0, 205)", mediumorchid: "rgb(186, 85, 211)", mediumpurple: "rgb(147, 112, 219)", mediumseagreen: "rgb(60, 179, 113)", mediumslateblue: "rgb(123, 104, 238)", mediumspringgreen: "rgb(0, 250, 154)", mediumturquoise: "rgb(72, 209, 204)", mediumvioletred: "rgb(199, 21, 133)", midnightblue: "rgb(25, 25, 112)", mintcream: "rgb(245, 255, 250)", mistyrose: "rgb(255, 228, 225)", moccasin: "rgb(255, 228, 181)", navajowhite: "rgb(255, 222, 173)", navy: "rgb(0, 0, 128)", oldlace: "rgb(253, 245, 230)", olive: "rgb(128, 128, 0)", olivedrab: "rgb(107, 142, 35)", orange: "rgb(255, 165, 0)", orangered: "rgb(255, 69, 0)", orchid: "rgb(218, 112, 214)", palegoldenrod: "rgb(238, 232, 170)", palegreen: "rgb(152, 251, 152)", paleturquoise: "rgb(175, 238, 238)", palevioletred: "rgb(219, 112, 147)", papayawhip: "rgb(255, 239, 213)", peachpuff: "rgb(255, 218, 185)", peru: "rgb(205, 133, 63)", pink: "rgb(255, 192, 203)", plum: "rgb(221, 160, 221)", powderblue: "rgb(176, 224, 230)", purple: "rgb(128, 0, 128)", rebeccapurple: "rgb(102, 51, 153)", red: "rgb(255, 0, 0)", rosybrown: "rgb(188, 143, 143)", royalblue: "rgb(65, 105, 225)", saddlebrown: "rgb(139, 69, 19)", salmon: "rgb(250, 128, 114)", sandybrown: "rgb(244, 164, 96)", seagreen: "rgb(46, 139, 87)", seashell: "rgb(255, 245, 238)", sienna: "rgb(160, 82, 45)", silver: "rgb(192, 192, 192)", skyblue: "rgb(135, 206, 235)", slateblue: "rgb(106, 90, 205)", slategray: "rgb(112, 128, 144)", slategrey: "rgb(112, 128, 144)", snow: "rgb(255, 250, 250)", springgreen: "rgb(0, 255, 127)", steelblue: "rgb(70, 130, 180)", tan: "rgb(210, 180, 140)", teal: "rgb(0, 128, 128)", thistle: "rgb(216, 191, 216)", tomato: "rgb(255, 99, 71)", turquoise: "rgb(64, 224, 208)", violet: "rgb(238, 130, 238)", wheat: "rgb(245, 222, 179)", white: "rgb(255, 255, 255)", whitesmoke: "rgb(245, 245, 245)", yellow: "rgb(255, 255, 0)", yellowgreen: "rgb(154, 205, 50)", transparent: "rgba(0, 0, 0, 0)" };
+
+function isColorName(name) {
+    return !!color_names[name];
+}
+
+function getColorByName(name) {
+    return color_names[name];
+}
+
+var ColorNames = {
+    isColorName: isColorName,
+    getColorByName: getColorByName
+};
+
+function HUEtoRGB(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+}
+
+function HSLtoHSV(h, s, l) {
+
+    if (arguments.length == 1) {
+        var _arguments$ = arguments[0],
+            h = _arguments$.h,
+            s = _arguments$.s,
+            l = _arguments$.l;
+    }
+    var rgb = HSLtoRGB(h, s, l);
+
+    return RGBtoHSV(rgb.r, rgb.g, rgb.b);
+}
+
+function HSLtoRGB(h, s, l) {
+
+    if (arguments.length == 1) {
+        var _arguments$2 = arguments[0],
+            h = _arguments$2.h,
+            s = _arguments$2.s,
+            l = _arguments$2.l;
+    }
+
+    var r, g, b;
+
+    h /= 360;
+    s /= 100;
+    l /= 100;
+
+    if (s == 0) {
+        r = g = b = l; // achromatic
+    } else {
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = HUEtoRGB(p, q, h + 1 / 3);
+        g = HUEtoRGB(p, q, h);
+        b = HUEtoRGB(p, q, h - 1 / 3);
+    }
+
+    return { r: round(r * 255), g: round(g * 255), b: round(b * 255) };
+}
+
+var fromHSL = {
+    HUEtoRGB: HUEtoRGB,
+    HSLtoHSV: HSLtoHSV,
+    HSLtoRGB: HSLtoRGB
+};
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+};
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+var toArray = function (arr) {
+  return Array.isArray(arr) ? arr : Array.from(arr);
+};
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var color_regexp = /(#(?:[\da-f]{3}){1,2}|#(?:[\da-f]{8})|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
+var color_split = ',';
+
+function matches(str) {
+    var matches = str.match(color_regexp);
+    var result = [];
+
+    if (!matches) {
+        return result;
+    }
+
+    for (var i = 0, len = matches.length; i < len; i++) {
+
+        if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
+            result.push({ color: matches[i] });
+        } else {
+            var nameColor = ColorNames.getColorByName(matches[i]);
+
+            if (nameColor) {
+                result.push({ color: matches[i], nameColor: nameColor });
+            }
+        }
+    }
+
+    var pos = { next: 0 };
+    result.forEach(function (item) {
+        var startIndex = str.indexOf(item.color, pos.next);
+
+        item.startIndex = startIndex;
+        item.endIndex = startIndex + item.color.length;
+
+        pos.next = item.endIndex;
+    });
+
+    return result;
+}
+
+function convertMatches(str) {
+    var m = matches(str);
+
+    m.forEach(function (it, index) {
+        str = str.replace(it.color, '@' + index);
+    });
+
+    return { str: str, matches: m };
+}
+
+function convertMatchesArray(str) {
+    var splitStr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
+
+    var ret = convertMatches(str);
+    return ret.str.split(splitStr).map(function (it, index) {
+        it = trim(it);
+
+        if (ret.matches[index]) {
+            it = it.replace('@' + index, ret.matches[index].color);
+        }
+
+        return it;
+    });
+}
+
+function reverseMatches(str, matches) {
+    matches.forEach(function (it, index) {
+        str = str.replace('@' + index, it.color);
+    });
+
+    return str;
+}
+
+function trim(str) {
+    return str.replace(/^\s+|\s+$/g, '');
+}
+
+/**
+ * @method rgb
+ *
+ * parse string to rgb color
+ *
+ * 		color.parse("#FF0000") === { r : 255, g : 0, b : 0 }
+ *
+ * 		color.parse("rgb(255, 0, 0)") == { r : 255, g : 0, b :0 }
+ * 		color.parse(0xff0000) == { r : 255, g : 0, b : 0 }
+ * 		color.parse(0xff000000) == { r : 255, g : 0, b : 0, a: 0 }
+ *
+ * @param {String} str color string
+ * @returns {Object}  rgb object
+ */
+function parse(str) {
+    if (typeof str == 'string') {
+
+        if (ColorNames.isColorName(str)) {
+            str = ColorNames.getColorByName(str);
+        }
+
+        if (str.indexOf("rgb(") > -1) {
+            var arr = str.replace("rgb(", "").replace(")", "").split(",");
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+                arr[i] = parseInt(trim(arr[i]), 10);
+            }
+
+            var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
+
+            obj = Object.assign(obj, RGBtoHSL(obj));
+
+            return obj;
+        } else if (str.indexOf("rgba(") > -1) {
+            var arr = str.replace("rgba(", "").replace(")", "").split(",");
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+
+                if (len - 1 == i) {
+                    arr[i] = parseFloat(trim(arr[i]));
+                } else {
+                    arr[i] = parseInt(trim(arr[i]), 10);
+                }
+            }
+
+            var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
+
+            obj = Object.assign(obj, RGBtoHSL(obj));
+
+            return obj;
+        } else if (str.indexOf("hsl(") > -1) {
+            var arr = str.replace("hsl(", "").replace(")", "").split(",");
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+                arr[i] = parseFloat(trim(arr[i]));
+            }
+
+            var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: 1 };
+
+            obj = Object.assign(obj, HSLtoRGB(obj));
+
+            return obj;
+        } else if (str.indexOf("hsla(") > -1) {
+            var arr = str.replace("hsla(", "").replace(")", "").split(",");
+
+            for (var i = 0, len = arr.length; i < len; i++) {
+
+                if (len - 1 == i) {
+                    arr[i] = parseFloat(trim(arr[i]));
+                } else {
+                    arr[i] = parseInt(trim(arr[i]), 10);
+                }
+            }
+
+            var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3] };
+
+            obj = Object.assign(obj, HSLtoRGB(obj));
+
+            return obj;
+        } else if (str.indexOf("#") == 0) {
+
+            str = str.replace("#", "");
+
+            var arr = [];
+            var a = 1;
+            if (str.length == 3) {
+                for (var i = 0, len = str.length; i < len; i++) {
+                    var char = str.substr(i, 1);
+                    arr.push(parseInt(char + char, 16));
+                }
+            } else if (str.length === 8) {
+                for (var i = 0, len = str.length; i < len; i += 2) {
+                    arr.push(parseInt(str.substr(i, 2), 16));
+                }
+
+                a = arr.pop() / 255;
+            } else {
+                for (var i = 0, len = str.length; i < len; i += 2) {
+                    arr.push(parseInt(str.substr(i, 2), 16));
+                }
+            }
+
+            var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: a };
+
+            obj = Object.assign(obj, RGBtoHSL(obj));
+
+            return obj;
+        }
+    } else if (typeof str == 'number') {
+        if (0x000000 <= str && str <= 0xffffff) {
+            var r = (str & 0xff0000) >> 16;
+            var g = (str & 0x00ff00) >> 8;
+            var b = (str & 0x0000ff) >> 0;
+
+            var obj = { type: 'hex', r: r, g: g, b: b, a: 1 };
+            obj = Object.assign(obj, RGBtoHSL(obj));
+            return obj;
+        } else if (0x00000000 <= str && str <= 0xffffffff) {
+            var _r = (str & 0xff000000) >> 24;
+            var _g = (str & 0x00ff0000) >> 16;
+            var _b = (str & 0x0000ff00) >> 8;
+            var _a = (str & 0x000000ff) / 255;
+
+            var obj = { type: 'hex', r: _r, g: _g, b: _b, a: _a };
+            obj = Object.assign(obj, RGBtoHSL(obj));
+
+            return obj;
+        }
+    }
+
+    return str;
+}
+
+function parseGradient(colors) {
+    if (typeof colors == 'string') {
+        colors = convertMatchesArray(colors);
+    }
+
+    colors = colors.map(function (it) {
+        if (typeof it == 'string') {
+            var ret = convertMatches(it);
+            var arr = trim(ret.str).split(' ');
+
+            if (arr[1]) {
+                if (arr[1].includes('%')) {
+                    arr[1] = parseFloat(arr[1].replace(/%/, '')) / 100;
+                } else {
+                    arr[1] = parseFloat(arr[1]);
+                }
+            } else {
+                arr[1] = '*';
+            }
+
+            arr[0] = reverseMatches(arr[0], ret.matches);
+
+            return arr;
+        } else if (Array.isArray(it)) {
+
+            if (!it[1]) {
+                it[1] = '*';
+            } else if (typeof it[1] == 'string') {
+                if (it[1].includes('%')) {
+                    it[1] = parseFloat(it[1].replace(/%/, '')) / 100;
+                } else {
+                    it[1] = +it[1];
+                }
+            }
+
+            return [].concat(toConsumableArray(it));
+        }
+    });
+
+    var count = colors.filter(function (it) {
+        return it[1] === '*';
+    }).length;
+
+    if (count > 0) {
+        var sum = colors.filter(function (it) {
+            return it[1] != '*' && it[1] != 1;
+        }).map(function (it) {
+            return it[1];
+        }).reduce(function (total, cur) {
+            return total + cur;
+        }, 0);
+
+        var dist = (1 - sum) / count;
+        colors.forEach(function (it, index) {
+            if (it[1] == '*' && index > 0) {
+                if (colors.length - 1 == index) {
+                    // it[1] = 1 
+                } else {
+                    it[1] = dist;
+                }
+            }
+        });
+    }
+
+    return colors;
+}
+
+var parser = {
+    matches: matches,
+    convertMatches: convertMatches,
+    convertMatchesArray: convertMatchesArray,
+    reverseMatches: reverseMatches,
+    parse: parse,
+    parseGradient: parseGradient,
+    trim: trim,
+    color_regexp: color_regexp,
+    color_split: color_split
 };
 
 /**
@@ -312,6 +858,12 @@ function brightness(r, g, b) {
     return Math.ceil(r * 0.2126 + g * 0.7152 + b * 0.0722);
 }
 
+
+
+
+
+
+
 function RGBtoYCrCb(r, g, b) {
 
     if (arguments.length == 1) {
@@ -328,7 +880,9 @@ function RGBtoYCrCb(r, g, b) {
 }
 
 function PivotRGB(n) {
-    return (n > 0.04045 ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
+    var point = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.04045;
+
+    return (n > point ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
 }
 
 function RGBtoXYZ(r, g, b) {
@@ -558,62 +1112,6 @@ var fromHSV = {
     HSVtoRGB: HSVtoRGB
 };
 
-function HUEtoRGB(p, q, t) {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-    return p;
-}
-
-function HSLtoHSV(h, s, l) {
-
-    if (arguments.length == 1) {
-        var _arguments$ = arguments[0],
-            h = _arguments$.h,
-            s = _arguments$.s,
-            l = _arguments$.l;
-    }
-    var rgb = HSLtoRGB(h, s, l);
-
-    return RGBtoHSV(rgb.r, rgb.g, rgb.b);
-}
-
-function HSLtoRGB(h, s, l) {
-
-    if (arguments.length == 1) {
-        var _arguments$2 = arguments[0],
-            h = _arguments$2.h,
-            s = _arguments$2.s,
-            l = _arguments$2.l;
-    }
-
-    var r, g, b;
-
-    h /= 360;
-    s /= 100;
-    l /= 100;
-
-    if (s == 0) {
-        r = g = b = l; // achromatic
-    } else {
-        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        var p = 2 * l - q;
-        r = HUEtoRGB(p, q, h + 1 / 3);
-        g = HUEtoRGB(p, q, h);
-        b = HUEtoRGB(p, q, h - 1 / 3);
-    }
-
-    return { r: round(r * 255), g: round(g * 255), b: round(b * 255) };
-}
-
-var fromHSL = {
-    HUEtoRGB: HUEtoRGB,
-    HSLtoHSV: HSLtoHSV,
-    HSLtoRGB: HSLtoRGB
-};
-
 function YCrCbtoRGB(y, cr, cb, bit) {
 
     if (arguments.length == 1) {
@@ -634,482 +1132,6 @@ function YCrCbtoRGB(y, cr, cb, bit) {
 
 var fromYCrCb = {
     YCrCbtoRGB: YCrCbtoRGB
-};
-
-var color_names = { aliceblue: "rgb(240, 248, 255)", antiquewhite: "rgb(250, 235, 215)", aqua: "rgb(0, 255, 255)", aquamarine: "rgb(127, 255, 212)", azure: "rgb(240, 255, 255)", beige: "rgb(245, 245, 220)", bisque: "rgb(255, 228, 196)", black: "rgb(0, 0, 0)", blanchedalmond: "rgb(255, 235, 205)", blue: "rgb(0, 0, 255)", blueviolet: "rgb(138, 43, 226)", brown: "rgb(165, 42, 42)", burlywood: "rgb(222, 184, 135)", cadetblue: "rgb(95, 158, 160)", chartreuse: "rgb(127, 255, 0)", chocolate: "rgb(210, 105, 30)", coral: "rgb(255, 127, 80)", cornflowerblue: "rgb(100, 149, 237)", cornsilk: "rgb(255, 248, 220)", crimson: "rgb(237, 20, 61)", cyan: "rgb(0, 255, 255)", darkblue: "rgb(0, 0, 139)", darkcyan: "rgb(0, 139, 139)", darkgoldenrod: "rgb(184, 134, 11)", darkgray: "rgb(169, 169, 169)", darkgrey: "rgb(169, 169, 169)", darkgreen: "rgb(0, 100, 0)", darkkhaki: "rgb(189, 183, 107)", darkmagenta: "rgb(139, 0, 139)", darkolivegreen: "rgb(85, 107, 47)", darkorange: "rgb(255, 140, 0)", darkorchid: "rgb(153, 50, 204)", darkred: "rgb(139, 0, 0)", darksalmon: "rgb(233, 150, 122)", darkseagreen: "rgb(143, 188, 143)", darkslateblue: "rgb(72, 61, 139)", darkslategray: "rgb(47, 79, 79)", darkslategrey: "rgb(47, 79, 79)", darkturquoise: "rgb(0, 206, 209)", darkviolet: "rgb(148, 0, 211)", deeppink: "rgb(255, 20, 147)", deepskyblue: "rgb(0, 191, 255)", dimgray: "rgb(105, 105, 105)", dimgrey: "rgb(105, 105, 105)", dodgerblue: "rgb(30, 144, 255)", firebrick: "rgb(178, 34, 34)", floralwhite: "rgb(255, 250, 240)", forestgreen: "rgb(34, 139, 34)", fuchsia: "rgb(255, 0, 255)", gainsboro: "rgb(220, 220, 220)", ghostwhite: "rgb(248, 248, 255)", gold: "rgb(255, 215, 0)", goldenrod: "rgb(218, 165, 32)", gray: "rgb(128, 128, 128)", grey: "rgb(128, 128, 128)", green: "rgb(0, 128, 0)", greenyellow: "rgb(173, 255, 47)", honeydew: "rgb(240, 255, 240)", hotpink: "rgb(255, 105, 180)", indianred: "rgb(205, 92, 92)", indigo: "rgb(75, 0, 130)", ivory: "rgb(255, 255, 240)", khaki: "rgb(240, 230, 140)", lavender: "rgb(230, 230, 250)", lavenderblush: "rgb(255, 240, 245)", lawngreen: "rgb(124, 252, 0)", lemonchiffon: "rgb(255, 250, 205)", lightblue: "rgb(173, 216, 230)", lightcoral: "rgb(240, 128, 128)", lightcyan: "rgb(224, 255, 255)", lightgoldenrodyellow: "rgb(250, 250, 210)", lightgreen: "rgb(144, 238, 144)", lightgray: "rgb(211, 211, 211)", lightgrey: "rgb(211, 211, 211)", lightpink: "rgb(255, 182, 193)", lightsalmon: "rgb(255, 160, 122)", lightseagreen: "rgb(32, 178, 170)", lightskyblue: "rgb(135, 206, 250)", lightslategray: "rgb(119, 136, 153)", lightslategrey: "rgb(119, 136, 153)", lightsteelblue: "rgb(176, 196, 222)", lightyellow: "rgb(255, 255, 224)", lime: "rgb(0, 255, 0)", limegreen: "rgb(50, 205, 50)", linen: "rgb(250, 240, 230)", magenta: "rgb(255, 0, 255)", maroon: "rgb(128, 0, 0)", mediumaquamarine: "rgb(102, 205, 170)", mediumblue: "rgb(0, 0, 205)", mediumorchid: "rgb(186, 85, 211)", mediumpurple: "rgb(147, 112, 219)", mediumseagreen: "rgb(60, 179, 113)", mediumslateblue: "rgb(123, 104, 238)", mediumspringgreen: "rgb(0, 250, 154)", mediumturquoise: "rgb(72, 209, 204)", mediumvioletred: "rgb(199, 21, 133)", midnightblue: "rgb(25, 25, 112)", mintcream: "rgb(245, 255, 250)", mistyrose: "rgb(255, 228, 225)", moccasin: "rgb(255, 228, 181)", navajowhite: "rgb(255, 222, 173)", navy: "rgb(0, 0, 128)", oldlace: "rgb(253, 245, 230)", olive: "rgb(128, 128, 0)", olivedrab: "rgb(107, 142, 35)", orange: "rgb(255, 165, 0)", orangered: "rgb(255, 69, 0)", orchid: "rgb(218, 112, 214)", palegoldenrod: "rgb(238, 232, 170)", palegreen: "rgb(152, 251, 152)", paleturquoise: "rgb(175, 238, 238)", palevioletred: "rgb(219, 112, 147)", papayawhip: "rgb(255, 239, 213)", peachpuff: "rgb(255, 218, 185)", peru: "rgb(205, 133, 63)", pink: "rgb(255, 192, 203)", plum: "rgb(221, 160, 221)", powderblue: "rgb(176, 224, 230)", purple: "rgb(128, 0, 128)", rebeccapurple: "rgb(102, 51, 153)", red: "rgb(255, 0, 0)", rosybrown: "rgb(188, 143, 143)", royalblue: "rgb(65, 105, 225)", saddlebrown: "rgb(139, 69, 19)", salmon: "rgb(250, 128, 114)", sandybrown: "rgb(244, 164, 96)", seagreen: "rgb(46, 139, 87)", seashell: "rgb(255, 245, 238)", sienna: "rgb(160, 82, 45)", silver: "rgb(192, 192, 192)", skyblue: "rgb(135, 206, 235)", slateblue: "rgb(106, 90, 205)", slategray: "rgb(112, 128, 144)", slategrey: "rgb(112, 128, 144)", snow: "rgb(255, 250, 250)", springgreen: "rgb(0, 255, 127)", steelblue: "rgb(70, 130, 180)", tan: "rgb(210, 180, 140)", teal: "rgb(0, 128, 128)", thistle: "rgb(216, 191, 216)", tomato: "rgb(255, 99, 71)", turquoise: "rgb(64, 224, 208)", violet: "rgb(238, 130, 238)", wheat: "rgb(245, 222, 179)", white: "rgb(255, 255, 255)", whitesmoke: "rgb(245, 245, 245)", yellow: "rgb(255, 255, 0)", yellowgreen: "rgb(154, 205, 50)", transparent: "rgba(0, 0, 0, 0)" };
-
-function isColorName(name) {
-    return !!color_names[name];
-}
-
-function getColorByName(name) {
-    return color_names[name];
-}
-
-var ColorNames = {
-    isColorName: isColorName,
-    getColorByName: getColorByName
-};
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-
-
-
-
-var slicedToArray = function () {
-  function sliceIterator(arr, i) {
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
-
-    try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
-
-        if (i && _arr.length === i) break;
-      }
-    } catch (err) {
-      _d = true;
-      _e = err;
-    } finally {
-      try {
-        if (!_n && _i["return"]) _i["return"]();
-      } finally {
-        if (_d) throw _e;
-      }
-    }
-
-    return _arr;
-  }
-
-  return function (arr, i) {
-    if (Array.isArray(arr)) {
-      return arr;
-    } else if (Symbol.iterator in Object(arr)) {
-      return sliceIterator(arr, i);
-    } else {
-      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-    }
-  };
-}();
-
-
-
-
-
-
-
-
-
-
-
-var toArray = function (arr) {
-  return Array.isArray(arr) ? arr : Array.from(arr);
-};
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
-
-var color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
-var color_split = ',';
-
-function matches(str) {
-    var matches = str.match(color_regexp);
-    var result = [];
-
-    if (!matches) {
-        return result;
-    }
-
-    for (var i = 0, len = matches.length; i < len; i++) {
-
-        if (matches[i].indexOf('#') > -1 || matches[i].indexOf('rgb') > -1 || matches[i].indexOf('hsl') > -1) {
-            result.push({ color: matches[i] });
-        } else {
-            var nameColor = ColorNames.getColorByName(matches[i]);
-
-            if (nameColor) {
-                result.push({ color: matches[i], nameColor: nameColor });
-            }
-        }
-    }
-
-    var pos = { next: 0 };
-    result.forEach(function (item) {
-        var startIndex = str.indexOf(item.color, pos.next);
-
-        item.startIndex = startIndex;
-        item.endIndex = startIndex + item.color.length;
-
-        pos.next = item.endIndex;
-    });
-
-    return result;
-}
-
-function convertMatches(str) {
-    var m = matches(str);
-
-    m.forEach(function (it, index) {
-        str = str.replace(it.color, '@' + index);
-    });
-
-    return { str: str, matches: m };
-}
-
-function convertMatchesArray(str) {
-    var splitStr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
-
-    var ret = convertMatches(str);
-    return ret.str.split(splitStr).map(function (it, index) {
-        it = trim(it);
-
-        if (ret.matches[index]) {
-            it = it.replace('@' + index, ret.matches[index].color);
-        }
-
-        return it;
-    });
-}
-
-function reverseMatches(str, matches) {
-    matches.forEach(function (it, index) {
-        str = str.replace('@' + index, it.color);
-    });
-
-    return str;
-}
-
-function trim(str) {
-    return str.replace(/^\s+|\s+$/g, '');
-}
-
-/**
- * @method rgb
- *
- * parse string to rgb color
- *
- * 		color.parse("#FF0000") === { r : 255, g : 0, b : 0 }
- *
- * 		color.parse("rgb(255, 0, 0)") == { r : 255, g : 0, b :0 }
- * 		color.parse(0xff0000) == { r : 255, g : 0, b : 0 }
- * 		color.parse(0xff000000) == { r : 255, g : 0, b : 0, a: 0 }
- *
- * @param {String} str color string
- * @returns {Object}  rgb object
- */
-function parse(str) {
-    if (typeof str == 'string') {
-
-        if (ColorNames.isColorName(str)) {
-            str = ColorNames.getColorByName(str);
-        }
-
-        if (str.indexOf("rgb(") > -1) {
-            var arr = str.replace("rgb(", "").replace(")", "").split(",");
-
-            for (var i = 0, len = arr.length; i < len; i++) {
-                arr[i] = parseInt(trim(arr[i]), 10);
-            }
-
-            var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: 1 };
-
-            obj = Object.assign(obj, RGBtoHSL(obj));
-
-            return obj;
-        } else if (str.indexOf("rgba(") > -1) {
-            var arr = str.replace("rgba(", "").replace(")", "").split(",");
-
-            for (var i = 0, len = arr.length; i < len; i++) {
-
-                if (len - 1 == i) {
-                    arr[i] = parseFloat(trim(arr[i]));
-                } else {
-                    arr[i] = parseInt(trim(arr[i]), 10);
-                }
-            }
-
-            var obj = { type: 'rgb', r: arr[0], g: arr[1], b: arr[2], a: arr[3] };
-
-            obj = Object.assign(obj, RGBtoHSL(obj));
-
-            return obj;
-        } else if (str.indexOf("hsl(") > -1) {
-            var arr = str.replace("hsl(", "").replace(")", "").split(",");
-
-            for (var i = 0, len = arr.length; i < len; i++) {
-                arr[i] = parseFloat(trim(arr[i]));
-            }
-
-            var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: 1 };
-
-            obj = Object.assign(obj, HSLtoRGB(obj));
-
-            return obj;
-        } else if (str.indexOf("hsla(") > -1) {
-            var arr = str.replace("hsla(", "").replace(")", "").split(",");
-
-            for (var i = 0, len = arr.length; i < len; i++) {
-
-                if (len - 1 == i) {
-                    arr[i] = parseFloat(trim(arr[i]));
-                } else {
-                    arr[i] = parseInt(trim(arr[i]), 10);
-                }
-            }
-
-            var obj = { type: 'hsl', h: arr[0], s: arr[1], l: arr[2], a: arr[3] };
-
-            obj = Object.assign(obj, HSLtoRGB(obj));
-
-            return obj;
-        } else if (str.indexOf("#") == 0) {
-
-            str = str.replace("#", "");
-
-            var arr = [];
-            if (str.length == 3) {
-                for (var i = 0, len = str.length; i < len; i++) {
-                    var char = str.substr(i, 1);
-                    arr.push(parseInt(char + char, 16));
-                }
-            } else {
-                for (var i = 0, len = str.length; i < len; i += 2) {
-                    arr.push(parseInt(str.substr(i, 2), 16));
-                }
-            }
-
-            var obj = { type: 'hex', r: arr[0], g: arr[1], b: arr[2], a: 1 };
-
-            obj = Object.assign(obj, RGBtoHSL(obj));
-
-            return obj;
-        }
-    } else if (typeof str == 'number') {
-        if (0x000000 <= str && str <= 0xffffff) {
-            var r = (str & 0xff0000) >> 16;
-            var g = (str & 0x00ff00) >> 8;
-            var b = (str & 0x0000ff) >> 0;
-
-            var obj = { type: 'hex', r: r, g: g, b: b, a: 1 };
-            obj = Object.assign(obj, RGBtoHSL(obj));
-            return obj;
-        } else if (0x00000000 <= str && str <= 0xffffffff) {
-            var _r = (str & 0xff000000) >> 24;
-            var _g = (str & 0x00ff0000) >> 16;
-            var _b = (str & 0x0000ff00) >> 8;
-            var a = (str & 0x000000ff) / 255;
-
-            var obj = { type: 'hex', r: _r, g: _g, b: _b, a: a };
-            obj = Object.assign(obj, RGBtoHSL(obj));
-
-            return obj;
-        }
-    }
-
-    return str;
-}
-
-function parseGradient(colors) {
-    if (typeof colors == 'string') {
-        colors = convertMatchesArray(colors);
-    }
-
-    colors = colors.map(function (it) {
-        if (typeof it == 'string') {
-            var ret = convertMatches(it);
-            var arr = trim(ret.str).split(' ');
-
-            if (arr[1]) {
-                if (arr[1].includes('%')) {
-                    arr[1] = parseFloat(arr[1].replace(/%/, '')) / 100;
-                } else {
-                    arr[1] = parseFloat(arr[1]);
-                }
-            } else {
-                arr[1] = '*';
-            }
-
-            arr[0] = reverseMatches(arr[0], ret.matches);
-
-            return arr;
-        } else if (Array.isArray(it)) {
-
-            if (!it[1]) {
-                it[1] = '*';
-            } else if (typeof it[1] == 'string') {
-                if (it[1].includes('%')) {
-                    it[1] = parseFloat(it[1].replace(/%/, '')) / 100;
-                } else {
-                    it[1] = +it[1];
-                }
-            }
-
-            return [].concat(toConsumableArray(it));
-        }
-    });
-
-    var count = colors.filter(function (it) {
-        return it[1] === '*';
-    }).length;
-
-    if (count > 0) {
-        var sum = colors.filter(function (it) {
-            return it[1] != '*' && it[1] != 1;
-        }).map(function (it) {
-            return it[1];
-        }).reduce(function (total, cur) {
-            return total + cur;
-        }, 0);
-
-        var dist = (1 - sum) / count;
-        colors.forEach(function (it, index) {
-            if (it[1] == '*' && index > 0) {
-                if (colors.length - 1 == index) {
-                    // it[1] = 1 
-                } else {
-                    it[1] = dist;
-                }
-            }
-        });
-    }
-
-    return colors;
-}
-
-var parser = {
-    matches: matches,
-    convertMatches: convertMatches,
-    convertMatchesArray: convertMatchesArray,
-    reverseMatches: reverseMatches,
-    parse: parse,
-    parseGradient: parseGradient,
-    trim: trim,
-    color_regexp: color_regexp,
-    color_split: color_split
 };
 
 /**
@@ -5695,6 +5717,11 @@ var Dom = function () {
             return null;
         }
     }, {
+        key: 'checked',
+        value: function checked() {
+            return this.el.checked;
+        }
+    }, {
         key: 'removeClass',
         value: function removeClass(cls) {
             this.el.className = (' ' + this.el.className + ' ').replace(' ' + cls + ' ', ' ').trim();
@@ -5732,11 +5759,14 @@ var Dom = function () {
     }, {
         key: 'html',
         value: function html(_html) {
-
-            if (typeof _html == 'string') {
-                this.el.innerHTML = _html;
-            } else {
-                this.empty().append(_html);
+            try {
+                if (typeof _html == 'string') {
+                    this.el.innerHTML = _html;
+                } else {
+                    this.empty().append(_html);
+                }
+            } catch (e) {
+                console.log(_html);
             }
 
             return this;
@@ -5747,9 +5777,21 @@ var Dom = function () {
             return this.el.querySelector(selector);
         }
     }, {
+        key: '$',
+        value: function $(selector) {
+            return new Dom(this.find(selector));
+        }
+    }, {
         key: 'findAll',
         value: function findAll(selector) {
             return this.el.querySelectorAll(selector);
+        }
+    }, {
+        key: '$$',
+        value: function $$(selector) {
+            return [].concat(toConsumableArray(this.findAll(selector))).map(function (el) {
+                return new Dom(el);
+            });
         }
     }, {
         key: 'empty',
@@ -5831,6 +5873,11 @@ var Dom = function () {
                 top: rect.top + Dom.getScrollTop(),
                 left: rect.left + Dom.getScrollLeft()
             };
+        }
+    }, {
+        key: 'rect',
+        value: function rect() {
+            return this.el.getBoundingClientRect();
         }
     }, {
         key: 'position',
@@ -6193,9 +6240,9 @@ var ColorSetsList = function (_BaseModule) {
 }(BaseModule);
 
 var Event = {
-    addEvent: function addEvent(dom, eventName, callback) {
+    addEvent: function addEvent(dom, eventName, callback, options) {
         if (dom) {
-            dom.addEventListener(eventName, callback);
+            dom.addEventListener(eventName, callback, options);
         }
     },
     removeEvent: function removeEvent(dom, eventName, callback) {
@@ -6333,7 +6380,12 @@ var EventMachin = function () {
 
       // 데이타 로드 하고 
       this.load();
+
+      this.afterRender();
     }
+  }, {
+    key: 'afterRender',
+    value: function afterRender() {}
 
     /**
      * 자식 컴포넌트로 사용될 객체 정의 
@@ -6393,7 +6445,8 @@ var EventMachin = function () {
 
         if (instance) {
           instance.render();
-          $el.replace(node, instance.$el.el);
+          var $parent = new Dom(node.parentNode);
+          $parent.replace(node, instance.$el.el);
         }
       });
     }
@@ -6613,10 +6666,10 @@ var EventMachin = function () {
     value: function checkEventType(e, eventObject) {
       var _this8 = this;
 
-      var onlyControl = e.ctrlKey ? eventObject.isControl : true;
-      var onlyShift = e.shiftKey ? eventObject.isShift : true;
-      var onlyAlt = e.altKey ? eventObject.isAlt : true;
-      var onlyMeta = e.metaKey ? eventObject.isMeta : true;
+      var onlyControl = eventObject.isControl ? e.ctrlKey : true;
+      var onlyShift = eventObject.isShift ? e.shiftKey : true;
+      var onlyAlt = eventObject.isAlt ? e.altKey : true;
+      var onlyMeta = eventObject.isMeta ? e.metaKey : true;
 
       var hasKeyCode = true;
       if (eventObject.codes.length) {
@@ -6640,7 +6693,7 @@ var EventMachin = function () {
 
       if (eventObject.delegate) {
         return function (e) {
-
+          e.xy = Event.posXY(e);
           if (_this9.checkEventType(e, eventObject)) {
             var delegateTarget = _this9.matchPath(e.target || e.srcElement, eventObject.delegate);
 
@@ -6654,6 +6707,7 @@ var EventMachin = function () {
         };
       } else {
         return function (e) {
+          e.xy = Event.posXY(e);
           if (_this9.checkEventType(e, eventObject)) {
             return callback(e);
           }
@@ -6665,7 +6719,13 @@ var EventMachin = function () {
     value: function addEvent(eventObject, callback) {
       eventObject.callback = this.makeCallback(eventObject, callback);
       this.addBinding(eventObject);
-      Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback);
+
+      var options = true;
+      if (eventObject.eventName === 'touchstart') {
+        options = { passive: true };
+      }
+
+      Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback, options);
     }
   }, {
     key: 'removeEventAll',
@@ -6802,10 +6862,6 @@ var ColorManager = function (_BaseModule) {
             $store.alpha = isUndefined(colorObj.a) ? $store.alpha : colorObj.a;
             $store.format = colorObj.type != 'hsv' ? colorObj.type || $store.format : $store.format;
 
-            if ($store.format == 'hex' && $store.alpha < 1) {
-                $store.format = 'rgb';
-            }
-
             if (colorObj.type == 'hsl') {
                 $store.hsl = Object.assign($store.hsl, colorObj);
                 $store.rgb = Color$1.HSLtoRGB($store.hsl);
@@ -6838,7 +6894,9 @@ var ColorManager = function (_BaseModule) {
         value: function toString($store, type) {
             type = type || $store.format;
             var colorObj = $store[type] || $store.rgb;
-            return Color$1.format(Object.assign({}, colorObj, { a: $store.alpha }), type);
+            return Color$1.format(_extends({}, colorObj, {
+                a: $store.alpha
+            }), type);
         }
     }, {
         key: '/toColor',
@@ -7266,6 +7324,11 @@ var BaseColorPicker = function (_UIElement) {
                     this.timerCloseColorPicker = setTimeout(this.hide.bind(this), this.delayTime || this.hideDelay);
                 }
             }
+        }
+    }, {
+        key: 'keyup.isAbsolute.escape $root',
+        value: function keyupIsAbsoluteEscape$root(e) {
+            this.hide();
         }
     }, {
         key: 'mouseover.isAbsolute $root',
@@ -7716,7 +7779,7 @@ var Opacity = function (_BaseSlider) {
     createClass(Opacity, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar2"></div>\n            </div>\n        </div>\n        ';
+            return '\n        <div class="opacity">\n            <div ref="$container" class="opacity-container">\n                <div ref="$colorbar" class="color-bar"></div>\n                <div ref="$bar" class="drag-bar"></div>\n            </div>\n        </div>\n        ';
         }
     }, {
         key: 'refresh',
@@ -8109,7 +8172,8 @@ var ColorInformation = function (_UIElement) {
     createClass(ColorInformation, [{
         key: 'template',
         value: function template() {
-            return '\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">S</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        ';
+            return (/*html*/'\n        <div class="information hex">\n            <div ref="$informationChange" class="information-change">\n                <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>\n            </div>\n            <div class="information-item hex">\n                <div class="input-field hex">\n                    <input ref="$hexCode" class="input" type="text" />\n                    <div class="title">HEX</div>\n                </div>\n            </div>\n            <div class="information-item rgb">\n                <div class="input-field rgb-r">\n                    <input ref="$rgb_r" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">R</div>\n                </div>\n                <div class="input-field rgb-g">\n                    <input ref="$rgb_g" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">G</div>\n                </div>\n                <div class="input-field rgb-b">\n                    <input ref="$rgb_b" class="input" type="number" step="1" min="0" max="255" />\n                    <div class="title">B</div>\n                </div>          \n                <div class="input-field rgb-a">\n                    <input ref="$rgb_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>                                                            \n            </div>\n            <div class="information-item hsl">\n                <div class="input-field hsl-h">\n                    <input ref="$hsl_h" class="input" type="number" step="1" min="0" max="360" />\n                    <div class="title">H</div>\n                </div>\n                <div class="input-field hsl-s">\n                    <input ref="$hsl_s" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>\n                    <div class="title">S</div>\n                </div>\n                <div class="input-field hsl-l">\n                    <input ref="$hsl_l" class="input" type="number" step="1" min="0" max="100" />\n                    <div class="postfix">%</div>                        \n                    <div class="title">L</div>\n                </div>\n                <div class="input-field hsl-a">\n                    <input ref="$hsl_a" class="input" type="number" step="0.01" min="0" max="1" />\n                    <div class="title">A</div>\n                </div>\n            </div>\n        </div>\n        '
+            );
         }
     }, {
         key: 'setCurrentFormat',
@@ -8121,11 +8185,16 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'initFormat',
         value: function initFormat() {
+            var _this2 = this;
+
             var current_format = this.format || 'hex';
 
-            this.$el.removeClass('hex');
-            this.$el.removeClass('rgb');
-            this.$el.removeClass('hsl');
+            ['hex', 'rgb', 'hsl'].filter(function (it) {
+                return it !== current_format;
+            }).forEach(function (formatString) {
+                _this2.$el.removeClass(formatString);
+            });
+
             this.$el.addClass(current_format);
         }
     }, {
@@ -8139,19 +8208,24 @@ var ColorInformation = function (_UIElement) {
             } else if (current_format == 'rgb') {
                 next_format = 'hsl';
             } else if (current_format == 'hsl') {
-                if (this.$store.alpha == 1) {
-                    next_format = 'hex';
-                } else {
-                    next_format = 'rgb';
-                }
+                next_format = 'hex';
             }
 
-            this.$el.removeClass(current_format);
-            this.$el.addClass(next_format);
             this.format = next_format;
+            this.initFormat();
 
             this.$store.dispatch('/changeFormat', this.format);
             this.$store.emit('lastUpdateColor');
+        }
+    }, {
+        key: 'goToFormat',
+        value: function goToFormat(to_format) {
+            this.format = to_format;
+            if (to_format === 'rgb' || to_format === 'hsl') {
+                this.initFormat();
+            }
+
+            this.$store.dispatch('/changeFormat', this.format);
         }
     }, {
         key: 'getFormat',
@@ -8254,18 +8328,11 @@ var ColorInformation = function (_UIElement) {
             this.changeHslColor();
         }
     }, {
-        key: 'keydown $hexCode',
-        value: function keydown$hexCode(e) {
-            if (e.which < 65 || e.which > 70) {
-                return this.checkNumberKey(e);
-            }
-        }
-    }, {
         key: 'keyup $hexCode',
         value: function keyup$hexCode(e) {
             var code = this.refs.$hexCode.val();
 
-            if (code.charAt(0) == '#' && code.length == 7) {
+            if (code.charAt(0) == '#' && (code.length == 7 || code.length === 9)) {
                 this.$store.dispatch('/changeColor', code, source$2);
                 this.$store.emit('lastUpdateColor');
             }
@@ -8274,6 +8341,21 @@ var ColorInformation = function (_UIElement) {
         key: 'click $formatChangeButton',
         value: function click$formatChangeButton(e) {
             this.nextFormat();
+        }
+    }, {
+        key: 'click $el .information-item.hex .input-field .title',
+        value: function click$elInformationItemHexInputFieldTitle(e) {
+            this.goToFormat('hex');
+        }
+    }, {
+        key: 'click $el .information-item.rgb .input-field .title',
+        value: function click$elInformationItemRgbInputFieldTitle(e) {
+            this.goToFormat('hsl');
+        }
+    }, {
+        key: 'click $el .information-item.hsl .input-field .title',
+        value: function click$elInformationItemHslInputFieldTitle(e) {
+            this.goToFormat('rgb');
         }
     }, {
         key: 'setRGBInput',
@@ -9395,6 +9477,138 @@ var XDColorPicker = function (_BaseColorPicker) {
     return XDColorPicker;
 }(BaseColorPicker);
 
+var source$8 = 'mini-control';
+
+var ColorControl$12 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl() {
+        classCallCheck(this, ColorControl);
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: VerticalHue, Opacity: Opacity$2 };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+            return (/*html*/'\n            <div class="control">\n                <div target="Opacity" ></div>            \n                <div target="Hue" ></div>\n            </div>\n        '
+            );
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$8 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var VSCodePicker = function (_BaseColorPicker) {
+    inherits(VSCodePicker, _BaseColorPicker);
+
+    function VSCodePicker() {
+        classCallCheck(this, VSCodePicker);
+        return possibleConstructorReturn(this, (VSCodePicker.__proto__ || Object.getPrototypeOf(VSCodePicker)).apply(this, arguments));
+    }
+
+    createClass(VSCodePicker, [{
+        key: 'template',
+        value: function template() {
+            return (/*html*/'\n            <div class=\'colorpicker-body\'>\n                <div class=\'color-view\'>\n                    <div class=\'color-view-container\'  ref="$colorview"></div>\n                </div>\n                <div class=\'color-tool\'>\n                    <div target="palette"></div>\n                    <div target="control"></div>\n                </div>\n            </div>\n        '
+            );
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                palette: ColorPalette,
+                control: ColorControl$12
+            };
+        }
+    }, {
+        key: 'initColorWithoutChangeEvent',
+        value: function initColorWithoutChangeEvent(color) {
+            console.log(color);
+            this.$store.dispatch('/initColor', color);
+            this.refresh();
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+            var color = this.$store.dispatch('/toColor');
+            var rgb = this.$store.rgb;
+            var bValue = Color$1.brightness(rgb.r, rgb.g, rgb.b);
+
+            this.refs.$colorview.css({
+                "background-color": color,
+                'color': bValue > 127 ? 'black' : 'white'
+            });
+            this.refs.$colorview.html(color);
+        }
+    }, {
+        key: 'click $colorview',
+        value: function click$colorview(e) {
+            this.nextFormat();
+        }
+    }, {
+        key: 'nextFormat',
+        value: function nextFormat() {
+            var current_format = this.$store.format || 'hex';
+
+            var next_format = 'hex';
+            if (current_format == 'hex') {
+                next_format = 'rgb';
+            } else if (current_format == 'rgb') {
+                next_format = 'hsl';
+            } else if (current_format == 'hsl') {
+                next_format = 'hex';
+            }
+
+            this.$store.dispatch('/changeFormat', next_format);
+            this.$store.emit('lastUpdateColor');
+            this.refresh();
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setBackgroundColor();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor() {
+            this.refresh();
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return VSCodePicker;
+}(BaseColorPicker);
+
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
@@ -9406,6 +9620,8 @@ var ColorPicker = {
                 return new RingColorPicker(opts);
             case 'mini':
                 return new MiniColorPicker(opts);
+            case 'vscode':
+                return new VSCodePicker(opts);
             case 'mini-vertical':
                 return new MiniColorPicker$2(opts);
             case 'sketch':
@@ -9420,6 +9636,7 @@ var ColorPicker = {
     MacOSColorPicker: MacOSColorPicker,
     RingColorPicker: RingColorPicker,
     MiniColorPicker: MiniColorPicker,
+    VSCodePicker: VSCodePicker,
     MiniVerticalColorPicker: MiniColorPicker$2
 };
 

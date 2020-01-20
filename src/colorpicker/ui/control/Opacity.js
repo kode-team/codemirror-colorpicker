@@ -20,7 +20,7 @@ export default class Opacity extends BaseSlider {
         <div class="opacity">
             <div ref="$container" class="opacity-container">
                 <div ref="$colorbar" class="color-bar"></div>
-                <div ref="$bar" class="drag-bar2"></div>
+                <div ref="$bar" class="drag-bar"></div>
             </div>
         </div>
         `

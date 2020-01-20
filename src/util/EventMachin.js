@@ -47,7 +47,11 @@ export default class EventMachin {
     // 데이타 로드 하고 
     this.load()    
 
+    this.afterRender()
+
   }
+
+  afterRender() { }
  
   /**
    * 자식 컴포넌트로 사용될 객체 정의 
@@ -94,7 +98,8 @@ export default class EventMachin {
 
       if (instance) {
         instance.render()
-        $el.replace(node, instance.$el.el)                
+        var $parent = new Dom(node.parentNode)
+        $parent.replace(node, instance.$el.el)                
       }
     })
   }
@@ -274,10 +279,10 @@ export default class EventMachin {
   }
 
   checkEventType (e, eventObject ) {
-    var onlyControl = e.ctrlKey ? eventObject.isControl : true;
-    var onlyShift = e.shiftKey ? eventObject.isShift : true; 
-    var onlyAlt = e.altKey ? eventObject.isAlt : true; 
-    var onlyMeta = e.metaKey ? eventObject.isMeta : true; 
+    var onlyControl = eventObject.isControl ? e.ctrlKey : true;
+    var onlyShift = eventObject.isShift ? e.shiftKey  : true; 
+    var onlyAlt = eventObject.isAlt ? e.altKey : true; 
+    var onlyMeta = eventObject.isMeta ? e.metaKey : true; 
 
     var hasKeyCode = true; 
     if (eventObject.codes.length) {
@@ -297,7 +302,7 @@ export default class EventMachin {
   makeCallback ( eventObject, callback) {
     if (eventObject.delegate) {
       return (e) => {
-
+        e.xy = Event.posXY(e);
         if (this.checkEventType(e, eventObject)) {
           const delegateTarget = this.matchPath(e.target || e.srcElement, eventObject.delegate);
   
@@ -311,6 +316,7 @@ export default class EventMachin {
       }
     }  else {
       return (e) => {
+        e.xy = Event.posXY(e);
         if (this.checkEventType(e, eventObject)) { 
           return callback(e);
         }
@@ -321,7 +327,13 @@ export default class EventMachin {
   addEvent(eventObject, callback) {
     eventObject.callback = this.makeCallback(eventObject, callback)
     this.addBinding(eventObject);
-    Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback)
+
+    var options = true; 
+    if (eventObject.eventName === 'touchstart') {
+      options = { passive : true }
+    }
+      
+    Event.addEvent(eventObject.dom, eventObject.eventName, eventObject.callback, options)
   }
 
   removeEventAll () {

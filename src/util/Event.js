@@ -1,8 +1,8 @@
 export default {    
 
-    addEvent (dom, eventName, callback) {
+    addEvent (dom, eventName, callback, options) {
         if (dom) {
-            dom.addEventListener(eventName, callback);
+            dom.addEventListener(eventName, callback, options);
         }
     },
    

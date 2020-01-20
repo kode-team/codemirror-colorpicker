@@ -273,6 +273,10 @@ export default class BaseColorPicker extends UIElement {
         }
     }
     
+    'keyup.isAbsolute.escape $root' (e) {
+        this.hide();
+    }
+
     'mouseover.isAbsolute $root' (e) {
         clearTimeout(this.timerCloseColorPicker);
         // this.__isMouseDown = true; 

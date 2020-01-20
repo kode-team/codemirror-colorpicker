@@ -77,22 +77,49 @@
                 .information-item.rgb {
                     display: inherit;
                 }
+
+                .information-item.hsl {
+                    display: none !important;
+                }                 
             }
     
             &.hex {
                 .information-item.hex {
                     display: inherit;
                 }
+                .information-item.hsl {
+                    display: none !important;
+                }                           
             }
+
+            &.hsl {
+                .information-item.rgb {
+                  display: none !important;
+                }
+        
+                .information-item.hsl {
+                  display: inherit;
+                }        
+            }            
     
             .information-item {
                 display: inline-flex !important;
                 margin-right: 0px;
+
     
                 > .input-field {
+                                    
+                    padding-left: 0px;
+
+                    &:last-child {
+                        padding-right: 0px;
+                    }                
+
                     > .title {
                         color: black;
                         font-size: 11px;
+                        cursor: pointer;
+
                     }
                 }
     
@@ -101,26 +128,30 @@
                 }
             }
     
-            .information-item.hsl {
-                display: none !important;
-            }
     
             .information-item.hex {
-                width: 70px;
+                width: 74px;
                 padding-right: 0px;
                 padding-left: 5px;
             }
     
             .information-item.rgb {
-                width: 144px;
+                width: 140px;
                 padding-left: 0px;
                 padding-right: 0px;
             }
+
+            .information-item.hsl {
+                display: none;
+                width: 140px;
+                padding-left: 0px;
+                padding-right: 0px;
+            }   
         }
     
         > .colorsets {
             > .menu {
-                display: none;
+                // display: none;
             }
     
             > .color-list {

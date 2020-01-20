@@ -1,4 +1,5 @@
 import { round } from './math'
+import { parse } from './parser';
 
 /**
  * @method RGBtoHSV
@@ -132,6 +133,31 @@ export function brightness(r, g, b) {
         return Math.ceil(r * 0.2126 + g * 0.7152 + b * 0.0722);
 }
 
+export const luminance = brightness;
+
+export function relativeLuminance (r, g, b) {
+    let R = (r / 255)
+    let G = (g / 255)
+    let B = (b / 255)
+
+    R = PivotRGB(R, 0.03928);
+    G = PivotRGB(G, 0.03928);
+    B = PivotRGB(B, 0.03928);
+
+    return luminance(R, G, B);
+}
+
+export function contrastRatio (color1, color2) {
+    var c1 = parse(color1);
+    var c2 = parse(color2);
+
+    var L1 = relativeLuminance(c1.r, c1.g, c1.b);
+    var L2 = relativeLuminance(c2.r, c2.g, c2.b);
+
+    return (L1 + 0.05) / (L2 + 0.05)
+}
+
+
 
 export function RGBtoYCrCb(r, g, b) {
 
@@ -145,9 +171,10 @@ export function RGBtoYCrCb(r, g, b) {
     return { y: Y, cr: Cr, cb: Cb };
 }
 
-export function PivotRGB(n) {
-    return ((n > 0.04045) ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
+export function PivotRGB(n, point = 0.04045) {
+    return ((n > point) ? Math.pow((n + 0.055) / 1.055, 2.4) : n / 12.92) * 100;
 }
+
 
 export function RGBtoXYZ(r, g, b) {
     //sR, sG and sB (Standard RGB) input range = 0 ÷ 255

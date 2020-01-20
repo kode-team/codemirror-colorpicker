@@ -6,7 +6,7 @@ const source = 'chromedevtool-information';
 export default class ColorInformation extends UIElement {
 
     template () {
-        return `
+        return /*html*/`
         <div class="information hex">
             <div ref="$informationChange" class="information-change">
                 <button ref="$formatChangeButton" type="button" class="format-change-button arrow-button"></button>
@@ -68,9 +68,10 @@ export default class ColorInformation extends UIElement {
     initFormat () {
         var current_format = this.format || 'hex';
     
-        this.$el.removeClass('hex');
-        this.$el.removeClass('rgb');
-        this.$el.removeClass('hsl');
+        ['hex', 'rgb', 'hsl'].filter(it => it !== current_format).forEach(formatString => {
+            this.$el.removeClass(formatString);
+        })
+
         this.$el.addClass(current_format);
     }
     
@@ -83,26 +84,29 @@ export default class ColorInformation extends UIElement {
         } else if (current_format == 'rgb') {
             next_format = 'hsl';
         } else if (current_format == 'hsl') {
-            if (this.$store.alpha == 1) {
-                next_format = 'hex';
-            } else {
-                next_format = 'rgb';
-            }
+            next_format = 'hex';
         }
 
-        this.$el.removeClass(current_format);
-        this.$el.addClass(next_format);
         this.format = next_format;
+        this.initFormat();
 
         this.$store.dispatch('/changeFormat', this.format);
-        this.$store.emit('lastUpdateColor')
+        this.$store.emit('lastUpdateColor')        
     }
+
+    goToFormat(to_format) {
+        this.format = to_format;
+        if (to_format === 'rgb' || to_format === 'hsl') {
+            this.initFormat();
+        }
+
+        this.$store.dispatch('/changeFormat', this.format);
+    }      
     
     getFormat () {
         return this.format || 'hex';   
     }
 
-    
     checkNumberKey(e) {
         var code = e.which,
             isExcept = false;
@@ -129,7 +133,7 @@ export default class ColorInformation extends UIElement {
             a : this.refs.$rgb_a.float(),
             source
         })
-        this.$store.emit('lastUpdateColor')
+        this.$store.emit('lastUpdateColor')        
     }
 
     changeHslColor () {
@@ -140,8 +144,8 @@ export default class ColorInformation extends UIElement {
             l : this.refs.$hsl_l.int(),
             a : this.refs.$hsl_a.float(),
             source
-        })       
-        this.$store.emit('lastUpdateColor')         
+        })    
+        this.$store.emit('lastUpdateColor')            
     }    
 
     '@changeColor' (sourceType) {
@@ -161,17 +165,11 @@ export default class ColorInformation extends UIElement {
     'input $hsl_s' (e) {  this.changeHslColor(); }
     'input $hsl_l' (e) {  this.changeHslColor(); }
     'input $hsl_a' (e) {  this.changeHslColor(); }      
-
-    'keydown $hexCode' (e) {
-        if(e.which < 65 || e.which > 70) {
-            return this.checkNumberKey(e);
-        }
-    }
     
     'keyup $hexCode' (e) {
         var code = this.refs.$hexCode.val();
     
-        if(code.charAt(0) == '#' && code.length == 7) {
+        if(code.charAt(0) == '#' && (code.length == 7 || code.length === 9)) {
             this.$store.dispatch('/changeColor', code, source)
             this.$store.emit('lastUpdateColor')            
         }
@@ -180,6 +178,18 @@ export default class ColorInformation extends UIElement {
     'click $formatChangeButton' (e) {
         this.nextFormat();
     }
+
+    'click $el .information-item.hex .input-field .title' (e) {
+        this.goToFormat('hex');
+    }    
+
+    'click $el .information-item.rgb .input-field .title' (e) {
+        this.goToFormat('hsl');
+    }    
+
+    'click $el .information-item.hsl .input-field .title' (e) {
+        this.goToFormat('rgb');
+    }      
 
     setRGBInput() {
         this.refs.$rgb_r.val(this.$store.rgb.r);

@@ -44,11 +44,7 @@ export default class ColorManager extends BaseModule {
 
         $store.alpha = isUndefined(colorObj.a) ? $store.alpha : colorObj.a; 
         $store.format = colorObj.type != 'hsv' ? (colorObj.type || $store.format) : $store.format;
-
-        if ($store.format == 'hex' && $store.alpha < 1) {
-            $store.format = 'rgb';
-        }
-
+        
         if (colorObj.type == 'hsl') {
             $store.hsl = Object.assign($store.hsl, colorObj); 
             $store.rgb = Color.HSLtoRGB($store.hsl);
@@ -80,7 +76,10 @@ export default class ColorManager extends BaseModule {
     '/toString' ($store, type) {
         type = type || $store.format
         var colorObj = $store[type] || $store.rgb
-        return Color.format(Object.assign({}, colorObj, {a: $store.alpha} ), type);
+        return Color.format({
+            ...colorObj,
+            a: $store.alpha
+        }, type);
     }
 
     '/toColor' ($store, type) {

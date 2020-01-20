@@ -5,7 +5,7 @@
  * convert color to format string
  *
  *     // hex
- *     color.format({ r : 255, g : 255, b : 255 }, 'hex')  // #FFFFFF
+ *     color.format({ r : 255, g : 255, b : 255, a: 1 }, 'hex')  // #FFFFFFFF
  *
  *     // rgb
  *     color.format({ r : 255, g : 255, b : 255 }, 'rgb') // rgba(255, 255, 255, 0.5);
@@ -48,7 +48,15 @@ export function hex(obj) {
     var b = obj.b.toString(16);
     if (obj.b < 16) b = "0" + b;
 
-    return `#${r}${g}${b}`;
+
+    var alphaValue = ''    
+    if (obj.a < 1) {
+        var alpha = Math.floor(obj.a * 255)
+        var alphaValue = alpha.toString(16);
+        if (alpha < 16) alphaValue = "0" + alphaValue;        
+    }
+
+    return `#${r}${g}${b}${alphaValue}`;
 }
 
 export function rgb (obj, defaultColor = 'rgba(0, 0, 0, 0)') {

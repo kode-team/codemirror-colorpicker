@@ -75,7 +75,7 @@ export default class CurrentColorSets extends UIElement {
 
     'click $colorSetsColorList .color-item'  (e) {
         this.$store.dispatch('/changeColor', e.$delegateTarget.attr('data-color'));
-        this.$store.emit('lastUpdateColor')
+        this.$store.emit('lastUpdateColor')        
     }
 
 }

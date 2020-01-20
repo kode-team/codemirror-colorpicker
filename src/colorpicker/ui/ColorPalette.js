@@ -106,8 +106,7 @@ export default class ColorPalette extends UIElement {
     mousedown (e) {
         this.isDown = true; 
         this.setMainColor(e);
-    }
-
+    }    
 
     'touchend document' (e) {
         if (this.isDown) {
@@ -126,6 +125,6 @@ export default class ColorPalette extends UIElement {
         e.preventDefault()
         this.isDown = true; 
         this.setMainColor(e);
-    } 
-
+    }
+    
 }

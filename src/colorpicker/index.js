@@ -4,6 +4,7 @@ import MiniColorPicker from './mini/index'
 import MiniVerticalColorPicker from './mini-vertical/index'
 import RingColorPicker from './ring/index'
 import XDColorPicker from './xd/index'
+import VSCodePicker from './vscode/index'
 
 export default {
     create (opts) {
@@ -16,6 +17,8 @@ export default {
             return new RingColorPicker(opts);            
         case 'mini': 
             return new MiniColorPicker(opts);            
+        case 'vscode': 
+            return new VSCodePicker(opts);
         case 'mini-vertical': 
             return new MiniVerticalColorPicker(opts);
         case 'sketch':
@@ -29,5 +32,6 @@ export default {
     MacOSColorPicker,
     RingColorPicker,
     MiniColorPicker,
+    VSCodePicker,
     MiniVerticalColorPicker 
 }    

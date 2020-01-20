@@ -68,7 +68,7 @@ export default class BaseBox extends UIElement {
         this.refreshColorUI(e);
     }
 
-    onDragMove (e) {      
+    onDragMove (e) {
         if (this.isDown) {
             this.refreshColorUI(e);
         }
@@ -80,7 +80,6 @@ export default class BaseBox extends UIElement {
             this.$store.emit('lastUpdateColor');            
             this.isDown = false 
         }
-
     }
 
 
