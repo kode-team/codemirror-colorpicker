@@ -374,13 +374,17 @@ export function makeUserFilterFunctionList (arr) {
             return [newKeys[key], JSON.stringify(it.context[key])].join(' = ')
         })
     
-        let preCallbackString = it.callback.toString().split("{");
+        let preCallbackString = it.callback;
         
-        preCallbackString.shift()
-        preCallbackString = preCallbackString.join("{")
-        preCallbackString = preCallbackString.split("}")
-        preCallbackString.pop()
-        preCallbackString = preCallbackString.join("}")  
+        if (typeof it.callback === 'function') {
+            preCallbackString = it.callback.toString().split("{");
+        
+            preCallbackString.shift()
+            preCallbackString = preCallbackString.join("{")
+            preCallbackString = preCallbackString.split("}")
+            preCallbackString.pop()
+            preCallbackString = preCallbackString.join("}")  
+        } 
 
         Object.keys(newKeys).forEach(key => {
             var newKey = newKeys[key]

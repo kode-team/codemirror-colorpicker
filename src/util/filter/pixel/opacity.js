@@ -8,7 +8,7 @@ export default function opacity (amount = 100) {
     amount = parseParamNumber(amount)   
     const $C = amount / 100; 
 
-    return pixel(() => {
+    return pixel(`
         $a *= $C 
-    }, { $C })
+    `, { $C })
 }

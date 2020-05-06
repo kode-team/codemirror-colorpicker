@@ -8,7 +8,7 @@ import {
  */
 export default function hue (amount = 360) {
     const $C = parseParamNumber(amount)          
-    return pixel(() => {
+    return pixel(`
         var hsv = Color.RGBtoHSV($r, $g, $b);
 
         // 0 ~ 360 
@@ -22,7 +22,7 @@ export default function hue (amount = 360) {
         $r = rgb.r
         $g = rgb.g
         $b = rgb.b
-    }, {
+    `, {
         $C
     })
 }

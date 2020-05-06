@@ -9,7 +9,7 @@ import {
  */
 export default function noise (amount = 1) {
     const $C = parseParamNumber(amount)    
-    return pixel(() => {
+    return pixel(`
         const C = Math.abs($C) * 5
         const min = -C
         const max = C 
@@ -18,7 +18,7 @@ export default function noise (amount = 1) {
         $r += noiseValue
         $g += noiseValue
         $b += noiseValue
-    }, {
+    `, {
         $C
     })
 }

@@ -10,7 +10,7 @@ export default function thresholdColor (scale = 200, amount = 100, hasColor = tr
     const $C = amount / 100;
     const $hasColor = hasColor
 
-    return pixel(() => {
+    return pixel(`
         // refer to Color.brightness 
         const v = ($C * Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722) ) >= $scale ? 255 : 0;
 
@@ -29,7 +29,7 @@ export default function thresholdColor (scale = 200, amount = 100, hasColor = tr
             $b = value 
         }
         
-    }, {
+    `, {
         $C, $scale, $hasColor
     })
 }

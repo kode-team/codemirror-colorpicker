@@ -10,9 +10,9 @@ export default function contrast(amount = 0) {
     amount = parseParamNumber(amount)       
     const $C = Math.max((128 + amount) / 128, 0);
 
-    return pixel(() => {
+    return pixel(`
         $r *= $C
         $g *= $C
         $b *= $C
-    }, { $C })
+    `, { $C })
 }

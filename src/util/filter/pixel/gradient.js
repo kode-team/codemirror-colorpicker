@@ -39,7 +39,7 @@ export default function gradient () {
         return  {r, g, b, a} 
     })
 
-    return pixel(() => {
+    return pixel(`
         const colorIndex = clamp(Math.ceil($r * 0.2126 + $g * 0.7152 + $b * 0.0722))
         const newColorIndex = clamp(Math.floor(colorIndex * ($scale / 256)))
         const color = $colors[newColorIndex]
@@ -48,5 +48,5 @@ export default function gradient () {
         $g = color.g 
         $b = color.b 
         $a = clamp(Math.floor(color.a * 256))
-    }, { }, { $colors, $scale })
+    `, { }, { $colors, $scale })
 }
