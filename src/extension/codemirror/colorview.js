@@ -301,7 +301,7 @@ export default class ColorView {
         this.empty_marker(lineNo, lineHandle);
         
         const result = this.match_result(lineHandle); 
-        let obj = { next : 0 };
+        let obj = { next : 0 }; 
 
         result.forEach(item => {
             this.render(obj, lineNo, lineHandle, item.color, item.nameColor);

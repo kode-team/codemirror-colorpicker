@@ -16,7 +16,7 @@ export default function grayscale (amount) {
         0, 0, 0, 1
     ]
     
-    return pixel(`
+    return pixel(/*javascript*/`
         $r = $matrix[0] * $r + $matrix[1] * $g + $matrix[2] * $b + $matrix[3] * $a
         $g = $matrix[4] * $r + $matrix[5] * $g + $matrix[6] * $b + $matrix[7] * $a
         $b = $matrix[8] * $r + $matrix[9] * $g + $matrix[10] * $b + $matrix[11] * $a
