@@ -7935,7 +7935,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'nextFormat',
         value: function nextFormat() {
-            var current_format = this.format || 'hex';
+            var current_format = this.$store.format || 'hex';
 
             var next_format = 'hex';
             if (current_format == 'hex') {
@@ -7947,20 +7947,17 @@ var ColorInformation = function (_UIElement) {
             }
 
             this.format = next_format;
-            this.initFormat();
-
-            this.$store.dispatch('/changeFormat', this.format);
+            this.$store.dispatch('/changeFormat', next_format);
             this.$store.emit('lastUpdateColor');
+            this.initFormat();
         }
     }, {
         key: 'goToFormat',
         value: function goToFormat(to_format) {
             this.format = to_format;
-            if (to_format === 'rgb' || to_format === 'hsl') {
-                this.initFormat();
-            }
-
             this.$store.dispatch('/changeFormat', this.format);
+            this.$store.emit('lastUpdateColor');
+            this.initFormat();
         }
     }, {
         key: 'getFormat',
@@ -8080,7 +8077,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'click $el .information-item.hex .input-field .title',
         value: function click$elInformationItemHexInputFieldTitle(e) {
-            this.goToFormat('hex');
+            this.goToFormat('rgb');
         }
     }, {
         key: 'click $el .information-item.rgb .input-field .title',
@@ -8090,7 +8087,7 @@ var ColorInformation = function (_UIElement) {
     }, {
         key: 'click $el .information-item.hsl .input-field .title',
         value: function click$elInformationItemHslInputFieldTitle(e) {
-            this.goToFormat('rgb');
+            this.goToFormat('hex');
         }
     }, {
         key: 'setRGBInput',

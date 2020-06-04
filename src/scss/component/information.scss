@@ -50,12 +50,14 @@
         padding: 3px;
         box-sizing: border-box;
         position: relative;
-
+ 
         > .title {
           text-align:center;
           font-size:12px;
           color:#a9a9a9;
           padding-top:2px;
+          cursor: pointer;
+          user-select: none;
         }
 
         input {
