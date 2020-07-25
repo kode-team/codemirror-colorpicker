@@ -28,7 +28,6 @@ export default class VSCodePicker extends BaseColorPicker {
     }
 
     initColorWithoutChangeEvent (color) {
-        console.log(color);
         this.$store.dispatch('/initColor', color);
         this.refresh();
     }

@@ -9415,7 +9415,6 @@ var VSCodePicker = function (_BaseColorPicker) {
     }, {
         key: 'initColorWithoutChangeEvent',
         value: function initColorWithoutChangeEvent(color) {
-            console.log(color);
             this.$store.dispatch('/initColor', color);
             this.refresh();
         }
@@ -9508,7 +9507,7 @@ var ColorPicker = {
 var colorpicker_class = 'codemirror-colorview';
 var colorpicker_background_class = 'codemirror-colorview-background';
 // Excluded tokens do not show color views..
-var excluded_token = ['comment', 'builtin'];
+var excluded_token = ['comment', 'builtin', 'qualifier'];
 
 function onChange(cm, evt) {
     if (evt.origin == 'setValue') {

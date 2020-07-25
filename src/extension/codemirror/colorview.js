@@ -4,7 +4,7 @@ import ColorPicker from '../../colorpicker/index';
 const colorpicker_class = 'codemirror-colorview'; 
 const colorpicker_background_class = 'codemirror-colorview-background';
 // Excluded tokens do not show color views..
-let excluded_token = ['comment', 'builtin'];
+let excluded_token = ['comment', 'builtin', 'qualifier'];
 
 
 function onChange(cm, evt) {
