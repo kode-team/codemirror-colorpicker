@@ -9,7 +9,7 @@ let excluded_token = ['comment', 'builtin', 'qualifier'];
 
 function onChange(cm, evt) {
     if (evt.origin == 'setValue') {  // if content is changed by setValue method, it initialize markers
-        cm.state.colorpicker.close_color_picker();
+        // cm.state.colorpicker.close_color_picker();
         cm.state.colorpicker.init_color_update();
         cm.state.colorpicker.style_color_update();
     } else {

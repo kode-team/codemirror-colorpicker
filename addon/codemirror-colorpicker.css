@@ -58,7 +58,8 @@
     position: relative;
     width: 10px;
     height: 12px;
-    padding: 0px; }
+    padding: 0px;
+    background-color: transparent; }
     .codemirror-colorpicker .colorpicker-body .arrow-button:before {
       content: "";
       display: inline-block;
