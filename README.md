@@ -37,7 +37,7 @@ bower install codemirror-colorpicker
 # How to use (for  browser) 
 
 ```
-<link rel="stylesheet" href="/codemirror-colorpicker/dist/codemirror-colorpciker.css/>
+<link rel="stylesheet" href="/codemirror-colorpicker/dist/codemirror-colorpicker.css/>
 <script src="/codemirror-colorpicker/dist/codemirror-colorpicker.min.js"></script>
 ```
 
