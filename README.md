@@ -16,7 +16,8 @@ https://colorpicker.easylogic.studio/
 
 # Sample Image 
 
-<img width="500px" src="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png" />
+<img width="500px" src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/screen-shot.png" />
+
 
 
 
@@ -118,9 +119,9 @@ You can set custom color paletts (ex : material, ...).
 }
 ```
 
-<img width="235px"   src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/colorpicker.png" align="absmiddle" />
+<img width="235px"   src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpicker.png" align="absmiddle" />
 
-<img width="235px"  src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/colorpaletts.png" align="absmiddle" />
+<img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpaletts.png" align="absmiddle" />
 
 ## Support color scale  for palette 
 
@@ -136,9 +137,9 @@ You can set custom color paletts (ex : material, ...).
 
 ```
 
-<img width="235px"   src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/scalecolors-title.png" align="absmiddle" />
+<img width="235px"   src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/scalecolors-title.png" align="absmiddle" />
 
-<img width="235px"  src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/scalecolors.png" align="absmiddle" />
+<img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/scalecolors.png" align="absmiddle" />
 
 ## Support Sketch Style 
 
@@ -152,7 +153,7 @@ You can set custom color paletts (ex : material, ...).
 
 ```
 
-<img width="235px"  src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/sketch-type.png" align="absmiddle" />
+<img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/sketch-type.png" align="absmiddle" />
 
 ## Support only Palette Style 
 
@@ -166,7 +167,7 @@ You can set custom color paletts (ex : material, ...).
 
 ```
 
-<img width="235px"  src="https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/resources/image/palette-type.png" align="absmiddle" />
+<img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/palette-type.png" align="absmiddle" />
 
 # Developments 
 
