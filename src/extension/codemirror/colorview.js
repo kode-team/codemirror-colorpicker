@@ -4,7 +4,7 @@ import ColorPicker from '../../colorpicker/index';
 const colorpicker_class = 'codemirror-colorview'; 
 const colorpicker_background_class = 'codemirror-colorview-background';
 // Excluded tokens do not show color views..
-let excluded_token = ['comment', 'builtin', 'qualifier'];
+let excluded_token = ['comment', 'builtin', 'qualifier', 'tag', 'property', 'property error', 'variable', 'variable-2'];
 
 
 function onChange(cm, evt) {
@@ -394,22 +394,15 @@ export default class ColorView {
         if (type == null && state == 'top')  return true;
         // if (type == null && state == 'prop')  return true;
 
-        var count = 0; 
-        for(var i = 0, len = this.excluded_token.length; i < len; i++) {
-            if (type === this.excluded_token[i]) {
-                count++;
-                break; 
-            }
-        }
-
-        return count > 0;   // true is that it has a excluded token 
+        return this.excluded_token.includes(type);   // true is that it has a excluded token 
     }
 
     render(cursor, lineNo, lineHandle, color, nameColor) {
         var start = lineHandle.text.indexOf(color, cursor.next);
 
-        if (this.is_excluded_token(lineNo, start) === true) {
+        if (this.is_excluded_token(lineNo, start+1) === true) {
             // excluded token do not show.
+            cursor.next = start + color.length;            
             return;
         }
 

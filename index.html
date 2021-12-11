@@ -17,10 +17,10 @@
     <meta name="twitter:title" content="ColorPicker for CodeMirror Addon">
     <meta name="twitter:description" content="Very Simple ColorPicker for CodeMirror">
     <meta name="twitter:image" content="https://easylogic.github.com/codemirror-colorpicker/resources/image/screen-shot.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.css" />
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.js" ></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/css/css.js" ></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.js" ></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/css/css.js" ></script>
     <link rel="stylesheet"
     href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
@@ -427,7 +427,9 @@
     <div class="codemirror-area">
         
 <textarea id="sample_text_area">
-.sample-green.red {
+$blue: yellow;
+
+.sample-green.red #address {
     background-color: green; 
     blue: blue;
 }
@@ -1011,7 +1013,7 @@ var scaleColors = Color.scale.copper(count);   // ['#000000', '#3d2618', '#9d623
     var colors = [ 'red', 'blue', 'white' ];
     var cm = CodeMirror.fromTextArea(document.getElementById("sample_text_area"), {
         lineNumbers: true, 
-        mode : "css",
+        mode: "text/x-scss",
         extraKeys : {
           'Ctrl-K' : function (cm, event) {
               cm.state.colorpicker.popup_color_picker();
