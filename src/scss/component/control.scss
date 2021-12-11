@@ -3,6 +3,25 @@
     padding: 10px 0px 10px 0px;
     user-select: none;
 
+    &.has-eyedropper {
+        padding-left: 30px;
+
+        .el-cp-color-control__left {
+          position: absolute;
+          left: 12px;
+          top: 20px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          box-sizing: border-box;
+        }
+
+        > .color, > .empty {
+          left: 45px;
+        }
+    }
+
+
     > .color, > .empty {
       position: absolute;
       left: 12px;

@@ -3,14 +3,27 @@ import BaseColorPicker from '../BaseColorPicker'
 import ColorControl from './ColorControl'
 import ColorPalette from '../ui/ColorPalette'
 import Color from '../../util/Color'
+import { enableEyeDropper } from '../../util/functions/support';
+import Eyedropper from '../ui/Eyedropper';
 
 export default class VSCodePicker extends BaseColorPicker {
 
     template () {
+
+        const hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+        let $eyedropper = !!enableEyeDropper ? `
+        <div class="el-cp-color-control__left">
+          <div target="Eyedropper"></div>
+        </div>
+      ` : '';
+
         return /*html*/`
             <div class='colorpicker-body'>
-                <div class='color-view'>
-                    <div class='color-view-container'  ref="$colorview"></div>
+                <div class='color-view ${hasEyeDropper}' >
+                    <div class='color-view-container'  >
+                        <div class="preview" ref="$colorview"></div>
+                    </div>
+                    ${$eyedropper}            
                 </div>
                 <div class='color-tool'>
                     <div target="palette"></div>
@@ -23,7 +36,8 @@ export default class VSCodePicker extends BaseColorPicker {
     components() {
         return { 
             palette: ColorPalette,  
-            control: ColorControl
+            control: ColorControl,
+            Eyedropper
         }
     }
 
