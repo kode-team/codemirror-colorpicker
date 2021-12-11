@@ -7693,6 +7693,43 @@ var Opacity = function (_BaseSlider) {
     return Opacity;
 }(BaseSlider);
 
+function isSupported(api, apiParent) {
+    return api in apiParent;
+}
+
+var enableEyeDropper = isSupported('EyeDropper', window);
+
+var Eyedropper = function (_UIElement) {
+  inherits(Eyedropper, _UIElement);
+
+  function Eyedropper() {
+    classCallCheck(this, Eyedropper);
+    return possibleConstructorReturn(this, (Eyedropper.__proto__ || Object.getPrototypeOf(Eyedropper)).apply(this, arguments));
+  }
+
+  createClass(Eyedropper, [{
+    key: 'template',
+    value: function template() {
+      return (/*html*/'\n      <nav class="el-cp-color-eyedropper">\n        <button type="button" ref="$button" title="Eyedropper">\n          <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\n            <path d="M7.797 18.344c-.019.001-.074-.009-.24-.065-.277-.094-.745-.25-1.137.141l-1.542 1.543a.595.595 0 0 1-.84-.84L5.58 17.58c.391-.39.235-.859.141-1.14-.045-.134-.06-.195-.072-.206-.002-.003-.005-.003-.007-.001l1.06-1.06.703.705a.432.432 0 1 0 .611-.611l-.703-.705.557-.557.703.703a.434.434 0 0 0 .611 0 .434.434 0 0 0 0-.61l-.703-.703.571-.572.703.704a.435.435 0 0 0 .612 0 .434.434 0 0 0 0-.61l-.705-.706L14 7.875l2.126 2.127-8.33 8.342zM19.29 9.37l-.654-.655 1.669-1.668a2.372 2.372 0 0 0-3.353-3.354l-1.669 1.669-.655-.654a1.341 1.341 0 0 0-1.898 1.897l.658.658-8.358 8.359c-.373.373-.214.841-.13 1.094.061.18.069.24.069.253l-1.543 1.542a1.458 1.458 0 1 0 2.062 2.061l1.536-1.54c.019-.003.08.006.259.066.252.085.72.243 1.093-.13l8.359-8.358.658.658a1.341 1.341 0 1 0 1.897-1.898z" fill="currentColor"/>\n          </svg>\n        </button>\n      </nav>\n    '
+      );
+    }
+  }, {
+    key: 'click $button',
+    value: function click$button() {
+      var _this2 = this;
+
+      if (enableEyeDropper) {
+        var eyeDropper = new EyeDropper();
+        eyeDropper.open().then(function (result) {
+          _this2.$store.dispatch('/changeColor', result.sRGBHex);
+          _this2.$store.emit('lastUpdateColor');
+        });
+      }
+    }
+  }]);
+  return Eyedropper;
+}(UIElement);
+
 var source = 'macos-control';
 
 var ColorControl = function (_UIElement) {
@@ -7706,12 +7743,16 @@ var ColorControl = function (_UIElement) {
     createClass(ColorControl, [{
         key: 'components',
         value: function components() {
-            return { Value: Value, Opacity: Opacity };
+            return { Value: Value, Opacity: Opacity, Eyedropper: Eyedropper };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+
+            var hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+            var $eyedropper = !!enableEyeDropper ? '\n        <div class="el-cp-color-control__left">\n          <div target="Eyedropper"></div>\n        </div>\n      ' : '';
+
+            return '\n        <div class="control ' + hasEyeDropper + '">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n            ' + $eyedropper + '                       \n        </div>\n        ';
         }
     }, {
         key: 'setBackgroundColor',
@@ -8579,12 +8620,16 @@ var ColorControl$2 = function (_UIElement) {
     createClass(ColorControl, [{
         key: 'components',
         value: function components() {
-            return { Hue: Hue, Opacity: Opacity };
+            return { Hue: Hue, Opacity: Opacity, Eyedropper: Eyedropper };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+
+            var hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+            var $eyedropper = !!enableEyeDropper ? '\n        <div class="el-cp-color-control__left">\n          <div target="Eyedropper"></div>\n        </div>\n      ' : '';
+
+            return '\n        <div class="control ' + hasEyeDropper + '">\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n            ' + $eyedropper + '            \n        </div>\n        ';
         }
     }, {
         key: 'setBackgroundColor',
@@ -9123,12 +9168,16 @@ var ColorControl$8 = function (_UIElement) {
     createClass(ColorControl, [{
         key: 'components',
         value: function components() {
-            return { Value: Value, Opacity: Opacity };
+            return { Value: Value, Opacity: Opacity, Eyedropper: Eyedropper };
         }
     }, {
         key: 'template',
         value: function template() {
-            return '\n        <div class="control">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n        </div>\n        ';
+
+            var hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+            var $eyedropper = !!enableEyeDropper ? '\n        <div class="el-cp-color-control__left">\n          <div target="Eyedropper"></div>\n        </div>\n      ' : '';
+
+            return '\n        <div class="control ' + hasEyeDropper + '">\n            <div target="Value" ></div>\n            <div target="Opacity" ></div>\n            <div ref="$controlPattern" class="empty"></div>\n            <div ref="$controlColor" class="color"></div>\n            ' + $eyedropper + '                                \n        </div>\n        ';
         }
     }, {
         key: 'setBackgroundColor',
@@ -9401,7 +9450,11 @@ var VSCodePicker = function (_BaseColorPicker) {
     createClass(VSCodePicker, [{
         key: 'template',
         value: function template() {
-            return (/*html*/'\n            <div class=\'colorpicker-body\'>\n                <div class=\'color-view\'>\n                    <div class=\'color-view-container\'  ref="$colorview"></div>\n                </div>\n                <div class=\'color-tool\'>\n                    <div target="palette"></div>\n                    <div target="control"></div>\n                </div>\n            </div>\n        '
+
+            var hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+            var $eyedropper = !!enableEyeDropper ? '\n        <div class="el-cp-color-control__left">\n          <div target="Eyedropper"></div>\n        </div>\n      ' : '';
+
+            return (/*html*/'\n            <div class=\'colorpicker-body\'>\n                <div class=\'color-view ' + hasEyeDropper + '\' >\n                    <div class=\'color-view-container\'  >\n                        <div class="preview" ref="$colorview"></div>\n                    </div>\n                    ' + $eyedropper + '            \n                </div>\n                <div class=\'color-tool\'>\n                    <div target="palette"></div>\n                    <div target="control"></div>\n                </div>\n            </div>\n        '
             );
         }
     }, {
@@ -9409,7 +9462,8 @@ var VSCodePicker = function (_BaseColorPicker) {
         value: function components() {
             return {
                 palette: ColorPalette,
-                control: ColorControl$12
+                control: ColorControl$12,
+                Eyedropper: Eyedropper
             };
         }
     }, {
