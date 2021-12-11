@@ -12,7 +12,32 @@
 
         .color-view {
             height: 34px;
-            @include transparent-background();
+
+            &.has-eyedropper {
+                display: flex;
+                .color-view-container {
+                    width: 254px;
+                    display: inline-block;
+                }
+
+                
+                .el-cp-color-control__left {
+                    float: right;
+                    width: 80px;
+                    text-align: center;
+                    padding: 6px 0px;
+                    
+                    button {
+                        display: inline-block;
+
+                        svg {
+                            path {
+                                fill: white;
+                            }
+                        }
+                    }
+                }
+            }
 
             .color-view-container {
                 line-height: 34px;
@@ -23,6 +48,12 @@
                 cursor: pointer;
                 user-select: none;                
                 text-shadow: 0 0 3px rgb(83, 83, 83);
+                @include transparent-background();
+                
+                .preview {
+                    display: block;
+                    height: 100%;
+                }
             }
         }
 

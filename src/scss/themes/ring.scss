@@ -53,5 +53,19 @@
             height: 30px;
             border-radius: 2px;
         }
+
+
+        &.has-eyedropper {
+            padding-left: 30px;
+            padding-top: 10px;
+    
+            > .color, > .empty {
+                top: -2px;
+            }
+
+            .el-cp-color-control__left {
+              top: 4px;
+            }
+        }        
     }
 }

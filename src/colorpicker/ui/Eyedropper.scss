@@ -1,0 +1,28 @@
+.el-cp-color-eyedropper {
+  button {
+    display: block;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: -4px;
+    font-size: 0;
+    border: none;
+    border-radius: var(--size-radius);
+    cursor: pointer;
+    outline: none;
+    box-sizing: border-box;
+    background: none;
+    transition: box-shadow var(--speed-focus) ease-out, opacity var(--speed-focus) ease-out;
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--color-key);
+    }
+    &:active {
+      opacity: .5;
+    }
+  }
+  svg {
+    display: block;
+    margin: 0 auto;
+    color: var(--color-fill);
+  }
+}

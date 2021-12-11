@@ -37,6 +37,15 @@
         > .color, > .empty {
             top: 4px;
         }
+
+        &.has-eyedropper {
+            padding-left: 30px;
+    
+            .el-cp-color-control__left {
+              top: 9px;
+            }
+        }
+    
     }
 
 

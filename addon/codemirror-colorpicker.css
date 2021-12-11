@@ -133,6 +133,19 @@
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none; }
+    .codemirror-colorpicker .colorpicker-body .control.has-eyedropper {
+      padding-left: 30px; }
+      .codemirror-colorpicker .colorpicker-body .control.has-eyedropper .el-cp-color-control__left {
+        position: absolute;
+        left: 12px;
+        top: 20px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+      .codemirror-colorpicker .colorpicker-body .control.has-eyedropper > .color, .codemirror-colorpicker .colorpicker-body .control.has-eyedropper > .empty {
+        left: 45px; }
     .codemirror-colorpicker .colorpicker-body .control > .color, .codemirror-colorpicker .colorpicker-body .control > .empty {
       position: absolute;
       left: 12px;
@@ -532,6 +545,10 @@
       height: 150px; }
     .codemirror-colorpicker.sketch > .colorpicker-body > .control {
       padding: 0px; }
+      .codemirror-colorpicker.sketch > .colorpicker-body > .control.has-eyedropper {
+        padding-left: 30px; }
+        .codemirror-colorpicker.sketch > .colorpicker-body > .control.has-eyedropper .el-cp-color-control__left {
+          top: 4px; }
       .codemirror-colorpicker.sketch > .colorpicker-body > .control > .color, .codemirror-colorpicker.sketch > .colorpicker-body > .control > .empty {
         position: absolute;
         right: 10px;
@@ -715,6 +732,10 @@
     padding-top: 0px; }
     .codemirror-colorpicker.macos .control > .color, .codemirror-colorpicker.macos .control > .empty {
       top: 4px; }
+    .codemirror-colorpicker.macos .control.has-eyedropper {
+      padding-left: 30px; }
+      .codemirror-colorpicker.macos .control.has-eyedropper .el-cp-color-control__left {
+        top: 9px; }
   .codemirror-colorpicker.macos .value {
     position: relative;
     padding: 6px 16px;
@@ -905,6 +926,13 @@
       width: 30px;
       height: 30px;
       border-radius: 2px; }
+    .codemirror-colorpicker.ring .control.has-eyedropper {
+      padding-left: 30px;
+      padding-top: 10px; }
+      .codemirror-colorpicker.ring .control.has-eyedropper > .color, .codemirror-colorpicker.ring .control.has-eyedropper > .empty {
+        top: -2px; }
+      .codemirror-colorpicker.ring .control.has-eyedropper .el-cp-color-control__left {
+        top: 4px; }
   .codemirror-colorpicker.xd {
     display: inline-block;
     padding-top: 12px;
@@ -985,8 +1013,23 @@
       border-radius: 0px;
       display: inline-block; }
       .codemirror-colorpicker.vscode .colorpicker-body .color-view {
-        height: 34px;
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+        height: 34px; }
+        .codemirror-colorpicker.vscode .colorpicker-body .color-view.has-eyedropper {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex; }
+          .codemirror-colorpicker.vscode .colorpicker-body .color-view.has-eyedropper .color-view-container {
+            width: 254px;
+            display: inline-block; }
+          .codemirror-colorpicker.vscode .colorpicker-body .color-view.has-eyedropper .el-cp-color-control__left {
+            float: right;
+            width: 80px;
+            text-align: center;
+            padding: 6px 0px; }
+            .codemirror-colorpicker.vscode .colorpicker-body .color-view.has-eyedropper .el-cp-color-control__left button {
+              display: inline-block; }
+              .codemirror-colorpicker.vscode .colorpicker-body .color-view.has-eyedropper .el-cp-color-control__left button svg path {
+                fill: white; }
         .codemirror-colorpicker.vscode .colorpicker-body .color-view .color-view-container {
           line-height: 34px;
           font-size: 14px;
@@ -998,7 +1041,11 @@
              -moz-user-select: none;
               -ms-user-select: none;
                   user-select: none;
-          text-shadow: 0 0 3px #535353; }
+          text-shadow: 0 0 3px #535353;
+          background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") repeat; }
+          .codemirror-colorpicker.vscode .colorpicker-body .color-view .color-view-container .preview {
+            display: block;
+            height: 100%; }
       .codemirror-colorpicker.vscode .colorpicker-body .color-tool {
         padding: 8px; }
     .codemirror-colorpicker.vscode .color {
@@ -1068,3 +1115,32 @@
       color: white; }
   .colorsets-contextmenu.small .menu-item.small-hide {
     display: none; }
+
+.el-cp-color-eyedropper button {
+  display: block;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: -4px;
+  font-size: 0;
+  border: none;
+  border-radius: var(--size-radius);
+  cursor: pointer;
+  outline: none;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background: none;
+  -webkit-transition: opacity var(--speed-focus) ease-out, -webkit-box-shadow var(--speed-focus) ease-out;
+  transition: opacity var(--speed-focus) ease-out, -webkit-box-shadow var(--speed-focus) ease-out;
+  transition: box-shadow var(--speed-focus) ease-out, opacity var(--speed-focus) ease-out;
+  transition: box-shadow var(--speed-focus) ease-out, opacity var(--speed-focus) ease-out, -webkit-box-shadow var(--speed-focus) ease-out; }
+  .el-cp-color-eyedropper button:focus-visible {
+    -webkit-box-shadow: 0 0 0 2px var(--color-key);
+            box-shadow: 0 0 0 2px var(--color-key); }
+  .el-cp-color-eyedropper button:active {
+    opacity: .5; }
+
+.el-cp-color-eyedropper svg {
+  display: block;
+  margin: 0 auto;
+  color: var(--color-fill); }

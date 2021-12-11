@@ -11,6 +11,15 @@
     
         > .control {
             padding: 0px;
+
+
+            &.has-eyedropper {
+                padding-left: 30px;
+        
+                .el-cp-color-control__left {
+                  top: 4px;
+                }
+            }            
     
             > .color, > .empty {
                 position: absolute;
