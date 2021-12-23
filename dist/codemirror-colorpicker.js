@@ -9527,9 +9527,98 @@ var VSCodePicker = function (_BaseColorPicker) {
     return VSCodePicker;
 }(BaseColorPicker);
 
+var source$9 = 'chromedevtool-control';
+
+var ColorControl$14 = function (_UIElement) {
+    inherits(ColorControl, _UIElement);
+
+    function ColorControl() {
+        classCallCheck(this, ColorControl);
+        return possibleConstructorReturn(this, (ColorControl.__proto__ || Object.getPrototypeOf(ColorControl)).apply(this, arguments));
+    }
+
+    createClass(ColorControl, [{
+        key: 'components',
+        value: function components() {
+            return { Hue: Hue, Opacity: Opacity, Eyedropper: Eyedropper };
+        }
+    }, {
+        key: 'template',
+        value: function template() {
+
+            var hasEyeDropper = enableEyeDropper ? 'has-eyedropper' : '';
+            var $eyedropper = !!enableEyeDropper ? '\n        <div class="el-cp-color-control__left">\n          <div target="Eyedropper"></div>\n        </div>\n      ' : '';
+
+            return '\n        <div class="control ' + hasEyeDropper + '">\n            <div>\n                ' + $eyedropper + '                                \n                <div class="color-info">\n                    <div ref="$controlPattern" class="empty"></div>\n                    <div ref="$controlColor" class="color"></div>        \n                </div>\n            </div>\n            <div target="Hue" ></div>\n            <div target="Opacity" ></div>\n\n        </div>\n        ';
+        }
+    }, {
+        key: 'setBackgroundColor',
+        value: function setBackgroundColor() {
+            this.refs.$controlColor.css("background-color", this.$store.dispatch('/toRGB'));
+        }
+    }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.setColorUI();
+            this.setBackgroundColor();
+        }
+    }, {
+        key: 'setColorUI',
+        value: function setColorUI() {
+            this.Hue.setColorUI();
+            this.Opacity.setColorUI();
+        }
+    }, {
+        key: '@changeColor',
+        value: function changeColor(sourceType) {
+            if (source$9 != sourceType) {
+                this.refresh();
+            }
+        }
+    }, {
+        key: '@initColor',
+        value: function initColor() {
+            this.refresh();
+        }
+    }]);
+    return ColorControl;
+}(UIElement);
+
+var BoxColorPicker = function (_BaseColorPicker) {
+    inherits(BoxColorPicker, _BaseColorPicker);
+
+    function BoxColorPicker() {
+        classCallCheck(this, BoxColorPicker);
+        return possibleConstructorReturn(this, (BoxColorPicker.__proto__ || Object.getPrototypeOf(BoxColorPicker)).apply(this, arguments));
+    }
+
+    createClass(BoxColorPicker, [{
+        key: 'template',
+        value: function template() {
+            return (/*html*/'\n            <div class=\'colorpicker-body\'>\n                <div target="palette"></div> \n                <div>\n                    <div target="control"></div>\n                    <div target="information"></div>\n                    <div target="currentColorSets"></div>\n                    <div target="colorSetsChooser"></div>\n                    <div target="contextMenu"></div>\n                </div>\n            </div>\n        '
+            );
+        }
+    }, {
+        key: 'components',
+        value: function components() {
+            return {
+                palette: ColorPalette,
+                control: ColorControl$14,
+                information: ColorInformation,
+                currentColorSets: CurrentColorSets,
+                colorSetsChooser: ColorSetsChooser,
+                contextMenu: CurrentColorSetsContextMenu
+            };
+        }
+    }]);
+    return BoxColorPicker;
+}(BaseColorPicker);
+
 var ColorPicker = {
     create: function create(opts) {
         switch (opts.type) {
+            case 'box':
+                return new BoxColorPicker(opts);
             case 'macos':
                 return new MacOSColorPicker(opts);
             case 'xd':

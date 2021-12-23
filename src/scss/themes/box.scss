@@ -1,0 +1,143 @@
+&.box {
+    width: 420px;
+    border-radius: 10px;
+    .colorpicker-body {
+        display: grid;
+        padding: 10px 20px 10px 10px;
+        grid-template-columns: 200px 1fr;
+        column-gap: 10px;
+        grid-template-rows: auto;
+
+        > .color {
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    }
+
+    .control {
+        padding: 0px !important;
+
+        > * {
+            vertical-align: middle;
+        }
+
+        .color-info {
+            position: relative;
+            height: 30px;
+            width: 30px;
+            display: inline-block;
+
+            > .color, > .empty {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                box-sizing: border-box;
+            }
+        
+            > .color {
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+  
+        }
+
+        > .color, > .empty {
+            top: 4px;
+        }
+
+        &.has-eyedropper {
+            padding-left: 30px;
+    
+            .el-cp-color-control__left {
+              display: inline-block;
+              width: 30px;
+              height: 30px;
+              position: relative;
+              top: auto;
+              left: auto;
+            }
+        }
+
+        .hue, .opacity {
+            padding-left: 0px !important;
+            margin-left: 0px !important; 
+            padding-right: 0px !important;
+        }
+    
+    }
+
+
+    .value {
+        position: relative;
+        // padding: 6px 16px;
+        // margin: 0px 0px 0px 42px;
+        box-sizing: border-box;
+        cursor: pointer;
+
+        > .value-container {
+            position: relative;
+            width: 100%;
+            height: 10px;
+            border-radius: 3px;
+            background-image: linear-gradient(to right, #000000 0%, rgba(255, 255, 255, 0) 100%);    
+            box-sizing: border-box;
+            
+            .drag-bar {
+                position: absolute;
+                cursor: pointer;
+                top: 50%;
+                left: 0px;
+                transform: translateX(-50%) translateY(-50%);
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }  
+              
+        }
+    }
+
+    .information {
+        margin-top: 6px;
+        .information-change {
+            display: none;
+        }
+
+        > .information-item {
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+    }
+
+    .colorsets {
+        border: 0px;
+        position: relative;
+
+        .color-list {
+            padding: 0px !important;
+            margin-right: 0px !important; 
+
+            .current-color-sets {
+                .color-item {
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 4px !important; 
+                    margin-bottom: 4px !important; 
+                }
+            }
+        }
+
+        .menu {
+            float: none;
+            position: absolute;
+            right: -20px;
+            top: -15px;
+        }
+    }
+
+    .color-chooser .color-chooser-container {
+        top: 0px;
+        left: 200px;
+    }
+
+} 

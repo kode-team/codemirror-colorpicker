@@ -5,10 +5,13 @@ import MiniVerticalColorPicker from './mini-vertical/index'
 import RingColorPicker from './ring/index'
 import XDColorPicker from './xd/index'
 import VSCodePicker from './vscode/index'
+import BoxColorPicker from './box/index'
 
 export default {
     create (opts) {
         switch(opts.type) {
+        case 'box': 
+            return new BoxColorPicker(opts);            
         case 'macos': 
             return new MacOSColorPicker(opts);
         case 'xd': 
