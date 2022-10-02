@@ -1,7 +1,7 @@
 # Colorpicker With CodeMirror
 
 
-This project was created to implement a color picker. It implemented basic functions for color and implemented image filters.
+This project was created to implement a color picker for CodeMirror 5. It implemented basic functions for color and implemented image filters.
 
 https://colorpicker.easylogic.studio/
 
