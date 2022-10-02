@@ -1,10 +1,8 @@
-# Colorpicker With CodeMirror
+# Colorpicker for CodeMirror
 
-
-This project was created to implement a color picker for CodeMirror 5. It implemented basic functions for color and implemented image filters.
+This project was created to implement a color picker for CodeMirror 5. It implements basic functions for color and for image filters.
 
 https://colorpicker.easylogic.studio/
-
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -25,34 +23,36 @@ https://colorpicker.easylogic.studio/
 
 ## npm 
 
-```npm
+```bash
 npm install codemirror-colorpicker
 ```
 
 ## bower 
 
-```
+```bash
 bower install codemirror-colorpicker 
 ```   
    
-# How to use (for  browser) 
+# How to use (for browsers) 
 
-```
+```html
 <link rel="stylesheet" href="/codemirror-colorpicker/dist/codemirror-colorpicker.css/>
 <script src="/codemirror-colorpicker/dist/codemirror-colorpicker.min.js"></script>
 ```
 
-# How to use (for require, nodejs) 
+# How to use (for `require`, `nodejs`) 
 
 after npm install 
 
 ## script 
 
-```
+```javascript
 require( 'codemirror-colorpicker' );
+```
 
 or 
 
+```javascript
 // es6
 import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
 import 'codemirror-colorpicker' 
@@ -84,9 +84,9 @@ import 'codemirror-colorpicker'
 }
 ```
 
-## Support short cut (for popup color picker) 
+## Support short cuts (for color pickers in popup windows)
 
-It can open color picker on current cursor.
+This is how to open a color picker at the current cursor location.
 
 ```javascript
 {
@@ -102,9 +102,9 @@ It can open color picker on current cursor.
 }
 ```
 
-## Support custom color paletts (since v1.5)
+## Support custom color palettes (since v1.5)
 
-You can set custom color paletts (ex : material, ...).
+You can set custom color palettes (ex : material, ...)
 
 ```javascript
 {
@@ -119,11 +119,11 @@ You can set custom color paletts (ex : material, ...).
 }
 ```
 
-<img width="235px"   src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpicker.png" align="absmiddle" />
+<img width="235px" src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpicker.png" align="absmiddle" />
 
-<img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpaletts.png" align="absmiddle" />
+<img width="235px" src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/colorpaletts.png" align="absmiddle" />
 
-## Support color scale  for palette 
+## Support color scale for palette 
 
 ```javascript
 {
@@ -181,7 +181,7 @@ You can set custom color paletts (ex : material, ...).
 
 <img width="235px"  src="https://cdn.jsdelivr.net/gh/easylogic/codemirror-colorpicker/resources/image/palette-type.png" align="absmiddle" />
 
-# Developments 
+# Development
 
 ## local dev 
 
@@ -199,4 +199,4 @@ open localhost:10001
 npm run build 
 ```
 
-# License : MIT 
+# License: MIT 
